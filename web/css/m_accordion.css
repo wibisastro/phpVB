@@ -1,0 +1,31 @@
+.m_accordion {
+width:100%;
+border:1px solid #96afe4;
+border-top:none;
+margin-left: 8px;
+width: 95%;
+margin-top:25px;
+}
+
+.m_accordion * {
+margin: 0px; 
+padding: 0px; 
+outline: 0; 
+}
+
+.m_accordion-title {
+border-top: 1px solid #96afe4;
+background: #bed0f6;
+padding: 5px;
+z-index:998;
+cursor:pointer;
+margin:0;
+font-size:15px;
+color: black;
+font-family:Verdana,Arial,"Bitstream Vera Sans",sans-serif;
+}
+
+.m_accordion-content {
+padding:0px 5px 5px;
+font-size: 14px;
+}

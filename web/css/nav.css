@@ -1,0 +1,173 @@
+#navigation {
+background: #F8F7EF;
+height:45px;
+padding: 0.5em; 
+padding-left: 1em; 
+margin: 4px 0 1em 0; 
+border-left: 1px dashed #B2B2B2;
+border-top: 1px dashed #B2B2B2;
+border-bottom: 1px solid #B2B2B2;
+border-right: 1px solid #B2B2B2;
+font-weight: bold; 
+}
+
+#navigation a {
+text-decoration: none;
+font: 8pt georgia; 
+font-weight: normal; 
+}
+
+/*sidenav*/
+
+.menu ul{
+padding: 0;
+list-style-type: none;
+margin: 0 0 0 0px;
+}
+
+.menu li a{
+display: block;
+font: 13px "lucida grande" ,tahoma,verdana,arial,sans-serif;
+padding: 5px 4px 3px;
+text-decoration: none;
+background-color: white;
+border-bottom: 1px solid #fdd6a1;
+color: #a26614;
+}
+
+.menu li.current a {
+background-color: #3b5998;
+color: white;
+}
+
+html>body .menu a{ /*Non IE rule*/
+width: auto;
+}
+
+.menu a:hover{
+background-color: #dd9637;
+color: #ffffff;
+}
+
+.menucontent{
+margin-left: 169px; 
+border: 1px solid #C0C0C0;
+background: white;
+}
+
+
+/*Credits: Dynamic Drive CSS Library */
+/*URL: http://www.dynamicdrive.com/style/ */
+
+.basictab{
+padding: 4px 0;
+margin-left: -40;
+margin-bottom: 0;
+margin-top: 4px;
+font: bold 12px Tahoma;
+list-style-type: none;
+text-align: left; /*set to left, center, or right to align the menu as desired*/
+}
+
+.basictab li{
+display: inline;
+margin: 0;
+}
+
+.basictab li a{
+text-decoration: none;
+padding: 4px 7px;
+border: 1px solid silver;
+border-bottom: none;
+background-color: #F8DE56;
+color: #033164;
+}
+
+.basictab li a:hover{
+background-color: #033164;
+color: #ffffff;
+cursor: hand;
+border-bottom: 1px solid silver;
+}
+
+.basictab li a:active{
+color: black;
+}
+
+.basictab li.selected a{ /*selected tab effect*/
+position: relative;
+top: 1px;
+padding-top: 5px;
+background-color: white;
+color: black;
+}
+
+.basictab li.selected a:hover{ 
+background-color: #d8dfea;
+color: black;
+border-bottom: none;
+}
+
+.basictab li.selected a:visited{ 
+color: black;
+border-bottom: none;
+}
+
+
+#tabcontainer{
+padding-left: 10px;
+padding-right: 10px;
+padding-bottom: 20px;
+padding-top: 20px; 
+border-top: 1px solid silver;
+background: white;
+margin-bottom: 20px; 
+margin-top: 0px;
+border-bottom: 1px solid silver;
+}
+
+/*Credits: Dynamic Drive CSS Library */
+/*URL: http://www.dynamicdrive.com/style/ */
+
+#topmenu ul{
+padding:0;
+margin-top:-50px;
+width: 80%;
+height: 50px;
+border: solid 0px;
+}
+
+#topmenu li{
+display: inline;
+}
+
+#topmenu li a{
+float: right;
+color: grey;
+padding: 10px 15px;
+text-decoration: none;
+font: 8pt tahoma;
+margin-top:1px;
+}
+
+#topmenu li.company{
+float: left;
+color: silver;
+padding: 5px 12px;
+text-decoration: none;
+font: 8pt Verdana; 
+}
+
+#topmenu li a:hover{
+color: #a2a2a2;
+}
+
+.closebox {
+margin:5px;
+padding:0px;
+position:absolute;
+top:0;
+right:0;
+font-family: verdana;
+font-size: 12px;
+}
