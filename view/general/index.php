@@ -1,3 +1,9 @@
-<div style="margin-bottom:10px">
-
-</div>
+<pre>
+<?include("README.txt");?>
+</pre>
+<pre>
+<?include("INSTALL.txt");?>
+</pre>
+<pre>
+<?include("MANIFEST.txt");?>
+</pre>

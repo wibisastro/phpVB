@@ -1,0 +1,8 @@
+#content-wrapper {
+  margin:0;
+  padding:0;
+}
+
+.theme-whbl #content-wrapper {
+  border:none;
+}

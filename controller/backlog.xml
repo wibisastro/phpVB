@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<backlog>
+    <title>Product Backlog</title>
+	<sprint>
+        <icon>fa fa-smile-o</icon>
+        <icontype>event-icon-gray</icontype>
+        <version>x.x.x</version>
+        <side>on-right</side>
+        <person>Wibi</person>
+        <date></date>
+        <caption>User Story</caption>
+        <story><![CDATA[
+As a programmer i have to be able to a build a form field based on xml file so that form design can be more flexible
+        ]]></story>
+	</sprint>
+	<sprint>
+        <icon>fa fa-smile-o</icon>
+        <icontype>event-icon-gray</icontype>
+        <version>x.x.x</version>
+        <side>on-right</side>
+        <person>Wibi</person>
+        <date></date>
+        <caption>User Story</caption>
+        <story><![CDATA[
+As a programmer i have to be able to define the navigation menu by using xml file so that it make the menu changes simpler just by changing the xml file
+        ]]></story>
+	</sprint>
+	<sprint>
+        <icon>fa fa-check</icon>
+        <icontype>event-icon-success</icontype>
+        <version>3.0.0</version>
+        <side>on-right</side>
+        <person>Wibi</person>
+        <date>05-05-2015</date>
+        <caption>Bootstrap Template</caption>
+        <story><![CDATA[
+
+<ul>
+	<li>Adopting Bootstrap Template: <a href="http://cube.adbee.technology" target="_blank">cube.adbee.technology</a></li>
+	<li>Facebook Page: <a href="https://www.facebook.com/pages/phpFramewerk/992809507396779" target="_blank">phpFramewerk</a></li>
+	<li>Product Backlog
+</ul>
+        ]]></story>
+	</sprint>
+	<sprint>
+        <icon>fa fa-check</icon>
+        <icontype>event-icon-success</icontype>
+        <version>2.0.0</version>
+        <side>on-right</side>
+        <person>Wibi</person>
+        <date>15-04-2014</date>
+        <caption>New CSS Design</caption>
+        <story><![CDATA[
+
+<ul>
+	<li>Post Example</li>
+	<li>Get Example</li>
+	<li>GitHub Repo: <a href="https://github.com/wibisastro/phpFramewerk" target="_blank">github.com/wibisastro/phpFramewerk</a></li>
+</ul>
+        ]]></story>
+	</sprint>
+	<sprint>
+        <icon>fa fa-check</icon>
+        <icontype>event-icon-success</icontype>
+        <version>1.0.0</version>
+        <side>on-right</side>
+        <person>Wibi</person>
+        <date>13-07-2007</date>
+        <caption>Initial Release</caption>
+        <story><![CDATA[
+
+<ul>
+	<li>Valid XHTML 1.0</li>
+	<li>Valid CSS 2</li>
+	<li>MVC approach</li>
+	<li>register_globals = off ready</li>
+	<li>Layout by CSS</li>
+	<li>Basic HTML Class</li>
+	<li>Error message system</li>
+</ul>
+        ]]></story>
+	</sprint>
+</backlog>

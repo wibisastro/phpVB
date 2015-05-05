@@ -1,4 +1,4 @@
-<?echo $frm->form("post.php",$hidden);?>
-Name: <?echo $frm->textbox("text","name","20","16");?>
-<?echo $frm->button("Submit");?>
+<form action="<?echo $_SERVER['SCRIPT_NAME'];?>" method="post">
+Name: <input name="name" type="text" />
+<input type="submit" name="cmd" value="Submit">
 </form>

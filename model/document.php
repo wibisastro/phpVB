@@ -1,6 +1,5 @@
 <?
 /********************************************************************
-*	Date		: Sunday, November 22, 2009
 *	Author		: Wibisono Sastrodiwiryo
 *	Email		: wibi@alumni.ui.ac.id
 *	Copyleft	: eGov Lab UI 
@@ -13,17 +12,20 @@
 # ---- ver 2.5, 22-Nov-09, tambah buildcolumn
 # ---- ver 2.6, 28-Jul-11, tambah parse_request
 # ---- ver 2.7, 21-Sep-11, perbaikan error_message
-# ---- ver 3.0, 15 April 2014, downgrade untuk publikasi kpu
+# ---- ver 3.0, 15-Apr-14, downgrade untuk publikasi kpu
+# ---- ver 3.1, 16-Jan-15, tambahkan fungsi readxml
+# ---- ver 3.2, 22-Jan-15, tambahkan fungsi navpath
+# ---- ver 4.1, 24-Mar-15, modifikasi fungsi sitemap
+# ---- ver 4.2, 25-Mar-15, modifikasi fungsi error_message
+# ---- ver 4.3, 25-Mar-15, modifikasi fungsi txt
+# ---- ver 4.4, 22-Apr-15, tambahkan fungsi readtable
 */
 
-class document extends api {
+class document {
 	function document() {
 		global $PHP_SELF,$ses;
-		$this->bodytype="left";
-		$this->forbiden="This script is not for direct execution";
-//		$this->leftside("general/sidenav.php");
-		if ($ses->cookies["item_perpage"]) {$this->item_perpage=$ses->cookies["item_perpage"];}
-		else {$this->item_perpage=12;}
+//		if ($ses->cookies["item_perpage"]) {$this->item_perpage=$ses->cookies["item_perpage"];}
+//		else {$this->item_perpage=12;}
 		$this->curdate = date("l")." ".date("j")." ".date("M")." ".date("y").", ".date("H:i");
 		$this->querystring(getenv("QUERY_STRING"));
 	}
@@ -37,22 +39,18 @@ class document extends api {
 		return "<a href=\"$link\"$class $java$title$target$id>$text</a>";
 	}
 
-	function txt ($key,$style="") {
-		#---24-Dec-06, 15:0 -> tambah paramater $class
-		#---25-Dec-06, 14:15 -> perbaiki fungsi 
-		#---15 April 2014 -> downgrade gak kepake dulu
-		global $tbl_text;
-		list($db_server_id,$db_name)=$this->connect_db();
-		if ((INT)$key) {$where="WHERE text_id=$key";}
-		else {$where="WHERE name='$key'";}
-		$query ="SELECT text,text_id,type FROM $tbl_text $where";
-		$buffer=$this->read_db($db_name, $query,$db_server_id) or die("text:".mysql_error());
-		$result=mysql_fetch_object($buffer);
-		if ($result->text) {
-			if ($style) {$result="<span class=$style>$result->text</span>";}
-			elseif ($result->type != "button" && $result->type != "label") {$result="<span class=\"$result->type\">$result->text</span>";}
-			else {$result=$result->text;}
-		} else {$result="<sub>notexist:</sub> $key";}
+	function txt ($name,$style="") {
+        $xml=$this->readxml("text");
+        foreach ($xml->text as $text) {
+            if ($text->name == $name) {
+                if ($style) {
+                    $result="<span class=$style>$text->text</span>";
+                } elseif ($text->type != "button" && $text->type != "label") {
+                    $result="<span class=\"$text->type\">$text->text</span>";
+                } else {$result=$text->text;}
+                break;
+            } else {$result="NoText:$name";}
+        }
 	return $result;
 	}
 
@@ -108,52 +106,36 @@ class document extends api {
 	}
 
 	function error_message ($message="") {
-		global $ses;
-		if ($ses->error || $this->error) {
-			if ($ses->error && !$this->doctype) {
-				if ($ses->error=="NotLogin") {
-					if (!$this->pagetitle) {
-						$this->pagetitle="Please Login First...";
-					}
+		global $gov2;
+		if ($gov2->error || $this->error) {
+			if ($gov2->error) {
+				if ($gov2->error=="NotLogin") {
+                    unset($this->content);
+					$this->content("../controller/gov2view.php");
 				} else {
-					$this->error=$ses->error;
-					$this->error_message=sprintf(strip_tags($this->txt($ses->error)),$message);
+					$this->error=$gov2->error;
+					$this->error_message=sprintf(strip_tags($this->txt($gov2->error)),$message);
 					$this->pagetitle="Authentication Failed";
 				}
-				if ($ses->error!="NotAuthorized") {
-					$this->button=array("Login");
-				}
-			} elseif ($this->doctype=="public" && $ses->error!="NotLogin") {
-				if ($ses->error=="NotMember") {
-					unset($this->doctype);
-					$this->status="Please Connect";
-				}
-				$this->error=$ses->error;
-				$this->error_message=sprintf(strip_tags($this->txt($ses->error)),$message);
-			} elseif ($this->doctype=="activation" && !$this->error) {
-//				$this->rightside("general/login.php",1);
-			} elseif ($this->doctype=="public" && $ses->error=="NotLogin") {
-//				$this->rightside("general/login.php",1);
 			} else {
-				$this->pagetitle="Operation Failed";
-
+				$this->pagetitle="Invalid Execution";
 				$this->error_message=sprintf(strip_tags($this->txt($this->error)),$message);
 			}
 		}
 	}
 
 	function error_message_ajax ($div="") {
-		global $ses;
+		global $gov2;
 		if (!$div) {$div="tab_alert";}
 		$this->div_error=$div;
 		if ($ses->error || $this->error) {
 			if ($ses->error) {
 				$this->action=$this->subdomainurl."/login.php";
 				$this->button=array("Login");
-				$this->error=$ses->error;
+				$this->error=$gov2->error;
 				$this->error_message=$this->txt("Error$ses->error");
 			} else {
-				$this->error=$this->error;
+				$this->error=$gov2->error;
 				$this->error_message=$this->txt("Error$this->error");
 			}
 		}
@@ -171,18 +153,24 @@ class document extends api {
 		}
 	}
 
-	function sitemap ($parent) {
-		$parent+=0;
-		$index=$this->sitemap_thread($parent);
-		if (is_array($index)) {
-			$result.="<ul>\n";
-			while (list($key, $val) = each($index)) {
-				$result.="<li>$val";$c++;
-				if ($c < sizeof($index) + 1) {$result.=$this->sitemap($key);} else {break;}
-				$result.="</li>\n";
-			}
-			$result.="</ul>\n";
-		}
+	function sitemap($menus) {
+        $result="<ul>\n";
+        foreach ($menus->menu as $menuitem) {
+            if (!$menuitem->type) {
+                $result.="<li>$menuitem->caption</li>\n";
+            } elseif ($menuitem->type=="dropdown") {
+                $result.="<li>$menuitem->caption";
+                $result.=$this->sitemap($menuitem);
+                $result.="</li>\n";
+            } elseif ($menuitem->type=="submenu") {
+                foreach ($menuitem->menu as $menuitem) {
+                    $result.="<li>$menuitem->caption";
+                    $result.=$this->sitemap($menuitem);
+                    $result.="</li>\n";
+                }
+            }
+        }
+        $result.="</ul>\n";
 	return $result;
 	}
 
@@ -350,14 +338,73 @@ class document extends api {
 		global $PHP_SELF,$doc;
 		ksort($data);
 		$prefix=substr($prefix,0,-6);
-		$result="$prefix » ";
+		$result="$prefix >> ";
 		while (list($key,$val)=each($data)) {
 			$c++;
 			$result.=$doc->lnk("$PHP_SELF?cmd=$val[cmd]&$val[qs]",$val["caption"]);
-			if ($c < sizeof($data)) {$result.=" » ";}
+			if ($c < sizeof($data)) {$result.=" >> ";}
 		}
 		$result.="</div>";
 	return $result;
 	}	
+    
+    function readxml($filename) {
+        if (file_exists(xmlpath."/".$filename.".xml")) {
+            $result=simplexml_load_file(xmlpath."/".$filename.".xml");
+            return $result;
+        } else {
+            return "Failed";
+        }    
+    } 
+    
+    function navpath($data,$menu_id) {
+        static $c; global $navpath;
+        $c+=0;
+        foreach ($data->children() as $child) {
+            if ((INT)$child->menu_id == (INT)$menu_id) {
+                $c++;
+                $navpath[$c][caption]=$child->caption;
+                $navpath[$c][url]=$child->url;
+            } elseif($child->menu) {
+                $b=$c;
+                $this->navpath($child,$menu_id);
+                if ($c>$b) {
+                    $c++;
+                    $navpath[$c][caption]=$child->caption;
+                    $navpath[$c][url]=$child->url;
+                    break;
+                }
+            }
+        }
+        if (is_array($navpath)) {arsort($navpath);}
+    }
+    
+  function trim_text($input, $length, $ellipses = true, $strip_html = true) {
+    //strip tags, if desired
+    if ($strip_html) {$input = strip_tags($input);}  
+    //no need to trim, already shorter than trim length
+    if (strlen($input) <= $length) {return $input;}  
+    //find last space within length
+    $last_space = strrpos(substr($input, 0, $length), ' ');
+    $trimmed_text = substr($input, 0, $last_space);  
+    //add ellipses (...)
+    if ($ellipses) {
+        $trimmed_text .= '...';
+    }  
+    return $trimmed_text;
+  }
+    
+    function readtable($table) {
+        list($db_link_id,$db_name)=$this->connect_db();
+		$table=str_replace("'","",$table);
+		$query="SHOW CREATE TABLE $table";
+        mysql_select_db($db_name, $db_link_id);
+        $result = mysql_query($query, $db_link_id);
+        if (!$result) {return mysql_error();}
+        else {
+            $result=mysql_fetch_object($result);
+            return $result->{"Create Table"};
+        }
+    }
 }
 ?>
