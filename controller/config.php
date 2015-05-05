@@ -9,7 +9,7 @@
 #---------------------------------------admin configuration
 #-----change this to your local installation folder
 	define("site","http://localhost");	
-	define("dirpath",$_SERVER["DOCUMENT_ROOT"]."/framew0.0.2");
+	define("dirpath",str_replace("/controller","",$_SERVER["DOCUMENT_ROOT"]));
     
 #---------------------------------------path configuration
 #-----mostly do not need to change this
@@ -17,13 +17,13 @@
 	define("cnfpath",dirpath."/conf");
 	define("modpath",dirpath."/model");
 	define("viwpath",dirpath."/view");
-	define("ctrpath",dirpath."/web");
+	define("ctrpath",dirpath."/controller");
 	define("imgpath",ctrpath."/images");
 
 #---------------------------------------url configuration
 #-----change this only if you know what you're doing
 	define("siturl",$_SERVER["HOST"]);
-	define("imgurl",siturl."web/images");
+	define("imgurl",siturl."/images");
 
 #---------------------------------------database configuration
 #-----do not change this
