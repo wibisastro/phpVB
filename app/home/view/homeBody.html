@@ -1,0 +1,33 @@
+{% extends "baseLayout.html" %}
+
+{% block head %}
+	{{ parent() }}
+	{% include('baseHead.html') %}
+{% endblock %}
+
+{% block header %}
+	{% include('baseHeader.html') %}
+{% endblock %}
+
+{% block sideNav %}
+	{% include('baseSideNav.html') %}
+{% endblock %}
+
+{% block titleBar %}
+	{% include('baseTitleBar.html') %}
+{% endblock %}
+	
+{% block content %}
+    {% for item in contents %}
+       {% include(item) %}
+	{% endfor %}
+{% endblock %}
+	
+{% block footer %}
+	{% include('baseFooter.html') %}
+{% endblock %}
+
+{% block js %}
+	{{ parent() }}
+	{% include('baseJS.html') %}
+{% endblock %}

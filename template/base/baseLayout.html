@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% block head %} {% endblock %}
+</head>
+<body class="theme-turquoise fixed-footer fixed-header">
+	<div id="theme-wrapper">
+		<header class="navbar" id="header-navbar">
+			<div class="container">
+				{% block header %} {% endblock %}
+			</div>
+		</header>
+		
+		<div id="page-wrapper" class="container">
+			<div class="row">
+				
+				<div id="nav-col">
+				  <section id="col-left" class="col-left-nano">
+				    <div id="col-left-inner" class="col-left-nano-content">
+						<div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav">
+							{% block sideNav %} {% endblock %}
+						</div>
+				    </div>
+				  </section>
+				  <div id="nav-col-submenu"></div>
+				</div>
+				
+				<div id="content-wrapper">
+            		<div class="row">
+						<div class="col-lg-12">
+							{% block titleBar %} {% endblock %}	
+							{% block content %} {% endblock %}
+						</div>
+	            	</div>
+				</div>
+				
+	  		</div>
+		</div>
+	</div>
+	
+	<footer id="footer-bar" class="row">
+	    <div id="footer-copyright" class="col-xs-12">
+		{% block footer %} {% endblock %}
+		</div>
+	</footer>
+	
+	{% block js %} {% endblock %}
+</body>
+</html>

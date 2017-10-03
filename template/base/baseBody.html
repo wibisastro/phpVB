@@ -1,0 +1,15 @@
+
+{% extends "baseLayout.html" %}
+
+{% block head %}
+    {{ parent() }}
+    <style type="text/css">
+        .important { color: #336699; }
+    </style>
+{% endblock %}
+{% block content %}
+    {% for item in contents %}
+       {% include(item) %}
+	{% endfor %}
+{% endblock %}
+	

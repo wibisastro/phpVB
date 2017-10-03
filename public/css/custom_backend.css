@@ -1,0 +1,65 @@
+#content-wrapper {
+  margin:0;
+  padding:0;
+}
+
+.theme-whbl #content-wrapper {
+  border:none;
+}
+
+.modal-dialog{
+  margin: 55px auto;
+}
+
+.modal-header{
+  background-color:#242424;
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-top-right-radius: 5px;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-topright: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.modal-header h4{
+  color:#f2be35;
+  font-weight:bold;
+}
+
+.sidebar-status {
+  padding: 0px;
+}
+
+/*----tambahan dari hafidz----*/
+
+.timeline .event-icon.event-icon-gray {
+    background-color: silver;
+    border-color: #ddd;
+    color: #fff;
+}
+
+.timeline .event-icon.event-icon-testing {
+    background-color: #f2be35;
+    border-color: #ffcf46;
+    color: #fff;
+}
+
+#header-navbar .nav > li > a {
+    background-color: #3c85c9;
+}
+
+.header-bg {
+    background: #3c85c9 none repeat scroll 0 0;
+    height: 50px;
+    position: absolute;
+    width: 100%;
+    z-index: 1;
+}
+
+.form-horizontal .form-group{
+  margin-right: 0px;
+  margin-left: 0px;
+}
+.form-group .control-label{
+  text-align:left;
+}

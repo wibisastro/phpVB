@@ -1,0 +1,77 @@
+.main-box .icon i{
+  display: unset;
+  float: none;
+  margin: auto;
+}
+
+.connect{
+  font-size:20px;
+  line-height:120px;
+}
+
+.connect i{
+  color: #3c85c9;
+}
+
+.modal-screenshot{
+  text-align: center;
+}
+
+.modal-header {
+  background: #3c85c9 none repeat scroll 0 0;
+  color: #fff;
+}
+
+.modal-title{
+  font-weight: bold;
+}
+
+.saas-frame {
+position: relative;
+bottom: 0;
+left: 0;
+right: 0;
+}
+    
+.saas-loading {
+position: absolute;
+top: 100px;
+margin-left: auto;
+margin-right: auto;
+width:90%;
+text-align: center; 
+}
+
+.saas-loading h2 {
+color: grey;
+padding-top: 14px;
+font-size: 2em;
+}
+
+.btn_panel {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: normal;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.428571429;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.form-horizontal .form-group{
+  margin-right: 0px;
+  margin-left: 0px;
+}
+.form-group .control-label{
+  text-align:left;
+}
