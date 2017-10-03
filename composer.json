@@ -1,0 +1,21 @@
+{
+    "name": "phpFramewerk",
+    "description": "Simple framework for Gov 2.0",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Wibisono Sastrodiwiryo",
+            "email": "wibi@alumni.ui.ac.id"
+        }
+    ],
+    "require": {
+        "twig/twig": "~1.34",
+        "nikic/fast-route": "^1.2"
+    },
+	"autoload": {
+		"psr-4": {
+			"Gov2lib\\":"lib",
+			"Home\\":"app/home"
+		}
+	}
+}
