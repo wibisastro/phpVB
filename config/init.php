@@ -29,29 +29,7 @@ $frm = new Gov2lib\helper\formage;
 
 //--------routing
 
-$dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-    $r->addRoute('GET', '/', 'Home');
-    $r->addRoute('GET', '/index.php', 'Home');
-    $r->addRoute('GET', '/framework', 'Framework');
-    $r->addRoute('GET', '/platform', 'Platform');
-    $r->addRoute('GET', '/website', 'Website');
-    // {id} must be a number (\d+)
-    $r->addRoute('GET', '/user/{id:\d+}', 'get_user_handler');
-    // The /{title} suffix is optional
-    $r->addRoute('GET', '/articles/{id:\d+}[/{title}]', 'get_article_handler');
-});
-
-// Fetch method and URI from somewhere
-$httpMethod = $_SERVER['REQUEST_METHOD'];
-$uri = $_SERVER['REQUEST_URI'];
-
-// Strip query string (?foo=bar) and decode URI
-if (false !== $pos = strpos($uri, '?')) {
-    $uri = substr($uri, 0, $pos);
-}
-$uri = rawurldecode($uri);
-
-$routeInfo = $dispatcher->dispatch($httpMethod, $uri);
+include("route.php");
 
 switch ($routeInfo[0]) {
     case FastRoute\Dispatcher::NOT_FOUND:
@@ -75,7 +53,4 @@ $escaper = new Twig_Extension_Escaper('html');
 //$twig = new Twig_Environment($loader, array('cache'=> __DIR__.'/../template/cache')); //---- for prod env
 $twig = new Twig_Environment($loader, array('auto_reload'=> true)); //---- for dev env
 $twig->addExtension($escaper);
-
-if (!$_SESSION['active_client'] || ($_SESSION['active_client'] && basename($_SERVER['SCRIPT_NAME'])=='cloud.php')) {$fullpage=true;}
-
 $template = $twig->load($found->baseName.'Body.html');
