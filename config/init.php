@@ -7,21 +7,18 @@
 *	Copyleft	: eGov Lab UI 
 *********************************************************************/
 
-//--------error_reporting (E_ALL & ~E_NOTICE & ~E_WARNING); 
-#--instalation helper, must be shut off upon success
-error_reporting(E_ALL & ~E_NOTICE);
-ini_set("display_errors", 1);
+session_start();
 
-//--------constant
+//--------load configuration
 
-define("CSS_URL","/css");
-define("JS_URL","/js");
+include(__DIR__.'/config.php');
 
-//--------autoloading
+//--------load classes
 
 require_once __DIR__."/../vendor/autoload.php";
 
 $api = new Gov2lib\api\api;
+$dsn = new Gov2lib\env\dbConnect;
 $doc = new Gov2lib\env\document;
 $ses = new Gov2lib\env\session;
 $exc = new Gov2lib\env\customException;
@@ -34,23 +31,32 @@ include("route.php");
 switch ($routeInfo[0]) {
     case FastRoute\Dispatcher::NOT_FOUND:
         throw new Exception(NOT_FOUND);
-        break;
+    break;
     case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
         $allowedMethods = $routeInfo[1];
         throw new Exception('Method '.METHOD_NOT_ALLOWED.' is not Alowed');
-        break;
+    break;
     case FastRoute\Dispatcher::FOUND:
         $handler = $routeInfo[1]."\model\index";
         $vars = $routeInfo[2];
-		$found = new $handler;
-        break;
+		$page = new $handler;
+		/*
+		if (is_array($_GET)) {
+			while (list($key,$val)=each($_GET)) {
+			    $val=strip_tags($val);
+			    if (preg_match('/[^a-zA-Z0-9_.]/', $val)) {throw new Exception('IlegalQueryString');} 
+			    else {$_GET[$key]=$val;}
+			}
+		}
+		*/
+    break;
 }
 
 //--------templating
 
-$loader = new Twig_Loader_Filesystem(array(__DIR__.'/../template/base',$found->templateDir));
+$loader = new Twig_Loader_Filesystem(array(__DIR__.'/../template/base',$page->templateDir));
 $escaper = new Twig_Extension_Escaper('html');
 //$twig = new Twig_Environment($loader, array('cache'=> __DIR__.'/../template/cache')); //---- for prod env
 $twig = new Twig_Environment($loader, array('auto_reload'=> true)); //---- for dev env
 $twig->addExtension($escaper);
-$template = $twig->load($found->baseName.'Body.html');
+$template = $twig->load($page->baseName.'Body.html');

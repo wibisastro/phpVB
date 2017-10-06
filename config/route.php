@@ -26,11 +26,11 @@ try {
 			$uri = rawurldecode($uri);
 			$routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 		}  else {
-	        throw new exception('InvalidRouterConfigFile');
+	        throw new Exception('InvalidRouterConfigFile');
 		}
     } else {
-        throw new exception('NoRouterConfigFile');
+        throw new Exception('NoRouterConfigFile');
     }
-} catch (exception $e) {
-		echo $e->getMessage();
+} catch (Exception $e) {
+	echo $e->getMessage();
 }	

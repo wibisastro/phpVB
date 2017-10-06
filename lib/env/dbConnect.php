@@ -1,4 +1,4 @@
-<?php namespace Gov2lib\env
+<?php namespace Gov2lib\env;
 /*
 Author		: Wibisono Sastrodiwiryo
 Date		: 29 Sep 2017
@@ -8,83 +8,88 @@ Version		: 0.1.0 --- initial release
 			0.2.0 --- PSR 4
 */
 
-#---------------------------------------cybergl platform tables configuration
-	$tbl_online			= "online";
-	$tbl_session		= "session";
-	$tbl_text			= "text";
-	$tbl_unauth			= "unauthorized";
-#---------------------------------------database classes
-
 class dbConnect {
-	
-	function connect(Config $conf)
-	{
-	    $dsns =& $conf->searchPath(array('config', 'db'));
-	    if ($dsns === FALSE) throw new Example_Config_Exception(
-	        'Unable to find config/db section in configuration.'
-	    );
-	
-	    $dsns =& $dsns->toArray();
-	
-	    foreach($dsns as $dsn) {
-	        try {
-	            $this->connectDB($dsn);
-	            return;
-	        } catch (Example_Datasource_Exception $e) {
-	            // Some warning/logging code recording the failure
-	            // to connect to one of the databases
-	        }
-	    }
-	    throw new Example_Datasource_Exception(
-	        'Unable to connect to any of the configured databases'
-	    );
+	function __construct () {
+		$tables=__DIR__.'/../../config/dbTables.xml';
+		try {
+		    if (file_exists($tables)) {
+		        $list=simplexml_load_file($tables);
+				if (is_object($list)) {
+					foreach ($list->table as $table) {
+						$this->{'tbl_'.$table}=$table;
+					}
+				} else {
+			        throw new \Exception('InvalidTableConfigFile');
+				}
+		    } else {
+		        throw new \Exception('NoTableConfigFile');
+		    }
+		} catch (Exception $e) {
+			echo $e->getMessage();
+		}	
+	}
+  
+	function connectDB ($dsnName="master") {
+		static $_recentRandom;
+		$_dsns=__DIR__.'/../../config/dbSource.xml';
+		try {
+		    if (file_exists($_dsns)) {
+		        $list=simplexml_load_file($_dsns);
+				if (is_object($list)) {
+					foreach ($list->dsn as $dsn) {
+						if ($dsnName==$dsn->name) {
+							$_user=$dsn->user;
+			                $_pass=$dsn->pass;
+			                $_host=$dsn->host;
+			                $_db=$dsn->db;	
+						}
+					}
+					$_dbLink=mysqli_connect($_host, $_user, $_pass,$_db);
+					if ($_dbLink) {
+						$result=array($_dbLink,$_db,$_recentRandom);
+						return $result;
+					} else {
+						throw new \Exception('CannotConnectDSN '.$dsnName);
+					}
+				}  else {
+			        throw new \Exception('InvalidDSNConfigFile');
+				}
+		    } else {
+		        throw new \Exception('NoDSNConfigFile');
+		    }
+		} catch (Exception $e) {
+			echo $e->getMessage();
+		}	
 	}
 
-	function connect_db($db_server="") {
-		static $recent_random;
-		switch ($db_server) {
-			case "account":
-				$db["sys"]["user"]   = "root";
-				$db["sys"]["pass"]   = "";
-				$db["sys"]["host"]   = "localhost";
-				$db_name		 = "";
-				$db_link_id=mysql_pconnect($db["sys"]["host"], $db["sys"]["user"], $db["sys"]["pass"]) or die("Unable to connect to SQL server 'system'");	
-			break;
-			default:
-				$db["master"]["user"]	= "root";
-				$db["master"]["pass"]	= "";
-				$db["master"]["host"]	= "localhost";
-				$db_name			= "";
-				$db_link_id=mysql_pconnect($db["master"]["host"], $db["master"]["user"], $db[master]["pass"]) or die("Unable to connect to SQL 'master'");
+	function writeDB ($query,$fname,$table="",$dsnName="master") {
+		try {
+			list($_link_id,$db_name)=$this->connectDB($dsnName);
+			if ($_link_id) {
+				$this->readDB($db_name,$query,$_link_id);
+				if ($table) {
+					$result=mysqli_fetch_object($this->readDB($db_name, "SELECT LAST_INSERT_ID() AS id FROM $table",$_link_id));
+					return $result->id;
+				}
+			} else {
+				throw new \Exception('writeDBerror:'.mysqli_error($_link_id));
+			}
+		} catch (Exception $e) {
+			echo $e->getMessage();
 		}
-		$result=array($db_link_id,$db_name,$random);
-	return $result;
+		
+		
 	}
 
-	function write_db($query,$fname,$table="",$db="master") {
-		list($db_link_id,$db_name)=$this->connect_db($db);
-		$this->read_db($db_name,$query,$db_link_id) or die("$fname: ($db)".mysql_error());
-
-		if ($table) {
-			$result=mysql_result($this->read_db($db_name, "SELECT LAST_INSERT_ID() FROM $table", $db_link_id),0);
-			$query=str_replace("(null","($result",$query);
+	function readDB ($db_name, $query, $_link_id) {
+		try {
+			$result = mysqli_query($_link_id,$query);
+			if ($result) {return $result;}
+			else {throw new \Exception('readDBerror:'.mysqli_error($_link_id));}
+		} catch (Exception $e) {
+			echo $e->getMessage();
 		}
-	return $result;
 	}
-
-	function read_db($db_name, $query, $db_link_id) {
-       if (!mysql_select_db($db_name, $db_link_id)) {
-               echo 'Could not select database';
-               exit;
-       }
-       $result = mysql_query($query, $db_link_id);
-       if (!$result) {
-               echo "DB Error, could not query the database\n";
-               echo 'MySQL Error: ' . mysql_error();
-               exit;
-       }
-       return $result;
-    }
-
+	
 }
 ?>

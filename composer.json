@@ -15,7 +15,8 @@
 	"autoload": {
 		"psr-4": {
 			"Gov2lib\\":"lib",
-			"Home\\":"app/home"
+			"Home\\":"app/home",
+			"OPD\\":"app/opd"
 		}
 	}
 }
