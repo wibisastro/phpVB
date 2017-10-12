@@ -66,13 +66,13 @@ class dbConnect {
 		try {
 			list($_link_id,$db_name)=$this->connectDB($dsnName);
 			if ($_link_id) {
-				$this->readDB($db_name,$query,$_link_id);
-				if ($table) {
-					$result=mysqli_fetch_object($this->readDB($db_name, "SELECT LAST_INSERT_ID() AS id FROM $table",$_link_id));
+				$this->queryDB($db_name,$query,$_link_id);
+				if (strlen($table)>0) {
+					$result=mysqli_fetch_object($this->queryDB($db_name, "SELECT LAST_INSERT_ID() AS id FROM $table",$_link_id));
 					return $result->id;
 				}
 			} else {
-				throw new \Exception('writeDBerror:'.mysqli_error($_link_id));
+				throw new \Exception('DBLinkError:'.mysqli_error($_link_id));
 			}
 		} catch (Exception $e) {
 			echo $e->getMessage();
@@ -81,11 +81,11 @@ class dbConnect {
 		
 	}
 
-	function readDB ($db_name, $query, $_link_id) {
+	function queryDB ($db_name, $query, $_link_id) {
 		try {
 			$result = mysqli_query($_link_id,$query);
 			if ($result) {return $result;}
-			else {throw new \Exception('readDBerror:'.mysqli_error($_link_id));}
+			else {throw new \Exception('DBQueryError:'.mysqli_error($_link_id));}
 		} catch (Exception $e) {
 			echo $e->getMessage();
 		}

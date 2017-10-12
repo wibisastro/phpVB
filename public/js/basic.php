@@ -218,6 +218,7 @@
     function updateFootable() {
         var paramTable = $('.footable');
         paramTable.trigger('footable_redraw'); //Redraw the table
+        $('.footable-order').footable();
     }
 
     function magnific_gallery() {

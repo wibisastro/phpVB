@@ -1,0 +1,122 @@
+-- phpMyAdmin SQL Dump
+-- version 4.2.12deb2+deb8u2
+-- http://www.phpmyadmin.net
+--
+-- Host: localhost
+-- Generation Time: Mar 21, 2017 at 04:01 AM
+-- Server version: 5.5.54-0+deb8u1
+-- PHP Version: 5.6.29-0+deb8u1
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
+--
+-- Database: `bappeda_lutarakab`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `opd`
+--
+
+CREATE TABLE IF NOT EXISTS `opd` (
+`opd_id` smallint(5) unsigned NOT NULL,
+  `opd_uni_id` mediumint(7) unsigned NOT NULL,
+  `nama` char(255) NOT NULL,
+  `singkatan` char(16) NOT NULL,
+  `kode` char(16) NOT NULL,
+  `account_id` mediumint(7) unsigned NOT NULL,
+  `tanggal_masuk` datetime NOT NULL
+) ENGINE=MyISAM AUTO_INCREMENT=77 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `opd`
+--
+
+INSERT INTO `opd` (`opd_id`, `opd_uni_id`, `nama`, `singkatan`, `kode`, `account_id`, `tanggal_masuk`) VALUES
+(20, 0, 'DINAS PENDIDIKAN', 'PENDIDIKAN', '[harap isi kode]', 0, '0000-00-00 00:00:00'),
+(21, 0, 'BADAN PERENCANAAN PEMBANGUNAN DAERAH (BAPPEDA)', 'BAPPEDA', '[harap isi kode]', 0, '0000-00-00 00:00:00'),
+(22, 0, 'BADAN PENDAPATAN DAERAH', 'BAPENDA', '[harap isi kode]', 0, '0000-00-00 00:00:00'),
+(23, 0, 'DINAS TRANSMIGRASI DAN TENAGA KERJA', 'TRANSNAKER', '[harap isi kode]', 0, '2017-02-11 07:27:09'),
+(24, 0, 'DINAS PERIKANAN', 'D. PERIKANAN', '[harap isi kode]', 0, '2017-02-11 07:27:37'),
+(25, 0, 'DINAS KETAHANAN PANGAN', 'KETPANGAN', '[harap isi kode]', 0, '2017-02-11 07:27:56'),
+(26, 0, 'DINAS PETERNAKAN DAN KESEHATAN HEWAN', 'PETERNAKAN', '[harap isi kode]', 0, '2017-02-11 07:28:42'),
+(27, 0, 'DINAS TANAMAN PANGAN, HOLTIKULTURA DAN PERKEBUNAN', 'TPHP', '[harap isi kode]', 0, '2017-02-11 07:29:01'),
+(28, 0, 'INFORMASI DAN KOMUNIKASI', 'KOMINFO', '[harap isi kode]', 0, '2017-02-11 07:29:35'),
+(29, 0, 'DINAS PERHUBUNGAN,KOMUNIKASI DAN INFORMATIKA', 'D. KOMUNIKASI DA', '[harap isi kode]', 0, '2017-02-11 07:30:18'),
+(30, 0, 'DINAS PERPUSTAKAAN DAN KEARSIPAN DAERAH', 'PERPUSTAKAAN', '[harap isi kode]', 0, '2017-02-11 07:30:43'),
+(31, 0, 'BADAN PEMBERDAYAAN MASYARAKAT, PEMERINTAHAN DESA DAN KELURAHAN', '[harap isi singk', '[harap isi kode]', 0, '2017-02-11 07:31:21'),
+(32, 0, 'DINAS PEMBERDAYAAN MASYARAKAT DAN DESA', 'DPMD', '[harap isi kode]', 0, '2017-02-11 07:31:35'),
+(33, 0, 'BADAN KEPEGAWAIAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA', 'KEPEGAWAIAN', '[harap isi kode]', 0, '2017-02-11 07:31:49'),
+(34, 0, 'BADAN PENANGGULANGAN BENCANA DAERAH', 'BENCANA', '[harap isi kode]', 0, '2017-02-11 07:32:05'),
+(35, 0, 'INSPEKTORAT', 'INSPEKTORAT', '[harap isi kode]', 0, '2017-02-11 07:32:25'),
+(36, 0, 'BADAN PENGELOLA KEUANGAN DAN ASET DAERAH (BPKAD)', 'KEUANGAN', '[harap isi kode]', 0, '2017-02-11 07:32:39'),
+(37, 0, 'SEKRETARIAT DEWAN PERWAKILAN RAKYAT DAERAH', 'SEKWAN', '[harap isi kode]', 0, '2017-02-11 07:33:09'),
+(38, 0, 'SEKRETARIAT DAERAH', 'SETDA', '[harap isi kode]', 0, '2017-02-11 07:33:43'),
+(39, 0, 'DINAS SATUAN POLISI DAN PEMADAM KEBAKARAN', 'PAMONG', '[harap isi kode]', 0, '2017-02-11 07:34:00'),
+(40, 0, 'BADAN KESATUAN BANGSA DAN POLITIK', 'KESBANG', '[harap isi kode]', 0, '2017-02-11 07:34:14'),
+(41, 0, 'DINAS PEMUDA OLAHRAGA', 'D. PEMUDA OLGA', '[harap isi kode]', 0, '2017-02-11 07:34:31'),
+(42, 0, 'DINAS KEBUDAYAAN DAN PARIWISATA', 'KEBUDAYAAN', '[harap isi kode]', 0, '2017-02-11 07:34:44'),
+(43, 0, 'DINAS PENANAMAN MODAL DAN PELAYANAN TERPADU SATU PINTU', 'PM&PTSP', '[harap isi kode]', 0, '2017-02-11 07:35:09'),
+(44, 0, 'DINAS PERDAGANGAN, PERINDUSTRIAN, KOPERASI DAN USAHA KECIL MENENGAH', 'KOPERINDAG', '[harap isi kode]', 0, '2017-02-11 07:35:21'),
+(45, 0, 'DINAS SOSIAL', 'SOSIAL', '[harap isi kode]', 0, '2017-02-11 07:35:33'),
+(46, 0, 'DINAS SOSIAL,TENAGA KERJA DAN TRANSMIGRASI', 'TRANS DAN SOS', '[harap isi kode]', 0, '2017-02-11 07:35:53'),
+(47, 0, 'DINAS PENGENDALIAN PENDUDUK DAN KELUARGA BERENCANA', 'PP&KB', '[harap isi kode]', 0, '2017-02-11 07:36:08'),
+(48, 0, 'PEMBERDAYAAN PEREMPUAN DAN PERLINDUNGAN ANAK', 'PP&PA', '[harap isi kode]', 0, '2017-02-11 07:36:20'),
+(49, 0, 'BADAN KELUARGA BERENCANA DAN PEMBERDAYAAN PEREMPUAN', 'KB', '[harap isi kode]', 0, '2017-02-11 07:36:32'),
+(50, 0, 'DINAS KEPENDUDUKAN DAN CATATAN SIPIL', 'CAPIL', '[harap isi kode]', 0, '2017-02-11 07:36:45'),
+(51, 0, 'DINAS LINGKUNGAN HIDUP', 'DLH', '[harap isi kode]', 0, '2017-02-11 07:37:02'),
+(52, 0, 'DINAS PERHUBUNGAN', 'D. PERHUB', '[harap isi kode]', 0, '2017-02-11 07:37:16'),
+(53, 0, 'BADAN PENELITIAN DAN PENGEMBANGAN DAERAH', 'BALITBAGDA', '[harap isi kode]', 0, '2017-02-11 07:37:32'),
+(54, 0, 'DINAS PERUMAHAN RAKYAT, KAWASAN PERMUKIMAN DAN PERTANAHAN', 'PERUMTARKIM', '[harap isi kode]', 0, '2017-02-11 07:37:48'),
+(55, 0, 'DINAS PEKERJAAN UMUM', 'D. PU', '[harap isi kode]', 0, '2017-02-11 07:38:01'),
+(56, 0, 'RSUD ANDI DJEMMA MASAMBA', 'RSUD', '[harap isi kode]', 0, '2017-02-11 07:38:17'),
+(57, 0, 'DINAS KESEHATAN', 'DINAS KESEHATAN', '[harap isi kode]', 0, '2017-02-11 07:38:37'),
+(58, 0, 'KANTOR PELAYANAN PERIZINAN TERPADU', 'KPPT', '[harap isi kode]', 124, '2017-03-03 14:28:11'),
+(59, 0, 'BADAN KERJASAMA DAN PENANAMAN MODAL DAERAH', 'BKMD', '[harap isi kode]', 124, '2017-03-04 04:34:29'),
+(60, 0, 'BADAN KOORDINASI PENANAMAN MODAL', 'BKPM', '[harap isi kode]', 124, '2017-03-04 04:41:21'),
+(61, 0, 'MENTERI LHK', 'MENTERI LHK', '[harap isi kode]', 124, '2017-03-04 04:43:50'),
+(62, 0, 'BADAN PELAYANAN PERIZINAN PENANAMAN MODAL', 'BP3M', '[harap isi kode]', 124, '2017-03-04 04:47:41'),
+(64, 0, 'BADAN PELAYANAN PERIZINAN TERPADU SATU PINTU DAN PENANAMAN MODAL', 'BPPTSPM', '[harap isi kode]', 124, '2017-03-07 04:16:15'),
+(65, 0, 'BADAN KOORDINASI PENANAMAN MODAL DAERAH', 'BKPMD', '[harap isi kode]', 124, '2017-03-07 04:57:23'),
+(66, 0, 'BADAN KOORDINASI PENANAMAN MODAL DAERAH DAN PELAYANAN PERIZINAN TERPADU', 'BKPMD & P2T', '[harap isi kode]', 124, '0000-00-00 00:00:00'),
+(67, 0, 'BADAN KOORDINASI PENANAMAN MODAL DAN PELAYANAN TERPADU SATU PINTU', 'BPMPTSP', '[harap isi kode]', 124, '0000-00-00 00:00:00'),
+(68, 0, 'MENTERI KEHUTANAN', 'MENTERI KEHUTANA', '[harap isi kode]', 124, '0000-00-00 00:00:00'),
+(69, 0, 'BUPATI', 'BUPATI', '[harap isi kode]', 124, '0000-00-00 00:00:00'),
+(70, 0, '[Harap isi nama]', '[Harap isi opd]', '[harap isi kode]', 124, '0000-00-00 00:00:00'),
+(71, 0, 'DINAS PERTAMBANGAN DAN ENERGI', 'DISTAMBEN', '[harap isi kode]', 124, '0000-00-00 00:00:00'),
+(72, 0, 'BADAN KOORDINASI PENANAMAN MODAL DAERAH DAN PELAYANAN TERPADU SATU PINTU', 'BKPMDPTSP', '[harap isi kode]', 124, '0000-00-00 00:00:00'),
+(73, 0, 'DINAS KEHUTANAN', 'KEHUTANAN', '[harap isi kode]', 124, '0000-00-00 00:00:00'),
+(74, 0, 'DINAS PEKERJAAN UMUM PERTAMBANGAN DAN ENERGI', 'DPUPE', '[harap isi kode]', 124, '0000-00-00 00:00:00'),
+(75, 0, 'DIREKTORAT JENDERAL PERTAMBANGAN UMUM', 'DJPU', '[harap isi kode]', 124, '0000-00-00 00:00:00'),
+(76, 0, 'KANTOR PELAYANAN PERIZINAN TERPADU DAN PENANAMAN MODAL', 'KP2TPM', '[harap isi kode]', 124, '0000-00-00 00:00:00');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `opd`
+--
+ALTER TABLE `opd`
+ ADD PRIMARY KEY (`opd_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `opd`
+--
+ALTER TABLE `opd`
+MODIFY `opd_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=77;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

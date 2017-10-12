@@ -15,4 +15,19 @@
 		<uri>/opd</uri>
 		<handler>OPD</handler>
 	</route>
+	<route>
+		<method>GET</method>
+		<uri>/opd/{cmd}</uri>
+		<handler>OPD</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/opd/{cmd}/{no:\d+}/{opd_id:\d+}</uri>
+		<handler>OPD</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/opd</uri>
+		<handler>OPD</handler>
+	</route>
 </list>

@@ -1,0 +1,29 @@
+  <td>{{ no }}</td>
+  <td>{{ item.nama }} </td>
+  <td>{{ item.singkatan }}</td>
+  <td>{{ item.kode }}</td>
+  <td>{{ item.tanggal_masuk }}</td>
+	 {% if _SESSION.activeClient==0 %}
+  <td class="text-center">
+      <a href="{{ pageID }}/edit/{{ no }}/{{ item.opd_id }}" class="table-link" target="iframer">
+        <span class="fa-stack">
+          <i class="fa fa-square fa-stack-2x"></i>
+          <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
+        </span>
+      </a>
+      <a href="#remove{{ pageID }}" data-toggle="modal" data-{{ pageID }}_id="{{ item.opd_id }}" data-item="{{ item.nama }}" class="table-link danger">
+        <span class="fa-stack">
+          <i class="fa fa-square fa-stack-2x"></i>
+          <i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>
+        </span>
+      </a>
+      <a class="row-delete" href="#" id="del_{{ pageID }}_{{ item.opd_id }}"></a>
+  </td>
+  {% else %}
+  <td>
+      <a href="javascript:void(0)" class="table-link primary" onclick="share_to_panel('');">
+          <i class="fa fa-share-square-o"></i>
+      </a>
+  </td>
+  {% endif %}
+

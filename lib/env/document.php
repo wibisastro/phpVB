@@ -19,22 +19,22 @@
 
 class document {
 	function __construct () {
-		global $ses;
 		$this->body=array();
 		$this->body['_SESSION']=$_SESSION;
 		$this->body['_SERVER']=$_SERVER;
-//		$this->leftside("general/sidenav.php");
-/*
-		if ($ses->cookies["item_perpage"]) {$this->item_perpage=$ses->cookies["item_perpage"];}
-		else {$this->item_perpage=12;}
-		$this->querystring(getenv("QUERY_STRING"));
-		*/
+		$this->body['debug']=$_GET['debug'];
+	}
+
+	function content($val) {
+		$index=sizeof($this->content);
+		$index++;
+		$this->content[$index]=$val;
 	}
 	
 	function body ($var,$val) {
 		$this->body[$var]=$val;
 	} 
-
+/*
 	function lnk ($link, $text="", $class="", $java="",$title="",$target="",$id="") {
 		if ($class) {$class=" class=\"$class\"";}
 		if (!$text) {$text=$link;}
@@ -97,21 +97,10 @@ class document {
 		else {$this->rightside[$index]=$val;}
 	}
 
-	function content($val) {
-		$index=sizeof($this->content);
-		$index++;
-		if (file_exists(viwpath."/$val")) {$this->content[$index]=viwpath."/$val";}
-		else {$this->content[$index]=$val;}
-	}
-
 	function tab($val) {
 		$index=sizeof($this->tab);
 		$index++;
 		$this->tab[$index]=viwpath."/$val";
-	}
-
-	function strip_java($data) {
-		return eregi_replace("<[ \n\r]*script[^>]*>.*<[ \n\r]*/script[^>]*>","",$data);
 	}
 
 	function error_message ($message="") {
@@ -366,5 +355,6 @@ class document {
 		$result.="</div>";
 	return $result;
 	}	
+	*/
 }
 ?>
