@@ -1,0 +1,8 @@
+<nav class="breadcrumb has-arrow-separator" aria-label="breadcrumbs">
+  <ul>
+      <breadcrumb url="/" caption="Home" is-active=""></breadcrumb>
+      {% for item in breadcrumb %}
+        <breadcrumb url="{% if item.url %}{{ item.url }}{% else %}#{% endif %}" caption="{{ item.caption }}" is-active="{% if item.url == '/' ~ pageID %}true{% endif %}"></breadcrumb>
+      {% endfor %}
+  </ul>
+</nav>

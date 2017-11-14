@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainmenu>
+	<menu>
+		<caption>Menu Admin</caption>
+		<menu>
+	        <icon>fa-folder</icon>
+			<caption>Home</caption>
+			<url>/</url>
+		</menu>
+		<menu>
+	        <icon>fa-user</icon>
+			<caption>phpVB</caption>
+			<url>/phpvb</url>
+		</menu>
+		<menu>
+	        <icon>fa-users</icon>
+			<caption>Menubar</caption>
+			<url>/menubar</url>
+		</menu>
+		<menu>
+	        <icon>fa-institution</icon>
+			<caption>OPD</caption>
+			<url>/opd</url>
+		</menu>
+	</menu>
+	<menu>
+		<caption>Menu Admin2</caption>
+		<menu>
+	        <icon>fa-folder</icon>
+			<caption>Home</caption>
+			<url>/</url>
+		</menu>
+		<menu>
+	        <icon>fa-user</icon>
+			<caption>phpVB</caption>
+			<url>/phpvb</url>
+		</menu>
+		<menu>
+	        <icon>fa-users</icon>
+			<caption>Menubar</caption>
+			<url>/menubar</url>
+		</menu>
+		<menu>
+	        <icon>fa-institution</icon>
+			<caption>OPD</caption>
+			<url>/opd</url>
+		</menu>
+	</menu>
+</mainmenu>

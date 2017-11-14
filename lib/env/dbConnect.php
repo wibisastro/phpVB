@@ -8,7 +8,7 @@ Version		: 0.1.0 --- initial release
 			0.2.0 --- PSR 4
 */
 
-class dbConnect {
+class dbConnect extends customException {
 	function __construct () {
 		$tables=__DIR__.'/../../config/dbTables.xml';
 		try {
@@ -24,8 +24,8 @@ class dbConnect {
 		    } else {
 		        throw new \Exception('NoTableConfigFile');
 		    }
-		} catch (Exception $e) {
-			echo $e->getMessage();
+		} catch (\Exception $e) {
+			$this->exceptionHandler($e->getMessage());
 		}	
 	}
   
@@ -50,16 +50,17 @@ class dbConnect {
 						return $result;
 					} else {
 						throw new \Exception('CannotConnectDSN '.$dsnName);
-					}
+                    }
 				}  else {
 			        throw new \Exception('InvalidDSNConfigFile');
 				}
 		    } else {
 		        throw new \Exception('NoDSNConfigFile');
 		    }
-		} catch (Exception $e) {
-			echo $e->getMessage();
-		}	
+		} catch (\Exception $e) {
+            $this->exceptionHandler($e->getMessage());
+        }	
+        
 	}
 
 	function writeDB ($query,$fname,$table="",$dsnName="master") {
@@ -74,8 +75,8 @@ class dbConnect {
 			} else {
 				throw new \Exception('DBLinkError:'.mysqli_error($_link_id));
 			}
-		} catch (Exception $e) {
-			echo $e->getMessage();
+		} catch (\Exception $e) {
+			$this->exceptionHandler($e->getMessage());
 		}
 		
 		
@@ -86,8 +87,8 @@ class dbConnect {
 			$result = mysqli_query($_link_id,$query);
 			if ($result) {return $result;}
 			else {throw new \Exception('DBQueryError:'.mysqli_error($_link_id));}
-		} catch (Exception $e) {
-			echo $e->getMessage();
+		} catch (\Exception $e) {
+			$this->exceptionHandler($e->getMessage());
 		}
 	}
 	

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainmenu>
+	<menu>
+		<caption>Menu General</caption>
+		<menu>
+	        <icon>fa-folder</icon>
+			<caption>Home</caption>
+			<url>/</url>
+		</menu>
+		<menu>
+	        <icon>fa-user</icon>
+			<caption>phpVB</caption>
+			<url>/phpvb</url>
+		</menu>
+		<menu>
+	        <icon>fa-users</icon>
+			<caption>Navigation</caption>
+			<url>/nav</url>
+		</menu>
+		<menu>
+	        <icon>fa-institution</icon>
+			<caption>OPD</caption>
+			<url>/opd</url>
+		</menu>
+	</menu>
+	<menu>
+		<caption>Menu Tata Ruang</caption>
+		<menu callback="submenu_browse">
+	        <icon>fa-map-marker</icon>
+			<caption>Peta</caption>
+			<url>peta.php</url>
+			<childmenu>
+				<caption>Belum Ada Publikasi</caption>
+				<url>peta.php</url>
+			</childmenu>
+		</menu>
+		<menu>
+	        <icon>fa-sitemap</icon>
+			<caption>Dataset</caption>
+			<url>rtrw.php</url>
+		</menu>
+		<menu>
+	        <icon>fa-database</icon>
+			<caption>Import</caption>
+			<url>shp.php</url>
+		</menu>
+		<menu>
+	        <icon>fa-upload</icon>
+			<caption>Publikasi</caption>
+			<url>publikasi.php</url>
+		</menu>
+	</menu>
+	<menu>
+		<caption>Menu Perizinan</caption>
+		<menu>
+	        <icon>fa-cube</icon>
+			<caption>Komoditas</caption>
+			<url>komoditas.php</url>
+		</menu>
+		<menu>
+	        <icon>fa-certificate</icon>
+			<caption>Perizinan</caption>
+			<url>perizinan.php</url>
+		</menu>
+	</menu>
+	<menu>
+		<caption>Menu Bantuan</caption>
+		<menu>
+	        <icon>fa-question</icon>
+			<caption>FAQ</caption>
+			<url>faq.php</url>
+		</menu>
+		<menu>
+	        <icon>fa-exclamation-triangle</icon>
+			<caption>Tata Kelola</caption>
+			<url>tatakelola.php</url>
+		</menu>
+		<menu>
+	        <icon>fa-book</icon>
+			<caption>Manual</caption>
+			<url>manual.php</url>
+		</menu>
+		<menu>
+	        <icon>fa-code-fork</icon>
+			<caption>Milestone</caption>
+			<url>milestone.php</url>
+		</menu>
+	</menu>
+</mainmenu>

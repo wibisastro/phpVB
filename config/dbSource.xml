@@ -7,4 +7,11 @@
 		<pass></pass>
 		<db>framework</db>
 	</dsn>
+	<tables>
+		<table name="session">session</table>
+		<table name="online">online</table>
+		<table name="unauthorized">unauthorized</table>
+		<table name="apicall">apicall</table>
+		<table name="opd">opd</table>
+	</tables>
 </list>

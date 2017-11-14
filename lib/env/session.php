@@ -13,7 +13,7 @@ Version		: 0.0.1 -> 23-Nov-06, 13:55
 			: 0.2.4 -> ubah admin jadi supporter, Friday, May 13, 2011
 			: 0.3.0 -> downgrade ke 0.0.1 untuk publikasi open data kpu, 15 April 2014
 */
-class session {
+class session extends customException {
 	function __construct () {
 	    $this->timeout			= 120; #---seconds
 		$this->timeout_session	= 480; #---minutes

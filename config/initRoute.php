@@ -24,26 +24,21 @@ try {
 			$routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 			switch ($routeInfo[0]) {
 			    case FastRoute\Dispatcher::NOT_FOUND:
-			        throw new Exception(NOT_FOUND);
+			        throw new Exception("RouteNotFound");
 			    break;
 			    case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
 			        $allowedMethods = $routeInfo[1];
 			        throw new Exception('Method '.METHOD_NOT_ALLOWED.' is not Alowed');
 			    break;
 			    case FastRoute\Dispatcher::FOUND:
-			        $handler = $routeInfo[1]."\model\index";
 			        $vars = $routeInfo[2];
-					$page = new $handler;
-					/*
-					//-----security compliance check
-					if (is_array($_GET)) {
-						while (list($key,$val)=each($_GET)) {
-						    $val=strip_tags($val);
-						    if (preg_match('/[^a-zA-Z0-9_.]/', $val)) {throw new Exception('IlegalQueryString');} 
-						    else {$_GET[$key]=$val;}
-						}
+					if (substr($routeInfo[1],0,7)=="Gov2lib") {
+						$handler = $routeInfo[1];
+                        $handler=str_replace("/","\\",$handler);
+					} else {
+						$handler = "App\\".$routeInfo[1]."\model\index";
 					}
-					*/
+                    $page = new $handler;
 			    break;
 			}
 		}  else {
@@ -53,5 +48,5 @@ try {
         throw new Exception('NoRouterConfigFile');
     }
 } catch (Exception $e) {
-	echo $e->getMessage();
+    $doc->exceptionHandler($e->getMessage());
 }	

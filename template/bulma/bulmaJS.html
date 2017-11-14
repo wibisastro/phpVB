@@ -1,0 +1,12 @@
+
+<script src="js/httpVueLoader.js"></script>
+<script type="text/javascript">
+  new Vue({
+    el: '#app',
+    components: {
+    {% for item in components %}
+       '{{ item.tag }}': httpVueLoader('{{ webroot }}{% if STAGE=='prod' %}js{% else %}vue{% endif %}/{{ item.pageID }}/{{ item.component }}'),
+	{% endfor %}
+    }
+  });
+</script>

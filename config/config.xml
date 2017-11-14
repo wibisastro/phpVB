@@ -21,7 +21,7 @@
         <secretkey></secretkey>
     </recaptcha>
     <mailgun>
-        <apikey><get your own key at mailgun.com></apikey>
+        <apikey>get-your-own-key-at-mailgun.com</apikey>
         <domain>sso.gov2.web.id</domain>
     </mailgun>
     <googleoauth>
@@ -29,12 +29,8 @@
         <client_secret></client_secret>
     </googleoauth>
     <url>
-        <js>/js</js>
-        <css>/css</css>
-        <img>/images</img>
+        <devroot>/phpFramewerk/public</devroot>
+        <prodroot>/</prodroot>
+        <buildroot>/</buildroot>
     </url>
-	<template>
-        <name>maskedinput</name>
-        <js>jquery.maskedinput.min.js</js>
-    </template>
 </gov2config>

@@ -1,8 +1,10 @@
 <?php
+$doc->model("nav","menubar");
+$doc->component("nav");
 $doc->content("index.html");
 
 $doc->body("contents",$doc->content);
 $doc->body("pageTitle",'Government 2.0 StarterKit');
-$doc->body("title",'Bappenas');
+$doc->body("subTitle",'Bappenas');
 
-echo $template->render($doc->body);
+echo $doc->render();

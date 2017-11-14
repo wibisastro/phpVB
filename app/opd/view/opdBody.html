@@ -1,20 +1,20 @@
-{% extends "baseLayout.html" %}
+{% extends "bootstrapLayout.html" %}
 
 {% block head %}
 	{{ parent() }}
-	{% include('baseHead.html') %}
+	{% include('bootstrapHead.html') %}
 {% endblock %}
 
 {% block header %}
-	{% include('baseHeader.html') %}
+	{% include('bootstrapHeader.html') %}
 {% endblock %}
 
 {% block sideNav %}
-	{% include('baseSideNav.html') %}
+	{% include('bootstrapSideNav.html') %}
 {% endblock %}
 
 {% block titleBar %}
-	{% include('baseTitleBar.html') %}
+	{% include('bootstrapTitleBar.html') %}
 {% endblock %}
 	
 {% block content %}
@@ -24,10 +24,10 @@
 {% endblock %}
 	
 {% block footer %}
-	{% include('baseFooter.html') %}
+	{% include('bootstrapFooter.html') %}
 {% endblock %}
 
 {% block js %}
 	{{ parent() }}
-	{% include('baseJS.html') %}
+	{% include('bootstrapJS.html') %}
 {% endblock %}

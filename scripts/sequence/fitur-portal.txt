@@ -1,0 +1,61 @@
+title Proses RKP
+
+note over Daerah: File Musrenbang
+Daerah->KL: Usulan Output & Kegiatan
+
+loop Manual
+note left of KL: Arahan Kebijakan Presiden 
+note over KL: Menampung & menyaring usulan
+note right of KL: File usulan Prioritas (PN, PBidang, PrioKL)
+KL -> Sektor : Menyampaikan Hasil Usulan
+Sektor -->KL:koordinasi bolak-balik 
+end
+
+note over Dit PW :Meminta file Krisna
+
+loop Simu
+Sektor -> Dit PW:Menyampaikan usulan KL
+Sektor --> Dit PW:Update usulan
+note over Dit PW :File Simu
+end
+
+Dit PW -> Dit App:Kirim File Simu
+
+Loop Exercise Pagu
+Dit App ->Sektor : Koordinasi bolak balik
+Sektor -->Dit App : Update kode & nomenklatur File Simu
+loop Proses Exercise Pagu
+Dit App -> Dit App : Baseline APBN y-1
+end
+note over Dit App : Exercise Pagu / Lampiran A B C (baseline APBN y-1)
+end
+
+loop Manual
+DJA -> DJA: Bilateral Meeting / menyepakati hasil Exercise Pagu 
+Dit App -> DJA: Menyampaikan hasil Exercise Pagu
+DJA -> Dit App: Menyampaikan hasil based on Resource Envelope
+note left of DJA: SB Pagu Indikatif
+end
+
+loop Manual (Trilateral Meeting)
+note over DJA: Trilateral Meeting
+DJA --> Sektor :
+note over Sektor: Trilateral Meeting
+Sektor -->KL:
+note over KL: Trilateral Meeting
+note right of KL: File Trilateral Meeting untuk Input di Krisna
+end
+
+Dit App ->Dit PW: Kirim file untuk e-Musrenbangnas
+note right of Dit PW: File SB Pagu Indikatif untuk e-Musrenbangnas
+Dit PW -> Daerah: (penyampaian hasil project & alokasi base on SB Pagu Indikatif)
+note right of Daerah: event e-musrenbangnas
+
+loop Manual
+Dit App ->DJA: Menyampaikan hasil SB Pagu Indikatif ke DPR 
+DJA -> DPR: Menyampaikan hasil SB Pagu Indikatif ke DPR 
+DPR ->DPR : Penyampaian pendapat & Revisi
+end
+
+DPR -> Presiden: Hasil persetujuan untuk Perpres RKP
+note over Presiden: Perpres RKP

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<mainmenu>
-	<menu>
-        <menu_id>1</menu_id>
-        <icon>fa-users</icon>
-		<caption>Accounts</caption>
-		<url>/account.php</url>
-	</menu>
-</mainmenu>

@@ -1,4 +1,4 @@
-<?php namespace OPD\model;
+<?php namespace App\opd\model;
 /********************************************************************
 *	Date		: 6 Sep 2017
 *	Author		: Wibisono Sastrodiwiryo

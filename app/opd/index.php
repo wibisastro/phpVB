@@ -1,5 +1,5 @@
 <?php
-$main=new OPD\model\opd;
+$main=new App\opd\model\opd;
 try {
     if ($_POST) {
         switch($_POST["cmd"]) {
@@ -38,6 +38,7 @@ try {
 		$doc->body("contents",$doc->content);
 		$template = $twig->load($scf->baseName.'Body.html');
     } else {
+        if (!isset($vars["cmd"])) {$vars["cmd"]="";}
         switch($vars["cmd"]) {
             case "add":
 				$doc->content("scaffoldAdd.html");
@@ -56,19 +57,16 @@ try {
 				$template = $twig->load($scf->baseName.'Body.html');
             break;
             default:
-                if (!$_SESSION['activeClient']) {
-                    $scaffold['addbutton']=true;
-                    $scaffold['remove']=true;
-                    $scaffold['form']='default';
-                }
+                $scaffold['addbutton']=true;
+                $scaffold['remove']=true;
+                $scaffold['form']='default';
                 // $main->opd_history($_GET["parent"]);
                 // $breadcrumb=$main->breadcrumb_path($main->history);
 //                $data=$main->{$pageID."_browse"}($_GET["parent"]);
 //                $parent=$main->{$pageID."_read"}($_GET["parent"]);
 //                $doc->content("scaffold/browse.php");
-				$data=$main->{$pageID."Browse"}($vars["parent"]);
+				$data=$main->{$pageID."Browse"}();
 				$doc->content("scaffoldBrowse.html");
-				
 				$doc->body("contents",$doc->content);
 				$doc->body("data",$data);
 				$doc->body("dataSize",count($data));
@@ -80,4 +78,4 @@ try {
 	echo $e->getMessage();
 }
 
-echo $template->render($doc->body);
+$doc->render();
