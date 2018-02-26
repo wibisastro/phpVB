@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+	<route>
+		<method>GET</method>
+		<uri>/{app}/js/{component}</uri>
+		<handler>Gov2lib/js</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/{app}/vue/{component}</uri>
+		<handler>Gov2lib/vue</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/{app}/css/{style}</uri>
+		<handler>Gov2lib/css</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/{app}/img/{file}</uri>
+		<handler>Gov2lib/img</handler>
+	</route>
+</list>

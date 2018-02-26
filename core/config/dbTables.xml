@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<list>
-	<table>session</table>
-	<table>online</table>
-	<table>unauthorized</table>
-	<table>apicall</table>
-	<table>opd</table>
-</list>

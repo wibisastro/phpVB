@@ -5,29 +5,28 @@
 	{% include('bulmaHead.html') %}
 {% endblock %}
 
-{% block navbar %}
-	{% include('bulmaNavBar.html') %}
+{% block topbar %}
+	{% include('bulmaTopBar.html') %}
 {% endblock %}
 
 {% block header %}
 	{% include('bulmaHeader.html') %}
 {% endblock %}
 
-{% block menu %}
-	{% include('bulmaMenu.html') %}
+{% block pagetitle %}
+	{% include('bulmaPageTitle.html') %}
 {% endblock %}
 
-{% block titleBar %}
-	{% include('bulmaTitleBar.html') %}
-{% endblock %}
-
-{% block breadcrumb %}
-	{% include('bulmaBreadcrumb.html') %}
+{% block sidebar %}
+    {% for item in sidebars %}
+       {% include[item,'bulmaMissingFile.html'] %}
+	{% endfor %}
 {% endblock %}
 
 {% block content %}
     {% for item in contents %}
-       {% include(item) %}
+        <span>&nbsp;</span>
+       {% include[item,'bulmaMissingFile.html'] %}
 	{% endfor %}
 {% endblock %}
 

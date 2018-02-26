@@ -1,0 +1,32 @@
+	[{
+		"name": "cmd",
+		"value": "",
+		"label": "Submit"
+	}, {
+		"name": "id",
+		"value": "",
+		"label": "ID",
+		"placeholder": "Nomor ID",
+		"disabled": "true"
+	}, {
+		"name": "kode",
+		"value": "",
+		"label": "Kode",
+		"placeholder": "Kode juga ya",
+		"required": "true",
+        "error_message": "Harap isi kode dengan angka"
+	}, {
+		"name": "nama",
+		"value": "",
+		"label": "Nama",
+		"placeholder": "Isi nama dong",
+		"required": "true",
+        "error_message": "Harap isi text janji Presiden"
+    }, {
+		"name": "header",
+		"value": "",
+		"label": "Header",
+		"placeholder": "Isi header dong",
+		"required": "true",
+        "error_message": "Header belum diisi"
+		}]

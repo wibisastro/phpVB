@@ -1,0 +1,11 @@
+[{  "name": "cmd",
+    "value": "session",
+    "label": "Create Session"
+}, {
+    "name": "token",
+    "type": "textarea",
+    "value": "",
+    "label": "Token",
+    "placeholder": "Masukkan token Anda",
+    "required": "true"
+}]

@@ -1,10 +1,54 @@
 <?php
-require_once __DIR__."/../config/init.php";
+require_once "../core/init/index.php";
 
-try {
-	if (file_exists($page->controller)) {
-		include ($page->controller);
-	} else {throw new Exception("No Controller Found");}
-} catch (Exception $e) {
-	echo $e->getMessage();
+//if (STAGE == 'dev') {
+	header('Access-Control-Allow-Origin: *'); 
+	header('Access-Control-Allow-Headers: Content-type');
+//	header('Access-Control-Allow-Methods: POST');
+/*
+} else {
+
+    $http_origin = "localhost";
+    
+    $allowed_domains = array(
+      'localhost',
+      'api.kl2.web.id',
+    );
+
+    if (in_array($http_origin, $allowed_domains))
+    {  
+        $http_origin="http://".$http_origin;
+        header("Access-Control-Allow-Origin: $http_origin");
+        header('Access-Control-Allow-Headers: Content-type');
+        header('Access-Control-Allow-Methods: GET');
+    } 
 }
+*/
+if ($request=='page') {
+    $doc->render();
+} else {
+//        echo $request;
+    header("Content-type:application/json");
+    echo json_encode($response); 
+}
+/*
+if ($doc->counter) {
+//---- counter dihasilkan dari request page yang sukses
+//     atau dari request ajax yang error
+    if ($request=='page') {
+    //---- response non-ajax yang tidak error
+	   $doc->render();
+    } else {
+    //---- semua response ajax yang error
+        $response=$doc->response("is-danger","");
+        header("HTTP/1.1 422 Query Fails");
+        header("Content-type:application/json");
+        echo json_encode($response);
+    }
+} else {
+//---- semua response ajax yang tidak error 
+//---- response ajax dirender di fn masing2
+    header("Content-type:application/json");
+    echo json_encode($response);
+}
+*/

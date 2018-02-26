@@ -1,0 +1,32 @@
+	[{
+		"name": "cmd",
+		"value": "",
+		"label": "Submit"
+	}, {
+		"name": "id",
+		"value": "",
+		"label": "ID",
+		"placeholder": "Nomor ID",
+		"disabled": "true"
+	}, {
+		"name": "kode",
+		"value": "",
+		"label": "Kode",
+		"placeholder": "Kode juga ya",
+		"required": "true",
+        "error_message": "Harap isi kode dengan angka"
+	}, {
+		"name": "nama",
+		"value": "",
+		"label": "Nama",
+		"placeholder": "Isi nama dong",
+		"required": "true",
+        "error_message": "Harap isi text"
+    }, {
+		"name": "singkatan",
+		"value": "",
+		"label": "Singkatan",
+		"placeholder": "Isi singkatan dong",
+		"required": "true",
+        "error_message": "Singkatan belum diisi"
+		}]

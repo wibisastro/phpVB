@@ -1,0 +1,9 @@
+<div>
+    <gov2table
+        get-url="wilayah"
+        :columns="['id', 'nama', 'singkatan','level_label', 'children']"
+        :filter-key="searchQuery"
+        :recursive="true"
+        :item-per-page="itemPerPage">
+    </gov2table>
+</div>

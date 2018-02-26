@@ -1,89 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mainmenu>
 	<menu>
-		<caption>Menu General</caption>
-		<menu>
-	        <icon>fa-folder</icon>
-			<caption>Home</caption>
-			<url>/</url>
-		</menu>
-		<menu>
-	        <icon>fa-user</icon>
-			<caption>phpVB</caption>
-			<url>/phpvb</url>
-		</menu>
+		<caption>Components</caption>
 		<menu>
 	        <icon>fa-users</icon>
 			<caption>Navigation</caption>
-			<url>/nav</url>
+			<url>/components/gov2nav</url>
 		</menu>
-		<menu>
-	        <icon>fa-institution</icon>
-			<caption>OPD</caption>
-			<url>/opd</url>
-		</menu>
-	</menu>
-	<menu>
-		<caption>Menu Tata Ruang</caption>
-		<menu callback="submenu_browse">
-	        <icon>fa-map-marker</icon>
-			<caption>Peta</caption>
-			<url>peta.php</url>
-			<childmenu>
-				<caption>Belum Ada Publikasi</caption>
-				<url>peta.php</url>
-			</childmenu>
-		</menu>
-		<menu>
-	        <icon>fa-sitemap</icon>
-			<caption>Dataset</caption>
-			<url>rtrw.php</url>
-		</menu>
-		<menu>
-	        <icon>fa-database</icon>
-			<caption>Import</caption>
-			<url>shp.php</url>
-		</menu>
-		<menu>
-	        <icon>fa-upload</icon>
-			<caption>Publikasi</caption>
-			<url>publikasi.php</url>
-		</menu>
-	</menu>
-	<menu>
-		<caption>Menu Perizinan</caption>
 		<menu>
 	        <icon>fa-cube</icon>
-			<caption>Komoditas</caption>
-			<url>komoditas.php</url>
+			<caption>Button</caption>
+			<url>/components/gov2button</url>
+		</menu>
+		<menu>
+	        <icon>fa-cube</icon>
+			<caption>Search</caption>
+			<url>/components/gov2search</url>
+		</menu>
+		<menu>
+	        <icon>fa-cube</icon>
+			<caption>Notification</caption>
+			<url>/components/gov2notification</url>
 		</menu>
 		<menu>
 	        <icon>fa-certificate</icon>
-			<caption>Perizinan</caption>
-			<url>perizinan.php</url>
+			<caption>Formfield</caption>
+			<url>/components/gov2formfield</url>
+		</menu>
+		<menu>
+	        <icon>fa-cube</icon>
+			<caption>Table</caption>
+			<url>/components/gov2table</url>
+		</menu>
+		<menu>
+	        <icon>fa-certificate</icon>
+			<caption>Pagination</caption>
+			<url>/components/gov2pagination</url>
 		</menu>
 	</menu>
 	<menu>
-		<caption>Menu Bantuan</caption>
+		<caption>Examples</caption>
 		<menu>
-	        <icon>fa-question</icon>
-			<caption>FAQ</caption>
-			<url>faq.php</url>
+	        <icon>fa-users</icon>
+			<caption>Janji Presiden</caption>
+			<url>/examples/presiden</url>
 		</menu>
 		<menu>
-	        <icon>fa-exclamation-triangle</icon>
-			<caption>Tata Kelola</caption>
-			<url>tatakelola.php</url>
+	        <icon>fa-cube</icon>
+			<caption>OPD</caption>
+			<url>/examples/opd</url>
 		</menu>
 		<menu>
-	        <icon>fa-book</icon>
-			<caption>Manual</caption>
-			<url>manual.php</url>
+	        <icon>fa-cube</icon>
+			<caption>Wilayah</caption>
+			<url>/examples/wilayah</url>
+		</menu>
+	</menu>
+	<menu>
+		<caption>DAK</caption>
+        <url>/dak</url>
+		<menu>
+			<caption>Bidang</caption>
+			<url>/dak/bidang</url>
 		</menu>
 		<menu>
-	        <icon>fa-code-fork</icon>
-			<caption>Milestone</caption>
-			<url>milestone.php</url>
+			<caption>Prioritas</caption>
+			<url>/dak/prioritas</url>
+		</menu>
+		<menu>
+			<caption>Teknis</caption>
+			<url>/dak/teknis</url>
+		</menu>
+		<menu>
+			<caption>Usulan</caption>
+			<url>/dak/usulan</url>
 		</menu>
 	</menu>
 </mainmenu>

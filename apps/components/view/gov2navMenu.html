@@ -1,0 +1,16 @@
+<aside class="menu">
+  {% for mainmenu in menus %}
+    <div style="margin-bottom: 10px">
+      {% for menu in mainmenu.menu %}
+        <div class="menuspace" style="margin-bottom: 20px">
+        <menu-label>{{ menu.caption }}</menu-label>
+         <ul class="menu-list">
+          {% for item in menu.menu %}
+            <menu-list url="{{ webroot }}{{ item.url }}" caption="{{ item.caption }}" is-active="{% if item.url ==  '/' ~ pageID ~ '/' ~ className %}true{% endif %}"></menu-list>
+           {% endfor %}
+        </ul>
+        </div>
+        {% endfor %}
+    </div>
+  {% endfor %}
+</aside>

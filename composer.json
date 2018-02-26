@@ -1,6 +1,6 @@
 {
-    "name": "phpFramewerk",
-    "description": "Simple framework for Gov 2.0",
+    "name": "phpVB",
+    "description": "Simple web framework built with PHP Vue and Bulma",
     "type": "project",
     "authors": [
         {
@@ -10,12 +10,15 @@
     ],
     "require": {
         "twig/twig": "~1.34",
-        "nikic/fast-route": "^1.2"
+        "nikic/fast-route": "^1.2",
+        "guzzlehttp/guzzle": "~6.0",
+        "firebase/php-jwt": "^5.0",
+        "sergeytsalkov/meekrodb": "*"
     },
 	"autoload": {
 		"psr-4": {
-			"Gov2lib\\":"lib",
-			"App\\":"app"
+			"Gov2lib\\":"core/lib",
+			"App\\":"apps"
 		}
 	}
 }

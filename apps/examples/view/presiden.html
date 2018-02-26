@@ -1,0 +1,23 @@
+
+<div class="columns">
+  <div class="column is-8">
+    <gov2tablerows></gov2tablerows>
+    </div>
+    <div class="column is-2">
+      <gov2search></gov2search>  
+    </div>
+    <div class="column">
+      <gov2button button-label="Tambah Data!"></gov2button> 
+    </div>
+</div>
+
+<div>
+    <gov2table
+        get-url="presiden"
+        :columns="['id', 'nama', 'kode','header']"
+        :filter-key="searchQuery"
+        :readonly="true"
+        :item-per-page="itemPerPage">
+    </gov2table>
+</div>
+

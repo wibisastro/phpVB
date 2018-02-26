@@ -1,12 +1,22 @@
-
-<script src="js/httpVueLoader.js"></script>
-<script type="text/javascript">
-  new Vue({
-    el: '#app',
-    components: {
-    {% for item in components %}
-       '{{ item.tag }}': httpVueLoader('{{ webroot }}{% if STAGE=='prod' %}js{% else %}vue{% endif %}/{{ item.pageID }}/{{ item.component }}'),
-	{% endfor %}
-    }
-  });
-</script>
+{% if vueData %}
+   data () {
+        return {{ vueData|raw }}
+    },
+{% endif %}
+{% if vueComputed %}
+   computed () {
+        return {{ vueComputed|raw }}
+    },
+{% endif %}
+{% if vueMethods %}
+    methods: {
+        {{ vueMethods|raw }}
+    },
+{% endif %}
+{% if vueCreated %}
+    created: function () {
+        {{ vueCreated|raw }}
+    },
+{% endif %}
+{% if vueMounted %}
+{% endif %}

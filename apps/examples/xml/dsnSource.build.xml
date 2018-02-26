@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+	<dsn>
+		<name>master</name>
+		<host>localhost</host>
+		<user>dak</user>
+		<pass>dakkrisna2018</pass>
+		<db>dak</db>
+	</dsn>
+	<dsn>
+		<name>opd</name>
+		<host>localhost</host>
+		<user>dak</user>
+		<pass>dakkrisna2018</pass>
+		<db>dak</db>
+	</dsn>
+</list>

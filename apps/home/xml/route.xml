@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+	<route>
+		<method>GET</method>
+		<uri>/</uri>
+		<handler>home\model\index</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/index.php</uri>
+		<handler>home\model\index</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/gov2api.html</uri>
+		<handler>home\model\html</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/maintenance.html</uri>
+		<handler>home\model\html</handler>
+	</route>
+</list>

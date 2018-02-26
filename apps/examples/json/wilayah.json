@@ -1,0 +1,45 @@
+	[{
+		"name": "cmd",
+		"value": "",
+		"label": "Submit"
+	}, {
+		"name": "parent_id",
+		"value": "0",
+		"label": "Parent ID",
+		"placeholder": "Nomor Parent ID",
+		"disabled": "true"
+	}, {
+		"name": "id",
+		"value": "",
+		"label": "ID",
+		"placeholder": "Nomor ID",
+		"disabled": "true"
+	}, {
+		"name": "singkatan",
+		"value": "",
+		"label": "Singkatan",
+		"placeholder": "Singkatan",
+		"required": "true",
+        "error_message": "Singkatan belum diisi"
+	}, {
+		"name": "nama",
+		"value": "",
+		"label": "Nama",
+		"placeholder": "Nama wilayah",
+		"required": "true",
+        "error_message": "Nama wilayah belum diisi"
+    }, {
+		"name": "level",
+		"value": "provinsi",
+		"label": "Level",
+		"placeholder": "Tingkat wilayah",
+		"required": "true",
+        "error_message": "Pilih tingkat",
+        "options": {
+            "1":"provinsi",
+            "2":"kabupaten",
+            "3":"kecamatan",
+            "4":"kelurahan"
+        },
+        "type": "select"
+		}]
