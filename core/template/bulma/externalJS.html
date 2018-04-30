@@ -1,0 +1,6 @@
+
+{% block externalJS %}
+    {% for item in externalJS %}
+       {% include(item) %}
+	{% endfor %}
+{% endblock %}

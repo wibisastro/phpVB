@@ -24,10 +24,11 @@ require_once "../core/init/index.php";
     } 
 }
 */
+
+//print_r($response);
 if ($request=='page') {
     $doc->render();
 } else {
-//        echo $request;
     header("Content-type:application/json");
     echo json_encode($response); 
 }

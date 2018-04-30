@@ -22,10 +22,12 @@ module.exports = {
     },
     methods: {
         openNotif: function(data) {
-            console.log(data);
+         //   console.log(data);
             if (data['callback']) {
                 if (data['callback']=='openSnackbar') {
                     this.openSnackbar(data);
+                } else if (data['callback']=='errorSnackbar') {
+                    this.errorSnackbar(data);
                 } else if (data['callback']=='openErr') {
                     this.isNotif=true;
                     this.notifText=data['notification'];
@@ -48,6 +50,15 @@ module.exports = {
                 onAction: () => {
                     eventBus.$emit('openCreateSession',data['server'])
                 }
+            })
+        },
+        errorSnackbar: function(data) {
+            this.$snackbar.open({
+                duration: 50000,
+                message: data['notification'],
+                type: data['class'],
+                position: 'is-bottom-right',
+                actionText: 'OK'
             })
         },
         

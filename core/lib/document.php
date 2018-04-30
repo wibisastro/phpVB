@@ -34,7 +34,7 @@ class document extends customException {
         $_dir=__DIR__."/../../apps/$_appDir/model";
 		if (file_exists($_dir)) {
 	        $_files = array_slice(scandir($_dir), 2);
-	        while (list($_key,$_val)=each($_files)) {
+	        foreach($_files as $_key => $_val) {
                 $this->take($_appDir,str_replace(".php","",$_val));
 	        }
 		}
@@ -122,7 +122,7 @@ class document extends customException {
 
     function vars ($vars) {
         if (is_array($vars)) {
-            while(list($key,$val)=each($vars)) {
+            foreach($vars as $key => $val) {
                 $this->body[$key]=$val;       
             }
         }
@@ -136,6 +136,7 @@ class document extends customException {
         switch (STAGE) {
             case "prod":
             case "build":
+            case "local":
             case "dev":
                 $_dir.="/vue";
             break;
@@ -146,10 +147,11 @@ class document extends customException {
         }
 		if (file_exists($_dir)) {
 	        $_files = array_slice(scandir($_dir), 2);
-	        while (list($_key,$_val)=each($_files)) {
+	        foreach($_files as $_key => $_val) {
 	            switch (STAGE) {
 	                case "prod":
 	                case "build":
+            		case "local":
 	                case "dev":
 	                    if (substr($_val,-4)==".vue" && substr($_val,0,1)!="_") {
 	                        $_components[$_key]["component"]=$_val;
@@ -180,7 +182,7 @@ class document extends customException {
     function response ($_class,$_callback="",$_id=0) {
         global $_POST, $vars, $doc;
         if (is_array($doc->error)) {
-            list($_key,$_val)=each($doc->error);
+            foreach($doc->error as $_key => $_val);
             $_message="$_key: $_val";
         } else {
             if ($_POST["cmd"]) {$_cmd=strtoupper($_POST["cmd"]);}
@@ -209,7 +211,7 @@ class document extends customException {
         return $response;        
     }
     
-    function responseAuth ($data) {
+    function responseAuth ($data=null) {
         global $doc,$self;
         if (!$doc->error) {
             $response=$data;
@@ -228,11 +230,12 @@ class document extends customException {
             $this->body("vueData",json_encode($vueData));
         }
         $this->body("vueCreated",$vueCreated);
-        $this->body("vueMethods",$vueMethods);        
+        $this->body("vueMethods",$vueMethods);
+        $this->body("externalJS",$this->externalJS);
     }
     
     function render () {
-        global $twig,$template,$doc,$self;
+        global $twig,$template,$doc,$self,$loader;
         $this->body("sidebars",$this->sidebar);
         $this->body("sidebarsRight",$this->sidebarRight);
         if (is_array($this->error)) {
@@ -248,6 +251,10 @@ class document extends customException {
             if ($this->error['NoSession']) {
                 array_push($_errorBody,'tokenForm.html');
             }
+            if ($this->error['NotLogin']) {
+                $loader->addPath(__DIR__."/../../apps/gov2login/view","gov2login");
+                array_push($_errorBody,'@gov2login/notLogin.html');
+            }
             $this->body("contents",$_errorBody);
         } else {
             $this->body("contents",$this->content);
@@ -258,5 +265,14 @@ class document extends customException {
         $template = $twig->load($doc->baseBody);
         echo $template->render($this->body);
     }
+    
+    function externalJS ($_codeSnippet) {
+        global $doc;
+        $caller=explode("\\",get_called_class());
+		if (!isset($this->externalJS)) {$this->externalJS=array();}
+		$doc->counter();
+        if ($caller[1]!="document") {$_codeSnippet='@'.$caller[1].'/'.$_codeSnippet;} 
+		$doc->externalJS[$doc->counter]=$_codeSnippet;
+	}
 }
 ?>

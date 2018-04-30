@@ -25,19 +25,8 @@
     </section>
 
     <section class="section">
-        <div class="container">
-            <div class="columns">
-              <div class="column is-narrow">
-                <div style="width: 200px;">
-                    {% block sidebar %} {% endblock %}
-                </div>
-              </div>
-              <div class="column">
-                    {% block pagetitle %} {% endblock %}
-                    {% block content %} {% endblock %}
-              </div>
-            </div>
-        </div>
+        {% block pagetitle %} {% endblock %}
+        {% block content %} {% endblock %}
     </section>
 
     <footer class="footer">
@@ -60,7 +49,22 @@
     {% endfor %}
     },
 {% endblock %}
+methods: {
+        loadGrid: function (data) {
+            hot.loadData(data);
+        },
+        getGrid: function (data) {
+            eventBus.$emit("saveGrid",hot.getData());
+        }
+    },
+    created: function () {
+        eventBus.$on("loadGrid",this.loadGrid);
+        eventBus.$on("getGrid",this.getGrid);
+    }
   });
 </script>
+{% block externalJS %}
+    
+{% endblock %}
 </body>
 </html>

@@ -9,19 +9,29 @@
      {% endblock %}
     </head>
 <body>
-	<div id="app">
+<div id="app">
     <section class="hero is-primary">
     {% block topbar %} {% endblock %}
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">
+            phpVB
+          </h1>
+          <h2 class="subtitle">
+            {% block header %} {% endblock %}
+          </h2>
+        </div>
+      </div>
     </section>
-        
+
     <section class="section">
         <div class="container">
             <div class="columns">
-              <div class="column is-narrow">
+              <!--div class="column is-narrow">
                 <div style="width: 200px;">
                     {% block sidebar %} {% endblock %}
                 </div>
-              </div>
+              </div-->
               <div class="column">
                     {% block pagetitle %} {% endblock %}
                     {% block content %} {% endblock %}
@@ -38,7 +48,6 @@
       </div>
     </footer>
 </div>
-    
 <script type="text/javascript">
   new Vue({
 {% block js %}
@@ -51,6 +60,14 @@
     {% endfor %}
     },
 {% endblock %}
+methods: {
+        loadGrid: function (data) {
+            hot.loadData(data);
+        }
+    },
+    created: function () {
+        eventBus.$on("loadGrid",this.loadGrid);
+    }
   });
 </script>
 {% block externalJS %}

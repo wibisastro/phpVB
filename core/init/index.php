@@ -20,8 +20,6 @@ require_once __DIR__.'/../../vendor/autoload.php';
 
 $doc = new Gov2lib\document;
 
-$api = new Gov2lib\api;
-
 //--------routing
 
 require_once 'route.php';
