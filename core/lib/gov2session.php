@@ -1,6 +1,6 @@
 <?php namespace Gov2lib;
 /*
-Author		: Wibisono Sastrodiwiryoz
+Author		: Wibisono Sastrodiwiryo
 Date		: 21 Dec 2017
 Copyleft	: eGov Lab UI
 Contact		: wibi@alumni.ui.ac.id
@@ -10,13 +10,68 @@ use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 
-class api extends document {
-    function __construct ($_dsn="master") {
-        parent::__construct();  
-//        list($_link_id,$_name)=$this->connectDB($_dsn);
+class gov2session extends document {
+    function __construct () {
         $this->client = new \GuzzleHttp\Client();
+        $this->timeout	= 60*5; #-----5 menit     
+        if (isset($_GET['view'])) {
+            switch($_GET['view']) {
+                case "cases":echo json_encode($cases);break;
+		        case "cookie":echo json_encode($_COOKIE);break;
+		        case "session":echo json_encode($_SESSION);break;
+            }
+            exit;
+        }
     }
     
+    function authenticate ($_privilege="member") {
+        global $pageID,$doc;
+        $_valid="";
+        try {
+            if (!isset($_SESSION['account_id']) && $_privilege!="public") {
+                throw new \Exception("NotLogin:Page ".strtoupper($pageID)." requires you to login");
+            } else {
+                if (time()-$_SESSION["started"] > time()+$this->timeout) {
+                    throw new \Exception("sessionExpired:Please re-login");
+                } else {
+                    if ($_privilege=="member" || $_privilege=="webmaster") {
+                        $xml=__DIR__.'/../../apps/'.$pageID.'/xml/gov2member.xml';
+                        $_members=simplexml_load_file($xml);
+                        if (is_array($_members)) {
+                            foreach ($_members->member as $_member) {
+                                if ($_member->account_id==$_SESSION["account_id"]) {
+                                    $_valid=$_member;
+                                    break;
+                                } else {
+                                    throw new \Exception("NotMember:You need to be registered, please contact the admin");
+                                }
+                            }
+                            if (!$_valid->webmaster) {
+                                foreach ($_valid->privilege as $cases) {
+                                    $_controller = $cases->attributes();
+                                    if ($_controller['controller']==$_SERVER['SCRIPT_NAME']) {
+                                        break;
+                                    } else {
+                                        throw new \Exception("UnAuthorized:".$_SERVER['SCRIPT_NAME']);
+                                    }
+                                }
+                            }
+                        } else {
+                            throw new \Exception("InvalidXMLFile:".$pageID."/xml/gov2member.xml");
+                        }
+                    }
+                    $_SESSION["started"]=time()+$this->timeout;
+                    $_SESSION["counter"]++;
+//                    $this->cookie_save('started,counter');
+                //    } 
+                }
+            }
+        } catch (\Exception $e) {
+            $doc->exceptionHandler($e->getMessage());
+        }
+        $this->authorized=$_SESSION;
+    }
+    /*
     function getdata ($url) {
         global $doc;
         try {
@@ -28,7 +83,7 @@ class api extends document {
         }        
     }
 
-    function authenticate ($public) {
+    function loginAuthenticate ($public) {
         global $doc,$config;
         try {
             $res = $this->client->request('POST', trim($config->platform->apikey),[
@@ -44,7 +99,7 @@ class api extends document {
         }        
     }
     
-    function authorize ($_publickey) {
+    function loginAuthorize ($_publickey) {
         global $doc,$publickey,$self;
         try {
             if ($_SESSION['token']) {
@@ -113,6 +168,7 @@ class api extends document {
                 }
             }
             return $response;
+            */
         /*
         } catch (\Exception $e) {
             $self->exceptionHandler($e->getMessage());
@@ -124,6 +180,6 @@ class api extends document {
             header("HTTP/1.1 422 Auth Fail");
         }
         */
-    }
+    //}
 }
 ?>

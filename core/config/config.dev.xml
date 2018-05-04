@@ -28,5 +28,5 @@
         <client_id></client_id>
         <client_secret></client_secret>
     </googleoauth>
-    <webroot>/git/gov2/public</webroot>
+    <webroot>/phpvb/public</webroot>
 </gov2config>

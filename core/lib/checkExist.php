@@ -11,7 +11,7 @@ class checkExist {
     function checkAppDir ($_appDir) {
         $_dir=__DIR__."/../../apps";
         $_dirs = array_slice(scandir($_dir), 2);
-        while (list($_key,$_val)=each($_dirs)) {
+        foreach($_dirs as $_key => $_val) {
             if ($_val==$_appDir) {
                 return $_val;
                 break;
@@ -22,7 +22,7 @@ class checkExist {
     function checkAppFile ($_appDir, $_appFile) {
         $_dir=__DIR__."/../../apps/$_appDir/";
         $_files = array_slice(scandir($_dir), 2);
-        while (list($_key,$_val)=each($_files)) { 
+        foreach($_files as $_key => $_val) { 
             if ($_val==$_appFile) {
                 return $_val;
                 break;

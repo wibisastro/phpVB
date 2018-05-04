@@ -27,29 +27,21 @@
           </div>
 
           <div class="navbar-end">
-            <div role="navigation" aria-label="dropdown navigation">
-              <div class="navbar-item has-dropdown">
-                <a class="navbar-link">
-                  {{ loginname }}
+            {% if _SESSION['account_id'] %}
+                <a class="navbar-item" href="/gov2login">
+                  {{ _SESSION['fullname'] }}
                 </a>
-
-                <div class="navbar-dropdown is-right">
-                  <a class="navbar-item">
-                    Account
-                  </a>
-                  <a class="navbar-item">
-                    Profile
-                  </a>
-                  <a class="navbar-item">
-                    Components
-                  </a>
-                  <hr class="navbar-divider">
-                  <div class="navbar-item">
-                    Version 0.6.0
-                  </div>
-                </div>
-              </div>
-            </div>
+                <a class="navbar-item" href="/gov2login.php?cmd=logout">
+                  Logout
+                </a>
+            {% else %}
+                <a class="navbar-item" href="/gov2login/signup">
+                  Signup
+                </a>
+                <a class="navbar-item" href="/gov2login">
+                  Login
+                </a>
+            {% endif %}
           </div>
       </div>
     </nav>

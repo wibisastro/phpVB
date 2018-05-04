@@ -2,7 +2,7 @@
     
 class crudModel extends dsnSource {
 	function __construct ($_dsn="") {
-        parent::__construct();  
+        parent::__construct(); 
         list($_link_id,$_name)=$this->connectDB($_dsn);
 	}
     

@@ -5,15 +5,20 @@
 *	Email		: wibi@alumni.ui.ac.id
 *	Copyleft	: eGov Lab UI 
 *********************************************************************/
-
+//----todo pisahkan list domain ke file xml
 try { 
     $publickey="c65ca73ce4c38dcec21151aa64f1590c";
     $host=explode(".",$_SERVER["SERVER_NAME"]);
     switch ($_SERVER["SERVER_NAME"]) {
-        case "dak.bappeda.web.id":
-        case "api.kl2.web.id":
-		case "api.local.krisna.systems":
         case $host[0].".local.vlsm.org":
+		case "api.local.krisna.systems":
+            define('STAGE','local');
+            error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+            ini_set("display_errors", 1);
+        break;
+        case "dak.bappeda.web.id":
+        case "rajaampatkab.bappeda.web.id":
+        case "api.kl2.web.id":
             define('STAGE','build');
             error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 //			error_reporting(E_ALL);

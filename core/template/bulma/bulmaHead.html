@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="//cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css">
 <link rel="stylesheet" href="{{ webroot }}/css/buefy.min.css">
 <link rel="stylesheet" href="{{ webroot }}/css/bulma.min.css">
+<link rel="stylesheet" href="{{ webroot }}/css/handsontable.full.css">
 
 <script src="{{ webroot }}/js/vue.js"></script>
 <script src="{{ webroot }}/js/buefy.js"></script>
@@ -11,7 +12,20 @@
 <script src="{{ webroot }}/js/axios.min.js"></script>
 <script src="{{ webroot }}/js/vue-scrollto.js"></script>
 <script src="{{ webroot }}/js/gov2form.js"></script>
+<script src="{{ webroot }}/js/iframeResizer.min.js"></script>
+<script src="{{ webroot }}/js/handsontable.full.min.js"></script>
+
 <script type="text/javascript">
 Vue.use(Buefy.default);
 const eventBus = new Vue();
 </script>
+
+<style>
+.saas-frame {
+position: relative;
+top: 20px;
+bottom: 0;
+left: 0;
+right: 0;
+}
+</style>

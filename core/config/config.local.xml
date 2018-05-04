@@ -5,9 +5,9 @@
     <webmaster>wibi@alumni.ui.ac.id</webmaster>
 	<secure>true</secure>
     <platform>
-        <apikey>https://gov2.mti08.vlsm.org/api.php</apikey>
-        <ssonode>http://sso.gov2.web.id</ssonode>
-        <ssoconn>https://sso.gov2.web.id</ssoconn>
+        <apikey>http://gov2.local.mti08.vlsm.org/api.php</apikey>
+        <ssonode>http://sso.local.gov2.web.id</ssonode>
+        <ssoconn>http://sso.local.gov2.web.id</ssoconn>
     </platform>
     <apikey>
         <public>81d03a754448e774d706f0754acd88ff</public>
@@ -28,7 +28,9 @@
     </googleoauth>
     <webroot></webroot>
     <domain>
-        <mti08.vlsm.org>gov2session</mti08.vlsm.org>
-        <api.krisna.systems>apikrisna</api.krisna.systems>
+        <mti08.local.vlsm.org>gov2session</mti08.local.vlsm.org>
+        <api.local.krisna.systems>apikrisna</api.local.krisna.systems>
+        <dak.bappeda.web.id>dak</dak.bappeda.web.id>
+        <api.kl2.web.id>apikrisna</api.kl2.web.id>
     </domain>
 </gov2config>

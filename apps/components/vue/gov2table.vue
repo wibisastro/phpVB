@@ -173,6 +173,7 @@ module.exports = {
   },
   filters: {
     capitalize: function (str) {
+        alert(str);
         if (str) {
             return str.charAt(0).toUpperCase() + str.slice(1)   
         }
@@ -356,7 +357,6 @@ module.exports = {
         console.log(errors);
     },
     loadData: function(data) {
-        eventBus.$emit('loadingData',this.instance);
         this.gridData=Array.from(Object.keys(data), k=>data[k]);
         if (data['data'] == 'empty') {
             this.records=0;        
@@ -405,7 +405,6 @@ module.exports = {
         eventBus.$emit('printUrl'+this.instance,printUrl);
     },
     getData: function(id) {
-        eventBus.$emit('gettingData',this.instance);
         this.setParent(id);
         if (this.parent) {url=this.getUrl+'/table/'+this.scroll+'/'+this.parent;}
         else if (this.recursive) {url=this.getUrl+'/table/'+this.scroll+'/0';}

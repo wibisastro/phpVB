@@ -16,21 +16,37 @@ try {
     }
     
     $httpMethod = $_SERVER['REQUEST_METHOD'];
+
     $uri = $_SERVER['REQUEST_URI'];
     
+    if (substr($uri, 0, 4) == "http") {
+        $param=explode("/",$uri);
+        $uri="/".$param[3];
+    }
+    
     if (false !== $pos = strpos($uri, '?')) {$uri = substr($uri, 0, $pos);}
+    
     $uri = rawurldecode($uri);
-
+     
     if ($config->webroot=="/") {
         list($param,$pageID)=explode("/",$uri);
     } else {
         list($param,$pageID)=explode("/",str_replace($config->webroot,"",$uri));
     }
-
-    if (!$pageID || $pageID=="index.php" || strstr($pageID,'.html')) {
-        if (strstr($pageID,'.html')) {$htmlFile=$pageID;}
-        $pageID="home";
+    if (!$pageID || 
+        $pageID=="index.php" || 
+        $pageID=="gov2login.php" || 
+        strstr($pageID,'.html')) {
+            if (strstr($pageID,'.html')) {$htmlFile=$pageID;}
+            elseif ($pageID=="gov2login.php") {
+                $pageID="gov2login";
+                $req=json_decode(stripslashes($_POST["req"]),true);
+                $_POST=array_merge($_POST,$req);
+            } else {
+                $pageID=trim($config->domain->{$_SERVER["SERVER_NAME"]});
+            }
     } 
+
     $doc->pageID=$pageID;
 
     $default_router=__DIR__.'/../config/route.xml';
@@ -62,7 +78,10 @@ try {
                         $_POST = json_decode(trim(file_get_contents('php://input')), true);
                     } elseif ($httpMethod == "GET") {
                         $vars = $routeInfo[2];
-                        if (!isset($vars["cmd"])) {$vars["cmd"]="";}
+                        if (!isset($vars["cmd"])) {
+                            if ($_GET['cmd']=='logout') {$vars["cmd"]="logout";}
+                            else {$vars["cmd"]="";}
+                        }
                     }
                     if (substr($routeInfo[1],0,7)=="Gov2lib") {
                         $handler = $routeInfo[1];
@@ -74,9 +93,9 @@ try {
                         $controller = "App\\".$pageID."\\".$className;
                         $doc->body('className',$className);
                     }
-
                     if (class_exists($handler)) {
                         $self = new $handler;
+                        $self->ses = new Gov2lib\gov2session;
                     } else {
                         throw new Exception('Class/NameSpaceNotExist:'.$handler);
                     }  
