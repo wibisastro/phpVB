@@ -1,6 +1,6 @@
 
 {% block externalJS %}
     {% for item in externalJS %}
-       {% include(item) %}
+        {% include[item,'bulmaMissingFile.html'] %}
 	{% endfor %}
 {% endblock %}
