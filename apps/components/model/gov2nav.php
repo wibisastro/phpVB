@@ -31,7 +31,13 @@ class gov2nav extends \Gov2lib\document {
         if ($_menuFilePath) {
             $_menu = simplexml_load_file($_menuFilePath, "SimpleXMLElement", LIBXML_NOCDATA);
             $_json=json_decode(json_encode($_menu),TRUE);
+            if (!is_array($_json['menu'][0])) {
+                $_singleMenu=$_json['menu'];
+                unset($_json['menu']);
+                $_json['menu'][sizeof($_menus)+1]=$_singleMenu;
+            } 
             array_push($_menus,$_json);
+            //print_r($_menus);
             $doc->body['menus'] = $_menus;
             return $_menus;
         } else {

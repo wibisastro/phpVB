@@ -75,7 +75,7 @@
             </div>
           </div>
         </div>
-        <div class="field is-horizontal">
+        <div class="field is-horizontal" v-if="!hideButton">
           <div class="field-body">
             <div class="field is-grouped is-grouped-right">
               <div class="control">
@@ -129,10 +129,15 @@ module.exports = {
         fieldUrl: String,
         action: String,
         show: Boolean,
+        defaultLevel:{
+            type: Number,
+            default: 1
+        }, 
         parent_id: {
             type: Number,
             default: 0
-        }
+        },
+        instance: String
     },
     data: function () {
         return {
@@ -150,7 +155,9 @@ module.exports = {
                 x: false,
                 y: true
             },
-            selected: []
+            selected: [],
+            customButton:[],
+            hideButton:false
         }
     },
     methods: {
@@ -161,10 +168,12 @@ module.exports = {
         scrollTo: function () {
           this.$scrollTo('#myForm', '500', this.options)  
         },
-        toggleForm: function (theForm) {
-            this.isOpen = theForm;
-            this.form['cmd'] = 'add';
-            this.submit = 'Add';
+        toggleForm: function (data) {
+            this.isOpen = !this.isOpen;
+            if (this.customButton.length==0) {
+                this.form['cmd'] = 'add';
+                this.submit = 'Add';   
+            }
             this.form.reset();
         },
         onSubmit: function () {
@@ -218,7 +227,7 @@ module.exports = {
         },
         setFields: function (data) {
             this.fields=Object.assign({}, data);
-            this.setLevel(1);
+            this.setLevel(this.defaultLevel);
             if (this.show) {
                 this.form['cmd'] = this.fields[0]['value'];
                 this.submit = this.fields[0]['label'];
@@ -257,7 +266,15 @@ module.exports = {
         },
         setField: function (data) {
             this.form[data['name']] = data['value'];
-        }
+        },
+        setButton: function (data) {
+            this.customButton=data;
+            this.form['cmd'] = data['cmd'];
+            this.submit = data['caption'];
+        },
+        setHideButton: function () {
+            this.hideButton=true;
+        },
     },
     created: function () {
         eventBus.$on('toggleClick', this.toggleForm);
@@ -270,6 +287,8 @@ module.exports = {
         eventBus.$on('refreshPath', this.setParentId);
         eventBus.$on('setLevel', this.setLevel);
         eventBus.$on('toggleForm', this.toggleForm);
+        eventBus.$on('setButton', this.setButton);
+        eventBus.$on('hideButton', this.setHideButton);
         if (this.show) {
             this.isOpen=true;
         } 

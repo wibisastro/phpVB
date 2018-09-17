@@ -9,6 +9,7 @@ class gov2formfield extends \Gov2lib\document {
         //-default utk single controller    
         $GLOBALS['vueData']['action']=$self->className; 
         $GLOBALS['vueData']['fieldurl']=$self->className.'/fields'; 
+        $GLOBALS['vueData']['defaultLevel']=1; 
         
 	}
 

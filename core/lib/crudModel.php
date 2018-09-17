@@ -6,10 +6,10 @@ class crudModel extends dsnSource {
         list($_link_id,$_name)=$this->connectDB($_dsn);
 	}
     
-    function doBrowseTags ($source_id,$_source,$_target,$_target2="") {
+    function doBrowseTags ($source_id,$_source,$_target,$_target2="",$_caption="") {
         try {
             $query="SELECT *,
-            ".$_target."_nama AS target_nama,
+            ".$_target."_".$_caption." AS target_".$_caption.",
             ".$_target."_id AS target_id,
             ".$_source."_id AS source_id";
             if ($_target2) {
@@ -19,24 +19,24 @@ class crudModel extends dsnSource {
             if ($_target2) {
                 $query.=" AND ".$_target2."_id=%i";
             }
-            $results = \DB::query($query,$source_id,$_SESSION[$_target2."_id"]);
+            $results = \DB::query($query,$source_id,$this->ses->val[$_target2."_id"]);
         } catch (\MeekroDBException $e) {
-			$this->exceptionHandler($e->getMessage());
+			$this->exceptionHandler('doBrowseTags:'.$e->getMessage());
 		}
 	return $results;
 	}
     
-    function doTagging($data,$_source,$_target,$_target2) {
+    function doTagging($data,$_source,$_target,$_target2,$_caption) {
         try {
             if ($_target2) {
                 $query="SELECT * FROM ".$this->tbl->table." WHERE ".$_source."_id=%i AND ".$_target."_id=%i AND ".$_target2."_id=%i";
-                $_tagged=\DB::queryFirstRow($query,$data['source_id'],$data['target_id'],$_SESSION[$_target2."_id"]);            
+                $_tagged=\DB::queryFirstRow($query,$data['source_id'],$data['target_id'],$this->ses->val[$_target2."_id"]);            
             } else {
                 $query="SELECT * FROM ".$this->tbl->table." WHERE ".$_source."_id=%i AND ".$_target."_id=%i";
                 $_tagged=\DB::queryFirstRow($query,$data['source_id'],$data['target_id']);
             }
             if ($_tagged['id']) {
-                throw new \Exception('AlreadyTagged: '.$_tagged[$_target.'_nama'].' source_id='.$data['source_id']);
+                throw new \Exception('AlreadyTagged: '.$_tagged[$_target.'_'.$_caption].' source_id='.$data['source_id']);
             } else {
                 $query="SELECT * FROM ".$this->tbl->source." WHERE id=%i";
                 $_sourceData=\DB::queryFirstRow($query,$data['source_id']);
@@ -49,21 +49,21 @@ class crudModel extends dsnSource {
                 $_insert[$_source.'_nama']=$_sourceData['nama'];
                 $_insert[$_source.'_level']=$_sourceData['level_label'];
                 $_insert[$_target.'_id']=$data['target_id'];
-                $_insert[$_target.'_nama']=$_targetData['nama'];
+                $_insert[$_target.'_'.$_caption]=$_targetData[$_caption];
                 
                 if ($_target2) {
                     $query="SELECT * FROM ".$this->tbl->$_target2." WHERE id=%i";
-                    $_target2Data=\DB::queryFirstRow($query,$_SESSION[$_target2.'_id']);
+                    $_target2Data=\DB::queryFirstRow($query,$this->ses->val[$_target2.'_id']);
                 }
                 $columns = \DB::columnList($this->tbl->table);
                 if (in_array($_target.'_level',$columns)) {
                     $_insert[$_target.'_level']=$_targetData['level_label'];
                 }
                 if (in_array($_target2.'_id',$columns)) {
-                    $_insert[$_target2.'_id']=$_SESSION[$_target2.'_id'];
+                    $_insert[$_target2.'_id']=$this->ses->val[$_target2.'_id'];
                 }
-                if (in_array($_target2.'_nama',$columns)) {
-                    $_insert[$_target2.'_nama']=$_target2Data['nama'];
+                if (in_array($_target2.'_'.$_caption,$columns)) {
+                    $_insert[$_target2.'_'.$_caption]=$_target2Data[$_caption];
                 }
                 if (in_array($_target2.'_level',$columns)) {
                     $_insert[$_target2.'_level']=$_target2Data['level_label'];
@@ -71,18 +71,57 @@ class crudModel extends dsnSource {
                 if (in_array($_target2.'_parent',$columns)) {
                     $_insert[$_target2.'_parent']=$_target2Data['parent_id'];
                 }
+                if ($_source=='wilayah') {
+                    $_query_w="SELECT * FROM ".$this->tbl->wilayah." WHERE id=%i";
+                    $_wilayah = \DB::queryFirstRow($_query_w,$data['source_id']);
+                    switch ($_wilayah['level']) {
+                        case "3":
+                            $_query_w="SELECT 0 AS kel_id, kec.id AS kec_id, 
+                            kab.id AS kab_id, kab.parent_id AS prov_id
+                            FROM ".$this->tbl->wilayah." AS kec
+                            LEFT JOIN ".$this->tbl->wilayah." AS kab
+                            ON kec.parent_id=kab.id
+                            WHERE kec.id=%i";
+                        break;
+                        case "4":
+                            $_query_w="SELECT kel.id AS kel_id, 
+                            kec.id AS kec_id, kab.id AS kab_id, 
+                            kab.parent_id AS prov_id 
+                            FROM ".$this->tbl->wilayah." AS kel
+                            LEFT JOIN ".$this->tbl->wilayah." AS kec
+                            ON kel.parent_id=kec.id
+                            LEFT JOIN ".$this->tbl->wilayah." AS kab
+                            ON kec.parent_id=kab.id
+                            WHERE kel.id=%i";
+                        break;
+                    }
+                    if ($_wilayah['level'] == '2') {
+                        $_insert['provinsi_id']=$_wilayah['parent_id'];
+                        $_insert['kabupaten_id']=$_wilayah['id'];
+                    } else {
+                        try {
+                            $_wilayah = \DB::queryFirstRow($_query_w,$_wilayah['id']);
+                            $_insert['provinsi_id']=$_wilayah['prov_id']+0;
+                            $_insert['kabupaten_id']=$_wilayah['kab_id']+0;
+                            $_insert['kecamatan_id']=$_wilayah['kec_id']+0;
+                            $_insert['kelurahan_id']=$_wilayah['kel_id']+0;
+                        } catch (\MeekroDBException $e) {
+                            $this->exceptionHandler($e->getMessage().":".$uri);
+                        }   
+                    }
+                }
                 \DB::insert($this->tbl->table, $_insert);
                 $_id = \DB::insertId();
                 return $_id;
             }
         } catch (\MeekroDBException $e) {
-			$this->exceptionHandler($e->getMessage());
+			$this->exceptionHandler('doTagging:'.$e->getMessage());
         } catch (\Exception $e) {
 			$this->exceptionHandler($e->getMessage());
 		}
 	}
     
-    function setBreadcrumb ($_id=0) {
+    function setBreadcrumb ($_id=0,$_caption="") {
         static $_c;
         try {
             $query="SELECT * FROM ".$this->tbl->table." WHERE id=%i";
@@ -90,11 +129,15 @@ class crudModel extends dsnSource {
             if (is_array($results)) {
                 foreach ($results as $row) {
                     $_c++;
-                    $this->breadcrumb[$_c]['caption']=$row['nama'];
+                    if ($_caption) {
+                        $this->breadcrumb[$_c]['caption']=$row[$_caption];
+                    } else {
+                        $this->breadcrumb[$_c]['caption']=$row['nama'];    
+                    }
                     $this->breadcrumb[$_c]['id']=$row['id'];
                     $this->breadcrumb[$_c]['level']=$row['level'];
                     $this->breadcrumb[$_c]['level_label']=$row['level_label'];
-                    if ($row['parent_id']>0) {$this->setBreadcrumb($row['parent_id']);}
+                    if ($row['parent_id']>0) {$this->setBreadcrumb($row['parent_id'],$_caption);}
                 }
             }
         } catch (\MeekroDBException $e) {

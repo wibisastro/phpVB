@@ -2,7 +2,7 @@
     <div class="select" v-if="scrolls>1">
       <select v-model="scroll" @change="setScroll()">
         <option disabled="disabled">Scrolls</option>
-        <option v-for="item in scrolls" :value="item">{{ item }}</option>
+        <option v-for="item in scrolls" :value="item">scroll {{ item }}</option>
       </select>
     </div>  
 </template>
@@ -24,6 +24,9 @@ module.exports = {
             /*
             this.setFirstPage(this.scroll*this.scrollInterval-this.scrollInterval+1);
             */
+        },
+        setRows(data) {
+            this.rows=data;
         },
     },
     created: function () {

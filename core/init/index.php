@@ -7,8 +7,6 @@
 *	Copyleft	: eGov Lab UI 
 *********************************************************************/
 
-session_start();
-
 //--------load configuration
 require_once __DIR__.'/../config/index.php';
 

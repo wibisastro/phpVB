@@ -1,27 +1,15 @@
 <template>
 <div>
-    <div class="dropdown" :class="{ 'is-active' : isActive}">
-      <div class="dropdown-trigger">
-        <button class="button" @click="getData()">
-          <span>Tags</span>
-          <span class="icon is-small">
-            <i class="fa fa-angle-down" aria-hidden="true"></i>
-          </span>
+    <b-dropdown :class="{ 'is-active' : isActive}" class="is-bottom-left">
+        <button class="button is-primary" slot="trigger" @click="getData()">
+            <span>Tags</span>
+            <b-icon icon="menu-down"></b-icon>
         </button>
-      </div>
-      <div class="dropdown-menu">
-        <div class="dropdown-content">
-            <div v-for="item in gridData">
-              <div class="dropdown-item" @click="setTag('setTag',source_id,item['id'])">
-                <a>{{ item['nama'] }}</a>
-              </div>
-              <hr class="dropdown-divider">
-            </div>
-            <a class="dropdown-item" @click="isActive=false">Close</a>
-        </div>
-      </div>
-    </div>
-</div>
+
+        <b-dropdown-item v-for="(item,key) in gridData" :key="key"  @click="setTag('setTag',source_id,item['id'])">
+            {{ item[tagCaption] }}
+        </b-dropdown-item>
+    </b-dropdown>
 </template>
 
 <script>
@@ -31,6 +19,7 @@ module.exports = {
         getUrl: String,
         postUrl: String,
         source_id: Number,
+        tagCaption: String,
         instance: {
             type: String,
             default: ""

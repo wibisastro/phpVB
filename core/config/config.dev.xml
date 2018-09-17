@@ -29,4 +29,7 @@
         <client_secret></client_secret>
     </googleoauth>
     <webroot>/phpvb/public</webroot>
+    <domain>
+		<localhost>home</localhost>
+	</domain>
 </gov2config>

@@ -56,24 +56,4 @@
 			<url>/examples/wilayah</url>
 		</menu>
 	</menu>
-	<menu>
-		<caption>DAK</caption>
-        <url>/dak</url>
-		<menu>
-			<caption>Bidang</caption>
-			<url>/dak/bidang</url>
-		</menu>
-		<menu>
-			<caption>Prioritas</caption>
-			<url>/dak/prioritas</url>
-		</menu>
-		<menu>
-			<caption>Teknis</caption>
-			<url>/dak/teknis</url>
-		</menu>
-		<menu>
-			<caption>Usulan</caption>
-			<url>/dak/usulan</url>
-		</menu>
-	</menu>
 </mainmenu>

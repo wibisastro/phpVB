@@ -1,10 +1,11 @@
 <?php
 require_once "../core/init/index.php";
+//print_r($_SESSION);
 
 //if (STAGE == 'dev') {
-	header('Access-Control-Allow-Origin: *'); 
-	header('Access-Control-Allow-Headers: Content-type');
-//	header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
 /*
 } else {
 

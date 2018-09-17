@@ -13,7 +13,7 @@ use GuzzleHttp\Psr7\Request;
 class api extends document {
     function __construct ($_dsn="master") {
         parent::__construct();  
-//        list($_link_id,$_name)=$this->connectDB($_dsn);
+        list($_link_id,$_name)=$this->connectDB($_dsn);
         $this->client = new \GuzzleHttp\Client();
     }
     

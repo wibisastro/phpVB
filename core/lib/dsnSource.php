@@ -47,7 +47,7 @@ class dsnSource extends document {
 	}
   
 	function connectDB ($dsnName="master") {
-		static $_recentRandom;
+		static $_recentRandom,$config;
         global $pageID;
         if (!$dsnName) {$dsnName="master";} 
 		$_dsns='../apps/'.$pageID.'/xml/dsnSource.'.STAGE.'.xml';
@@ -59,8 +59,9 @@ class dsnSource extends document {
                         $shared_file='../apps/'.$list->share.'/xml/dsnSource.'.STAGE.'.xml';
                         if (file_exists($shared_file)) {
                             $shared_file_list=simplexml_load_file($shared_file);
-                            if (is_object($list)) {
-                                $list=$shared_file_list;
+                            if (is_object($shared_file_list)) {
+                               // print_r($shared_file_list);
+                                $_dsn=$this->credential($shared_file_list,$dsnName);
                             } else {
                                 throw new \Exception('InvalidDSNShareFile:'.$shared_file);       
                             }
@@ -68,21 +69,15 @@ class dsnSource extends document {
                             throw new \Exception('DSNShareFileNotExist:'.$shared_file);
                         }                        
                     }
-					foreach ($list->dsn as $dsn) {
-						if ($dsnName==$dsn->name) {
-                            $this->dsnName=$dsnName;
-							$_user=$dsn->user;
-			                $_pass=$dsn->pass;
-			                $_host=$dsn->host;
-			                $_db=$dsn->db;	
-							
-							\DB::$user = $dsn->user;
-							\DB::$password = $dsn->pass;
-							\DB::$dbName = $dsn->db;
-							\DB::$host = $dsn->host;
-						}
-					}
-					$_link_id=mysqli_connect($_host, $_user, $_pass,$_db);
+                    if (!is_array($_dsn)) {
+                        $_dsn=$this->credential($list,$dsnName);   
+                    }
+					$_link_id=mysqli_connect($_dsn['host'],$_dsn['user'],$_dsn['pass'],$_dsn['db'],$_dsn['port']);
+                    /*
+                    if (mysqli_connect_errno()) {
+                      echo "Failed to connect to MySQL via $dsnName: " . mysqli_connect_error();
+                    }
+                    */
 					if ($_link_id) {
 						$result=array($_link_id,$_db,$_recentRandom);
 						return $result;
@@ -100,7 +95,41 @@ class dsnSource extends document {
         }	
         
 	}
+    
+    function credential ($list,$dsnName) {
+        global $config;
+        foreach ($list->dsn as $dsn) {
+            if ($dsnName==trim($dsn->name)) {
+                $this->dsnName=$dsnName;
+                $_result['user']=trim($dsn->user);
+                $_result['pass']=trim($dsn->pass);
+                $_result['host']=trim($dsn->host);
+                if ($dsn->port) {
+                    $_result['port']=trim($dsn->port);    
+                } else {
+                    $_result['port']="3306";
+                }
+                
+                $_result['db']=trim($dsn->db);	
 
+                $config->db_host=$_host; 
+
+                \DB::$user = trim($dsn->user);
+                \DB::$password = trim($dsn->pass);
+                \DB::$dbName = trim($dsn->db);
+                \DB::$host = trim($dsn->host);
+                if ($dsn->port) {
+                    \DB::$port = trim($dsn->port);
+                } else {
+                    \DB::$port = "3306";
+                }
+//                if ($_SESSION['account_id']==14) echo \DB::$host;
+                return $_result;
+                break;
+            }
+        }
+    }
+    
 	function writeDB ($query,$fname,$table="") {
 		try {
 			list($_link_id,$db_name)=$this->connectDB($this->dsnName);

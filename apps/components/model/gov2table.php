@@ -6,6 +6,7 @@ class gov2table extends \Gov2lib\dsnSource {
         $path=explode("\\",__CLASS__);
         $this->className=$path[sizeof($path)-1];
         $GLOBALS['vueData']['geturl']='gov2table';
+        $GLOBALS['vueData']['isTableActive']='true';
         $GLOBALS['vueData']['records']=0;
         $GLOBALS['vueData']['interval']=array(10,20,50,100);
         $GLOBALS['vueCreated'].='eventBus.$on("setItemPerPage", this.setItemPerPage);';

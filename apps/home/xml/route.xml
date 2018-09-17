@@ -20,4 +20,14 @@
 		<uri>/maintenance.html</uri>
 		<handler>home\model\html</handler>
 	</route>
+    <route>
+		<method>GET</method>
+		<uri>/home/error</uri>
+		<handler>home\model\error</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/home</uri>
+		<handler>home\model\index</handler>
+	</route>
 </list>

@@ -17,28 +17,35 @@ class crudHandler extends crudModel {
         return $response;
     }
     
-    function getBrowseTags ($_id,$_source,$_target,$_target2="") {
-        global $doc;
+    function getBrowseTags ($_id,$_source,$_target,$_target2="",$_caption="") {
+        global $doc,$config,$self;
+        if ($_source=='wilayah' && ($_id==-1 || $_id==-2) && !$self->ses->val[$this->className.'_id']) {
+            $_id=trim($config->domain->attr['id']);
+        }
         $_id=$this->setRememberId($_id,$_source);
-        $data=$this->doBrowseTags($_id,$_source,$_target,$_target2);
+        $data=$this->doBrowseTags($_id,$_source,$_target,$_target2,$_caption);
         if (sizeof($data)==0) {$data=array("data"=>"empty");}
         return $doc->responseGet($data);        
     }
     
-    function postTagging ($_data,$_source,$_target,$_target2="") {
+    function postTagging ($_data,$_source,$_target,$_target2="",$_caption="") {
         global $doc;
         if (!$_data['source_id'] || !$_data['target_id']) {
             $response["class"]="is-warning";
             $response["notification"]="Pasangan ID tidak lengkap";
             header("HTTP/1.1 422 Incomplete fields");                    
         } else {
-            $id=$this->doTagging($_data,$_source,$_target,$_target2);
+            $id=$this->doTagging($_data,$_source,$_target,$_target2,$_caption);
             if (!is_array($doc->error)) {
                 $data=$this->doRead($id);
                 $response=$doc->response("is-primary","",$data['id']);
             } else {
-                $response=$doc->response("is-danger","");
-                header("HTTP/1.1 422 Query Fails");
+                $response["class"]="is-danger";
+    //            list($_caption,$_text)=explode(":",$doc->error);
+//                $response["notification"]="$_caption: $_text";
+                $response["notification"]=$doc->error;
+                $response["callback"]="infoSnackbar";
+                header("HTTP/1.1 422 Insert Fails");
             }
         }
         return $response;
@@ -96,10 +103,12 @@ class crudHandler extends crudModel {
         return $response;
     }
     
-    function getBreadcrumb ($_root) {
+    function getBreadcrumb ($_root,$_id=0,$_caption="") {
         global $vars,$doc,$config;
-        $_id=$this->setRememberId($vars['id']);
-        $this->setBreadcrumb($_id);
+        unset($this->breadcrumb);
+        if (!$_id) {$_id=$vars['id'];}
+        $_id=$this->setRememberId($_id,$_caption);
+        $this->setBreadcrumb($_id); 
         if (!$doc->error) {
             krsort($this->breadcrumb);
             $c=1;
@@ -169,17 +178,18 @@ class crudHandler extends crudModel {
             $_classname=$self->className;
         }
         if ($_id==-1) {
-            if ($_SESSION[$_classname.'_id']) {
-                $_id=$_SESSION[$_classname.'_id'];
+            if ($self->ses->val[$_classname.'_id']) {
+                $_id=$self->ses->val[$_classname.'_id'];
             } else {
                 $_id=0;
             }
         } elseif ($_id==-2) {
-            unset($_SESSION[$self->className.'_id']);
+            $self->ses->val[$self->className.'_id']="";
             $_id=0;
         } elseif ($_id!=0) {
-            $_SESSION[$_classname.'_id']=$_id;
+            $self->ses->val[$_classname.'_id']=$_id;
         }
+        $self->ses->sesSave($self->ses->val);
     return $_id;
     }
 }

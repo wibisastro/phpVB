@@ -25,10 +25,10 @@ try {
     }
 
     if ($doc->error) {
-        $doc->baseBody="bulmaBody.html";
+        $doc->baseBody="errorBody.html";
     }
     
-    $templates=array(__DIR__.'/../template/bulma');
+    $templates=array(__DIR__.'/../template/bulma',__DIR__.'/../template/general');
 
     $loader = new Twig_Loader_Filesystem($templates);
 

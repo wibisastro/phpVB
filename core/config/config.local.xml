@@ -3,11 +3,11 @@
     <comm>ok</comm>
     <title>SSO Node Gov2</title>
     <webmaster>wibi@alumni.ui.ac.id</webmaster>
-	<secure>true</secure>
+	<secure></secure>
     <platform>
-        <apikey>http://gov2.local.mti08.vlsm.org/api.php</apikey>
+        <apikey>http://gov2.local.mti08.vlsm.org</apikey>
         <ssonode>http://sso.local.gov2.web.id</ssonode>
-        <ssoconn>http://sso.local.gov2.web.id</ssoconn>
+        <ssoconn>http://sso.gov2.web.id</ssoconn>
     </platform>
     <apikey>
         <public>81d03a754448e774d706f0754acd88ff</public>
@@ -28,9 +28,8 @@
     </googleoauth>
     <webroot></webroot>
     <domain>
-        <mti08.local.vlsm.org>gov2session</mti08.local.vlsm.org>
-        <api.local.krisna.systems>apikrisna</api.local.krisna.systems>
-        <dak.bappeda.web.id>dak</dak.bappeda.web.id>
-        <api.kl2.web.id>apikrisna</api.kl2.web.id>
+        <rajaampatkab.local.kpu.go.id id="82850" level="2" shift="ALL">dpdraft</rajaampatkab.local.kpu.go.id>
+        <api.local.kpu.go.id>sidalih</api.local.kpu.go.id>
+        <api.local.krisna.systems>rkp</api.local.krisna.systems>
     </domain>
 </gov2config>

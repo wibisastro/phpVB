@@ -44,9 +44,10 @@ module.exports = {
             }
             if (this.pathData.length > 0) {this.isActive=true;}
             else {this.isActive=false;}
+//            eventBus.$emit('loadingStart');
         },
         getData: function(id) {
-
+//            eventBus.$emit('loadingStart');
             if (id) {url=this.pathUrl+'/'+id}
             else {url=this.pathUrl;}
             
@@ -65,6 +66,7 @@ module.exports = {
         },
         onGetDataFail: function(data) {
             eventBus.$emit('openNotif',data);
+//            eventBus.$emit('loadingDone');
         },
         getBack: function(data) {
             if (this.instance) {
@@ -80,11 +82,11 @@ module.exports = {
         },
     },
     created: function () { 
-        if (this.instance) {
+    //    if (this.instance) {
             this.getData(-1);        
-        } else {
-            this.getData();   
-        }
+    //    } else {
+    //        this.getData();   
+    //    }
         eventBus.$on('refreshPath'+this.instance, this.getData);
         eventBus.$on('onInstance', this.activeInstance);
     }

@@ -10,10 +10,11 @@ use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 
-class gov2session extends document {
-    function __construct () {
+class gov2session extends dsnSource {
+    function __construct ($_auth="") {
+        parent::__construct();
         $this->client = new \GuzzleHttp\Client();
-        $this->timeout	= 60*5; #-----5 menit     
+        $this->timeout	= time()+(24*60*60); #-----1 hari
         if (isset($_GET['view'])) {
             switch($_GET['view']) {
                 case "cases":echo json_encode($cases);break;
@@ -22,55 +23,244 @@ class gov2session extends document {
             }
             exit;
         }
+        if ($_COOKIE['Gov2Session']) {
+            $this->sesRead($_COOKIE['Gov2Session']);
+        } else {
+            if ($_auth["cmd"]!='sessave') { 
+                $_token['userRole']="public";
+                $this->sesSave($_token,1);
+            }
+        }
     }
     
-    function authenticate ($_privilege="member") {
-        global $pageID,$doc;
+    function sesReset () {
+        global $publickey;
+        unset($_COOKIE['Gov2Session']);
+        setcookie("Gov2Session");
+    }
+    
+    function sesSave ($data,$redirect=0) {
+        global $publickey;
+        if ($_COOKIE['Gov2Session']) {
+            $_token = $_COOKIE['Gov2Session'];
+        } else {
+            $_data['userRole']="public";
+            $_token = \Firebase\JWT\JWT::encode($_data,$publickey);
+        }
+        $_existing = \Firebase\JWT\JWT::decode($_token, $publickey, array('HS256'));
+        $_data = array_merge((array)$_existing,(array)$data);
+        $_token = \Firebase\JWT\JWT::encode($_data,$publickey);
+        setcookie("Gov2Session", $_token, $this->timeout,"/");
+        if ($redirect) { 
+            header('location: /');
+            exit;
+        }
+    }
+    
+    function sesRead ($data) {
+        global $publickey;
+        $_result=\Firebase\JWT\JWT::decode($data, $publickey, array('HS256'));
+        $this->val=json_decode(json_encode($_result), true);
+//        $GLOBALS['_GOV2SES']=(array)$_result;
+    }
+    
+    function authenticate ($_privilege="member", $_maintenance="") {
+        global $pageID,$doc,$config;
         $_valid="";
+        
         try {
-            if (!isset($_SESSION['account_id']) && $_privilege!="public") {
-                throw new \Exception("NotLogin:Page ".strtoupper($pageID)." requires you to login");
-            } else {
-                if (time()-$_SESSION["started"] > time()+$this->timeout) {
-                    throw new \Exception("sessionExpired:Please re-login");
+            if (STAGE!='dev') {
+				if ($config->domain->attr['shift'] && $config->domain->attr['shift'] != date("A") && $config->domain->attr['shift']!='ALL') {
+                    throw new \Exception("WrongTime:Portal ini hanya dapat dibuka pada waktu ".$config->domain->attr['shift']);
+                } elseif (!isset($this->val['account_id']) && $_privilege!="public") {
+                    throw new \Exception("NotLogin:Halaman ".strtoupper($pageID)." harus login terlebih dahulu");
                 } else {
-                    if ($_privilege=="member" || $_privilege=="webmaster") {
-                        $xml=__DIR__.'/../../apps/'.$pageID.'/xml/gov2member.xml';
-                        $_members=simplexml_load_file($xml);
-                        if (is_array($_members)) {
-                            foreach ($_members->member as $_member) {
-                                if ($_member->account_id==$_SESSION["account_id"]) {
-                                    $_valid=$_member;
-                                    break;
-                                } else {
-                                    throw new \Exception("NotMember:You need to be registered, please contact the admin");
+                    $doc->body['_SESSION']=(array)$this->val;
+                    
+                    if (!$this->val['id']) {
+                        $_member=$this->memberRead($this->val['account_id']);
+                        if ($_member['id']) {
+                            $_gov2session['id']=$_member['id'];
+                            $_gov2session['userRole']=$_member['role'];
+                            $_gov2session['status']=$_member['status'];
+                            $this->sesSave($_gov2session,1);
+                        }
+                    } else {
+                        $doc->body['_SESSION["userRole"]']=$this->val['userRole'];
+//                        $this->memberUpdateCounter($this->val['id']);
+                        switch ($this->val['status']) {
+                            case "pending":
+                                throw new \Exception("Pending:Akun Anda belum aktif, silahkan aktivasi terlebih dahulu");
+                            break;
+                            case "suspended":
+                                throw new \Exception("Suspended:Akun Anda terblokir, silakan hubungi Admin");
+                            break;
+                            default:
+                                $_userRole=array('guest'=>'1', 
+                                        'member'=>'2', 
+                                        'admin'=>'3',
+                                        'webmaster'=>'4',
+                                        'owner'=>'5',
+                                        'developer'=>'6');
+                                $_pageRole=array('guest'=>'1',
+                                        'member'=>'2',
+                                        'admin'=>'3',
+                                        'webmaster'=>'4',
+                                        'closed'=>'5',
+                                        'maintenance'=>'6');
+                                if ($_userRole[$this->val['userRole']]<$_pageRole[$_privilege] && $_privilege!='closed' && $_privilege!='maintenance') {
+                                    throw new \Exception("Unauthorized:Akun Anda tidak memiliki wewenang, silakan hubungi Admin");
+                                } elseif ($_userRole[$this->val['userRole']]<$_pageRole[$_privilege] && $_privilege=='closed') {
+                                    throw new \Exception("Closed:Menu ini ditutup");
+                                } elseif ($_userRole[$this->val['userRole']]<$_pageRole[$_privilege] && $_privilege=='maintenance') {
+                                    throw new \Exception("Maintenance:System sedang dalam peningkatan kapasitas hingga jam ".$_maintenance);
                                 }
-                            }
-                            if (!$_valid->webmaster) {
-                                foreach ($_valid->privilege as $cases) {
-                                    $_controller = $cases->attributes();
-                                    if ($_controller['controller']==$_SERVER['SCRIPT_NAME']) {
-                                        break;
-                                    } else {
-                                        throw new \Exception("UnAuthorized:".$_SERVER['SCRIPT_NAME']);
-                                    }
-                                }
-                            }
-                        } else {
-                            throw new \Exception("InvalidXMLFile:".$pageID."/xml/gov2member.xml");
                         }
                     }
-                    $_SESSION["started"]=time()+$this->timeout;
-                    $_SESSION["counter"]++;
-//                    $this->cookie_save('started,counter');
-                //    } 
                 }
+            } else {
+                $doc->body("_SESSION['fullname']",'Development');
+                $doc->body("_SESSION['account_id']']",'-1');
             }
         } catch (\Exception $e) {
             $doc->exceptionHandler($e->getMessage());
         }
-        $this->authorized=$_SESSION;
+//        $this->authorized=$_gov2session;
     }
+    
+    function memberUpdateCounter($id) {
+        try {
+            $_query="UPDATE member SET counter=counter+1,lastlogin_at=NOW() WHERE id=%i";
+            \DB::query($_query,$id);
+        } catch (\MeekroDBException $e) {
+			$this->exceptionHandler($e->getMessage());
+		}
+	}
+    
+    function memberRead ($id=0) {
+        global $doc;
+        try {
+            $query="SELECT * FROM member WHERE account_id=%i";
+            $result=\DB::queryFirstRow($query,$id);
+            if (!is_array($result)) {
+                $_id=$this->insertMember();
+                $query="SELECT * FROM member WHERE account_id=%i";
+                $result=\DB::queryFirstRow($query,$_id);
+            }
+        } catch (\MeekroDBException $e) {
+			$doc->exceptionHandler($e->getMessage());
+		}
+	return $result;
+	}
+    
+    function insertMember () {
+        global $doc,$config;
+//        $_attr=$config->domain->{$_SERVER["SERVER_NAME"]}->attributes();
+        try {
+            if ($this->val['account_id'] == '14' || $this->val['account_id'] == '138') {$_role='developer';}
+            else {$_role='guest';}
+            if ($config->domain->attr['level']==1) {
+                $_kab_id=0;
+                $_prov_id=trim($config->domain->attr['id']);
+            } else {
+                $_kab_id=trim($config->domain->attr['id']);
+                $_prov_id=$this->wilayahRead(trim($config->domain->attr['id']));
+                $_prov_id+=0;
+            }
+            $_fields=array('account_id' => $this->val['account_id'],
+                'fullname' => $this->val['fullname'],
+                'email' => $this->val['email'],
+                'status' => "active",
+                'role' => $_role,
+                'counter' => "1",
+                'lastlogin_at' => date('Y-m-d H:i:s'),
+                'created_at' => date('Y-m-d H:i:s'),
+                'kab_id' => $_kab_id,
+                'prov_id' => $_prov_id 
+             );
+            \DB::insert("member", $_fields);
+            return \DB::insertId();
+        } catch (\MeekroDBException $e) {
+			$doc->exceptionHandler($e->getMessage());
+		} catch (\Exception $e) {
+			$doc->exceptionHandler($e->getMessage());
+		}
+	}
+    
+    function wilayahRead ($kab_id) {
+        global $doc;
+        $_query="SELECT * FROM wilayah WHERE id=%i";
+        try {
+            $result=\DB::queryFirstRow($_query,$kab_id);
+        } catch (\MeekroDBException $e) {
+        	$doc->exceptionHandler($e->getMessage());
+		}
+        return $result['parent_id'];
+	}
+    
+    function authorize ($wilayah_id) {
+        global $pageID,$doc;
+        $_valid="";
+        try {
+            if (STAGE!='dev') {
+                if (!$this->val['privilege']) {
+                    $_privilege=$this->privilegeRead($wilayah_id);
+                    $_gov2session['privilege']=$_privilege;
+                    $this->sesSave($_gov2session);
+                } elseif ($this->val['privilege']['wilayah_id']!=$wilayah_id) {
+                    unset($this->val['privilege']);
+                    $_privilege=$this->privilegeRead($wilayah_id);
+                    $_gov2session['privilege']=$_privilege;
+                    $this->sesSave($_gov2session);
+                }
+                if ($this->val['privilege']['authorisation']=='authorized') {
+                    $doc->body['wilayah_penugasan']=$this->val['privilege']['wilayah_nama'];
+                } elseif ($this->val['privilege']['authorisation']=='unauthorized' && $this->val['userRole']=='member')  {
+                  throw new \Exception("Unauthorized:Akun Anda tidak memiliki wewenang di ".ucfirst($this->val['privilege']['level_label'])." ".$this->val['privilege']['nama'].", silakan hubungi Admin");   
+                }
+            } else {
+                $this->val['privilege']['authorisation']='authorized';
+                $this->val['privilege']['wilayah_id']=$wilayah_id;
+                $this->sesSave($_gov2session);
+            }
+        } catch (\Exception $e) {
+            $doc->exceptionHandler($e->getMessage());
+        }
+//        $this->authorized=$this->val;
+    }
+    
+    function privilegeRead ($wilayah_id) { 
+        global $doc,$config,$self;
+        try {
+            $_query="SELECT * FROM wilayah WHERE id=%i";
+            $_wilayah=\DB::queryFirstRow($_query,$wilayah_id);
+            #otorisasi level kecamatan kebawah
+            if ($_wilayah['level']==3) {
+                $_kec_id=$wilayah_id;
+            } elseif ($_wilayah['level']==4) {
+                $_kec_id=$_wilayah['parent_id'];
+            } else {
+                $_kec_id=0;
+            }
+            if ($_kec_id>0) {
+                $_query="SELECT * FROM privilege WHERE member_id=%i AND kecamatan_id=%i";
+                $_result=\DB::queryFirstRow($_query,$self->ses->val['id'],$_kec_id);
+                if ($_result['id']) {
+                    $_result['authorisation']='authorized';    
+                } else {
+                    $_result=$_wilayah;
+                    $_result['authorisation']='unauthorized';
+                }
+            } else {
+                $_result=$_wilayah;
+                $_result['authorisation']='authorized';
+            }
+        } catch (\MeekroDBException $e) {
+			$doc->exceptionHandler($e->getMessage());
+		}
+	return $_result;
+	}
+    
     /*
     function getdata ($url) {
         global $doc;

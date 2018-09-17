@@ -21,7 +21,6 @@ class document extends customException {
 	function __construct () {
         global $config;
 		$this->body=array();
-		$this->body['_SESSION']=$_SESSION;
 		$this->body['_SERVER']=$_SERVER;
 //		$this->body['debug']=$_GET['debug'];
         $this->body['webroot']=$config->webroot;
@@ -40,14 +39,15 @@ class document extends customException {
 		}
     }
     
-    function take ($_appDir,$_class="",$_fn="",$_param="") {
-        global $loader;
+    function take ($_appDir,$_class="",$_fn="",$_param="", $_dsn="") {
+        global $loader,$config;
         if (!$_class) {$_class=$_appDir;}
         $_handler = "\App\\".$_appDir."\model\\".$_class;
         try {
             $this->component($_appDir);
             if (class_exists($_handler)) {
-                $this->$_class=new $_handler;
+                if (!$_dsn) {$_dsn=$config->domain->attr['dsn'];}
+                $this->$_class=new $_handler($_dsn);
                 $loader->addPath($this->$_class->templateDir,$_appDir);
                 if ($_fn && !$_param) {
                     if (method_exists($this->$_class,$_fn)) {
@@ -133,6 +133,7 @@ class document extends customException {
         global $doc;
 		$_components=array();
         $_dir=__DIR__."/../../apps/$_appDir";
+        /*
         switch (STAGE) {
             case "prod":
             case "build":
@@ -140,14 +141,22 @@ class document extends customException {
             case "dev":
                 $_dir.="/vue";
             break;
-                /*
+                
                 $_dir.="/js";
             break;
-            */
+            
         }
+        */
+        $_dir.="/vue";
 		if (file_exists($_dir)) {
 	        $_files = array_slice(scandir($_dir), 2);
 	        foreach($_files as $_key => $_val) {
+                if (substr($_val,-4)==".vue" && substr($_val,0,1)!="_") {
+                    $_components[$_key]["component"]=$_val;
+                    $_components[$_key]["tag"]=str_replace(".vue","",$_val);
+                    $_components[$_key]["pageID"]=$_appDir;
+                }
+                /*
 	            switch (STAGE) {
 	                case "prod":
 	                case "build":
@@ -159,7 +168,7 @@ class document extends customException {
                             $_components[$_key]["pageID"]=$_appDir;
 	                    }
 	                break;
-                        /*
+                        
 	                case "prod":
 	                    if (substr($_val,-3)==".js") {
 	                        $_components[$_key]["component"]=$_val;
@@ -167,8 +176,9 @@ class document extends customException {
                             $_components[$_key]["pageID"]=$_appDir;
 	                    }
 	                break;
-                    */
+                    
 	            }
+                */
 	        }
 			$doc->body['components'][$_appDir]=$_components;
 		}
@@ -182,8 +192,9 @@ class document extends customException {
     function response ($_class,$_callback="",$_id=0) {
         global $_POST, $vars, $doc;
         if (is_array($doc->error)) {
-            foreach($doc->error as $_key => $_val);
-            $_message="$_key: $_val";
+            foreach($doc->error as $_key => $_val) {
+                $_message.="$_key: $_val\n";
+            }
         } else {
             if ($_POST["cmd"]) {$_cmd=strtoupper($_POST["cmd"]);}
             if ($vars["cmd"]) {$_cmd=strtoupper($vars["cmd"]);}
@@ -242,8 +253,12 @@ class document extends customException {
             $this->body("pageTitle",'Exception Occured');
             $this->body("subTitle","Please check exception list below ");
             $this->body("errors",$this->error);
-            $_errorBody=array('@components/gov2navBreadcrumb.html');
-            array_push($_errorBody,'errorMessage.html');
+            if ($this->error['NotLogin']) {
+                $_errorBody=array('errorMessage.html');
+            } else {
+                $_errorBody=array('@components/gov2navBreadcrumb.html');
+                array_push($_errorBody,'errorMessage.html');                
+            }
             array_push($_errorBody,'@components/gov2notification.html');
             if ($this->error['ErrToken']) {
                 array_push($_errorBody,'tokenMan.html');        
