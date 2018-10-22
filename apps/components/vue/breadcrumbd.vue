@@ -57,7 +57,12 @@ module.exports = {
             if ( linger>0 || reset>0 ) {
                 printUrl="Invalid";
             } else {
-                printUrl=url.replace(this.instance+'/', "");
+                if (this.urlListener) {
+                    //printUrl=url.replace('/', "");
+                    printUrl=url;
+                } else {
+                    printUrl=url.replace(this.instance+'/', "");    
+                }
             }
             eventBus.$emit('printUrl'+this.urlListener,printUrl);
             axios.get(url)

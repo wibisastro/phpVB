@@ -33,13 +33,19 @@ try {
     } else {
         list($param,$pageID,$scriptID,$cmdID)=explode("/",str_replace($config->webroot,"",$uri));
     }
+    
     if (!$pageID || 
+        $pageID=="install.php" || 
         $pageID=="index.php" || 
         $pageID=="gov2login.php" || 
         strstr($pageID,'.html')) {
             if (strstr($pageID,'.html')) {$htmlFile=$pageID;}
             elseif ($pageID=="gov2login.php") {
                 $pageID="gov2login";
+                $req=json_decode(stripslashes($_POST["req"]),true);
+                $_POST=array_merge($_POST,$req);
+            } elseif ($pageID=="install.php") {
+                $pageID="gov2config";
                 $req=json_decode(stripslashes($_POST["req"]),true);
                 $_POST=array_merge($_POST,$req);
             } else {

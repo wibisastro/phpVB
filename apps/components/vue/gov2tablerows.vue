@@ -6,12 +6,12 @@
             <span v-if="totalRows == 0"> 
                 <img src="../../images/working.gif"> 
             </span> &nbsp;
-           row(s) in &nbsp;
-            <span v-if="scrolls > 0"> {{ scrolls }} </span>
+           row(s) 
+            <span v-if="scrolls > 0"> in {{ scrolls }} scroll(s)</span>
             <span v-if="scrolls == 0"> 
-                <img src="../../images/working.gif">  
+                &nbsp;<img src="../../images/working.gif">  
             </span> &nbsp;
-         scroll(s)</span>
+         </span>
     </div>
     <div v-if="rows > 1 && noscroll">
         <span class="button">{{ rows }} row(s)</span>

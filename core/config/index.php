@@ -7,8 +7,9 @@
 *********************************************************************/
 //----todo pisahkan list domain ke file xml
 try { 
+    error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
     $publickey="c65ca73ce4c38dcec21151aa64f1590c";
-    $stages=array('dev','cybergl','biznet','drc','bppt','bssn','local');
+    $stages=array('dev','local','cybergl','biznet','drc','bppt','bssn');
     foreach($stages AS $stage) {
         if (file_exists(__DIR__."/config.".$stage.".xml")) {
             $config = simplexml_load_file(__DIR__."/config.".$stage.".xml");
@@ -24,6 +25,7 @@ try {
             throw new Exception('ConfigFileNotExist:'.__DIR__.'/config.'.$stage.'.xml');
         }
     }
+    
     switch (STAGE) {
         case "drc":
         case "cybergl":
@@ -48,14 +50,15 @@ try {
 //            error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
         break;
         default:
-            throw new Exception('UnConfiguredDomain');
+            //throw new Exception('UnConfiguredDomain');
+            define('STAGE','install');
 	}
     if ($config->secure==true) {
         $config->protocol="https";
     } else {
         $config->protocol="http";
     }
-    if (STAGE != 'dev') {
+    if (STAGE != 'dev' && STAGE != 'install') {
         foreach($config->domain->{$_SERVER["SERVER_NAME"]}->attributes() as $k => $v) {
             $config->domain->attr[$k]=$v;
         }

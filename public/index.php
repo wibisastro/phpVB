@@ -1,6 +1,6 @@
 <?php
+
 require_once "../core/init/index.php";
-//print_r($_SESSION);
 
 //if (STAGE == 'dev') {
 header('Access-Control-Allow-Origin: *');

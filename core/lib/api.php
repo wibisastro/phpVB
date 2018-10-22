@@ -1,6 +1,6 @@
 <?php namespace Gov2lib;
 /*
-Author		: Wibisono Sastrodiwiryoz
+Author		: Wibisono Sastrodiwiryo
 Date		: 21 Dec 2017
 Copyleft	: eGov Lab UI
 Contact		: wibi@alumni.ui.ac.id
@@ -12,16 +12,16 @@ use GuzzleHttp\Psr7\Request;
 
 class api extends document {
     function __construct ($_dsn="master") {
-        parent::__construct();  
-        list($_link_id,$_name)=$this->connectDB($_dsn);
+        parent::__construct();
+//        list($_link_id,$_name)=$this->connectDB($_dsn);
         $this->client = new \GuzzleHttp\Client();
     }
     
     function getdata ($url) {
         global $doc;
         try {
-            $res = $this->client->request('GET', $url);
-            return $res->getBody();
+            $res = $this->client->request('GET', $url,['headers' => ['Accept' => 'application/json']]);
+            return json_decode($res->getBody(),1);
         } catch (ClientException $e) {
             $doc->error("RequestError",Psr7\str($e->getRequest()));
             $doc->error("ResponseError",Psr7\str($e->getResponse()));

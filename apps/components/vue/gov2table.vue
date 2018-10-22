@@ -518,16 +518,24 @@ module.exports = {
     hasChildren: function (data) {
         eventBus.$emit('hasChildren',parseInt(data));
     },
-    sayUrl: function (url) {
+    sayUrl: function (url,listener) {
         let printUrl;
         let linger=url.indexOf('-1');
         let reset=url.indexOf('-2');
         if ( linger>0 || reset>0 ) {
             printUrl="Invalid";
         } else {
-            printUrl=url.replace(this.instance+'/', "");
+//            printUrl=url.replace(this.instance+'/', "");
+            printUrl=url;
+//            printUrl=url.replace(this.getUrl+'/', "");
         }
-        eventBus.$emit('printUrl'+this.instance,printUrl);
+        if (listener) {
+            eventBus.$emit('printUrl'+listener,printUrl);
+        } else {
+            eventBus.$emit('printUrl'+this.instance,printUrl);            
+        }
+
+//        eventBus.$emit('printUrl',printUrl);
     },
     getData: function(id) {
         eventBus.$emit('loadingStart',this.instance);
@@ -543,6 +551,7 @@ module.exports = {
     getTotalRecord: function(id) {
         if (this.recursive) {url=this.getUrl+'/count/'+id;}
         else {url=this.getUrl+'/count';}
+        this.sayUrl(url,'count');
         axios.get(url)
             .then(response => this.onGetTotalRecordDone(response.data))
             .catch(error => this.onGetDataFail(error.response.data));

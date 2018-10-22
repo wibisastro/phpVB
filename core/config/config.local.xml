@@ -31,5 +31,7 @@
         <rajaampatkab.local.kpu.go.id id="82850" level="2" shift="ALL">dpdraft</rajaampatkab.local.kpu.go.id>
         <api.local.kpu.go.id>sidalih</api.local.kpu.go.id>
         <api.local.krisna.systems>rkp</api.local.krisna.systems>
+        <lkpp.local.kl2.web.id>apisirup</lkpp.local.kl2.web.id>
+        <api.local.kl2.web.id>rkp</api.local.kl2.web.id>
     </domain>
 </gov2config>

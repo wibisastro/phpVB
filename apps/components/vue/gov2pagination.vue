@@ -32,6 +32,7 @@
 module.exports = {
   name: 'gov2pagination',
   props: {
+    instance: String,
     records: Number,
     itemPerPage: Number,
     scrollInterval: Number

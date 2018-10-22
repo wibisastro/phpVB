@@ -28,7 +28,7 @@ class gov2session extends dsnSource {
         } else {
             if ($_auth["cmd"]!='sessave') { 
                 $_token['userRole']="public";
-                $this->sesSave($_token,1);
+//                $this->sesSave($_token,1);
             }
         }
     }
@@ -67,7 +67,6 @@ class gov2session extends dsnSource {
     function authenticate ($_privilege="member", $_maintenance="") {
         global $pageID,$doc,$config;
         $_valid="";
-        
         try {
             if (STAGE!='dev') {
 				if ($config->domain->attr['shift'] && $config->domain->attr['shift'] != date("A") && $config->domain->attr['shift']!='ALL') {
@@ -76,8 +75,8 @@ class gov2session extends dsnSource {
                     throw new \Exception("NotLogin:Halaman ".strtoupper($pageID)." harus login terlebih dahulu");
                 } else {
                     $doc->body['_SESSION']=(array)$this->val;
-                    
-                    if (!$this->val['id']) {
+
+                    if (!$this->val['id'] && $_privilege!='public') {
                         $_member=$this->memberRead($this->val['account_id']);
                         if ($_member['id']) {
                             $_gov2session['id']=$_member['id'];
@@ -141,6 +140,7 @@ class gov2session extends dsnSource {
         global $doc;
         try {
             $query="SELECT * FROM member WHERE account_id=%i";
+//            echo \DB::$host;
             $result=\DB::queryFirstRow($query,$id);
             if (!is_array($result)) {
                 $_id=$this->insertMember();
@@ -205,13 +205,17 @@ class gov2session extends dsnSource {
             if (STAGE!='dev') {
                 if (!$this->val['privilege']) {
                     $_privilege=$this->privilegeRead($wilayah_id);
-                    $_gov2session['privilege']=$_privilege;
-                    $this->sesSave($_gov2session);
+//                    $_gov2session['privilege']=$_privilege;
+                    $this->val['privilege']=$_privilege;
+//                    $this->sesSave($_gov2session);
+                    $this->sesSave($this->val);
                 } elseif ($this->val['privilege']['wilayah_id']!=$wilayah_id) {
                     unset($this->val['privilege']);
                     $_privilege=$this->privilegeRead($wilayah_id);
-                    $_gov2session['privilege']=$_privilege;
-                    $this->sesSave($_gov2session);
+//                    $_gov2session['privilege']=$_privilege;
+//                    $this->sesSave($_gov2session);
+                    $this->val['privilege']=$_privilege;
+                    $this->sesSave($this->val);
                 }
                 if ($this->val['privilege']['authorisation']=='authorized') {
                     $doc->body['wilayah_penugasan']=$this->val['privilege']['wilayah_nama'];
@@ -221,7 +225,8 @@ class gov2session extends dsnSource {
             } else {
                 $this->val['privilege']['authorisation']='authorized';
                 $this->val['privilege']['wilayah_id']=$wilayah_id;
-                $this->sesSave($_gov2session);
+//                $this->sesSave($_gov2session);
+                $this->sesSave($this->val);
             }
         } catch (\Exception $e) {
             $doc->exceptionHandler($e->getMessage());

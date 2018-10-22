@@ -16,3 +16,12 @@ apps/sidalih
 apps/kementerian
 apps/monitoringdp
 core/scripts
+apps/apisirup
+apps/wilayah
+apps/renjakl
+apps/gov2config
+config.biznet.xml
+core/config/config.bppt.xml
+core/config/config.bssn.xml
+core/config/config.cybergl.xml
+core/config/config.drc.xml
