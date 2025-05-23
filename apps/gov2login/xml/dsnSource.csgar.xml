@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+    <dsn>
+        <name>master</name>
+        <host>localhost</host>
+        <user>admin</user>
+        <pass>B3k3s0ng</pass>
+        <db>gov2_sso</db>
+    </dsn>
+
+    <dsn>
+        <name>sso.csgar.ui.ac.id</name>
+        <host>localhost</host>
+        <user>admin</user>
+        <pass>B3k3s0ng</pass>
+        <db>gov2_sso</db>
+    </dsn>
+</list>

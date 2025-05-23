@@ -1,0 +1,32 @@
+<div class="card">
+  <header class="card-header">
+    <p class="card-header-title">
+      Wilayah
+    </p>
+  </header>
+  <div class="card-content">
+    <div class="content">
+        <breadcrumbd path-url="/apiwilayah/widget/breadcrumb" :link="false" instance="wilayah"></breadcrumbd>
+    </div>
+  </div>
+    <div>
+        <gov2table
+            :is-active="true"
+            get-url="/apiwilayah/widget"
+            post-url="privilege"
+            tag-url="privilege"
+            :columns="['nama']"
+            :dyn-col-name="{col1:'nama',col2:'level_label'}"
+            :recursive="false"
+            :readonly="true"
+            instance="wilayah"
+            :show-tagging-at-level=3
+            :tag-closeable=true
+            :child-component="{instance:'privilege',type:'dropdown'}"
+            :tag-limit=4
+            tag-caption="fullname"
+            :item-per-page=100
+            :kab-id="kabid">
+        </gov2table>
+    </div>
+</div>

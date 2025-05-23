@@ -1,0 +1,25 @@
+<div class="card">
+  <header class="card-header">
+    <p class="card-header-title">
+      Member
+    </p>
+  </header>
+  <!-- <div class="card-content">
+    <div class="content">
+        <breadcrumbd path-url="member/breadcrumb" instance="member"></breadcrumbd>
+    </div>
+  </div> -->
+    <div>
+        <gov2table
+            :is-active="true"
+            get-url="privilege"
+            :columns="['id', 'fullname','email','role']"
+            :recursive="false"
+            :readonly="true"
+            instance="member"
+            :item-per-page=100
+            :kab-id="kabid">
+        </gov2table>
+    </div>
+  
+</div>

@@ -1,0 +1,31 @@
+<div class="card">
+  <header class="card-header">
+    <p class="card-header-title">
+      Program Kegiatan
+    </p>
+  </header>
+  <div class="card-content">
+    <div class="content">
+        <breadcrumbd path-url="/renstra/taguser/breadcrumb" instance="renstra"></breadcrumbd>
+    </div>
+  </div>
+    <div>
+        <gov2table
+            :is-active="true"
+            get-url="/renstra/taguser"
+            post-url="eselon2"
+            tag-url="eselon2"
+            :columns="['nama']"
+            :dyn-col-name="{col1:'nama',col2:'level_label'}"
+            :recursive="true"
+            :readonly="true"
+            instance="renstra"
+            :show-tagging-at-level=2
+            :tag-closeable=true
+            :child-component="{instance:'privilege',type:'dropdown'}"
+            :tag-limit=4
+            tag-caption="fullname"
+            :item-per-page=100>
+        </gov2table>
+    </div>
+</div>

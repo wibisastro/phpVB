@@ -1,0 +1,21 @@
+<div class="row">
+    <div class="col-lg-12">
+        <tablepack
+                title="Member"
+                :is-active="true"
+                get-url="privilege"
+                :columns="['id', 'fullname','email','role']"
+                :recursive="false"
+                :readonly="true"
+                instance="member"
+                :filter-key="searchQuerymember"
+                :item-per-page="100"
+                :interval="interval"
+                :scroll-interval="scrollInterval"
+                :children-tooltip="false"
+                :kab-id="kabid"
+                :item-per-page-cols="4"
+                :pagination-cols="6">
+        </tablepack>
+    </div>
+</div>

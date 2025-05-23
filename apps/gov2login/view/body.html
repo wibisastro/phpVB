@@ -1,0 +1,30 @@
+{% extends "@gov2login/layout.html" %}
+
+{% block head %}
+	{{ parent() }}
+	{% include('bulmaHead.html') %}
+{% endblock %}
+
+{% block topbar %}
+	{% include('@gov2login/topbar.html') %}
+{% endblock %}
+
+{% block pagetitle %}
+	{% include('bulmaPageTitle.html') %}
+{% endblock %}
+
+{% block content %}
+    {% for item in contents %}
+        <span>&nbsp;</span>
+       {% include[item,'bulmaMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block js %}
+	{{ parent() }}
+	{% include('bulmaJS.html') %}
+{% endblock %}
+
+{% block externalJS %}
+	{% include('externalJS.html') %}
+{% endblock %}

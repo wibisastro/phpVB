@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gov 2.0 Login</title>
+</head>
+<style rel="stylesheet">
+    .spinner {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        height:60px;
+        width:60px;
+        margin:0px auto;
+        -webkit-animation: rotation .6s infinite linear;
+        -moz-animation: rotation .6s infinite linear;
+        -o-animation: rotation .6s infinite linear;
+        animation: rotation .6s infinite linear;
+        border-left:6px solid rgba(0,174,239,.15);
+        border-right:6px solid rgba(0,174,239,.15);
+        border-bottom:6px solid rgba(0,174,239,.15);
+        border-top:6px solid rgba(0,174,239,.8);
+        border-radius:100%;
+    }
+
+    @-webkit-keyframes rotation {
+        from {-webkit-transform: rotate(0deg);}
+        to {-webkit-transform: rotate(359deg);}
+    }
+    @-moz-keyframes rotation {
+        from {-moz-transform: rotate(0deg);}
+        to {-moz-transform: rotate(359deg);}
+    }
+    @-o-keyframes rotation {
+        from {-o-transform: rotate(0deg);}
+        to {-o-transform: rotate(359deg);}
+    }
+    @keyframes rotation {
+        from {transform: rotate(0deg);}
+        to {transform: rotate(359deg);}
+    }
+</style>
+<body>
+<div class="spinner" id="spinner"></div>
+<a target="_parent" href="https://{{ _SERVER['SERVER_NAME'] }}/gov2login/auth/session/{{ token }}"></a>
+<div id="parent_href"></div>
+</body>
+<script>
+    /*
+    let parent_href = null;
+    window.parent.postMessage('check_href', 'https://renobiro.bkn.kl2.web.id');
+    window.parent.postMessage('check_href', 'https://reno.bkn.go.id');
+
+    window.addEventListener('message', event => {
+        // IMPORTANT: check the origin of the data!
+        if (event.origin.startsWith('https://renobiro.bkn.kl2.web.id') ||
+            event.origin.startsWith('https://reno.bkn.go.id')) {
+            parent_href = event.data;
+        }
+    });
+
+     const el = document.getElementById('parent_href');
+     el.innerHTML += parent_href;
+*/
+    
+//    if (parent_href === 'https://renobiro.bkn.kl2.web.id/gov2pipe' || parent_href === 'https://reno.bkn.go.id/gov2pipe') {
+        // window.parent.postMessage(`{{_SERVER['SERVER_NAME']}}`, 'https://renobiro.bkn.kl2.web.id');
+    if ('{{ ssonode }}' === 'sso.krisna.men' || '{{ ssonode }}' === 'sso.kl.krisna.systems') {
+        window.parent.location.href = "https://{{ _SERVER['SERVER_NAME'] }}/gov2login/auth/pipe/{{ token }}";
+    } else {
+        window.parent.location.href = "https://{{ _SERVER['SERVER_NAME'] }}/gov2login/auth/session/{{ token }}";
+    }
+</script>
+</html>

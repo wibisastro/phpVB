@@ -1,0 +1,35 @@
+{% extends "@gov2login/b4Layout.html" %}
+
+{% block head %}
+    {{ parent() }}
+    {% embed '@gov2login/b4head.html' %}
+        {% block extracss %}
+        <link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/custom.css"/>
+        {% endblock %}
+        {% block extrajs %}{% endblock %}
+    {% endembed %}
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block pagetitle %}
+    {% include('bs4SkeletonPageTitle.html') %}
+{% endblock %}
+
+{% block notification %}
+    {% include('bs4SkeletonNotification.html') %}
+{% endblock %}
+
+{% block content %}
+    {% for item in contents %}
+        {% include[item,'bs4MissingFile.html'] %}
+    {% endfor %}
+{% endblock %}
+
+{% block js %}
+    {{ parent() }}
+    {% include('bs4JS.html') %}
+{% endblock %}
+
+{% block externalJS %}
+{% endblock %}

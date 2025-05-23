@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+    <table name="kementerian">kementerian</table>
+    <table name="wilayah">wilayah_local</table>
+    <table name="renstra">renstra2024</table>
+    <table name="member">member</table>
+    <table name="privilege">privilege</table>
+    <table name="options">options</table>
+    <table name="ref_unitkerja">kementerian</table>
+    <table name="role">role</table>
+</list>
