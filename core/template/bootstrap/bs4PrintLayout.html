@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<link type="image/x-icon" href="{{ webroot }}/images/logo-bkn.png" rel="shortcut icon" />
+	<title>{{pageTitle}}</title>
+
+	<!-- Load required Bootstrap and BootstrapVue CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.css" />
+
+
+	<!-- google font libraries -->
+	<link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+	<link href="https://fonts.googleapis.com/css?family=Philosopher&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Berkshire+Swash&display=swap" rel="stylesheet">
+
+	<!-- font awesome -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<!-- vue and friends -->
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+	<script src="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.js"></script>
+	<script src="{{ webroot }}/js/httpVueLoader.js"></script>
+	<script src="{{ webroot }}/js/axios.min.js"></script>
+
+	<script type="text/javascript">
+		const eventBus = new Vue();
+	</script>
+</head>
+
+<body>
+	<div id="app">
+		{% block notification %} {% endblock %}
+		<div class="container">
+			{% block content %} {% endblock %}
+			{% block footer %} {% endblock %}
+		</div>
+	</div>
+
+{% block customVueLoader %}
+<script>
+	httpVueLoader.httpRequest = function(url) {
+		const apppath = window.location.pathname.split("/");
+		const originAppPath = window.location.href+'/../../../'+apppath[1];
+		const componentPath = url.split('/');
+		const originComponent = originAppPath + `/vue/${componentPath[componentPath.length-1]}`
+		return axios.get(originComponent)
+				.then(function(res) {
+					if (res.data !== "") {
+						// console.log(`${componentPath[componentPath.length-1]} : loaded from Origin`)
+						return res.data;
+					} else {
+						return axios.get(url)
+								.then(function (res) {
+									// console.log(`${url} : loaded from Target`)
+									return res.data;
+								})
+								.catch(function (err) {
+									// console.log(`${url} : error`)
+									return Promise.reject(err.status)
+								})
+					}
+				})
+				.catch(function(err) {
+					return axios.get(url)
+							.then(function (res) { return res.data;})
+							.catch(function (err) { return Promise.reject(err.status)})
+				});
+	}
+</script>
+{% endblock %}
+
+<script>
+  new Vue({
+	{% block js %}
+	    el: '#app',
+	    components: {
+	    {% for component in components %}
+	        {% for item in component %}
+	       '{{ item.tag }}': httpVueLoader('{{ webroot }}/{{ item.pageID }}/vue/{{ item.component }}'),
+		   {% endfor %}
+	    {% endfor %}
+	    },
+	{% endblock %}
+  });
+</script>
+
+{% block externalJS %}
+
+{% endblock %}
+
+</body>
+
+</html>

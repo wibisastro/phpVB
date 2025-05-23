@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+    <table name="member">member</table>
+    <table name="options">options</table>
+    <table name="kementerian">kementerian</table>
+    <table name="ref_unitkerja">ref_unitkerja_local</table>
+
+    <table name="survey_service">survey_survey_service</table>
+    <table name="survey_local">survey_survey_local</table>
+    <table name="kuesioner_service">survey_kuesioner_service</table>
+    <table name="kuesioner_local">survey_kuesioner_local</table>
+</list>

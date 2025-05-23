@@ -5,6 +5,7 @@ class gov2pagination {
         global $self,$doc;
 		$self->take("components","gov2nav", "setDefaultNav");
         $doc->body("pageTitle",'Pagination Component');
+        $GLOBALS['vueData']['isTableActive']='true';
         $self->content();
         $self->demo();
     }

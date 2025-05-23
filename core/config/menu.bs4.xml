@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menufilter>
+    <domain>
+        <bs4 notification="true" message="true" item="true">bs4</bs4>
+        <renstra notification="true" message="true" item="true">renstra</renstra>
+    </domain>
+</menufilter>

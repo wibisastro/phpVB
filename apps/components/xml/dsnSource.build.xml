@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <list>
-    <share>presiden</share>
+	<dsn>
+		<name>master</name>
+		<host>localhost</host>
+		<user>sidalih</user>
+		<pass>JogedBungbung17</pass>
+		<db>kpu_sidalih</db>
+	</dsn>
 </list>

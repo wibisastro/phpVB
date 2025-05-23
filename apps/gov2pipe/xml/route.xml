@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+    <route>
+		<method>GET</method>
+		<uri>/gov2pipe/gov2api.html</uri>
+		<handler>gov2pipe\model\html</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2pipe</uri>
+		<handler>gov2pipe\model\index</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2pipe/index/{cmd}[/{id}]</uri>
+		<handler>gov2pipe\model\index</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/gov2pipe/index/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2pipe\model\index</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2pipe/fields/{cmd}</uri>
+		<handler>gov2pipe\model\index</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/gov2pipe</uri>
+		<handler>gov2pipe\model\index</handler>
+	</route>
+    
+    <!-- pipedin -->
+	<route>
+		<method>GET</method>
+		<uri>/gov2pipe/pipedin</uri>
+		<handler>gov2pipe\model\pipedin</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2pipe/pipedin/{cmd}[/{id}]</uri>
+		<handler>gov2pipe\model\pipedin</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/gov2pipe/pipedin/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2pipe\model\pipedin</handler>
+	</route>
+	<route>
+        <method>POST</method>
+        <uri>/gov2pipe/pipedin</uri>
+        <handler>gov2pipe\model\pipedin</handler>
+    </route>
+	
+</list>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     
+<title>Cari Pemilih Berdasarkan NIK - Gov2</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/http-vue-loader@1.3.5/src/httpVueLoader.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://jakpuskota.drc.sidalih.gov2.web.id/js/gov2form.js"></script>
+
+<script type="text/javascript">
+const eventBus = new Vue();
+</script>
+</head>
+<body>
+<div id="app">
+       <gov2search-nik post-url="https://konaweutarakab.kpu.go.id" level="kab"></gov2search-nik>
+</div>
+<script type="text/javascript">
+  new Vue({
+	    el: '#app',
+        components: {'gov2searchNik': httpVueLoader('gov2searchNik.vue')},
+  });
+</script>
+</body>
+</html>

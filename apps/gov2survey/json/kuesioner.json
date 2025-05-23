@@ -1,0 +1,69 @@
+[{
+    "name": "cmd",
+    "value": "",
+    "label": "Submit"
+},{
+    "name": "id",
+    "value": "",
+    "label": "ID",
+    "placeholder": "Nomor ID",
+    "disabled": "true"
+},{
+    "name": "referensi_id",
+    "value": "",
+    "required": "true",
+    "label": "Referensi",
+    "error_message": "Referensi wajib dipilih",
+    "type":"gov2component"
+},{
+    "name": "judul_kuesioner",
+    "value": "",
+    "required": "true",
+    "label": "Judul Kuesioner",
+    "error_message": "Judul Kuesioner wajib di isi",
+    "type":"gov2component"
+},{
+    "name": "date_start",
+    "value": "",
+    "required": "true",
+    "label": "Tanggal Mulai",
+    "error_message": "Tanggal Mulai harus dipilih",
+    "type":"gov2component"
+},{
+    "name": "time_start",
+    "value": "",
+    "label": "Jam Mulai",
+    "error_message": "Jam Mulai harus dipilih",
+    "type":"gov2component"
+},{
+    "name": "date_end",
+    "value": "",
+    "required": "true",
+    "label": "Tanggal Berakhir",
+    "error_message": "Tanggal Berakhir harus dipilih",
+    "type":"gov2component"
+},{
+    "name": "time_end",
+    "value": "",
+    "label": "Jam Berakhir",
+    "error_message": "Jam Berakhir harus dipilih",
+    "type":"gov2component"
+},{
+    "name": "status",
+    "label": "Status",
+    "required": true,
+    "error_message": "Status harus dipilih",
+    "type":"select",
+    "options": {
+        "active": "Active",
+        "inactive": "Inactive"
+    }
+},{
+    "name": "level",
+    "type":"hidden",
+    "options": {
+        "1": "survey",
+        "2": "pertanyaan",
+        "3": "opsi"
+    }
+}]

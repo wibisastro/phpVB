@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+	<dsn>
+		<name>gov2core.local</name>
+		<host>localhost</host>
+		<user>root</user>
+		<pass>Kn3+@zXIg2R26j</pass>
+		<db>gov2core</db>
+	</dsn>
+</list>

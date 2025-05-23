@@ -1,4 +1,4 @@
-<div class="columns">
+<div class="columns" v-if="isTableActive">
   <div class="column">
       <gov2itemperpage :interval="interval"></gov2itemperpage>  
     </div>
@@ -8,8 +8,9 @@
           
   <div class="column is-9">
       <gov2pagination 
+        instance="{{ className }}" 
         :records="records" 
         :scroll-interval="scrollInterval"
-        :item-per-page="itemPerPage"></gov2pagination>    
+        :item-per-page="itemPerPage"></gov2pagination>
     </div>
 </div>

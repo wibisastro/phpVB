@@ -1,13 +1,12 @@
 <?php namespace App\home;
     
 class index {
-    function __construct () {
-        global $self;
-		$self->take("components","gov2nav", "setDefaultNav");      
+    function __construct () {	 
     }
     
     function index () {
         global $self,$doc;
+        $self->take("components","gov2nav", "setDefaultNav");
         $doc->body("pageTitle",'Home Page');
         $self->content();        
     }

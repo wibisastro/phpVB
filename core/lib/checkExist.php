@@ -7,7 +7,12 @@
 *	Version		: 1.0.0 
 *********************************************************************/
 
-class checkExist {
+class checkExist extends dsnSource {
+	function __construct ($_dsn="") {
+        parent::__construct(); 
+        list($_link_id,$_name)=$this->connectDB($_dsn);
+	}
+    
     function checkAppDir ($_appDir) {
         $_dir=__DIR__."/../../apps";
         $_dirs = array_slice(scandir($_dir), 2);

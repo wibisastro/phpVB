@@ -1,0 +1,41 @@
+{% extends "cubeLayout.html" %}
+
+{% block head %}
+	{{ parent() }}
+	{% include('cubeHead.html') %}
+{% endblock %}
+
+{% block header %}
+	{% include('cubeHeader.html') %}
+{% endblock %}
+
+{% block pagetitle %}
+	{% include('cubePageTitle.html') %}
+{% endblock %}
+
+{% block sidebar %}
+    {% for item in sidebars %}
+       {% include[item,'cubeMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block content %}
+    {% for item in contents %}
+       {% include[item,'bulmaMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+
+{% block footer %}
+	{% include('cubeFooter.html') %}
+{% endblock %}
+
+{% block js %}
+	{{ parent() }}
+	{% include('cubeJS.html') %}
+{% endblock %}
+
+{% block cubeJQueryJS %}
+	{{ parent() }}
+	{% include('cubeJQueryJS.html') %}
+{% endblock %}

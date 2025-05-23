@@ -1,0 +1,44 @@
+{% extends "bs4Layout.html" %}
+
+{% block head %}
+	{{ parent() }}
+	{% include('bs4Head.html') %}
+{% endblock %}
+
+{% block header %}
+	{% include('bs4Header.html') %}
+{% endblock %}
+
+{% block pagetitle %}
+	{% include('bs4PageTitle.html') %}
+{% endblock %}
+
+{% block notification %}
+	{% include('bs4Notification.html') %}
+{% endblock %}
+
+{% block sidebar %}
+    {% for item in sidebars %}
+       {% include[item,'bs4MissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block content %}
+    {% for item in contents %}
+       {% include[item,'bs4MissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+
+{% block footer %}
+	{% include('bs4Footer.html') %}
+{% endblock %}
+
+{% block js %}
+	{{ parent() }}
+	{% include('vueJS.html') %}
+{% endblock %}
+
+{% block externalJS %}
+	{% include('externalJS.html') %}
+{% endblock %}

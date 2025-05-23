@@ -1,0 +1,26 @@
+{% if vueData %}
+   data () {
+        return {{ vueData|raw }}
+    },
+{% endif %}
+{% if vueComputed %}
+   computed () {
+        return {{ vueComputed|raw }}
+    },
+{% endif %}
+{% if vueMethods %}
+    methods: {
+        {{ vueMethods|raw }}
+    },
+{% endif %}
+{% if vueCreated %}
+    created: function () {
+        {{ vueCreated|raw }}
+    },
+{% endif %}
+{% if vueMounted %}
+{% endif %}
+
+	
+
+    

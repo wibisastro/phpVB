@@ -1,28 +1,31 @@
 <template>
+<div>
     <b-tag v-if="taggedData != 'empty'" rounded
         :type="tagCloseable ? 'is-info' : 'is-warning'"
         :closable="tagCloseable"
         @close="unSetTag(taggedData['id'],taggedData['source_id'])">
-        <b-tooltip :label="setDesc(taggedData)" multilined v-text="setLabel(taggedData['target_nama'])">
+        <b-tooltip :label="setDesc(taggedData)" multilined v-text="setLabel(taggedData[caption])">
         </b-tooltip>
     </b-tag>
+</div>
 </template>
 
 <script>
 module.exports = {
     name: 'gov2tagged',
     props: {
+        tagCaption: String,
         taggedData: Object,
         tagCloseable: Boolean
     },
-    data() {
-        return {
-            
+    computed: {
+        caption: function () {
+            return 'target_'+this.tagCaption;
         }
     },
     methods: {
         setDesc: function(data) {
-            var result="(id:" + data['target_id'] + ") " + data['target_nama'];
+            var result="(id:" + data['target_id'] + ") " + data[this.caption];
             return result;
         },
         setLabel: function(data) {

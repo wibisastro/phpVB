@@ -1,0 +1,107 @@
+.notification {
+  border-radius: 3px;
+  padding: 1.25rem 2.5rem 1.25rem 1.5rem;
+  position: relative;
+  margin: auto;
+}
+
+.notification.is-danger {
+  background-color: #ff3860;
+  color: #fff;
+}
+
+.notification.is-danger ul {
+  margin: auto;
+}
+
+.saas-frame {
+  overflow: hidden;
+  padding-top: 100%;
+  position: relative;
+}
+
+.saas-frame iframe {
+  border: 0;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  position: absolute;
+}
+
+.none {
+  display: none;
+}
+
+.col-md-12 .main-box-body {
+  overflow:auto;
+}
+
+.philosopher {
+  font-family: 'Philosopher', sans-serif;
+}
+
+#nav-col {
+  overflow-y: auto !important;
+}
+
+.block-header .block-title {
+    font-size: 20px;
+    font-weight: 500;
+    margin: 10px 0px;
+}
+
+.no-background {
+  background: none !important;
+}
+
+.bg-black {
+  height: 280px;
+  width: 100%;
+  background-size: cover;
+  background-position: 0 50%;
+  background-image: url('https://i.imgur.com/Ka1lhQU.png') !important;
+  background-color: #3e4a59 !important;
+  /*z-index: 1;*/
+  opacity: 1;
+  display : flex;
+  align-items : center;
+  overflow: hidden;
+}
+.bg-black p {
+  padding-left: 40px;
+}
+.bg-black .row {
+  color: white;
+}
+.bg-black .row span.judul {
+  font-size: 36px;
+}
+.bg-black .row span.desc {
+  font-size: 22px;
+}
+.berk {
+  font-family: 'Berkshire Swash', cursive;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+@keyframes rotationLeft {
+  from {
+    transform: rotate(359deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}

@@ -1,0 +1,99 @@
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+<title>{{ pageTitle }} - Gov2</title>
+
+<!-- Load required Bootstrap and BootstrapVue CSS -->
+
+<link type="text/css" rel="stylesheet" href="{{ webroot }}/css/bootstrap.min.css" />
+<link type="text/css" rel="stylesheet" href="{{ webroot }}/css/bootstrap-vue.min.css" />
+
+<!-- <link rel="stylesheet" type="text/css" href="{{ webroot }}/css/bootstrap.min.css" /> -->
+<!-- <link rel="stylesheet" type="text/css" href="{{ webroot }}/css/bootstrap-vue.min.css" /> -->
+
+<!-- do not use this cause create error in notification -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha256-L/W5Wfqfa0sdBNIKN9cG6QA5F2qx4qICmU2VgLruv9Y=" crossorigin="anonymous" /> -->
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-vue@2.0.0-rc.11/dist/bootstrap-vue.min.css"> -->
+
+<!-- libraries -->
+<link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/nanoscroller-min.css" />
+<link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/nifty-component.css"/>
+<link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/custom.css"/>
+<link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/wizard.css"/>
+<link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/timeline.css"/>
+<!-- <link rel="stylesheet" type="text/css" href="{{ webroot }}/css/handsontable.full.css"/> -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css">
+
+<!-- <link rel="stylesheet" type="text/css" href="{{ webroot }}/css/bootstrap.min.css"/> -->
+<!-- <link rel="stylesheet" type="text/css" href="{{ webroot }}/css/bootstrap-vue.min.css"/> -->
+
+<!-- global styles -->
+<link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/theme_styles.css" />
+
+<!-- Favicon -->
+{% 	
+	if pageID == 'dpdraft2' 
+	or pageID == 'dpaktif2' 
+	or pageID == 'dpsnapshot2' 
+	or pageID == 'dppublik2' 
+	or pageID == 'dppindah2'
+	or pageID == 'apisidalih' 
+	or pageID == 'apitahapan' 
+	or pageID == 'apitps' 
+	or pageID == 'apiwilayah' 
+	or pageID == 'apidparsip' 
+	or pageID == 'apidpsnapshot' 
+	or pageID == 'boardsidalih' 
+	or pageID == 'boardtahapan' 
+	or pageID == 'boardtps'
+	or pageID == 'boardwilayah'
+	or pageID == 'sidalih' 
+%}
+	<link type="image/x-icon" href="{{ webroot }}/images/logo-sidalih.png" rel="shortcut icon" />
+{% else %}
+	<link type="image/x-icon" href="{{ webroot }}/images/logo-krisna.png" rel="shortcut icon" />
+{% endif %}
+
+<!-- google font libraries -->
+<link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://fonts.googleapis.com/css?family=Philosopher&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Berkshire+Swash&display=swap" rel="stylesheet">
+
+<!-- font awesome -->
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="//cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css">
+
+<!-- vue and friends -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js"></script>
+<script src="{{ webroot }}/js/bootstrap-vue.min.js"></script>
+<script src="{{ webroot }}/js/httpVueLoader.js"></script>
+<script src="{{ webroot }}/js/axios.min.js"></script>
+<script src="{{ webroot }}/js/vue-scrollto.js"></script>
+
+<script src="{{ webroot }}/js/gov2form.js"></script>
+<script src="{{ webroot }}/js/iframeResizer.min.js"></script>
+<!-- <script src="{{ webroot }}/js/handsontable.full.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+
+<!-- canvas JS -->
+<!-- <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script> -->
+
+<!-- chart JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js"></script>
+
+<!-- lodash -->
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+
+<!-- <script src="//cdnjs.cloudflare.com/ajax/libs/vue/2.5.2/vue.min.js"></script> -->
+<!-- CDNJS :: Sortable (https://cdnjs.com/) -->
+<script src="//cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
+<!-- CDNJS :: Vue.Draggable (https://cdnjs.com/) -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue-draggable-nested-tree@3.0.0-beta2/dist/vue-draggable-nested-tree.cjs.min.js"></script> -->
+
+<script type="text/javascript">
+	const eventBus = new Vue();
+</script>

@@ -1,0 +1,55 @@
+<div class="row">
+	<div class="col-lg-12">
+		<div class="main-box">
+			<ren-breadcrumb
+					:is-active="true"
+					:is-horizontal="true"
+					path-url="{{ className }}/breadcrumb"
+                    instance="survey_survey"
+			></ren-breadcrumb>
+		</div>
+	</div>
+</div>
+
+<b-row v-if="is_survey">
+    <b-col cols="4">
+        <bs4tablerows></bs4tablerows>
+    </b-col>
+</b-row>
+
+<b-row> &nbsp;</b-row>
+
+<div class="row" v-if="is_survey">
+	<div class="col-lg-12 col-md-12">
+		<tablepack
+			title="Survey"
+			:is-active="true"
+			get-url="instance_survey_survey"
+			instance="survey_survey"
+			:columns="['id','nama', 'owner', 'date_end']"
+			:custom-column-names="{nama: 'Judul', date_end:'Berakhir Pada'}"
+			:filter-key="searchQuerysurvey_survey"
+			:item-per-page="itemPerPagesurvey_survey"
+			:drillup="false"
+			:interval="interval"
+			:recursive="true"
+			:readonly="true"
+			:is-bulk-approval="false"
+			:scroll-interval="scrollInterval">
+		</tablepack>
+	</div>
+</div>
+
+<template v-if="is_pertanyaan">
+    <survey get-url="{{className}}/table/-1" post-url="{{className}}" :chunk-size="5"></survey>
+</template>
+
+<b-row> &nbsp;</b-row>
+
+<b-row v-if="is_survey">
+	<b-col>
+		<reset get-url="{{className}}" :paged="true" button-label="Tarik Data Survey" count-cmd="countServiceData"></reset>
+	</b-col>
+</b-row>
+
+<b-row> &nbsp;</b-row>

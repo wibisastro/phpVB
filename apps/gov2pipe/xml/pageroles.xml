@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pageroles>
+    <guest>1</guest>
+    <pimpinan>2</pimpinan>
+    <member>3</member>
+    <admin>4</admin>
+    <webmaster>5</webmaster>
+    <closed>6</closed>
+</pageroles>

@@ -24,6 +24,7 @@
               </div>
               <div class="column">
                     {% block pagetitle %} {% endblock %}
+                    <br>
                     {% block content %} {% endblock %}
               </div>
             </div>
@@ -56,5 +57,16 @@
 {% block externalJS %}
     
 {% endblock %}
+<script>
+iFrameResize({
+    log                     : false,// Enable console logging
+    enablePublicMethods     : true,// Enable methods within iframe hosted page
+    resizedCallback         : function(messageData){ // Callback fn when message is received
+    }
+});
+    
+// var quickviews = bulmaQuickview.attach(); 
+    // quickviews now contains an array of all Quickview instances
+</script> 
 </body>
 </html>

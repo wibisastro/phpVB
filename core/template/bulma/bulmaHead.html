@@ -14,6 +14,7 @@
 <script src="{{ webroot }}/js/gov2form.js"></script>
 <script src="{{ webroot }}/js/iframeResizer.min.js"></script>
 <script src="{{ webroot }}/js/handsontable.full.min.js"></script>
+<script src="{{ webroot }}/js/burger.js"></script>
 
 <script type="text/javascript">
 Vue.use(Buefy.default);
@@ -22,10 +23,24 @@ const eventBus = new Vue();
 
 <style>
 .saas-frame {
-position: relative;
-top: 20px;
-bottom: 0;
-left: 0;
-right: 0;
+    position: relative;
+    top: 20px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.timeline-item {
+    margin: 5px 0;
+    padding: 5px;
+    border: 1px solid #e8e8e8;
+}
+.subtitle:not(:last-child), .title:not(:last-child) {
+    margin-bottom: 0;
+}
+.breadcrumb:not(:last-child) {
+    margin-bottom: 0;
 }
 </style>
+
+
+{% block style %} {% endblock %}

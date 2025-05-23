@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainmenu>
+	<!-- <menu>
+		<caption>Survey</caption>
+		<icon>fa fa-list</icon>
+		<menu>
+			<caption>Kuesioner</caption>
+			<url>/survey/kuesioner</url>
+			<icon>fa fa-edit</icon>
+		</menu>
+		<menu>
+			<caption>Survey</caption>
+			<url>/survey/survey</url>
+			<icon>fa fa-bullhorn</icon>
+		</menu>
+		<menu>
+			<caption>Survey Result</caption>
+			<url>/survey/survey</url>
+			<icon>fa fa-bar-chart-o</icon>
+		</menu>
+	</menu> -->
+	<menu>
+		<caption>Kuesioner</caption>
+		<url>/survey/kuesioner</url>
+		<icon>fa fa-edit</icon>
+	</menu>
+	<menu>
+		<caption>Survey</caption>
+		<url>/survey/survey</url>
+		<icon>fa fa-bullhorn</icon>
+	</menu>
+	<menu>
+		<caption>Survey Result</caption>
+		<url>/survey/survey</url>
+		<icon>fa fa-bar-chart-o</icon>
+	</menu>
+</mainmenu>

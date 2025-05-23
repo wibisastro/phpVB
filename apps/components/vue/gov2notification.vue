@@ -17,14 +17,33 @@ module.exports = {
         return {
             isNotif:false,
             notifClass: '',
-            notifText: ''
+            notifText: '',
+            isLoading: false
         }
     },
     methods: {
-        openNotif: function(data) {
-         //   console.log(data);
+        loading () {
+            const vm = this
+            vm.isLoading = true
+            setTimeout(() => {
+                if (vm.isLoading) {
+                    vm.isLoading = false;
+                    let fail=[]
+                    fail['class']="is-danger";
+                    fail['notification']="Proses butuh waktu lama, tunggu hingga muncul pop-up";
+                    this.errorSnackbar(fail);
+                }
+            }, 7 * 1000)
+        },
+        loadingDone () {
+            this.isLoading=false;
+        },
+        openNotif: function(data) { //console.log(data);  
+            let callback = ['infoSnackbar','toggleForm','resetButton','confirmClose'];         
             if (data['callback']) {
-                if (data['callback']=='openSnackbar') {
+                if (callback.includes(data['callback'])) {
+                    this.infoSnackbar(data);
+                } else if (data['callback']=='openSnackbar') {
                     this.openSnackbar(data);
                 } else if (data['callback']=='errorSnackbar') {
                     this.errorSnackbar(data);
@@ -40,21 +59,33 @@ module.exports = {
             }
             
         },
-        openSnackbar: function(data) {
+        infoSnackbar: function(data) {
             this.$snackbar.open({
-                duration: 50000,
+                duration: 5000,
                 message: data['notification'],
                 type: data['class'],
                 position: 'is-bottom-right',
+                actionText: 'Dismiss'
+            })
+        },
+        openSnackbar: function(data) {
+            this.$snackbar.open({
+                duration: 5000,
+                message: data['notification'],
+                type: data['class'],
+                position: 'is-bottom-right',
+                actionText: 'Dismiss',
+                /*
                 actionText: 'Create Session',
                 onAction: () => {
                     eventBus.$emit('openCreateSession',data['server'])
                 }
+                */
             })
         },
         errorSnackbar: function(data) {
             this.$snackbar.open({
-                duration: 50000,
+                duration: 5000,
                 message: data['notification'],
                 type: data['class'],
                 position: 'is-bottom-right',
@@ -65,6 +96,8 @@ module.exports = {
     },
     created: function () {
         eventBus.$on('openNotif', this.openNotif);
+        eventBus.$on('loadingStart', this.loading);
+        eventBus.$on('loadingDone', this.loadingDone);
     }
 }
 </script>

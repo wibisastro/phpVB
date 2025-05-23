@@ -1,70 +1,123 @@
 <template>
-<div>
-<table class="table is-striped is-hoverable" width="100%">
+<div v-if="isActive" class="table-container-outer">
+<div class="table-container-fade" v-if="wideTable"></div>
+<div class="table-container" :style="{ width: setWideTable() }">
+  <table class="table table-striped" :class="{ 'is-bordered': isBordered }">
     <thead>
+      <tr v-if="headers">
+        <th v-for="(val,key) in headers" :colspan="val['colspan']"  :rowspan="isHeader(key)">
+            <center>{{ val['caption'] }}</center>
+        </th>
+      </tr>
       <tr>
+        <th v-if="!headers">
+            <input
+                type="checkbox"
+                v-model="allSelected"
+                @change="selectAll"
+                :disabled="headers">
+        </th>
         <th v-for="key in additionalColumns"
           @click="sortBy(key)"
-          :class="{ active: sortKey == key }" v-text="columnName(key)">
-          <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'" v-if="!tagUrl">
-          </span>
+          :class="{ active: sortKey == key }" v-if="!headers">
+            <center>
+                {{ columnName(key) }}
+              <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'" v-if="!tagUrl">
+              </span>
+            </center>
+        </th>
+        <th v-for="key in additionalColumns" v-if="headers">
+            <center>{{ columnName(key) }}</center>
         </th>
         <th v-if="!readonly"></th>
         <th v-if="childComponent">
-            <span v-if="childComponent['type'] == 'checkbox'">
-                {{ childComponent['instance'] | capitalize}}
-            </span>
+            <center v-if="childComponent['type'] == 'checkbox'">
+                {{ childComponent['instance'] | capitalize }}
+            </center>
         </th>
       </tr>
     </thead>
-    <tfoot>
+    <tfoot v-if="!isTotal">
       <tr>
+        <th>
+            <input
+                type="checkbox"
+                v-model="allSelected"
+                @change="selectAll"
+                :disabled="headers">
+        </th>
         <th v-for="key in additionalColumns"
           @click="sortBy(key)"
-          :class="{ active: sortKey == key }" v-text="columnName(key)">
+          :class="{ active: sortKey == key }">
+        <center>
+            {{ columnName(key) }}
           <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'" v-if="!tagUrl">
           </span>
+        </center>
         </th>
         <th v-if="!readonly"></th>
         <th v-if="childComponent">
             <span v-if="childComponent['type'] == 'checkbox'">
-                {{ childComponent['instance'] | capitalize}}
+                {{ childComponent['instance'] | capitalize }}
             </span>
         </th>
       </tr>
     </tfoot>
-    <tbody>
-      <tr v-for="entry in filteredData">
-        <td v-for="key in columns">
+    <tbody> 
+      <tr v-for="entry in filteredData" :class="{ 'is-selected': checked[entry['id']] }">
+        <td>
+            <input
+                type="checkbox"
+                v-model="checked[entry['id']]"
+                :true-value="entry['id']"
+                @change="checkedRow" :disabled="isCheckbox(entry['checkbox'])">
+        </td>
+        <td v-for="(key,index) in columns">
             <a v-if="recursive == true" @click="getChildren(entry['id'])">{{ entry[key] }}</a>
             <!--a v-if="showLink(entry['id'])" @click="getChildren(entry['id'])">{{ entry[key] }}</a-->
             <span v-if="recursive == false">{{ entry[key] }}</span>
+            <span v-if="entry['tag'] && entry['tag']['field']==key" class="tag" :class="entry['tag']['color']">{{ entry['tag']['caption'] }}</span> 
             <span v-for="(tags,dataset) in taggedData" v-if="isTaggedData">
                 <b-taglist>
                     <span v-for="tag in tags" v-if="tagUrl==dataset">
-                        <gov2tagged :source_id="parseInt(entry['id'])" :tagged-data="tag" v-if="tag[instance+'_id'] == entry['id'] && key == dataset" :tag-closeable="tagCloseable"></gov2tagged>
+                        <gov2tagged :source_id="parseInt(entry['id'])" :tagged-data="tag" v-if="tag[instance+'_id'] == entry['id'] && key == dataset" :tag-closeable="tagCloseable" :tag-caption="tagCaption"></gov2tagged>
                     </span>
                     <span v-for="tag in tags" v-if="tagUrl!=dataset">
-                        <gov2tagged :source_id="parseInt(entry['id'])" :tagged-data="tag" v-if="tag[instance+'_id'] == entry['id'] && key == dataset"></gov2tagged>
+                        <gov2tagged :source_id="parseInt(entry['id'])" :tagged-data="tag" v-if="tag[instance+'_id'] == entry['id'] && key == dataset" :tag-caption="tagCaption"></gov2tagged>
                     </span>
                 </b-taglist>
             </span>
             &nbsp;
-        </td>
+        </td>        
         <td v-if="!readonly">
             <a class="tag is-warning" @click="edit(entry['id'])">Edit</a>
             <a class="tag is-danger" @click="del(entry['id'])" v-if="entry['children'] == 0 || !entry['children']">Del</a>
             <a class="tag is-warning" @click="hasChildren(entry['children'])" v-if="entry['children'] > 0">Del</a>
         </td>
         <td v-if="childComponent && childComponent['type'] == 'dropdown'">
-            <gov2tagging :post-url="postUrl" :get-url="childComponent['instance']" :source_id="parseInt(entry['id'])" :instance="instance" v-if="showTagging(entry['level'],entry['id'])" :tag-limit="tagLimit" :tags="tags"></gov2tagging>
+            <gov2tagging :post-url="postUrl" :get-url="childComponent['instance']" :source_id="parseInt(entry['id'])" :instance="instance" v-if="showTagging(entry['level'],entry['id'])" :tag-limit="tagLimit" :tags="tags" :tag-caption="tagCaption"></gov2tagging>
         </td>
         <td v-if="childComponent && childComponent['type'] == 'checkbox'">
             <gov2checkbox :post-url="postUrl" :source_id="parseInt(entry['id'])" :instance="instance" v-if="showTagging(entry['level'],entry['id'])" :tags="tags" :tag-url="tagUrl" :parent_id="parent" :tag-limit="tagLimit"></gov2checkbox>
         </td>
+        <td v-if="childComponent && childComponent['type'] == 'progress'" width="70%">
+            <gov2progress :instance="instance" :hi="entry['hi']" :lo="entry['lo']"></gov2progress>
+        </td>
       </tr>
     </tbody>
+    
+    <tfoot v-if="isTotal">
+      <tr>
+        <th></th>
+        <th v-for="key in isTotal">
+            {{ countTotal(key) }}
+        </th>
+        <th v-if="!readonly"></th>
+      </tr>
+    </tfoot>
+
    </table>
+</div>
 </div>
 </template>
 
@@ -72,6 +125,7 @@
 module.exports = {
   name: 'gov2table',
   props: {
+    isActive: Boolean,
     getUrl: String,
     postUrl: String,
     tagUrl: String,
@@ -85,25 +139,35 @@ module.exports = {
         type: String,
         default: ""
     },
+    instanceTo: {
+        type: String,
+        default: ""
+    },
     childComponent: Object,
     selected: Number,
     tagCloseable: Boolean,
     showTaggingAtLevel: Number,
     tagLimit: Number,
     taggingId: Number,
+    tagCaption: String,
     dynColName: {},
-    linkOn: {}
+    linkOn: {},
+    headers: {},
+    isBordered: Boolean,
+    isTotal: Array,
+    wideTable: Boolean,
   },
   components: {
     'gov2tagging': httpVueLoader('./_gov2tagging.vue'),
     'gov2tagged': httpVueLoader('./_gov2tagged.vue'),
     'gov2checkbox': httpVueLoader('./_gov2checkbox.vue'),
+    'gov2progress': httpVueLoader('./_gov2progress.vue'),
     'gov2component': httpVueLoader('./gov2component.vue'),
   },
   data () {
     var sortOrders = {}
     this.columns.forEach(function (key) {
-      sortOrders[key] = 1
+        sortOrders[key] = 1
     });
     return {
         gridData: [],
@@ -114,7 +178,11 @@ module.exports = {
         scroll: 1,
         parent: 0,
         taggedData: {},
-        tags: []
+        tags: [],
+        checked: {},
+        isFullPage: true,
+        tableWidth: 500,
+        allSelected: false,
     }
   },
   computed: {
@@ -137,7 +205,10 @@ module.exports = {
         var filterKey = this.filterKey && this.filterKey.toLowerCase()
         var order = this.sortOrders[sortKey] || 1
         var data = this.gridData
+        // const result = data.join('');
+        // console.log(result);
         data=this.paging(data);
+       
       if (filterKey) {
         data = data.filter(function (row) {
           return Object.keys(row).some(function (key) {
@@ -173,13 +244,77 @@ module.exports = {
   },
   filters: {
     capitalize: function (str) {
-        alert(str);
         if (str) {
             return str.charAt(0).toUpperCase() + str.slice(1)   
         }
     }
   },
+    mounted() {
+        this.$nextTick(function() {
+            window.addEventListener('resize', this.setTableWidth);
+        })
+    },
   methods: {
+    isCheckbox: function (data) {
+      if (this.headers) {
+          return true;
+      } else if (data) {
+          return false;
+      } else {
+          return true;
+      }
+    },
+    selectAll: function () {
+        var selected = {};
+        if (this.allSelected==true) {
+            this.filteredData.forEach(function (row) {
+                if (row.checkbox) {
+                    selected[row.id]=row.id;
+                }
+            });
+            this.checked = selected;
+        } else {
+            this.checked = {}
+        }
+        this.checkedRow();
+    },
+    setWideTable: function () {
+        if (this.wideTable) {
+            return this.tableWidth + 'px';   
+        } else {
+            return '100%';
+        }
+    },
+    countTotal: function (key) {
+        var total=0;
+        this.filteredData.forEach(function (row) {
+            total=parseInt(total)+parseInt(row[key]);
+        });
+        if (!isNaN(total)) {
+            eventBus.$emit('total'+key,total);
+            return total;
+        } else {
+            eventBus.$emit('total'+key,this.filteredData.length);
+            return this.filteredData.length;
+        }
+    },
+    isHeader: function(data) {
+        if (this.headers && data==0) {
+            return 2;
+        } else {
+            return 1;
+        }
+    },
+    printLog: function (data) {
+        console.log(data);
+    },
+    checkedRow: function () {
+        eventBus.$emit('setChecked',this.checked);
+    },
+    resetChecked: function () {
+        this.checked=[];
+        this.checkedRow();
+    },
     reload: function() {
         location.reload();  
     },
@@ -294,6 +429,7 @@ module.exports = {
         } else {
             url=this.tagUrl+'/getTags/'+this.parent;
         }
+        // console.log(url)
         axios.get(url,config)
             .then(response => this.loadTaggedData(response.data,otherTag))
             .catch(error => this.onGetDataFail(error.response.data));
@@ -326,12 +462,13 @@ module.exports = {
     },
     setParent: function (data) {
         if (data) {
-            this.parent = parseInt(data);
+            this.parent = data;
             eventBus.$emit('parent'+this.instance,data);
         }
     },
     setScroll: function (data) {
         this.scroll = parseInt(data);
+        eventBus.$emit('pageScroll'+this.instance,this.scroll);
     },
     paging: function (data) {
         var page = 1;
@@ -357,6 +494,7 @@ module.exports = {
         console.log(errors);
     },
     loadData: function(data) {
+        //console.log(data);
         this.gridData=Array.from(Object.keys(data), k=>data[k]);
         if (data['data'] == 'empty') {
             this.records=0;        
@@ -371,8 +509,12 @@ module.exports = {
                 }
             }
         }
-        this.getTotalRecord(this.parent);
-        this.pagination(this.records);
+        
+        if (!this.isTotal) {
+            this.getTotalRecord(this.parent);
+            this.pagination(this.records);
+        }
+        eventBus.$emit('loadingDone',this.instance);
     },
     pagination: function (records) {
         var pagination=[];
@@ -383,6 +525,7 @@ module.exports = {
         eventBus.$emit('setRows'+this.instance,this.records);
     },
     edit: function (id) {
+        // console.log(id)
         axios.get(this.getUrl+'/edit/'+parseInt(id))
             .then(response => eventBus.$emit('dataEdit',response.data))
             .catch(error => this.onGetDataFail(error.response.data));
@@ -393,23 +536,34 @@ module.exports = {
     hasChildren: function (data) {
         eventBus.$emit('hasChildren',parseInt(data));
     },
-    sayUrl: function (url) {
+    sayUrl: function (url,listener) {
         let printUrl;
         let linger=url.indexOf('-1');
         let reset=url.indexOf('-2');
         if ( linger>0 || reset>0 ) {
             printUrl="Invalid";
         } else {
-            printUrl=url.replace(this.instance+'/', "");
+//            printUrl=url.replace(this.instance+'/', "");
+            printUrl=url;
+//            printUrl=url.replace(this.getUrl+'/', "");
         }
-        eventBus.$emit('printUrl'+this.instance,printUrl);
+        if (listener) {
+            eventBus.$emit('printUrl'+listener,printUrl);
+        } else {
+            eventBus.$emit('printUrl'+this.instance,printUrl);            
+        }
+
+//        eventBus.$emit('printUrl',printUrl);
     },
     getData: function(id) {
+        eventBus.$emit('loadingStart',this.instance);
         this.setParent(id);
+        //console.log(this.instance);
         if (this.parent) {url=this.getUrl+'/table/'+this.scroll+'/'+this.parent;}
         else if (this.recursive) {url=this.getUrl+'/table/'+this.scroll+'/0';}
         else {url=this.getUrl+'/table/'+this.scroll+'/';}
         this.sayUrl(url);
+        //console.log(url);
         axios.get(url)
             .then(response => this.loadData(response.data))
             .catch(error => this.onGetDataFail(error.response.data));
@@ -417,29 +571,40 @@ module.exports = {
     getTotalRecord: function(id) {
         if (this.recursive) {url=this.getUrl+'/count/'+id;}
         else {url=this.getUrl+'/count';}
+        this.sayUrl(url,'count');
         axios.get(url)
-            .then(response => eventBus.$emit('setTotalRecord',response.data))
+            .then(response => this.onGetTotalRecordDone(response.data))
             .catch(error => this.onGetDataFail(error.response.data));
+    },
+    onGetTotalRecordDone: function(data) {
+        eventBus.$emit('setTotalRecord'+this.instance,data);
+        eventBus.$emit('loadingDone',this.instance);
     },
     getChildren: function (id) {
         this.setScroll(1);
         this.getData(id);
+        
         eventBus.$emit('refreshPath'+this.instance,id);
-        axios.get(this.getUrl+'/children/'+parseInt(id))
+        axios.get(this.getUrl+'/children/'+id)
             .then(response => eventBus.$emit('setLevel',response.data['level']))
             .catch(error => this.onGetDataFail(error.response.data));
-//        eventBus.$emit('toggleForm',false);
+        // eventBus.$emit('toggleForm',false);
         this.gotoPage(1);
         eventBus.$emit('setCurrentPage',1);
     },
-    onGetDataFail: function(data) {
+    onGetDataFail: function(data) { console.log(data);
+        this.gridData=[];
+        eventBus.$emit('loadingDone',this.instance);
         eventBus.$emit('openNotif',data);
     },
     setInstance: function() {
         eventBus.$on('getChildren'+this.instance, this.getChildren);
+    },
+    setTableWidth: function  () {
+        this.tableWidth=document.documentElement.clientWidth-220;
     }
   },
-  created: function () {
+  created: function () {    
     if (this.recursive) {
         if (this.selected) {
             this.getData(this.selected);
@@ -469,11 +634,14 @@ module.exports = {
     }
     eventBus.$on('refreshTags'+this.instance, this.getTaggedData);
     eventBus.$on('reload', this.reload);
+    eventBus.$on('resetChecked', this.resetChecked);
+    this.setTableWidth();
   }
 }
 </script>
 
 <style>
+
 th.active {
   color: blue;
 }
@@ -502,4 +670,37 @@ th.active .arrow {
   border-right: 4px solid transparent;
   border-top: 4px solid blue;
 }
+    
+.table-container {
+	overflow-y: auto;
+	_overflow: auto;
+	margin: 0 0 1em;
+    width: 100%;
+}
+    
+.table-container::-webkit-scrollbar {
+	-webkit-appearance: none;
+	width: 14px;
+	height: 14px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+	border-radius: 8px;
+	border: 3px solid #fff;
+	background-color: rgba(0, 0, 0, .3);
+}
+    
+.table-container-outer { position: relative; }
+
+.table-container-fade {
+	position: absolute;
+	right: 0;
+	width: 20px;
+	height: 100%;
+	background-image: -webkit-linear-gradient(0deg, rgba(255,255,255,.5), #fff);
+	background-image: -moz-linear-gradient(0deg, rgba(255,255,255,.5), #fff);
+	background-image: -ms-linear-gradient(0deg, rgba(255,255,255,.5), #fff);
+	background-image: -o-linear-gradient(0deg, rgba(255,255,255,.5), #fff);
+}
+
 </style>

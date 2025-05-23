@@ -1,5 +1,13 @@
 <?php namespace App\components\model;
 
+/**
+ * Class gov2formfield
+ * @package App\components\model
+ *
+ * v0.2 [April 21, 2021] [rijal@cybergl.co.id] Perubahan fn checkRequired() pada baris 46-51 menyesuaikan
+ *      deprecated each() ke versi PHP7.2
+ */
+
 class gov2formfield extends \Gov2lib\document {
 	function __construct () {
         global $pageID,$self,$doc;
@@ -8,17 +16,23 @@ class gov2formfield extends \Gov2lib\document {
         $this->className=$path[sizeof($path)-1];
         //-default utk single controller    
         $GLOBALS['vueData']['action']=$self->className; 
-        $GLOBALS['vueData']['fieldurl']=$self->className.'/fields'; 
-        
+        $GLOBALS['vueData']['fieldurl']=$self->className.'/fields';
+        $GLOBALS['vueData']['defaultLevel']=1;
 	}
 
-    function getLevel ($_fields,$_data) {
-        foreach($_fields as $key=>$val) {
-            if ($val['name'] == "level") {
-                foreach($val['options'] as $key2=>$val2) {
-                    //harus diubah ketika implmen tabel yang bener
-                    //if ($data->level==$val2) {return $key2;break;} <- yg lama
-                    if ($_data==$key2) {return $val2;break;}
+    function getLevel ($fields,$level,$level_label="") {
+        foreach($fields as $_key=>$_val) {
+            if ($_val['name'] == "level") {
+                foreach($_val['options'] as $_key2=>$_val2) {
+                    if ($level==$_key2 && !$level_label) {return $_val2;break;}
+                    //--------baris di atas akan deprecated
+                    if ($level==$_key2 && !is_array($_val2) && $level_label==$_val2) {
+                        return $_val2;break;
+                    } elseif ($level==$_key2 && is_array($_val2)) {
+                        foreach($_val2 as $_key3=>$_val3) {
+                            if ($level_label==$_val3) {return $_val3;break;}
+                        }
+                    }
                 }
             }                    
         }        
@@ -30,17 +44,18 @@ class gov2formfield extends \Gov2lib\document {
 	}
     
     function checkRequired ($data,$fields) {
-        while(list($key,$val)=each($fields)) {
-            if ($val['required']==true) {
-                if (!$data[$val['name']]) {
-                    $result[$val['name']]=$val['error_message'];
-                } 
-            } 
+        $result = null;
+        foreach ($fields as $field) {
+            if ((bool)$field['required'] == true) {
+                if (!$data[$field['name']]) {
+                    $result[$field['name']] = $field['error_message'] ? $field['error_message'] : "{$field['name']} required";
+                }
+            }
         }
         return $result;
     }
     
-    function getFields ($_file) {
+    function getFields ($_file) { //echo $_file;
         try {
             if (!file_exists($_file)) {
                 throw new \Exception('JsonFileNotExist:'.$_file);

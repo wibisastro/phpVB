@@ -1,0 +1,55 @@
+	[{
+		"name": "cmd",
+		"value": "",
+		"label": "Submit"
+	}, {
+		"name": "id",
+		"value": "",
+		"label": "ID",
+		"disabled": "true"
+	},{
+		"name": "app",
+		"value": "",
+		"label": "APP",
+		"disabled": "true"
+	}, {
+		"name": "nama",
+		"value": "",
+		"label": "Nama",
+		"required": "true,",
+		"error_message": "Nama wajib diisi"
+	},{
+		"name": "privilege",
+		"value": "",
+		"label": "Privilege",
+		"required": "true,",
+		"error_message": "Privilege wajib diisi"
+	}, {
+		"name": "type",
+		"label": "Type",
+		"required": "true",
+		"error_message": "Pilih Type",
+		"options": {
+			"checkbox":"Checkbox",
+			"radio":"Radio",
+			"option":"Option",
+			"text":"Text",
+			"textbox":"Textbox"
+		},
+		"type": "select"
+	},{
+		"name": "keterangan",
+		"value": "",
+		"label": "Keterangan",
+		"error_message": "Beri Keterangan"
+	}, {
+		"name": "status",
+		"label": "Status",
+		"required": "true",
+        "error_message": "Pilih status",
+        "options": {
+            "on":"ON",
+            "off":"OFF"
+        },
+        "type": "select"
+    }]

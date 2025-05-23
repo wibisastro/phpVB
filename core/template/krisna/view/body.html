@@ -1,0 +1,39 @@
+{% extends "krisnaLayout.html" %}
+
+{% block head %}
+	{{ parent() }}
+	{% include('krisnaHead.html') %}
+{% endblock %}
+
+{% block header %}
+	{% include('krisnaHeader.html') %}
+{% endblock %}
+
+{% block pagetitle %}
+	{% include('krisnaPageTitle.html') %}
+{% endblock %}
+
+{% block sidebar %}
+    {% for item in sidebars %}
+       {% include[item,'krisnaMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block content %}
+    {% for item in contents %}
+       {% include[item,'krisnaMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block footer %}
+	{% include('krisnaFooter.html') %}
+{% endblock %}
+
+{% block js %}
+	{{ parent() }}
+	{% include('krisnaJS.html') %}
+{% endblock %}
+
+{% block krisnaJQueryJS %}
+	{% include('krisnaJQueryJS.html') %}
+{% endblock %}

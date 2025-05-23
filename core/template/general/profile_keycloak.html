@@ -1,0 +1,39 @@
+{% if _SESSION['account_id'] %}
+<b-row>
+    <b-col cols="12">
+        <div class="main-box">
+            <div class="main-box-header">KEYCLOAK User Profile</div>
+            <div class="main-box-body">
+                <b-row>
+                    <b-col cols="3">NIP</b-col>
+                    <b-col cols="9">: {{_SESSION['account_id']}}</b-col>
+                </b-row>
+                <b-row>
+                    <b-col cols="3">Full Name</b-col>
+                    <b-col cols="9">: {{_SESSION['fullname']}}</b-col>
+                </b-row>
+                <b-row>
+                    <b-col cols="3">Email</b-col>
+                    <b-col cols="9">: {{_SESSION['email']}}</b-col>
+                </b-row>
+                <b-row>
+                    <b-col cols="3">Email Verified</b-col>
+                    <b-col cols="9">: {{_SESSION['email_verified'] ? 'verified' : 'false'}}</b-col>
+                </b-row>
+                <b-row>
+                    <b-col cols="3">Role</b-col>
+                    <b-col cols="9">: {{_SESSION['userRole']}}</b-col>
+                </b-row>
+                <b-row>
+                    <b-col cols="3" class="row-details">Token Expired in</b-col>
+                    <b-col cols="9">: {{_SESSION['expired_in']}}</b-col>
+                </b-row>
+                <b-row>
+                    <b-col cols="3" class="row-details">Password</b-col>
+                    <b-col cols="9">: <a href="https://sso.gov2.web.id/gov2sso/login" target="_blank">Ganti Password di SSO Gov 2.0</a> <br />Login -> Profile -> Ganti Password -> <br />Kembali ke:&nbsp; {{ _SERVER["SERVER_NAME"] }}</b-col>
+                </b-row>
+            </div>
+        </div>
+    </b-col>
+</b-row>
+{% endif %}
