@@ -1,0 +1,44 @@
+[{
+    "name": "cmd",
+    "value": "",
+    "label": "Submit"
+},{
+    "name": "id",
+    "value": "",
+    "label": "ID",
+    "placeholder": "Nomor ID",
+    "disabled": "true"
+},{
+    "name": "nomor",
+    "value": "",
+    "label": "Nomor",
+    "type": "select",
+    "required": true,
+    "options": {
+        "a": "a",
+        "b": "b",
+        "c": "c",
+        "d": "d",
+        "e": "e"
+    }
+},{
+    "name": "nama",
+    "value": "",
+    "label": "Jawaban",
+    "required": true,
+    "error_message": "Jawaban harus diisi"
+},{
+    "name": "bobot",
+    "value": "",
+    "label": "Bobot",
+    "placeholder": "Harap isi bobot dengan angka",
+    "required": true
+},{
+    "name": "level",
+    "type":"hidden",
+    "options": {
+        "1": "survey",
+        "2": "pertanyaan",
+        "3": "opsi"
+    }
+}]

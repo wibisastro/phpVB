@@ -1,0 +1,62 @@
+{% extends "bs4Layout.html" %}
+
+{% block head %}
+    {{ parent() }}
+    {% include('@gov2pipe/bs4Head.html') %}
+{% endblock %}
+
+{% block header %}
+    {% include('bs4HeaderNew.html') %}
+{% endblock %}
+
+{% block pagetitle %}
+    {% include('bs4PageTitle.html') %}
+{% endblock %}
+
+{% block notification %}
+    {% include('bs4Notification.html') %}
+{% endblock %}
+
+{% block welcome_krisna %}{% endblock %}
+
+{% block sidebar %}
+    {% for item in sidebars %}
+        {% include[item,'bs4MissingFile.html'] %}
+    {% endfor %}
+{% endblock %}
+
+{% block content %}
+    {% for item in contents %}
+        {% include[item,'bs4MissingFile.html'] %}
+    {% endfor %}
+{% endblock %}
+
+{% block footer %}
+    {% include('@gov2pipe/footer.html') %}
+{% endblock %}
+
+{% block js %}
+    {{ parent() }}
+    {% include('bs4JS.html') %}
+{% endblock %}
+
+{% block externalJS %}
+	{% include('externalJS.html') %}
+
+<script>
+    iFrameResize({log: false}, '#myIframe');
+
+    if (document.readyState === "complete"
+        || document.readyState === "loaded"
+        || document.readyState === "interactive") {
+        const frame = document.getElementById('myIframe');
+
+        window.addEventListener('message', event => {
+            // IMPORTANT: check the origin of the data!
+            if (event.origin.startsWith('https://sso.gov2.web.id')) {
+                frame.contentWindow.postMessage(window.location.href, 'https://sso.gov2.web.id');
+            }
+        });
+    }
+</script>
+{% endblock %}

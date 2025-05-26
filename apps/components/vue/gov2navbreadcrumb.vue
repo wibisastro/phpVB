@@ -33,9 +33,9 @@ module.exports = {
         },
         onGetDataFail: function(data) {
             eventBus.$emit('openNotif',data);
-        }        
+        }
     },
-    created: function () { 
+    created: function () {
         this.getData();
     }
 }

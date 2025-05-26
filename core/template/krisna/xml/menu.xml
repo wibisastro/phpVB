@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainmenu>
+    <menu>
+		<caption>Menu 1</caption>
+		<url>/krisna</url>
+		<menu>
+			<caption>Dashboard</caption>
+			<url>/krisna</url>
+		</menu>
+		<menu>
+			<caption>Advanced</caption>
+			<url>/krisna/advanced</url>
+		</menu>
+		<menu>
+			<caption>Users</caption>
+			<url>/krisna/user</url>
+		</menu>
+		<menu>
+            <caption>Footable</caption>
+            <url>/krisna/tables/foo</url>
+        </menu>
+        <menu>
+			<caption>Simple</caption>
+			<url>/krisna/simple</url>
+		</menu>
+		<menu>
+			<caption>Multiple File Upload</caption>
+			<url>/krisna/form/dropzone</url>
+		</menu>
+	</menu>
+	<menu>
+		<caption>Menu 2</caption>
+		<menu>
+			<caption>Form Elements</caption>
+			<url>/krisna/form/elements</url>
+		</menu>
+		<menu>
+			<caption>Form X-Editable</caption>
+			<url>/krisna/form/xeditable</url>
+		</menu>
+		<menu>
+			<caption>Form WYSIWYG</caption>
+			<url>/krisna/form/wysiwyg</url>
+		</menu>
+		<menu>
+			<caption>Form WYSIWYG Summernote</caption>
+			<url>/krisna/form/wysiwyg-summernote</url>
+		</menu>
+		<menu>
+			<caption>Form WYSIWYG CKEditor</caption>
+			<url>/krisna/form/wysiwyg-ckeditor</url>
+		</menu>
+		<menu>
+			<caption>Form Wizard Popup</caption>
+			<url>/krisna/formwizardpopup</url>
+		</menu>
+		<menu>
+			<caption>Form Wizard</caption>
+			<url>/krisna/formwizard</url>
+		</menu>
+	</menu>
+	<menu>
+		<caption>UI Kit</caption>
+		<menu>
+			<caption>Elements</caption>
+			<url>/krisna/ui/elements</url>
+		</menu>
+		<menu>
+			<caption>Notifications And Alerts</caption>
+			<url>/krisna/ui/notifications-alerts</url>
+		</menu>
+		<menu>
+			<caption>Modals</caption>
+			<url>/krisna/ui/modals</url>
+		</menu>
+		<menu>
+			<caption>Video</caption>
+			<url>/krisna/video</url>
+		</menu>
+		<menu>
+			<caption>Awesome Icons</caption>
+			<url>/krisna/ui/awesome</url>
+		</menu>
+		<menu>
+			<caption>Halflings Icons</caption>
+			<url>/krisna/ui/halflings</url>
+		</menu>
+		<menu>
+			<caption>Nestable</caption>
+			<url>/krisna/ui/nestable</url>
+		</menu>
+		<menu>
+			<caption>Typography</caption>
+			<url>/krisna/ui/typography</url>
+		</menu>
+		<menu>
+			<caption>3 Level Menu</caption>
+			<menu>
+				<caption>3rd level menu</caption>
+				<url>#</url>
+			</menu>
+			<menu>
+				<caption>3rd level menu</caption>
+				<url>#</url>
+			</menu>
+			<menu>
+				<caption>3rd level menu</caption>
+				<url>#</url>
+			</menu>
+		</menu>
+	</menu>
+	<menu>
+		<caption>Menu 4</caption>
+		<menu>
+			<caption>Google Maps</caption>
+			<url>/krisna/maps</url>
+		</menu>
+		<menu>
+			<caption>Grid</caption>
+			<url>/krisna/grid</url>
+		</menu>
+		<menu>
+			<caption>Graph Flot</caption>
+			<url>/krisna/graphflot</url>
+		</menu>
+		<menu>
+			<caption>Faq</caption>
+			<url>/krisna/faq</url>
+		</menu>
+		<menu>
+			<caption>Email Templates</caption>
+			<url>/krisna/email/templates</url>
+		</menu>
+		<menu>
+			<caption>Morris dan Mixed</caption>
+			<url>/krisna/morrismixed</url>
+		</menu>
+		<menu>
+			<caption>Invoice</caption>
+			<url>/krisna/invoice</url>
+		</menu>
+		<menu>
+			<caption>Search</caption>
+			<url>/krisna/search</url>
+		</menu>
+		<menu>
+			<caption>Timeline Grid</caption>
+			<url>/krisna/timelinegrid</url>
+		</menu>
+		<menu>
+			<caption>User Profile</caption>
+			<url>/krisna/userprofile</url>
+		</menu>
+		<menu>
+			<caption>xChart</caption>
+			<url>/krisna/graphs/xchart</url>
+		</menu>
+		<menu>
+			<caption>DyGraphs</caption>
+			<url>/krisna/graphs/dygraphs</url>
+		</menu>
+	</menu>
+	<menu>
+		<caption>Menu 5</caption>
+		<menu>
+			<caption>Timeline</caption>
+			<url>/krisna/timeline</url>
+		</menu>
+		<menu>
+			<caption>Gallery</caption>
+			<url>/krisna/gallery</url>
+		</menu>
+		<menu>
+			<caption>Team Members</caption>
+			<url>/krisna/teammembers</url>
+		</menu>
+		<menu>
+			<caption>Project</caption>
+			<url>/krisna/project</url>
+		</menu>
+		<menu>
+			<caption>Pricing</caption>
+			<url>/krisna/pricing</url>
+		</menu>
+		<menu>
+			<caption>Galerry v2</caption>
+			<url>/krisna/galleryv2</url>
+		</menu>
+		<menu>
+			<caption>Calendar</caption>
+			<url>/krisna/calendar</url>
+		</menu>
+		<menu>
+			<caption>Intro</caption>
+			<url>/krisna/intro</url>
+		</menu>
+		<menu>
+			<caption>Widget</caption>
+			<url>/krisna/widget</url>
+		</menu>
+		<menu>
+			<caption>Login</caption>
+			<url>/krisna/login</url>
+		</menu>
+		<menu>
+			<caption>Login Full</caption>
+			<url>/krisna/loginfull</url>
+		</menu>
+		<menu>
+			<caption>Registrasi</caption>
+			<url>/krisna/registrasi</url>
+		</menu>
+		<menu>
+			<caption>Registrasi Full</caption>
+			<url>/krisna/registrasifull</url>
+		</menu>
+		<menu>
+			<caption>Typography</caption>
+			<url>/krisna/typography</url>
+		</menu>
+		<menu>
+			<caption>Forgot Password</caption>
+			<url>/krisna/password</url>
+		</menu>
+		<menu>
+			<caption>Forgot Password Full</caption>
+			<url>/krisna/forgot-password</url>
+		</menu>
+		<menu>
+			<caption>lock Screen</caption>
+			<url>/krisna/lockscreen</url>
+		</menu>
+		<menu>
+			<caption>lock Screen Full</caption>
+			<url>/krisna/lockscreenfull</url>
+		</menu>
+		<menu>
+			<caption>Error 500</caption>
+			<url>/krisna/error500</url>
+		</menu>
+		<menu>
+			<caption>Error 404 Nested</caption>
+			<url>/krisna/error404nested</url>
+		</menu>
+		<menu>
+			<caption>Error 404</caption>
+			<url>/krisna/error404</url>
+		</menu>
+		<menu>
+			<caption>Inbox</caption>
+			<url>/krisna/inbox</url>
+		</menu>
+		<menu>
+			<caption>Email Compose</caption>
+			<url>/krisna/email/compose</url>
+		</menu>
+		<menu>
+			<caption>Email Detail</caption>
+			<url>/krisna/email/detail</url>
+		</menu>
+	</menu>
+</mainmenu>

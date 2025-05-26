@@ -2,73 +2,58 @@
 <mainmenu>
 	<menu>
 		<caption>Components</caption>
+        <url>/components</url>
 		<menu>
-	        <icon>fa-users</icon>
-			<caption>Navigation</caption>
+	        <caption>Navigation</caption>
 			<url>/components/gov2nav</url>
 		</menu>
 		<menu>
-	        <icon>fa-cube</icon>
-			<caption>Button</caption>
+	        <caption>Button</caption>
 			<url>/components/gov2button</url>
 		</menu>
 		<menu>
-	        <icon>fa-cube</icon>
-			<caption>Search</caption>
+	        <caption>Search</caption>
 			<url>/components/gov2search</url>
 		</menu>
 		<menu>
-	        <icon>fa-cube</icon>
-			<caption>Notification</caption>
+	        <caption>Notification</caption>
 			<url>/components/gov2notification</url>
 		</menu>
 		<menu>
-	        <icon>fa-certificate</icon>
-			<caption>Formfield</caption>
+	        <caption>Formfield</caption>
 			<url>/components/gov2formfield</url>
 		</menu>
 		<menu>
-	        <icon>fa-cube</icon>
-			<caption>Table</caption>
+	        <caption>Table</caption>
 			<url>/components/gov2table</url>
 		</menu>
 		<menu>
-	        <icon>fa-certificate</icon>
-			<caption>Pagination</caption>
+	        <caption>Pagination</caption>
 			<url>/components/gov2pagination</url>
+		</menu>
+		<menu>
+	        <caption>SSO</caption>
+			<url>/components/gov2sso</url>
+		</menu>
+		<menu>
+	        <caption>Login</caption>
+			<url>/components/gov2login</url>
 		</menu>
 	</menu>
 	<menu>
 		<caption>Examples</caption>
+        <url>/examples</url>
 		<menu>
-	        <icon>fa-users</icon>
-			<caption>Janji Presiden</caption>
+	        <caption>Janji Presiden</caption>
 			<url>/examples/presiden</url>
 		</menu>
 		<menu>
-	        <icon>fa-cube</icon>
-			<caption>OPD</caption>
+	        <caption>OPD</caption>
 			<url>/examples/opd</url>
 		</menu>
-		<menu>
-	        <icon>fa-cube</icon>
-			<caption>Wilayah</caption>
+        <menu>
+	        <caption>Wilayah</caption>
 			<url>/examples/wilayah</url>
-		</menu>
-	</menu>
-	<menu>
-		<caption>DAK</caption>
-		<menu>
-			<caption>Bidang</caption>
-			<url>/dak/bidang</url>
-		</menu>
-		<menu>
-			<caption>Prioritas</caption>
-			<url>/dak/prioritas</url>
-		</menu>
-		<menu>
-			<caption>Bidang-Prioritas</caption>
-			<url>/dak/bidangprioritas</url>
 		</menu>
 	</menu>
 </mainmenu>

@@ -1,0 +1,21 @@
+<div class="box">
+    <p>Token Anda telah expired, silahkan meminta kembali token kepada pejabat berwenang</p>
+</div>
+<p>&nbsp;</p>
+<div>
+<!--    <gov2formfield -->
+<!--    action="{{ webroot }}/{{ pageID }}"-->
+<!--    field-url="{{ webroot }}/{{ pageID }}/fields/tokenform"-->
+<!--    :show=true></gov2formfield>-->
+</div>
+
+<!-- component berikut ada di apikrisna -->
+<gov2tokenform
+        action="{{ webroot }}/{{ pageID }}"
+        :show="true"
+        :session-expired="true"
+        field-url="{{ webroot }}/{{ pageID }}/fields/sessionform"
+        {% if _SESSION[className ~ '_id'] %}
+        :parent_id="{{ _SESSION[className ~ '_id'] }}"
+        {% endif %}>
+</gov2tokenform>

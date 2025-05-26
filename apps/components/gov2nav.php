@@ -8,20 +8,20 @@ class gov2nav {
     function index () {
         global $doc,$self;
         $doc->body("pageTitle",'Navigation Component');
-		$self->setDefaultNav();
+		$self->take("components","gov2nav", "setDefaultNav");
     }
     
     function breadcrumb ($vars) {
         global $self,$config,$doc;
         if ($vars['xml']) {$xml=$vars['xml'].".xml";}
-//        if ($vars['className']=="index") {unset($xml);}
         $self->menus=$self->menubar($vars['pageID'],$xml);
         $self->breadcrumb($self->menus,$vars['pageID'],$vars['className']);
         if (!$doc->error) {
+            $self->breadcrumb = $self->breadcrumb ?? [];
             krsort($self->breadcrumb);
             $c=1;
             $url=json_decode(json_encode($config->webroot),true);
-            $data[0]=array("caption"=>"Home","url"=>$url[0]);
+            $data[0]=array("caption"=>"Home","url"=>$url[0] ?? "/");
             foreach($self->breadcrumb as $key => $val) {
                 if ($val['caption']) {
                     $data[$c]=$val;

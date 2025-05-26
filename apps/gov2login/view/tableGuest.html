@@ -1,0 +1,10 @@
+<div>
+    <gov2table
+        :is-active="true"
+        get-url="{{ className }}"
+        :columns="['id', 'account_id', 'fullname', 'status', 'role', 'email', 'lastlogin_at', 'created_at', 'counter']"
+        :filter-key="searchQuery"
+        :readonly=true
+        :item-per-page="itemPerPage">
+    </gov2table>
+</div>

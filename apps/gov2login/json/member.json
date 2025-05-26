@@ -1,0 +1,38 @@
+	[{
+		"name": "cmd",
+		"value": "",
+		"label": "Submit"
+	}, {
+		"name": "id",
+		"value": "",
+		"label": "Account ID",
+		"disabled": "true"
+	}, {
+		"name": "fullname",
+		"value": "",
+		"label": "Nama",
+		"disabled": "true"
+    }, {
+		"name": "email",
+		"value": "",
+		"label": "email",
+		"disabled": "true"
+    }, {
+		"name": "status",
+		"label": "Status",
+		"required": "true",
+        "error_message": "Pilih status",
+        "options": {
+            "pending":"pending",
+            "active":"active",
+            "suspended":"suspended"
+        },
+        "type": "select"
+    }, {
+		"name": "role",
+		"value": "",
+		"label": "Role",
+		"required": "true",
+		"type": "gov2component",
+		"error_message": "Pilih Role"
+	}]

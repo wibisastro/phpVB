@@ -1,0 +1,12 @@
+{
+  "parent_id": 0,
+  "app": "telaahrenjakl",
+  "type": "service",
+  "level": 1,
+  "level_label": "cluster",
+  "privilege": "member",
+  "nama": "",
+  "keterangan": "",
+  "status": "on",
+  "value": ""
+}

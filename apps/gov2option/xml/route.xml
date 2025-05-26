@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+    <route>
+        <method>GET</method>
+        <uri>/gov2option/index/{cmd}[/{id}]</uri>
+        <handler>gov2option\model\index</handler>
+    </route>
+
+    <route>
+        <method>GET</method>
+        <uri>/gov2option/controlpanel</uri>
+        <handler>gov2option\model\controlpanel</handler>
+    </route>
+    <route>
+        <method>GET</method>
+        <uri>/gov2option/controlpanel/{cmd}[/{portal}[/{parent_id}]]</uri>
+        <handler>gov2option\model\controlpanel</handler>
+    </route>
+    <route>
+        <method>POST</method>
+        <uri>/gov2option/controlpanel</uri>
+        <handler>gov2option\model\controlpanel</handler>
+    </route>
+
+    <route>
+        <method>GET</method>
+        <uri>/gov2option/option/{privilege}</uri>
+        <handler>gov2option\model\option</handler>
+    </route>
+    <route>
+        <method>GET</method>
+        <uri>/gov2option/option/{privilege}/{cmd}[/{id}]</uri>
+        <handler>gov2option\model\option</handler>
+    </route>
+    <route>
+        <method>GET</method>
+        <uri>/gov2option/option/{privilege}/{cmd}/{scroll}/[{id}]</uri>
+        <handler>gov2option\model\option</handler>
+    </route>
+    <route>
+        <method>POST</method>
+        <uri>/gov2option/option/{privilege}</uri>
+        <handler>gov2option\model\option</handler>
+    </route>
+
+
+    <route>
+        <method>GET</method>
+        <uri>/gov2option/{pageID}/{privilege}</uri>
+        <handler>gov2option\model\option</handler>
+    </route>
+    <route>
+        <method>GET</method>
+        <uri>/gov2option/{pageID}/{privilege}/{cmd}[/{id}]</uri>
+        <handler>gov2option\model\option</handler>
+    </route>
+    <route>
+        <method>GET</method>
+        <uri>/gov2option/{pageID}/{privilege}/{cmd}/{scroll}/[{id}]</uri>
+        <handler>gov2option\model\option</handler>
+    </route>
+    <route>
+        <method>POST</method>
+        <uri>/gov2option/{pageID}/{privilege}</uri>
+        <handler>gov2option\model\option</handler>
+    </route>
+
+    <route>
+        <method>POST</method>
+        <uri>/gov2option</uri>
+        <handler>gov2option\model\receiver</handler>
+    </route>
+
+    <route>
+        <method>POST</method>
+        <uri>/gov2option/provider</uri>
+        <handler>gov2option\model\provider</handler>
+    </route>
+</list>

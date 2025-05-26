@@ -1,6 +1,9 @@
-apps/apikrisna
-apps/gov2session
-apps/gov2login
-apps/jadwalkpu
-apps/pemilihkpu
-core/scripts
+/vendor
+/.idea
+Homestead.json
+Homestead.yaml
+.env
+composer.lock
+/logs/*
+/public/.htaccess
+/core/scripts/sql/*

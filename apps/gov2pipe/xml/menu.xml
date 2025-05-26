@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainmenu>
+		<menu>
+			<!-- <caption>Struktur</caption>
+			<url>/renjakl/struktur</url>
+			<icon>fa fa-clone</icon> -->
+		</menu>
+		<!-- <menu>
+			<caption>Struktur</caption>
+			<url>/renjakl/struktur</url>
+			<icon>fa fa-clone</icon>
+		</menu>
+		<menu>
+			<caption>Reset</caption>
+			<url>/renjakl/reset</url>
+			<icon>fa fa-undo</icon>
+		</menu>
+		<menu>
+			<caption>PJ</caption>
+			<url>/renjakl/tagging</url>
+			<icon>fa fa-spinner</icon>
+		</menu>
+		<menu>
+			<caption>Tematik</caption>
+			<url>/renjakl/taggingtematik</url>
+			<icon>fa fa-spinner</icon>
+		</menu>
+		<menu>
+			<caption>Treeview</caption>
+			<url>/renjakl/treeview</url>
+			<icon>fa fa-clone</icon>
+		</menu>
+		<menu>
+			<caption>Tag</caption>
+			<url>/renjakl/tag</url>
+			<icon>fa fa-tag</icon>
+		</menu>
+		<menu>
+			<caption>Telaah</caption>
+			<url>/renjakl/telaah</url>
+			<icon>fa fa-warning</icon>
+		</menu> -->
+
+
+</mainmenu>

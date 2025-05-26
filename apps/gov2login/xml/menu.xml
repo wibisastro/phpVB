@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainmenu>
+	<menu>
+		<caption>Account</caption>
+        <url>/gov2login</url>
+        <menu>
+			<caption>Login</caption>
+			<url>/gov2login</url> 
+		</menu>	
+		<menu>
+			<caption>Signup</caption>
+			<url>/gov2login/signup</url> 
+		</menu>	
+		<menu>
+			<caption>Profile</caption>
+			<url>/gov2login/profile</url> 
+		</menu>
+		<menu>
+			<caption>Forgot Password</caption>
+			<url>/gov2login/forgot</url> 
+		</menu>
+	</menu>
+	<menu>
+		<caption>Roles</caption>
+        <url>/gov2login/roles</url>
+		<menu>
+			<caption>Registration</caption>
+			<url>/gov2login/register</url> 
+		</menu>
+		<menu>
+			<caption>Token Check</caption>
+			<url>/gov2login/token</url> 
+		</menu>
+		<menu>
+			<caption>Logout</caption>
+			<url>/gov2login/delete</url> 
+		</menu>
+	</menu>
+</mainmenu>

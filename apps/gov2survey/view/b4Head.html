@@ -1,0 +1,96 @@
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+<title>{{ pageTitle }} - Gov2</title>
+
+<!-- Load required Bootstrap and BootstrapVue CSS -->
+<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+<link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+
+
+<!-- libraries -->
+<!-- <link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/nanoscroller-min.css" /> -->
+<link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/nifty-component.css"/>
+<!-- <link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/wizard.css"/> -->
+<!-- <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"> -->
+
+<!-- global styles -->
+<link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/theme_styles.css" />
+
+<!-- theme kerjasama-->
+<!-- <link rel="stylesheet" type="text/css" href="{{ webroot }}/rokuone/css/theme_kerjasama.css" /> -->
+
+<link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/custom.css"/>
+
+<!-- Favicon -->
+<!-- <link type="image/x-icon" href="https://www.bkn.go.id/wp-content/themes/bkn-responsive/favicon.ico" rel="shortcut icon" /> -->
+
+
+<!-- google font libraries -->
+<link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<!-- <link href="https://fonts.googleapis.com/css?family=Philosopher&display=swap" rel="stylesheet"> -->
+<!-- <link href="https://fonts.googleapis.com/css?family=Berkshire+Swash&display=swap" rel="stylesheet"> -->
+
+<!-- font awesome -->
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!--<link rel="stylesheet" href="//cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css">-->
+
+<style>
+	body {
+		background: #e7ebee;
+	}
+</style>
+
+<!-- vue and friends -->
+{% if 'bkn.go.id' in _SERVER['SERVER_NAME'] %}
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.min.js"></script>
+{% else %}
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+{% endif %}
+<script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+<script src="{{ webroot }}/js/httpVueLoader.js"></script>
+<script src="{{ webroot }}/js/axios.min.js"></script>
+<script src="{{ webroot }}/js/vue-scrollto.js"></script>
+
+<script src="{{ webroot }}/js/gov2form.js"></script>
+<script src="{{ webroot }}/js/iframeResizer.min.js"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>-->
+
+<!-- canvas JS -->
+<!-- <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script> -->
+
+<!-- chart JS -->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js"></script>-->
+
+{% if '/survey_view' in _SERVER['REQUEST_URI'] %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.3.1/highcharts.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.3.1/modules/exporting.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.3.1/modules/offline-exporting.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.3.1/modules/export-data.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.3.1/modules/accessibility.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.3.1/modules/no-data-to-display.min.js"></script>
+
+<!-- For drilldown -->
+<!-- <script src="https://code.highcharts.com/modules/drilldown.js"></script> -->
+{% endif %}
+
+{% if '/survey' in _SERVER['REQUEST_URI'] %}
+	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/id.min.js"></script>
+{% endif %}
+
+<!-- CDNJS :: Sortable (https://cdnjs.com/) -->
+<!--<script src="//cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>-->
+<!-- CDNJS :: Vue.Draggable (https://cdnjs.com/) -->
+<!--<script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>-->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue-draggable-nested-tree@3.0.0-beta2/dist/vue-draggable-nested-tree.cjs.min.js"></script> -->
+
+<script type="text/javascript">
+	const eventBus = new Vue();
+	Vue.config.devtools = true;
+	Vue.prototype.$window = window;
+</script>

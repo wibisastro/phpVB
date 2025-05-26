@@ -1,0 +1,10 @@
+<div>
+    <gov2table
+        :is-active="true"
+        get-url="{{ roleName }}"
+        :columns="['id', 'account_id', 'fullname', 'status', 'role', 'email', 'lastlogin_at', 'created_at', 'counter']"
+        :filter-key="searchQuery"
+        :item-per-page="itemPerPage"
+        :compare-role="true">
+    </gov2table>
+</div>

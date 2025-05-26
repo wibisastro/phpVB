@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+	<dsn>
+		<name>master</name>
+		<host>localhost</host>
+		<user>root</user>
+		<pass></pass>
+		<db>kpu_sidalih</db>
+	</dsn>
+</list>

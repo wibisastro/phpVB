@@ -1,0 +1,48 @@
+[{
+    "name": "cmd",
+    "value": "",
+    "label": "Submit"
+},{
+    "name": "id",
+    "value": "",
+    "label": "ID",
+    "placeholder": "Nomor ID",
+    "disabled": "true"
+},{
+    "name": "nama",
+    "value": "",
+    "label": "Nama",
+    "placeholder": "Masukan Nama",
+    "error_message": "Nama wajib diisi",
+    "required": "true"
+},{
+    "name": "spesifikasi",
+    "value": "",
+    "label": "Spesifikasi",
+    "placeholder": "Masukan Spesifikasi",
+    "error_message": "Spesifikasi wajib diisi",
+    "required": "true"
+
+},{
+    "name": "kategori",
+    "value": "",
+    "label": "Kategori",
+    "required": "true",
+    "error_message": "Kategori harus dipilih",
+    "type": "select",
+    "options": {
+        "tetap":"Tetap",
+        "lancar":"Lancar",
+        "tb":"Tidak Berwujud",
+        "keuangan":"Keuangan",
+        "sdm":"SDM"
+    }
+},{
+    "name": "jumlah",
+    "value": "",
+    "label": "Jumlah",
+    "directive": "numeric",
+    "placeholder": "Masukan Jumlah",
+    "error_message": "Jumlah wajib diisi",
+    "required": "true"
+}]

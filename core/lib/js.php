@@ -12,7 +12,7 @@ class js extends checkExist {
 		global $vars;
         $_app=$this->checkAppDir($vars["app"]);
         $this->baseName=$_app;
-        $this->baseBody='bulmaJsBody.html';
+        $this->baseBody='jsBody.html';
         #---perlu antisipasi jika $_app null
         $this->controller=__DIR__."/index.php";
         if (!isset($vars["component"])) {$vars["component"]="";}

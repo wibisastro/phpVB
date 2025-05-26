@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cari Pemilih Berdasarkan NIK - Gov2</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/http-vue-loader@1.3.5/src/httpVueLoader.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://admin.sidalih.gov2.web.id/js/gov2form.js"></script>
+
+</head>
+<body>
+<pre>
+- tag: &lt;gov2search-nik post-url="https://jakartaprov.kpu.go.id" level="prov"&gt;&lt;/gov2search-nik&gt;
+- ganti parameter post-url dengan alamat portal tempat pencarian
+- sesuaikan parameter level, prov untuk protal provinsi dan kab atau tanpa parameter level untuk portal kabupaten
+- harus dijalankan dari protokol http atau https, tidak bisa dari open file
+- misalnya http://localhost/search.html
+</pre>
+<div id="app">
+    <gov2search-nik post-url="https://jakartaprov.kpu.go.id" level="prov"></gov2search-nik>
+</div>
+
+<script type="text/javascript">
+  const eventBus = new Vue();
+  new Vue({
+	    el: '#app',
+        components: {'gov2searchNik': httpVueLoader('https://admin.sidalih.gov2.web.id/components/vue/gov2searchNik.vue')},
+  });
+</script>
+</body>
+</html>

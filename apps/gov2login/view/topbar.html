@@ -1,0 +1,40 @@
+<div>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+          Home
+        </a>
+          
+        <div class="navbar-burger burger" data-target="navMenu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      <div class="navbar-menu" id="navMenu">
+          <div class="navbar-end">
+            {% if _SESSION['account_id'] %}
+                <a class="navbar-item" href="/gov2login/guest">
+                  Guest
+                </a>
+                <a class="navbar-item" href="/gov2login/member">
+                  Member
+                </a>
+                <a class="navbar-item" href="/gov2login">
+                  {{ _SESSION['fullname'] }}
+                </a>
+                <a class="navbar-item" href="/gov2login.php?cmd=logout">
+                  Logout
+                </a>
+            {% else %}
+                <a class="navbar-item" href="/gov2login/auth/signup">
+                  Signup
+                </a>
+                <a class="navbar-item" href="/gov2login">
+                  Login
+                </a>
+            {% endif %}
+          </div>
+      </div>
+    </nav>
+</div>

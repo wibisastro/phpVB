@@ -1,0 +1,37 @@
+<b-row>
+    <b-col cols="12">
+        <div class="main-box">
+			<gov2breadcrumb
+					:is-active="true"
+					:is-horizontal="true"
+					path-url="/gov2login/ref_unitkerja/breadcrumb"
+			></gov2breadcrumb>
+		</div>
+    </b-col>
+</b-row>
+
+<b-row>
+    <b-col cols="12">
+        <tablepack
+                :is-active="true"
+                get-url="/gov2login/ref_unitkerja"
+                post-url="{{className}}"
+                :readonly="true"
+                :columns="['kode', 'nama']"
+                :custom-column-names="{nama:'Unit Kerja', member: '{{roleName}}'}"
+                :filter-key="searchQuery"
+                :item-per-page="itemPerPage"
+                :children-tooltip="false"
+                :interval="interval"
+                :recursive="true"
+                :is-bulk-approval="false"
+                :scroll-interval="scrollInterval"
+                tag-url="{{className}}"
+                tag-caption="fullname"
+                :tag-closeable="true"
+                :is-tag-wilayah="false"
+                :child-component="{instance:'/gov2login/ref_user',type:'dropdown'}"
+                level-end="eselon2">
+        </tablepack>
+    </b-col>
+</b-row>

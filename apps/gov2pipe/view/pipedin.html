@@ -1,0 +1,18 @@
+{% if pipedin %}
+    <div class="alert alert-success" role="alert">
+    <i class="fa fa-check-circle fa-fw fa-lg"></i>
+    <strong>Well done!</strong> Sudah login dengan akun Gov2 KRISNA {{ pipedin }}.
+        <p align="right">
+<a class="btn btn-success" href="/gov2pipe/pipedin/logout">Logout dari KRISNA</a>
+</p>
+    </div>
+
+{% else %}
+    <div class="alert alert-danger" role="alert">
+        <i class="fa fa-times-circle fa-fw fa-lg"></i>
+        <strong>Oh snap!</strong> Belum login ke KRISNA, Silahkan login terlebih dahulu!
+        <p align="right">
+            <a class="btn btn-danger" href="/gov2pipe">Login ke KRISNA</a>
+        </p>
+    </div>
+{% endif %}

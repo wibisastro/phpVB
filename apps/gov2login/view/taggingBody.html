@@ -1,0 +1,52 @@
+{% extends "bulmaSourceTargetLayout.html" %}
+
+{% block head %}
+	{{ parent() }}
+	{% include('bulmaHead.html') %}
+{% endblock %}
+
+{% block topbar %}
+	{% include('bulmaTopBar.html') %}
+{% endblock %}
+
+{% block header %}
+	{% include('bulmaHeader.html') %}
+{% endblock %}
+
+{% block pagetitle %}
+	{% include('bulmaPageTitle.html') %}
+{% endblock %}
+
+{% block sidebar %}
+    {% for item in sidebars %}
+       {% include[item,'bulmaMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block content %}
+    {% for item in contents %}
+       {% include[item,'bulmaMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block contentRight %}
+    {% for item in contentsRight %}
+       {% include[item,'bulmaMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block contentLeft %}
+    {% for item in contentsLeft %}
+       {% include[item,'bulmaMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block footer %}
+	{% include('bulmaFooter.html') %}
+{% endblock %}
+
+{% block js %}
+	{{ parent() }}
+	{% include('bulmaJS.html') %}
+{% endblock %}
+

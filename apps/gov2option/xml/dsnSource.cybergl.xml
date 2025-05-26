@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+    <share>dpdraft2</share>
+    <dsn>
+		<name>lkpp.kl2.web.id</name>
+		<host>localhost</host>
+		<user>rijal</user>
+		<pass>cybergl05</pass>
+		<db>kl_lkpp</db>
+	</dsn>
+	<dsn>
+		<name>kemenpanrb.kl2.web.id</name>
+		<host>localhost</host>
+		<user>rijal</user>
+		<pass>cybergl05</pass>
+		<db>kl_kemenpanrb</db>
+	</dsn>
+	<dsn>
+        <name>klhk.kl2.web.id</name>
+        <host>localhost</host>
+        <user>dennis</user>
+        <pass>cavalo01</pass>
+        <db>kl_klhk</db>
+    </dsn>
+	<dsn>
+		<name>kemenperin.kl2.web.id</name>
+		<host>localhost</host>
+		<user>rijal</user>
+		<pass>cybergl05</pass>
+		<db>kl_kemenperin</db>
+	</dsn>
+	<dsn>
+		<name>bappenas.kl2.web.id</name>
+		<host>localhost</host>
+		<user>rijal</user>
+		<pass>cybergl05</pass>
+		<db>kl_bappenas</db>
+	</dsn>
+</list>

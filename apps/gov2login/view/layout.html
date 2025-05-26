@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    {% block head %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="Wibisono Sastrodiwiryo">
+     {% endblock %}
+    </head>
+<body>
+<div id="app">
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+              <div class="column">
+                    {% block content %} {% endblock %}
+              </div>
+            </div>
+        </div>
+    </section>
+</div>
+    
+<script type="text/javascript">
+  new Vue({
+{% block js %}
+    el: '#app',
+    components: {
+    {% for component in components %}
+        {% for item in component %}
+       '{{ item.tag }}': httpVueLoader('{{ webroot }}/{{ item.pageID }}/vue/{{ item.component }}'),
+	   {% endfor %}
+    {% endfor %}
+    },
+{% endblock %}
+  });
+</script>
+{% block externalJS %}
+    
+{% endblock %}
+<script>
+iFrameResize({
+    log                     : false,// Enable console logging
+    enablePublicMethods     : true,// Enable methods within iframe hosted page
+    resizedCallback         : function(messageData){ // Callback fn when message is received
+    }
+});
+</script>
+<script type="text/javascript" src="/js/iframeResizer.contentWindow.min.js"></script>
+</body>
+</html>

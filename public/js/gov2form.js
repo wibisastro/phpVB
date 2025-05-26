@@ -70,7 +70,14 @@ class Form {
     
     submit(requestType, url) {
         return new Promise((resolve, reject)=>{
-            axios[requestType](url, this.data())
+            var config = {
+                onUploadProgress: function(progressEvent) {
+                    var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total );
+                    eventBus.$emit("progressBar",percentCompleted);
+                },
+                withCredentials: true
+            };
+            axios[requestType](url, this.data(),config)
             .then(response => {
                 this.onSuccess(response.data);
                 resolve(response.data);

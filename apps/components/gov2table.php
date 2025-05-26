@@ -9,7 +9,7 @@ class gov2table {
     
     function index () {
         global $doc,$self;
-        $self->gov2nav->setDefaultNav();
+        $self->take("components","gov2nav", "setDefaultNav");
         $doc->body("pageTitle",'Table Component');
         $doc->body("subTitle",'Contoh Data Tabel Tematik');
         $self->gov2notification->content();

@@ -1,0 +1,22 @@
+<div class="row">
+    <div class="col-lg-12">
+        <tablepack
+                :is-active="true"
+                get-url="{{ roleName }}"
+                :columns="['id', 'account_id', 'fullname', 'status', 'role', 'email', 'lastlogin_at', 'created_at', 'counter']"
+                :filter-key="searchQuery"
+                :item-per-page="itemPerPage"
+                :compare-role="true"
+                :interval="interval"
+                :scroll-interval="scrollInterval"
+                :children-tooltip="false" 
+                :crud-permission="true">
+        </tablepack>
+    </div>
+</div>
+
+<gov2formfield-bs4
+        :action="action"
+        :field-url="fieldurl"
+        :default-level="defaultLevel">
+</gov2formfield-bs4>

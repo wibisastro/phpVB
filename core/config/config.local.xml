@@ -3,11 +3,11 @@
     <comm>ok</comm>
     <title>SSO Node Gov2</title>
     <webmaster>wibi@alumni.ui.ac.id</webmaster>
-	<secure>true</secure>
+	<secure></secure>
     <platform>
-        <apikey>http://gov2.local.mti08.vlsm.org/api.php</apikey>
+        <apikey>http://gov2.local.mti08.vlsm.org</apikey>
         <ssonode>http://sso.local.gov2.web.id</ssonode>
-        <ssoconn>http://sso.local.gov2.web.id</ssoconn>
+        <ssoconn>http://sso.gov2.web.id</ssoconn>
     </platform>
     <apikey>
         <public>81d03a754448e774d706f0754acd88ff</public>
@@ -28,9 +28,22 @@
     </googleoauth>
     <webroot></webroot>
     <domain>
-        <mti08.local.vlsm.org>gov2session</mti08.local.vlsm.org>
-        <api.local.krisna.systems>apikrisna</api.local.krisna.systems>
-        <dak.bappeda.web.id>dak</dak.bappeda.web.id>
-        <api.kl2.web.id>apikrisna</api.kl2.web.id>
+        <gov2core.local>home</gov2core.local>
     </domain>
+	<css>
+        <warning>warning</warning>
+        <danger>alert alert-danger alert-dismissible fade show</danger>
+    </css>
+    <pageroles>
+        <guest>1</guest>
+        <member>2</member>
+        <admin>3</admin>
+        <webmaster>4</webmaster>
+        <closed>5</closed>
+        <developer>6</developer>
+    </pageroles>
+    <dataroles>
+        <level>prov</level>
+        <level>kab</level>
+    </dataroles>
 </gov2config>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gov2config>
+    <comm>ok</comm>
+    <title>Gov2 Config</title>
+    <webmaster>wibi@alumni.ui.ac.id</webmaster>
+	<secure></secure>
+    <platform>
+        <apikey>http://gov2.local.mti08.vlsm.org</apikey>
+        <ssonode>http://sso.local.gov2.web.id</ssonode>
+        <ssoconn>http://sso.gov2.web.id</ssoconn>
+    </platform>
+    <apikey>
+        <public></public>
+        <secret></secret>
+    </apikey>
+    <recaptcha>
+        <api>https://www.google.com/recaptcha/api/siteverify</api>
+        <sitekey></sitekey>
+        <secretkey></secretkey>
+    </recaptcha>
+    <googleoauth>
+        <client_id></client_id>
+        <client_secret></client_secret>
+    </googleoauth>
+    <webroot>/</webroot>
+    <domain>
+        <localhost>home</localhost>
+    </domain>
+</gov2config>

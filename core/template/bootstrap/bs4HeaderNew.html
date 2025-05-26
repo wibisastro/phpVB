@@ -1,0 +1,12 @@
+<bs4-header 
+    get-url="/{{ pageID }}"
+    root="{{ 'https://'~_SERVER['SERVER_NAME'] }}"
+    acc-id="{{ _SESSION['account_id'] }}"
+    fullname="{{ _SESSION['fullname'] }}"
+    role="{{ _SESSION['userRole'] }}"
+    domain="{{ pageID }}"
+    cmd-id="{{ cmdID }}"
+    portal-name="{{_SESSION['portal_nama']}}"
+    unit-name="{{_SESSION['unit_nama']}}"
+    is-tagging-opd="{{_SESSION['is_tagging_opd']}}"
+></bs4-header>

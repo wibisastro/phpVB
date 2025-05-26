@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+	<dsn>
+		<name>master</name>
+		<host>localhost</host>
+		<user>root</user>
+		<pass></pass>
+		<db></db>
+	</dsn>
+    <dsn>
+		<name>api.local.kpu.go.id</name>
+		<host>localhost</host>
+		<user>root</user>
+		<pass></pass>
+		<db>kpu_api</db>
+	</dsn>
+    <dsn>
+		<name>rajaampatkab.local.kpu.go.id</name>
+		<host>localhost</host>
+		<user>root</user>
+		<pass></pass>
+		<db>kpu_papuabaratprov_rajaampatkab</db>
+	</dsn>
+    <dsn>
+		<name>bulelengkab.local.kpu.go.id</name>
+		<host>localhost</host>
+		<user>root</user>
+		<pass></pass>
+		<db>kpu_baliprov_bulelengkab</db>
+	</dsn>
+    <dsn>
+		<name>lkpp.local.kl2.web.id</name>
+		<host>localhost</host>
+		<user>root</user>
+		<pass></pass>
+		<db>kl_lkpp</db>
+	</dsn>
+	<dsn>
+		<name>kemenpanrb.local.kl2.web.id</name>
+		<host>localhost</host>
+		<user>root</user>
+		<pass></pass>
+		<db>kl_kemenpanrb</db>
+	</dsn>
+</list>

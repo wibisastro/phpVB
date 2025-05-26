@@ -1,0 +1,45 @@
+<div class="row">
+	<div class="col-lg-12">
+		<div class="main-box">
+			<ren-breadcrumb
+					:is-active="true"
+					:is-horizontal="true"
+					path-url="{{ className }}/breadcrumb"
+					instance="survey_view"
+			></ren-breadcrumb>
+		</div>
+	</div>
+</div>
+
+<b-row>
+    <b-col cols="4">
+        <bs4tablerows></bs4tablerows>
+    </b-col>
+</b-row>
+<b-row> &nbsp;</b-row>
+
+<div class="row" v-if="is_diklat">
+	<div class="col-md-12">
+		<tablepack
+			title="Survey"
+			:is-active="true"
+			get-url="instance_survey_view"
+			post-url="instance_survey_view"
+			instance="survey_view"
+			:columns="['id','nama', 'owner', 'pertanyaan', 'responden', 'score', 'max_score']"
+			:custom-column-names="{nama: 'Judul', score: 'Skor', max_score: 'Skor Maks.'}"
+			:filter-key="searchQuerysurvey_view"
+			:item-per-page="itemPerPagesurvey_view"
+			:drillup="false"
+			:interval="interval"
+			:recursive="true"
+			:readonly="true"
+			:is-bulk-approval="false"
+			:scroll-interval="scrollInterval">
+		</tablepack>
+	</div>
+</div>
+
+<template v-if="is_pertanyaan">
+<survey-result get-App="instance_survey_pertanyaan" get-cmd="table"></survey-result>
+</template>

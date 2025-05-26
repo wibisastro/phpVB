@@ -1,0 +1,44 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="main-box">
+            <gov2breadcrumb
+                    path-url="/apiwilayah/widget/breadcrumb"
+                    :link="false"
+                    instance="wilayah"
+                    :is-active="true"
+                    :is-horizontal="true">
+            </gov2breadcrumb>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <tablepack
+                title="Wilayah"
+                :is-active="true"
+                get-url="/apiwilayah/widget"
+                post-url="privilege"
+                tag-url="privilege"
+                :columns="['nama']"
+                :dyn-col-name="{col1:'nama',col2:'level_label'}"
+                :recursive="false"
+                :readonly="true"
+                instance="wilayah"
+                :filter-key="searchQuerywilayah"
+                :item-per-page="100"
+                :show-tagging-at-level=3
+                :tag-closeable=true
+                :child-component="{instance:'privilege',type:'dropdown'}"
+                :tag-limit=4
+                tag-caption="fullname"
+                :interval="interval"
+                :scroll-interval="scrollInterval"
+                :children-tooltip="false"
+                :crud-permission="true"
+                :kab-id="kabid"
+                :item-per-page-cols="4"
+                :pagination-cols="6">
+        </tablepack>
+    </div>
+</div>

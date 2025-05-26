@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+	<route>
+		<method>GET</method>
+		<uri>/</uri>
+		<handler>gov2survey\model\index</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey</uri>
+		<handler>gov2survey\model\index</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/index/{cmd}[/{id}]</uri>
+		<handler>gov2survey\model\index</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/gov2survey/index/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2survey\model\index</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/gov2survey/index</uri>
+		<handler>gov2survey\model\index</handler>
+	</route>
+
+	<!-- KUESIONER -->
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/kuesioner</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/kuesioner/{cmd}[/{id}]</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/kuesioner/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/gov2survey/{app}/kuesioner</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/instance_kuesioner_diklat/{cmd}[/{id}]</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/instance_kuesioner_diklat/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/gov2survey/{app}/instance_kuesioner_diklat</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/instance_kuesioner_pertanyaan/{cmd}[/{id}]</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/instance_kuesioner_pertanyaan/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/gov2survey/{app}/instance_kuesioner_pertanyaan</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/instance_kuesioner_opsi/{cmd}[/{id}]</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/instance_kuesioner_opsi/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/gov2survey/{app}/instance_kuesioner_opsi</uri>
+		<handler>gov2survey\model\kuesioner</handler>
+	</route>
+	<!-- END KUESIONER -->
+
+    <!-- Survey -->
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/survey</uri>
+		<handler>gov2survey\model\survey</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/survey/{cmd}[/{id}]</uri>
+		<handler>gov2survey\model\survey</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/survey/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2survey\model\survey</handler>
+	</route>
+
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/instance_survey_survey/{cmd}[/{id}]</uri>
+		<handler>gov2survey\model\survey</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/instance_survey_survey/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2survey\model\survey</handler>
+	</route>
+
+	<route>
+		<method>POST</method>
+		<uri>/gov2survey/{app}/survey</uri>
+		<handler>gov2survey\model\survey</handler>
+	</route>
+	<!-- END Survey -->
+	
+	<!-- Survey Result -->
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/survey_view</uri>
+		<handler>gov2survey\model\survey_view</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/survey_view/{cmd}[/{id}]</uri>
+		<handler>gov2survey\model\survey_view</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/survey_view/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2survey\model\survey_view</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/gov2survey/{app}/survey_view</uri>
+		<handler>gov2survey\model\survey_view</handler>
+	</route>
+
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/instance_survey_view/{cmd}[/{id}]</uri>
+		<handler>gov2survey\model\survey_view</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/instance_survey_view/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2survey\model\survey_view</handler>
+	</route>
+
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/instance_survey_pertanyaan/{cmd}[/{id}]</uri>
+		<handler>gov2survey\model\survey_view</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/{app}/instance_survey_pertanyaan/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2survey\model\survey_view</handler>
+	</route>
+	<!-- END Survey Result -->
+
+	<!-- API digunakan untuk keperluan webservices -->
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/api/{cmd}[/{id}]</uri>
+		<handler>gov2survey\model\api</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2survey/api/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2survey\model\api</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/gov2survey/api</uri>
+		<handler>gov2survey\model\api</handler>
+	</route>
+	<!-- END API -->
+</list>

@@ -39,14 +39,16 @@ module.exports = {
             return data.toUpperCase();
         },
         loadData: function(data) {
+            // console.log(data);
             if (data) {
                 this.pathData=Array.from(Object.keys(data), k=>data[k]);
             }
             if (this.pathData.length > 0) {this.isActive=true;}
             else {this.isActive=false;}
+//            eventBus.$emit('loadingStart');
         },
         getData: function(id) {
-
+//            eventBus.$emit('loadingStart');
             if (id) {url=this.pathUrl+'/'+id}
             else {url=this.pathUrl;}
             
@@ -56,15 +58,22 @@ module.exports = {
             if ( linger>0 || reset>0 ) {
                 printUrl="Invalid";
             } else {
-                printUrl=url.replace(this.instance+'/', "");
+                if (this.urlListener) {
+                    //printUrl=url.replace('/', "");
+                    printUrl=url;
+                } else {
+                    printUrl=url.replace(this.instance+'/', "");    
+                }
             }
             eventBus.$emit('printUrl'+this.urlListener,printUrl);
+            // console.log(url)
             axios.get(url)
                 .then(response => this.loadData(response.data))
                 .catch(error => this.onGetDataFail(error.response.data));
         },
         onGetDataFail: function(data) {
             eventBus.$emit('openNotif',data);
+//            eventBus.$emit('loadingDone');
         },
         getBack: function(data) {
             if (this.instance) {
@@ -80,11 +89,11 @@ module.exports = {
         },
     },
     created: function () { 
-        if (this.instance) {
+    //    if (this.instance) {
             this.getData(-1);        
-        } else {
-            this.getData();   
-        }
+    //    } else {
+    //        this.getData();   
+    //    }
         eventBus.$on('refreshPath'+this.instance, this.getData);
         eventBus.$on('onInstance', this.activeInstance);
     }

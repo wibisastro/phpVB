@@ -13,11 +13,42 @@
     <route>
 		<method>GET</method>
 		<uri>/gov2api.html</uri>
-		<handler>home\model\html</handler>
+		<handler>home\model\apikey</handler>
 	</route>
     <route>
 		<method>GET</method>
 		<uri>/maintenance.html</uri>
 		<handler>home\model\html</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/home/error</uri>
+		<handler>home\model\error</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/home</uri>
+		<handler>home\model\index</handler>
+	</route>
+
+	<route>
+		<method>GET</method>
+		<uri>/home/crud</uri>
+		<handler>home\model\crud</handler>	
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/home/crud/{cmd}[/{id}]</uri>
+		<handler>home\model\crud</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/home/crud/{cmd}/{scroll}/[{id}]</uri>
+		<handler>home\model\crud</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/home/crud</uri>
+		<handler>home\model\crud</handler>
 	</route>
 </list>

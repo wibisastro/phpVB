@@ -1,0 +1,46 @@
+<gov2formfield-bs4
+        :action="action"
+        {% if _SESSION[className ~ '_id'] %}
+:parent_id="{{ _SESSION[className ~ '_id'] }}"
+{% endif %}
+:field-url="fieldurl"
+:default-level="defaultLevel">
+</gov2formfield-bs4>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="main-box">
+      <gov2breadcrumb
+              path-url="option/breadcrumb"
+              :is-active="true"
+              :is-horizontal="true">
+      </gov2breadcrumb>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-10 col-md-4 col-sm-12">
+    <gov2tablerows-bs4></gov2tablerows-bs4>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <tablepack
+            :is-active="true"
+            get-url="option"
+            post-url="option"
+            :columns="['nama', 'type', 'privilege', 'keterangan', 'status']"
+            :dyn-col-name="{col1:'nama',col2:'level_label'}"
+            :recursive="true"
+            :filter-key="searchQuery"
+            :item-per-page="100"
+            :interval="interval"
+            :scroll-interval="scrollInterval"
+            level-end="option"
+            :children-tooltip="false"
+            :kab-id="kabid">
+    </tablepack>
+  </div>
+</div>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<headers>
+	<header>
+		<caption>Notif</caption>
+		<jumlah>8</jumlah>
+		<items>
+			<caption>New comment on ‘Awesome P...</caption>
+			<icon>fa fa-comment</icon>
+			<time>13 min.</time>
+		</items>
+		<items>
+			<caption>New User Registration</caption>
+			<icon>fa fa-plus</icon>
+			<time>13 min.</time>
+		</items>
+		<items>
+			<caption>New Message</caption>
+			<icon>fa fa-envelope</icon>
+			<time>13 min.</time>
+		</items>
+		<items>
+			<caption>New Purchase</caption>
+			<icon>fa fa-shopping-cart</icon>
+			<time>13 min.</time>
+		</items>
+		<items>
+			<caption>New Order</caption>
+			<icon>fa fa-clock-o</icon>
+			<time>13 min.</time>
+		</items>
+	</header>
+	<header>
+		<caption>Message</caption>
+		<jumlah>16</jumlah>
+		<items>
+			<image>/img/samples/messages-photo-1.png</image>
+			<caption>George Clooney</caption>
+			<message>Look, just because I don't be givin' no man a foot massage don't make it right for Marsellus to throw...</message>
+			<time>13 min.</time>
+		</items>
+		<items>
+			<image>/img/samples/messages-photo-2.png</image>
+			<caption>Emma Watson</caption>
+			<message>Look, just because I don't be givin' no man a foot massage don't make it right for Marsellus to throw...</message>
+			<time>13 min.</time>
+		</items>
+		<items>
+			<image>/img/samples/messages-photo-3.png</image>
+			<caption>Robert Downey Jr.</caption>
+			<message>Look, just because I don't be givin' no man a foot massage don't make it right for Marsellus to throw...</message>
+			<time>13 min.</time>
+		</items>
+	</header>
+	
+	<header>
+		<caption>BKN</caption>
+		<items>
+			<caption>Renjakl</caption>
+			<icon>fa fa-archive</icon>
+			<uri>/renjakl</uri>
+		</items>
+		<!-- <items>
+			<caption>PHLNLPK</caption>
+			<icon>fa fa-archive</icon>
+			<uri>/phlnlpk</uri>
+		</items> -->
+	</header>
+	
+</headers>

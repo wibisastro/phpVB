@@ -1,0 +1,33 @@
+[{
+    "name": "cmd",
+    "value": "",
+    "label": "Submit"
+},{
+    "name": "id",
+    "value": "",
+    "label": "ID",
+    "placeholder": "Nomor ID",
+    "disabled": true
+},{
+    "name": "nomor",
+    "value": "",
+    "label": "Nomor",
+    "placeholder": "1 atau 2 atau seterusnya",
+    "required": true,
+    "error_message": "Nomor harus diisi"
+},{
+    "name": "nama",
+    "value": "",
+    "label": "Pertanyaan",
+    "placeholder": "Pertanyaan kuesioner",
+    "required": true,
+    "error_message": "Pertanyaan harus diisi"
+},{
+    "name": "level",
+    "type":"hidden",
+    "options": {
+        "1": "survey",
+        "2": "pertanyaan",
+        "3": "opsi"
+    }
+}]

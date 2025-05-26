@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    {% endblock %}
+</head>
+
+<body>
+<div id="app">
+    {% block notification %} {% endblock %}
+    <div class="container">
+        {% block content %} {% endblock %}
+    </div>
+</div>
+<script>
+	httpVueLoader.httpRequest = function(url) {
+		const apppath = window.location.pathname.split("/");
+		const originAppPath = window.location.href+'/../../../'+apppath[1];
+		const componentPath = url.split('/');
+		const originComponent = originAppPath + `/vue/${componentPath[componentPath.length-1]}`
+		return axios.get(originComponent)
+				.then(function(res) {
+					if (res.data !== "") {
+						// console.log(`${componentPath[componentPath.length-1]} : loaded from Origin`)
+						return res.data;
+					} else {
+						return axios.get(url)
+								.then(function (res) {
+									// console.log(`${url} : loaded from Target`)
+									return res.data;
+								})
+								.catch(function (err) {
+									// console.log(`${url} : error`)
+									return Promise.reject(err.status)
+								})
+					}
+				})
+				.catch(function(err) {
+					return axios.get(url)
+							.then(function (res) { return res.data;})
+							.catch(function (err) { return Promise.reject(err.status)})
+				});
+	}
+</script>
+<script>
+    new Vue({
+    {% block js %}
+    el: '#app',
+        components: {
+        {% for component in components %}
+        {% for item in component %}
+        '{{ item.tag }}': httpVueLoader('{{ webroot }}/{{ item.pageID }}/vue/{{ item.component }}'),
+        {% endfor %}
+        {% endfor %}
+    },
+    {% endblock %}
+    });
+</script>
+
+{% block externalJS %}
+
+{% endblock %}
+
+</body>
+
+</html>
+
+<style>
+    body {
+        font-size: 16px !important;
+    }
+    .menu-custom {
+        margin-bottom: 60px !important;
+    }
+</style>

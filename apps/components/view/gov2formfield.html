@@ -4,5 +4,6 @@
     {% if _SESSION[className ~ '_id'] %}
         :parent_id="{{ _SESSION[className ~ '_id'] }}"
     {% endif %}
-    :field-url="fieldurl"></gov2formfield>
+    :field-url="fieldurl"
+    :default-level="defaultLevel"></gov2formfield>
 </div>

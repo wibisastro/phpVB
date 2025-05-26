@@ -1,0 +1,22 @@
+<div>
+    <gov2formfield 
+    :action="action"
+    {% if _SESSION[className ~ '_id'] %}
+        :parent_id="{{ _SESSION[className ~ '_id'] }}"
+    {% endif %}
+    :field-url="fieldurl"
+    :default-level="defaultLevel"></gov2formfield><br/>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<gov2table
+			:is-active="true"
+			:get-url="geturl"
+			:columns="['id','nama','spesifikasi','nama_kategori','jumlah']"
+			:filter-key="searchQuery"
+			:readonly="false"
+			:item-per-page="itemPerPage">
+		</gov2table>
+	</div>
+</div>
