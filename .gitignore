@@ -7,3 +7,16 @@ composer.lock
 /logs/*
 /public/.htaccess
 /core/scripts/sql/*
+
+# IDE and Editor
+.vscode/
+.claude/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
