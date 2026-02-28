@@ -7,7 +7,7 @@
 *	Copyleft	: eGov Lab UI
 *********************************************************************/
 try {
-    $requestWith=explode(",",$_SERVER['HTTP_ACCEPT']);
+    $requestWith=explode(",", $_SERVER['HTTP_ACCEPT'] ?? '');
 
     if ($requestWith[0]=="application/json") {
         $request="ajax";
@@ -15,7 +15,7 @@ try {
         $request="page";
     }
 
-    if (strstr($_SERVER['HTTP_USER_AGENT'],'curl')) {
+    if (strstr($_SERVER['HTTP_USER_AGENT'] ?? '','curl')) {
         $requester="webservice";
     } else {
         $requester="browser";
@@ -31,9 +31,11 @@ try {
     }
 
     if (false !== $pos = strpos($uri, '?')) {
-        list($_dummy,$_qs)=explode('/?',$uri);
+        $parts=explode('/?',$uri);
+        $_dummy=$parts[0] ?? '';
+        $_qs=$parts[1] ?? '';
         parse_str($_qs, $qs);
-        if ($qs['cmd']!='logout') {
+        if (($qs['cmd'] ?? '')!='logout') {
             $_qs=implode('/',array_values($qs));
         } else {
             $_qs="";
@@ -45,15 +47,19 @@ try {
     $uri = rawurldecode($uri);
 
     if ($config->webroot=="/") {
-        list($param,$pageID,$scriptID,$cmdID)=explode("/",$uri);
+        $uriParts=explode("/",$uri);
     } else {
-        list($param,$pageID,$scriptID,$cmdID)=explode("/",str_replace($config->webroot,"",$uri));
+        $uriParts=explode("/",str_replace($config->webroot,"",$uri));
     }
+    $param=$uriParts[0] ?? '';
+    $pageID=$uriParts[1] ?? '';
+    $scriptID=$uriParts[2] ?? '';
+    $cmdID=$uriParts[3] ?? '';
 
     if ($pageID == 'ssignup' || $pageID == 'ssignup.php') {
         header("location: /gov2sso/signup?".$_SERVER['QUERY_STRING']);
     } elseif ($pageID == 'slogin' || $pageID == 'slogin.php') {
-        header("location: /gov2sso/slogin/".$_GET['client']);
+        header("location: /gov2sso/slogin/".($_GET['client'] ?? ''));
     } elseif (!$pageID ||
         $pageID=="install.php" ||
         $pageID=="index.php" ||
@@ -117,7 +123,7 @@ try {
                         } elseif ($httpMethod == "GET") {
                             $vars = $routeInfo[2];
                             if (!isset($vars["cmd"])) {
-                                if ($_GET['cmd']=='logout') {$vars["cmd"]="logout";}
+                                if (($_GET['cmd'] ?? '')=='logout') {$vars["cmd"]="logout";}
                                 else {$vars["cmd"]="";}
                             }
                         }

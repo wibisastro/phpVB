@@ -10,7 +10,7 @@ class member extends \Gov2lib\crudHandler {
 //        parent::__construct($config->domain->attr['dsn']);
         if (!$dsn) {
             try {
-                $cookies = $doc->envRead($_COOKIE['Gov2Session']);
+                $cookies = $doc->envRead($_COOKIE['Gov2Session'] ?? null);
                 $dsn = $cookies['portal'];
                 $this->predefined_dsn = $dsn;
                 $this->predefined_dsn_id = $cookies['portal_id'];
@@ -161,7 +161,7 @@ class member extends \Gov2lib\crudHandler {
     function doBrowseTags ($source_id,$_source,$_target,$_target2="",$_caption="")
     {
         global $config, $vars;
-        $role = $_GET['role'];
+        $role = $_GET['role'] ?? '';
         $connector = new \Gov2lib\DBConnector($config->domain->attr['dsn']);
 
         try {
@@ -171,7 +171,7 @@ class member extends \Gov2lib\crudHandler {
             ".$_source."_id AS source_id";
 
             $query.=" FROM ".$this->tbl->role." WHERE ".$_source."_parent=%i AND member_role=%s";
-            
+
             $results = $connector->db->query($query,$source_id, $role);
         } catch (\MeekroDBException $e) {
 			$this->exceptionHandler('doBrowseTags:'.$e->getMessage());
@@ -207,7 +207,7 @@ class member extends \Gov2lib\crudHandler {
     function doTagging ($data, $_source, $_target, $_target2, $_caption)
     {
         global $uri, $self, $vars, $config;
-        $role = $_GET['role'];
+        $role = $_GET['role'] ?? '';
         $account_id = $self->ses->val['account_id'];
         $connector = new \Gov2lib\DBConnector($config->domain->attr['dsn']);
 
@@ -237,7 +237,7 @@ class member extends \Gov2lib\crudHandler {
                 $_insert[$_target.'_id'] = $data['target_id'];
                 $_insert[$_target.'_email'] = $_targetData['email'];
                 $_insert[$_target.'_account_id'] = $_targetData['account_id'];
-                $_insert[$_target.'_role'] = $_GET['role'];
+                $_insert[$_target.'_role'] = $_GET['role'] ?? '';
 
                 // fullname
                 $_insert[$_target.'_'.$_caption] = $_targetData[$_caption];

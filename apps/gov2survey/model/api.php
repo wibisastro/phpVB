@@ -126,18 +126,18 @@ class api extends \Gov2lib\crudHandler {
             $dsn = 'ppsiasndit.bkn.kl2.web.id';
         }
 
-        $app = $_GET['app'];
-        $level_label = $_GET['level_label'];
-        $level = intval($_GET['level']);
-        $unit_id = intval($_GET['unit_id']);
-        $parent_id = intval($_GET['id']);
-        $local_parent_id = intval($_GET['local_parent_id']);
+        $app = $_GET['app'] ?? '';
+        $level_label = $_GET['level_label'] ?? '';
+        $level = intval($_GET['level'] ?? 0);
+        $unit_id = intval($_GET['unit_id'] ?? 0);
+        $parent_id = intval($_GET['id'] ?? 0);
+        $local_parent_id = intval($_GET['local_parent_id'] ?? 0);
 
         if($level == 2) {
             $survey_id = $local_parent_id;
             $pertanyaan_id = 0;
         } else if($level == 3) {
-            $survey_id = $_GET['survey_id'];
+            $survey_id = $_GET['survey_id'] ?? 0;
             $pertanyaan_id = $local_parent_id;
         }
 
@@ -173,8 +173,8 @@ class api extends \Gov2lib\crudHandler {
             $dsn = 'ppsiasndit.bkn.kl2.web.id';
         }
 
-        $app = $_GET['app'];
-        $kuesioner_unit_id = intval($_GET['kuesioner_unit_id']);
+        $app = $_GET['app'] ?? '';
+        $kuesioner_unit_id = intval($_GET['kuesioner_unit_id'] ?? 0);
         $connector = new \Gov2lib\DBConnector($dsn);
 
         $query = "SELECT a.id AS service_id, a.kuesioner_unit_id, a.account_id, 

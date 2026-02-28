@@ -8,7 +8,7 @@ class kuesioner extends \Gov2lib\crudHandler {
         $this->className=$path[sizeof($path)-1];
         $this->controller=__DIR__."/../".$this->className.".php";
         try {
-            $cookies = $doc->envRead($_COOKIE['Gov2Session']);
+            $cookies = $doc->envRead($_COOKIE['Gov2Session'] ?? null);
             $this->dsn = $cookies['portal'];
             $this->dsn_id = $cookies['portal_id'];
             if (!$this->dsn) {

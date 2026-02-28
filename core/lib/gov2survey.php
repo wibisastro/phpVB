@@ -24,7 +24,7 @@ class gov2survey
     {
         global $doc, $config;
         try {
-            $cookies = $doc->envRead($_COOKIE['Gov2Session']);
+            $cookies = $doc->envRead($_COOKIE['Gov2Session'] ?? null);
             $this->dsn = $cookies['portal'];
             if (!$this->dsn) {
                 $this->dsn = $config->domain->attr['dsn'];
