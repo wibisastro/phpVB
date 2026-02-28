@@ -6,7 +6,7 @@ use DB;
 
 class crud extends \Gov2lib\crudHandler
 {
-    public $tbl;
+    public ?\stdClass $tbl = null;
 
     function __construct ()
     {
@@ -31,9 +31,10 @@ class crud extends \Gov2lib\crudHandler
         $GLOBALS['vueData']['fieldurl'] = $this->className.'/fields'; //<-overwrite default
     }
 
-    function getRecords($scrolls,$data="") {
+    public function getRecords(array $vars, string $parentName = ''): mixed {
         global $uri,$config,$self;
 
+        $scrolls = $vars['scroll'] ?? 0;
         $scrolled=$this->scroll($scrolls);
         try {
             $_query ="SELECT id,nama,spesifikasi,kategori,

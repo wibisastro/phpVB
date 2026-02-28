@@ -1,6 +1,7 @@
 <?php namespace App\components;
     
 class gov2formfield {
+	public mixed $fields = null;
 	function __construct ($method="") {
 		global $self;
 		$this->fields = $self->getFields(__DIR__."/json/formfield.json");

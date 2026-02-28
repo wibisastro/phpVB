@@ -59,7 +59,7 @@ try {
 	}
     //echo "c :".$controller;
     if (class_exists($controller)) {
-        ${$pageID} = new $controller(); print_r($doc->error);
+        ${$pageID} = new $controller();
         if (!is_array($doc->error)) {
             if (method_exists(${$pageID},$cmd)) {
                 $response=${$pageID}->$cmd($payload);

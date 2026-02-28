@@ -1,6 +1,7 @@
 <?php namespace App\gov2option\fields;
 
 
+#[\AllowDynamicProperties]
 class tokenEntity
 {
     function __construct()

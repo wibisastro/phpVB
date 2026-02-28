@@ -269,6 +269,11 @@ class document extends customException
     {
         global $doc, $pageID;
 
+        // Skip if components for this app are already registered
+        if (!empty($doc->body['components'][$appDir])) {
+            return;
+        }
+
         $dir = __DIR__ . "/../../apps/{$appDir}/vue";
         $components = [];
 
@@ -277,14 +282,11 @@ class document extends customException
 
             foreach ($files as $key => $val) {
                 if (str_ends_with($val, '.vue') && !str_starts_with($val, '_')) {
-                    $existingComponents = $doc->body['components'][$appDir] ?? [];
-                    if (!in_array($val, array_column($existingComponents, 'component'))) {
-                        $components[$key] = [
-                            'component' => $val,
-                            'tag' => str_replace('.vue', '', $val),
-                            'pageID' => $appDir,
-                        ];
-                    }
+                    $components[$key] = [
+                        'component' => $val,
+                        'tag' => str_replace('.vue', '', $val),
+                        'pageID' => $appDir,
+                    ];
                 }
             }
 

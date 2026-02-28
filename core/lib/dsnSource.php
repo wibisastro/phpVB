@@ -13,7 +13,7 @@ class dsnSource extends document
 {
     protected ?\stdClass $tbl = null;
     protected string $dsnName = 'master';
-    protected int $scrollInterval = 1000;
+    public int $scrollInterval = 1000;
     public ?array $api = null;
 
     public function __construct()
