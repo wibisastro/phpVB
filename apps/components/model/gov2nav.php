@@ -9,7 +9,7 @@ class gov2nav extends \Gov2lib\document {
         $this->className=$path[sizeof($path)-1];
         $className=$self->className;
         if (!$className) {$className=$this->className;}
-        $GLOBALS['vueData']['pathurl']=$config->webroot."/components/gov2nav/breadcrumb/$pageID/$className";
+        $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/$className", '/');
 	}
 
 	function setDefaultNav ($_menuFile="") {
@@ -17,13 +17,13 @@ class gov2nav extends \Gov2lib\document {
         $this->menus=$this->menubar($pageID,$_menuFile);
         $this->sidebar('gov2navMenu.html');
         $this->content('gov2navBreadcrumb.html');
-        $GLOBALS['vueData']['pathurl']=$config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile);
+        $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
 	}
 
     function setDefaultNavCustom ($_menuFile="") {
         global $pageID,$config,$self;
         $this->sidebar('gov2navMenuCustom.html');
-        $GLOBALS['vueData']['pathurl']=$config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile);
+        $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
     }
 	
     function menubar ($pageID,$_menuFile="",$xml=true, $data = array(), $caption = '', $icon = '') {
