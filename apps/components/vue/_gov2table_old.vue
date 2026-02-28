@@ -408,7 +408,7 @@ module.exports = {
         this.setParent(id);
         if (this.parent) {url=this.getUrl+'/table/'+this.scroll+'/'+this.parent;}
         else if (this.recursive) {url=this.getUrl+'/table/'+this.scroll+'/0';}
-        else {url=this.getUrl+'/table/'+this.scroll+'/';}
+        else {url=this.getUrl+'/table/'+this.scroll;}
         this.sayUrl(url);
         axios.get(url)
             .then(response => this.loadData(response.data))

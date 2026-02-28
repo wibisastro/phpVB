@@ -860,7 +860,7 @@
                 
                 if (this.parent) {url=this.getUrl+'/table/'+this.scroll+'/'+this.parent;}
                 else if (this.recursive) {url=this.getUrl+'/table/'+this.scroll+'/0';}
-                else {url=this.getUrl+'/table/'+this.scroll+'/';}
+                else {url=this.getUrl+'/table/'+this.scroll;}
 
                 if (this.readLastUrlParam) {
                     let currUrl = window.location.href;

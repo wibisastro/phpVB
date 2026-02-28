@@ -36,6 +36,14 @@
 (function(){
     var baseURL = "{{ protocol }}://{{ _SERVER.SERVER_NAME }}";
     axios.defaults.baseURL = baseURL;
+    axios.interceptors.request.use(function(config) {
+        if (config.url && !config.url.match(/^https?:\/\//)) {
+            if (config.url.charAt(0) !== '/') {
+                config.url = '/' + config.url;
+            }
+        }
+        return config;
+    });
     var originalHttpRequest = httpVueLoader.httpRequest;
     httpVueLoader.httpRequest = function(url) {
         if (url.charAt(0) === '/') { url = baseURL + url; }
