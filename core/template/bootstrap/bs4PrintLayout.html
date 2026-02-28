@@ -25,6 +25,17 @@
 	<script src="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.js"></script>
 	<script src="{{ webroot }}/js/httpVueLoader.js"></script>
 	<script src="{{ webroot }}/js/axios.min.js"></script>
+	<script>
+	(function(){
+	    var baseURL = "{{ protocol }}://{{ _SERVER.SERVER_NAME }}";
+	    axios.defaults.baseURL = baseURL;
+	    var originalHttpRequest = httpVueLoader.httpRequest;
+	    httpVueLoader.httpRequest = function(url) {
+	        if (url.charAt(0) === '/') { url = baseURL + url; }
+	        return originalHttpRequest(url);
+	    };
+	})();
+	</script>
 
 	<script type="text/javascript">
 		const eventBus = new Vue();

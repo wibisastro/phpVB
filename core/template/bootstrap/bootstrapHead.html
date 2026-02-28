@@ -13,6 +13,12 @@
 
 <script src="/public/lib/vue/dist/vue.js"></script>
 <script src="/public/lib/axios/dist/axios.min.js"></script>
+<script>
+(function(){
+    var baseURL = "{{ protocol }}://{{ _SERVER.SERVER_NAME }}";
+    axios.defaults.baseURL = baseURL;
+})();
+</script>
 <script src="/public/lib/lodash/lodash.min.js"></script>
 <script src="/public/lib/numeral/min/numeral.min.js"></script>
 <script src="/public/lib/sweetalert2/dist/sweetalert2.all.min.js"></script>
