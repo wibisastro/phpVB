@@ -1,19 +1,9 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    #Detect HTTPS from reverse proxy
-    RewriteCond %{HTTP:X-Forwarded-Proto} =https
-    RewriteRule .* - [E=HTTPS:on]
-
     #Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
-    RewriteCond %{HTTP:X-Forwarded-Proto} =https
-    RewriteRule ^ https://%{HTTP_HOST}%1 [L,R=301]
-
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_URI} (.+)/$
-    RewriteCond %{HTTP:X-Forwarded-Proto} !=https
     RewriteRule ^ %1 [L,R=301]
 
     #Handle Front Controller...
