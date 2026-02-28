@@ -1,21 +1,24 @@
-<?php namespace Gov2lib;
+<?php
+
+namespace Gov2lib;
 
 use DB;
 use Exception;
 use MeekroDBException;
 use WhereClause;
-use \Gov2lib\DBConnector;
+use Gov2lib\DBConnector;
+
 /**
- * -----------------------------------
- * Provide an API for gov2option app.
+ * Options API for managing application options
  *
- * Class gov2option
  * @package Gov2lib
- * -----------------------------------
  */
 class gov2option
 {
-    function __construct ()
+    /**
+     * Initialize options handler with database connection
+     */
+    public function __construct(): void
     {
         global $doc, $config;
         try {
@@ -30,14 +33,14 @@ class gov2option
     }
 
     /**
-     * Get a single row from options table.
+     * Get a single option row from options table
      *
-     * @param array $where
-     * @param string $whereType
-     * @param string[] $select
+     * @param array $where WHERE clause conditions
+     * @param string $whereType AND or OR for WHERE clause
+     * @param string[] $select Fields to select
      * @return null|array
      */
-    function get ($where=[], $whereType='and', $select=['id', 'parent_id', 'nama', 'value'])
+    public function get(array $where = [], string $whereType = 'and', array $select = ['id', 'parent_id', 'nama', 'value']): ?array
     {
         global $doc;
         $select_field = join(',', $select);
@@ -50,6 +53,7 @@ class gov2option
 
         $q = "SELECT {$select_field} FROM options WHERE %l";
         $res = null;
+
         try {
             $res = DB::queryFirstRow($q, $where_clause);
         } catch (MeekroDBException $e) {
@@ -62,10 +66,19 @@ class gov2option
         } catch (Exception $e) {
             $doc->exceptionHandler($e->getMessage());
         }
+
         return $res;
     }
 
-    function connector_get ($where=[], $whereType='and', $select=['id', 'parent_id', 'nama', 'value'])
+    /**
+     * Get option using custom database connector
+     *
+     * @param array $where WHERE clause conditions
+     * @param string $whereType AND or OR for WHERE clause
+     * @param string[] $select Fields to select
+     * @return null|array
+     */
+    public function connector_get(array $where = [], string $whereType = 'and', array $select = ['id', 'parent_id', 'nama', 'value']): ?array
     {
         global $doc, $config;
         $select_field = join(',', $select);
@@ -79,6 +92,7 @@ class gov2option
 
         $q = "SELECT {$select_field} FROM options WHERE %l";
         $res = null;
+
         try {
             $res = $connector->db->queryFirstRow($q, $where_clause);
         } catch (MeekroDBException $e) {
@@ -86,13 +100,21 @@ class gov2option
         } catch (Exception $e) {
             $doc->exceptionHandler($e->getMessage());
         }
+
         return $res;
     }
 
-    function create ($data)
+    /**
+     * Create new option record
+     *
+     * @param array $data Option data
+     * @return null|array
+     */
+    public function create(array $data): ?array
     {
         global $doc;
         $result = null;
+
         try {
             DB::insert('options', $data);
             $result = $this->get(['id' => DB::insertId()], 'and',
@@ -100,25 +122,30 @@ class gov2option
         } catch (MeekroDBException $e) {
             $doc->exceptionHandler($e->getMessage());
         }
+
         return $result;
     }
 
-    function mvc ()
+    /**
+     * Create MVC instance
+     *
+     * @return MVC
+     */
+    public function mvc(): MVC
     {
         return new MVC();
     }
 
     /**
      * Get gov2option active year
-     * 
-     * @return int year or current year by default if no year options found.
+     *
+     * @return int year or current year by default if no year options found
      */
-    public function getActiveYear()
+    public function getActiveYear(): int
     {
         global $self, $pageID;
 
         $activeYear = cint(date("Y"));
-
         $tahun = $self->opt->get(['app' => $pageID, 'nama' => 'Tahun']);
 
         if ($tahun == null) {
@@ -133,10 +160,10 @@ class gov2option
 
         $member = $this->getMember();
 
-        if(!empty($member)){
-            if(!empty($member['attr'])){
+        if (!empty($member)) {
+            if (!empty($member['attr'])) {
                 $xmlArray = json_decode(json_encode(simplexml_load_string($member['attr'])), true);
-                if($xmlArray['tahun']){
+                if ($xmlArray['tahun'] ?? false) {
                     $activeYear = $xmlArray['tahun'];
                 }
             }
@@ -145,37 +172,54 @@ class gov2option
         return $activeYear;
     }
 
-    function getMember(){
+    /**
+     * Get member data from database
+     *
+     * @return null|array
+     */
+    public function getMember(): ?array
+    {
         global $doc, $self;
 
         $accountId = $self->ses->val['account_id'];
-
         $_response = null;
+
         try {
-            $_query ="SELECT * FROM member WHERE account_id=%i";
+            $_query = "SELECT * FROM member WHERE account_id=%i";
             $_response = \DB::queryFirstRow($_query, $accountId);
         } catch (\MeekroDBException $DBException) {
             $this->exceptionHandler($DBException->getMessage());
         }
+
         return $_response;
     }
 }
 
+/**
+ * MVC configuration class
+ */
 class MVC
 {
-    function __construct($className = "")
+    public int $id = 0;
+    public int $parent_id = 0;
+    public string $name = '';
+    public bool $active = true;
+    public bool $recorded = false;
+
+    /**
+     * Initialize MVC with optional class name
+     */
+    public function __construct(string $className = ""): void
     {
         global $self;
-        $this->id = 0;
-        $this->parent_id = 0;
         $this->name = $className ?: $self->className;
-        $this->active = true;
-        $this->recorded = false;
-
         $this->get();
     }
 
-    final function get ()
+    /**
+     * Get or create MVC configuration
+     */
+    final public function get(): void
     {
         global $self, $pageID;
 
@@ -197,17 +241,31 @@ class MVC
         }
     }
 
-    private function create ()
+    /**
+     * Create MVC configuration record
+     */
+    private function create(): ?array
     {
         global $self, $doc, $pageID;
-        $parent_data = ['app' => $pageID, 'nama' => 'MVC', 'parent_id' => 0,
-                        'status' => 'on', 'type' => 'option', 'level' => 1,
-                        'level_label' => 'cluster', 'privilege' => 'admin',
-                        'keterangan' => 'Enable/Disable MVC', 'created_by' => $self->ses->val['account_id']];
+
+        $parent_data = [
+            'app' => $pageID,
+            'nama' => 'MVC',
+            'parent_id' => 0,
+            'status' => 'on',
+            'type' => 'option',
+            'level' => 1,
+            'level_label' => 'cluster',
+            'privilege' => 'admin',
+            'keterangan' => 'Enable/Disable MVC',
+            'created_by' => $self->ses->val['account_id']
+        ];
+
         $parent = $self->opt->get(['app' => $pageID, 'nama' => 'MVC', 'parent_id' => 0, 'level' => 1]);
         if (!$parent) {
             $parent = $self->opt->create($parent_data);
         }
+
         $mvc_data = $parent_data;
         $mvc_data['nama'] = $this->name;
         $mvc_data['parent_id'] = $parent['id'];
@@ -217,9 +275,12 @@ class MVC
         $mvc_data['status'] = 'on';
         $mvc_data['value'] = 1;
         $mvc_data['keterangan'] = 'Check untuk enable MVC ini';
+
         $mvc = $self->opt->create($mvc_data);
         if (!is_array($doc->error)) {
-           return  $mvc;
+            return $mvc;
         }
+
+        return null;
     }
 }

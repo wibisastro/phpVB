@@ -1,66 +1,76 @@
-<?php namespace Gov2lib;
+<?php
 
+namespace Gov2lib;
 
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 
+/**
+ * eSign client for document signing
+ */
 class eSignClient
 {
-    private $USER;
-    private $PASS;
-    public $BASE_URI = 'http://esign.bkn.go.id/api/sign/';
+    private string $USER;
+    private string $PASS;
+    public string $BASE_URI = 'http://esign.bkn.go.id/api/sign/';
+    private Client $client;
+    public array $errors = [];
+    public ?array $error = null;
 
-    private $client;
-    public $errors = [];
-    public $error = null;
-
-    public function __construct ($username = '', $password = '')
+    /**
+     * Initialize eSign client
+     */
+    public function __construct(string $username = '', string $password = ''): void
     {
         global $config;
 
         if (!$username) {
-            $username = (string) $config->esign->username;
+            $username = (string)($config->esign->username ?? '');
         }
-        
+
         if (!$password) {
-            $password = (string) $config->esign->password;
+            $password = (string)($config->esign->password ?? '');
         }
 
         $this->USER = $username;
         $this->PASS = $password;
 
         $this->client = new Client([
-            'verify'    => false,
-            'base_uri'  => $this->BASE_URI,
-            'auth'      => [$this->USER, $this->PASS],
-            // 'debug'     => 'true'
+            'verify' => false,
+            'base_uri' => $this->BASE_URI,
+            'auth' => [$this->USER, $this->PASS],
         ]);
     }
 
     /**
-     * Sign method wrapper. Saat ini baru hanya implemen tipe visible 
-     * dengan QR menggunakan tag_koordinat. 
-     * 
-     * @param string $filename path/to/file.pdf
-     * @param string $nik nik penandatangan
-     * @param string $phrase passphrase penandatangan
-     * @param string $linkQR
-     * @param int $width
-     * @param int $height
-     * @param string $tag_koordinat
+     * Sign document with QR code
+     *
+     * @param string $filename Path to PDF file
+     * @param string $nik NIK of signer
+     * @param string $phrase Passphrase for signer
+     * @param string $linkQR QR code link
+     * @param int $width QR width in pixels
+     * @param int $height QR height in pixels
+     * @param string $tag_koordinat Coordinate tag
      * @return array
      */
-    public function sign ($filename, $nik, $phrase, $linkQR, $width = 70, $height = 70, $tag_koordinat = '#')
-    {
-
+    public function sign(
+        string $filename,
+        string $nik,
+        string $phrase,
+        string $linkQR,
+        int $width = 70,
+        int $height = 70,
+        string $tag_koordinat = '#'
+    ): array {
         if (!file_exists($filename)) {
             $error = [
-                'status_code'   => 404,
-                'error'         => "File {$filename} tidak ditemukan"
+                'status_code' => 404,
+                'error' => "File {$filename} tidak ditemukan"
             ];
-            
+
             array_push($this->errors, $error);
             $this->error = $error;
             return $error;
@@ -69,29 +79,36 @@ class eSignClient
         $options = [
             'multipart' => [
                 [
-                    'name'      => 'file',
-                    'contents'  => fopen($filename, 'r')
-                ],[
-                    'name'      => 'nik',
-                    'contents'  => $nik,
-                ],[
-                    'name'      => 'passphrase',
-                    'contents'  => $phrase,
-                ],[
-                    'name'      => 'tampilan',
-                    'contents'  => 'visible',
-                ],[
-                    'name'      => 'linkQR',
-                    'contents'  => $linkQR,
-                ],[
-                    'name'      => 'width',
-                    'contents'  => $width,
-                ],[
-                    'name'      => 'height',
-                    'contents'  => $height,
-                ],[
-                    'name'      => 'tag_koordinat',
-                    'contents'  => $tag_koordinat,
+                    'name' => 'file',
+                    'contents' => fopen($filename, 'r')
+                ],
+                [
+                    'name' => 'nik',
+                    'contents' => $nik,
+                ],
+                [
+                    'name' => 'passphrase',
+                    'contents' => $phrase,
+                ],
+                [
+                    'name' => 'tampilan',
+                    'contents' => 'visible',
+                ],
+                [
+                    'name' => 'linkQR',
+                    'contents' => $linkQR,
+                ],
+                [
+                    'name' => 'width',
+                    'contents' => $width,
+                ],
+                [
+                    'name' => 'height',
+                    'contents' => $height,
+                ],
+                [
+                    'name' => 'tag_koordinat',
+                    'contents' => $tag_koordinat,
                 ],
             ]
         ];
@@ -106,24 +123,24 @@ class eSignClient
             $result = $status_user;
         }
 
-        // TODO : IMPLEMENT keempat jenis eSign.
-        
         return $result;
     }
 
-    public function cekStatusUser ($nik)
+    /**
+     * Check user status
+     */
+    public function cekStatusUser(string $nik): array
     {
         try {
             $response = $this->client->get("/api/user/status/{$nik}");
             $response_code = $response->getStatusCode();
 
             if ($response_code == 200) {
-               $result = $this->decodeResponse($response);
+                $result = $this->decodeResponse($response);
             }
-
         } catch (ClientException $e) {
             $this->exceptionHandler($e);
-            $result = $this->error;
+            $result = $this->error ?? [];
         } catch (ConnectException $e) {
             $error = [
                 'status_code' => 404,
@@ -135,16 +152,13 @@ class eSignClient
             $result = $error;
         }
 
-        return $result;
+        return $result ?? [];
     }
 
     /**
-     * Cek dan buat direktori jika tidak ditemukan
-     * 
-     * @param string $filename path/to/dir
-     * @return void|array array jika ada error saat membuat dir
+     * Check and create directory if not exists
      */
-    private function ckDir($filename)
+    private function ckDir(string $filename): ?array
     {
         $result = null;
         if (!is_dir($filename)) {
@@ -160,15 +174,18 @@ class eSignClient
                 $result = $error;
             }
         }
+
         return $result;
     }
 
     /**
-     * Unduh signed dokumen menggunakan id_dokumen
-     * 
-     * @param string $id_dokumen dari respon header ketika sign dokumen
+     * Download signed document
+     *
+     * @param string $id_dokumen Document ID
+     * @param string $save_to Save path
+     * @return array
      */
-    public function download ($id_dokumen, $save_to = '')
+    public function download(string $id_dokumen, string $save_to = ''): array
     {
         $tmpDir = sys_get_temp_dir();
 
@@ -177,10 +194,10 @@ class eSignClient
         } else {
             $basename = basename($save_to);
 
-            if (strpos('.', $basename) === false) {
+            if (strpos($basename, '.') === false) {
                 $error = [
-                    'status_code'   => 400,
-                    'error'         => "Parameter 'save_to' tidak valid. {$save_to} tidak mengandung {filename}.pdf"
+                    'status_code' => 400,
+                    'error' => "Parameter 'save_to' tidak valid. {$save_to} tidak mengandung {filename}.pdf"
                 ];
 
                 array_push($this->errors, $error);
@@ -191,10 +208,10 @@ class eSignClient
 
                 if (!is_writable($save_to)) {
                     $error = [
-                        'status_code'   => 403,
-                        'error'         => "File {$save_to} tidak writable"
+                        'status_code' => 403,
+                        'error' => "File {$save_to} tidak writable"
                     ];
-                    
+
                     array_push($this->errors, $error);
                     $this->error = $error;
                     return $error;
@@ -210,14 +227,13 @@ class eSignClient
 
             if ($response_code == 200) {
                 $result = [
-                    'status_code'   => $response_code,
-                    'filename'      => $filename
+                    'status_code' => $response_code,
+                    'filename' => $filename
                 ];
             }
-
         } catch (ClientException $e) {
             $this->exceptionHandler($e);
-            $result = $this->error;
+            $result = $this->error ?? [];
         } catch (ConnectException $e) {
             $error = [
                 'status_code' => 404,
@@ -229,17 +245,20 @@ class eSignClient
             $result = $error;
         }
 
-        return $result;
+        return $result ?? [];
     }
 
-    public function verify ($filename)
+    /**
+     * Verify signed document
+     */
+    public function verify(string $filename): array
     {
         if (!file_exists($filename)) {
             $error = [
-                'status_code'   => 404,
-                'error'         => "File {$filename} tidak ditemukan"
+                'status_code' => 404,
+                'error' => "File {$filename} tidak ditemukan"
             ];
-            
+
             array_push($this->errors, $error);
             $this->error = $error;
             return $error;
@@ -248,8 +267,8 @@ class eSignClient
         $options = [
             'multipart' => [
                 [
-                    'name'      => 'signed_file',
-                    'contents'  => fopen($filename, 'r')
+                    'name' => 'signed_file',
+                    'contents' => fopen($filename, 'r')
                 ]
             ]
         ];
@@ -261,10 +280,9 @@ class eSignClient
             if ($response_code == 200) {
                 $result = $this->decodeResponse($response);
             }
-
         } catch (ClientException $e) {
             $this->exceptionHandler($e);
-            $result = $this->error;
+            $result = $this->error ?? [];
         } catch (ConnectException $e) {
             $error = [
                 'status_code' => 404,
@@ -276,27 +294,18 @@ class eSignClient
             $result = $error;
         }
 
-        return $result;
-    }
-
-    private function invisible ()
-    {
-
+        return $result ?? [];
     }
 
     /**
-     * eSign dokumen dengan QR
-     * 
-     * @param array $options Guzzle multipart https://docs.guzzlephp.org/en/6.5/request-options.html#multipart
-     * @param string $filename {app}-{mvc}-{row_id}.pdf
-     * @return array
+     * Sign document with visible QR code
      */
-    private function visibleQR ($options, $filename)
+    private function visibleQR(array $options, string $filename): array
     {
         global $config, $self;
-        $IS_KEUANGAN = strpos($_SERVER[SERVER_NAME], 'keuangan') !== false;
+        $IS_KEUANGAN = str_contains($_SERVER['SERVER_NAME'] ?? '', 'keuangan');
 
-        $folder = (string) $config->esign->folder;
+        $folder = (string)($config->esign->folder ?? '');
         if ($IS_KEUANGAN) {
             $portal = $self->dsn;
         }
@@ -318,13 +327,20 @@ class eSignClient
 
         if ($IS_KEUANGAN) {
             $error = $this->ckDir($folder_portal);
-            if ($error) {return $error;}
+            if ($error) {
+                return $error;
+            }
         }
 
         $error = $this->ckDir($folder_app);
-        if ($error) {return $error;}
+        if ($error) {
+            return $error;
+        }
+
         $error = $this->ckDir($folder_mvc);
-        if ($error) {return $error;}
+        if ($error) {
+            return $error;
+        }
 
         $options['sink'] = $filename;
 
@@ -341,10 +357,9 @@ class eSignClient
                     'path' => $filename
                 ];
             }
-
         } catch (ClientException $e) {
             $this->exceptionHandler($e);
-            $result = $this->error;
+            $result = $this->error ?? [];
         } catch (ConnectException $e) {
             $error = [
                 'status_code' => 404,
@@ -355,48 +370,38 @@ class eSignClient
             $this->error = $error;
             $result = $error;
         }
-        
-        return $result;
-    }
 
-    private function visibleTTD ()
-    {
-
+        return $result ?? [];
     }
 
     /**
-     * @return bool
+     * Check if there are errors
      */
-    public function hasError ()
+    public function hasError(): bool
     {
-        return count($this->errors) > 0 ? true : false;
+        return count($this->errors) > 0;
     }
 
     /**
-     * Decode response
-     * 
-     * @param Psr\Http\Message\ResponseInterface $response
-     * @return array|null
+     * Decode JSON response
      */
-    private function decodeResponse (object $response) 
+    private function decodeResponse(object $response): array
     {
-        $stream = (string) $response->getBody();
-        return json_decode($stream, 1);
+        $stream = (string)$response->getBody();
+        return json_decode($stream, 1) ?? [];
     }
 
     /**
-     * @param ClientException $e
-     * @return void
+     * Handle exceptions
      */
-    private function exceptionHandler(object $e) {
-        // var_dump($e);exit;
-        $error = $e->getResponse()->getBody(true);
-        $error = json_decode($error, 1);
+    private function exceptionHandler(object $e): void
+    {
+        $error = $e->getResponse()?->getBody(true) ?? '';
+        $error = json_decode($error, 1) ?? [];
         $error['code'] = $e->getCode();
-        $error['request'] = Psr7\Message::toString($e->getRequest()); // full error request string, including response body.
-        $error['response'] = Psr7\Message::toString($e->getResponse()); // full error response string, including response body.
+        $error['request'] = Psr7\Message::toString($e->getRequest());
+        $error['response'] = Psr7\Message::toString($e->getResponse());
         array_push($this->errors, $error);
         $this->error = $error;
     }
 }
-?>

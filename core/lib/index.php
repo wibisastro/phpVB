@@ -1,18 +1,34 @@
-<?php namespace Gov2lib;
+<?php
 
-class index {
-    function __construct () {
+namespace Gov2lib;
 
+/**
+ * Index controller for serving static files
+ */
+class index
+{
+    /**
+     * Initialize index controller
+     */
+    public function __construct(): void
+    {
     }
-    
-    function index () {
+
+    /**
+     * Serve file with CORS headers
+     */
+    public function index(): void
+    {
         global $self;
-        if (file_exists($self->templateDir."/".$self->componentName)) {
+
+        if (file_exists($self->templateDir . "/" . $self->componentName)) {
             header('Access-Control-Allow-Origin: *');
             header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
             header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
-            readfile($self->templateDir."/".$self->componentName);
+            readfile($self->templateDir . "/" . $self->componentName);
             exit;
-        } else {echo "NotExist";}        
+        } else {
+            echo "NotExist";
+        }
     }
 }

@@ -1,29 +1,27 @@
-<?php namespace Gov2lib;
-/********************************************************************
-*	Date		: Sep 30, 2017
-*	Author		: Wibisono Sastrodiwiryo
-*	Email		: wibi@alumni.ui.ac.id
-*	Copyleft	: eGov Lab UI 
-*	Version		: 1
-*/
+<?php
 
-class customException extends \Exception {
-    /*
-    public function __construct () {
-		@set_exception_handler(array($this, 'exceptionHandler'));
-	}
-    */
-	public function exceptionHandler ($e) {
+namespace Gov2lib;
+
+/**
+ * Base exception handler for the Gov2lib framework.
+ *
+ * @author Wibisono Sastrodiwiryo <wibi@alumni.ui.ac.id>
+ * @since 2017-09-30
+ */
+class customException extends \Exception
+{
+    /**
+     * Handle an exception by parsing its "Code:Message" format
+     * and delegating to the document error handler.
+     */
+    public function exceptionHandler(string $e): void
+    {
         global $doc;
-        list($code,$message)=explode(":",$e);
-        $doc->error($code,$message);
-	}
-	/*
-	public function errorLog ($e) {
-	    $errorMsg = 'Exception on line '.$this->getLine().' in '.$this->getFile()
-	    .' with message: <b>'.$e.'</b> ';
-	    return $errorMsg;
-	}
-    */
+
+        $parts = explode(':', $e, 2);
+        $code = $parts[0] ?? 'Error';
+        $message = $parts[1] ?? $e;
+
+        $doc->error($code, $message);
+    }
 }
-?>

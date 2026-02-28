@@ -1,4 +1,6 @@
-<?php namespace Gov2lib;
+<?php
+
+namespace Gov2lib;
 
 use DB;
 use Exception;
@@ -6,19 +8,18 @@ use MeekroDBException;
 use WhereClause;
 
 /**
- * -----------------------------------
- * Provide an API for gov2survey app.
+ * Survey API for managing survey data
  *
- * Class gov2option
  * @package Gov2lib
- * -----------------------------------
  */
 class gov2survey
 {
+    public string $table = 'survey_kuesioner_local';
 
-    public $table = 'survey_kuesioner_local';
-
-    function __construct ()
+    /**
+     * Initialize survey handler with database connection
+     */
+    public function __construct(): void
     {
         global $doc, $config;
         try {
@@ -32,14 +33,21 @@ class gov2survey
         }
     }
 
-    final function get_list ($parent_id = 0, $level_label='survey')
+    /**
+     * Get survey list by parent and level
+     *
+     * @param int $parent_id Parent record ID
+     * @param string $level_label Level label (survey, pertanyaan, opsi)
+     * @return array|object
+     */
+    final public function get_list(int $parent_id = 0, string $level_label = 'survey'): array|object
     {
         global $uri, $doc;
         $result = [];
 
         $connector = new DBConnector($this->dsn);
 
-        $q = "SELECT * FROM {$this->table} 
+        $q = "SELECT * FROM {$this->table}
             WHERE parent_id=%i AND level_label=%s";
 
         try {
@@ -50,18 +58,19 @@ class gov2survey
         } catch (Exception $e) {
             $doc->exceptionHandler($e->getMessage());
         }
+
         return $result;
     }
 
     /**
-     * Get a single row from options table.
+     * Get a single survey row
      *
-     * @param array $where
-     * @param string $whereType
-     * @param string[] $select
+     * @param array $where WHERE clause conditions
+     * @param string $whereType AND or OR for WHERE clause
+     * @param string[] $select Fields to select
      * @return null|array
      */
-    final function get ($where=[], $whereType='and', $select=['*'])
+    final public function get(array $where = [], string $whereType = 'and', array $select = ['*']): ?array
     {
         global $doc;
         $select_field = join(',', $select);
@@ -75,6 +84,7 @@ class gov2survey
 
         $q = "SELECT {$select_field} FROM {$this->table} WHERE %l";
         $res = null;
+
         try {
             $res = $connector->db->queryFirstRow($q, $where_clause);
         } catch (MeekroDBException $e) {
@@ -82,25 +92,38 @@ class gov2survey
         } catch (Exception $e) {
             $doc->exceptionHandler($e->getMessage());
         }
+
         return $res;
     }
 
-    final function create (&$data)
+    /**
+     * Create new survey record
+     *
+     * @param array $data Survey data
+     * @return void
+     */
+    final public function create(array &$data): void
     {
         global $doc;
         $connector = new DBConnector($this->dsn);
 
         try {
             $connector->db->insert($this->table, $data);
-            $data = $self->get(['id' => $connector->db->insertId()]);
+            $data = $this->get(['id' => $connector->db->insertId()]);
         } catch (MeekroDBException $e) {
             $doc->exceptionHandler($e->getMessage());
         } catch (Exception $e) {
             $doc->exceptionHandler($e->getMessage());
         }
     }
-    
-    final function update (&$data)
+
+    /**
+     * Update survey record
+     *
+     * @param array $data Survey data with ID
+     * @return void
+     */
+    final public function update(array &$data): void
     {
         global $doc;
         $connector = new DBConnector($this->dsn);
@@ -114,36 +137,43 @@ class gov2survey
         }
     }
 
-    private function collection (&$data, $level_label) 
+    /**
+     * Get collection instance based on level label
+     *
+     * @param array $data Survey data array
+     * @param string $level_label Level label
+     * @return object
+     */
+    private function collection(array &$data, string $level_label): object
     {
-        $result = [];
-
-        switch($level_label) {
-            case 'survey':
-                $result = new SurveyCollection($data);
-                break;
-            case 'pertanyaan':
-                $result = new SurveyPertanyaanCollection($data);
-                break;
-            case 'opsi':
-                $result = new SurveyOpsiCollection($data);
-                break;
-        }
-        return $result;
+        return match($level_label) {
+            'survey' => new SurveyCollection($data),
+            'pertanyaan' => new SurveyPertanyaanCollection($data),
+            'opsi' => new SurveyOpsiCollection($data),
+            default => new BaseSurveyCollection(),
+        };
     }
 }
 
-
-class BaseSurveyCollection 
+/**
+ * Base survey collection class
+ */
+class BaseSurveyCollection
 {
-    protected $_items = [];
+    protected array $_items = [];
 
-    public function items ()
+    /**
+     * Get all items
+     */
+    public function items(): array
     {
         return $this->_items;
     }
 
-    public function get ($key)
+    /**
+     * Get single item by key or filter
+     */
+    public function get(int|array $key): ?object
     {
         $result = null;
 
@@ -152,7 +182,7 @@ class BaseSurveyCollection
         }
 
         if (!is_array($key)) {
-            $result = $this->_items[$key];
+            $result = $this->_items[$key] ?? null;
         } else {
             $filtered = array_filter($this->_items, function($item) use($key) {
                 $keys = array_keys($key);
@@ -167,21 +197,27 @@ class BaseSurveyCollection
                 if (count($keys) == array_sum($true)) {
                     return $item;
                 }
+
+                return false;
             });
 
             if ($filtered) {
-                $result = $filtered[0];
+                $result = $filtered[0] ?? null;
             }
         }
+
         return $result;
     }
 
-    public function filter ($key)
+    /**
+     * Filter items by conditions
+     */
+    public function filter(array $key): array
     {
         $result = [];
 
         if (is_string($key) || !is_array($key)) {
-            throw new Exception("Invalid key $key");
+            throw new Exception("Invalid key");
         }
 
         $result = array_filter($this->_items, function($item) use($key) {
@@ -194,15 +230,16 @@ class BaseSurveyCollection
                 }
             }
 
-            if (array_sum($true) > 0) {
-                return $item;
-            }
+            return array_sum($true) > 0;
         });
 
         return $result;
     }
 
-    public function serialize ()
+    /**
+     * Serialize all items
+     */
+    public function serialize(): array
     {
         $items = [];
 
@@ -215,32 +252,46 @@ class BaseSurveyCollection
         return $items;
     }
 
-    public function length()
+    /**
+     * Get number of items
+     */
+    public function length(): int
     {
         return count($this->_items);
     }
 
-    public function keys()
+    /**
+     * Get all item keys
+     */
+    public function keys(): array
     {
         return array_keys($this->_items);
     }
 }
 
+/**
+ * Base survey class
+ */
 class BaseSurvey
 {
-    public function serialize ()
+    /**
+     * Serialize object to array
+     */
+    public function serialize(): array
     {
-        $data = (array)$this;
-        return $data;
+        return (array)$this;
     }
 
-    public function save()
+    /**
+     * Save survey to database
+     */
+    public function save(): void
     {
         global $self;
 
         $this->created_by = $self->ses->val['account_id'];
 
-        if ($this->id) {
+        if ($this->id ?? false) {
             $this->modify_by = $self->ses->val['account_id'];
         }
 
@@ -255,38 +306,41 @@ class BaseSurvey
             $self->sur->update($data);
         } else {
             $data = $self->sur->create($data);
-            switch($data['level_label']) {
-                case 'survey':
-                    $data = new SurveyEntity($data);
-                    foreach($data as $key => $val) {
-                        $this->{$key} = $val;
-                    }
-                    break;
-                case 'pertanyaan':
-                    $data = new SurveyPertanyaan($data);
-                    foreach($data as $key => $val) {
-                        $this->{$key} = $val;
-                    }
-                    break;
-                case 'opsi':
-                    $data = new SurveyOpsi($data);
-                    foreach($data as $key => $val) {
-                        $this->{$key} = $val;
-                    }
-            }
+            match($data['level_label']) {
+                'survey' => $this->assignData(new SurveyEntity($data)),
+                'pertanyaan' => $this->assignData(new SurveyPertanyaan($data)),
+                'opsi' => $this->assignData(new SurveyOpsi($data)),
+                default => null,
+            };
         }
     }
 
-    public function keys ()
+    /**
+     * Assign data properties
+     */
+    private function assignData(object $dataObj): void
+    {
+        foreach($dataObj as $key => $val) {
+            $this->{$key} = $val;
+        }
+    }
+
+    /**
+     * Get object keys
+     */
+    public function keys(): array
     {
         return array_keys($this->serialize());
     }
 
-    private function validate_level ()
+    /**
+     * Validate level based on parent
+     */
+    private function validate_level(): void
     {
         global $self;
 
-        $parent_id = intval($this->parent_id);
+        $parent_id = intval($this->parent_id ?? 0);
 
         if ($parent_id) {
             $parent = $self->sur->get(['id' => $parent_id]);
@@ -294,24 +348,27 @@ class BaseSurvey
             $parent = ['level_label' => 'root'];
         }
 
-        switch($parent['level_label'])
-        {
-            case 'root':
-                $this->level = 1;
-                $this->level_label = 'survey';
-                break;
-            case 'survey':
-                $this->level = 2;
-                $this->level_label = 'pertanyaan';
-                break;
-            case 'pertanyaan':
-                $this->level = 3;
-                $this->level_label = 'opsi';
-                break;
-        }
+        match($parent['level_label'] ?? 'root') {
+            'root' => [
+                $this->level = 1,
+                $this->level_label = 'survey',
+            ],
+            'survey' => [
+                $this->level = 2,
+                $this->level_label = 'pertanyaan',
+            ],
+            'pertanyaan' => [
+                $this->level = 3,
+                $this->level_label = 'opsi',
+            ],
+            default => null,
+        };
     }
 
-    private function validate ()
+    /**
+     * Validate survey data
+     */
+    private function validate(): void
     {
         if (!isset($this->nama) || !$this->nama) {
             throw new \Exception("Property 'nama' should not be empty");
@@ -335,62 +392,49 @@ class BaseSurvey
 
         $this->validate_level();
 
-        switch($this->level_label) {
-            case 'survey':
-                $this->parent_id = 0;
-                break;
-            case 'pertanyaan':
-                if (!isset($this->parent_id) || intval($this->parent_id) == 0) {
-                    throw new \Exception("Property 'parent_id' should not be empty or 0");
-                }
-
-                if (!isset($this->nomor) || !$this->nomor) {
-                    throw new \Exception("Property 'nomor' should not be empty or 0");
-                }
-                break;
-            case 'opsi':
-                if (!isset($this->parent_id) || intval($this->parent_id) == 0) {
-                    throw new \Exception("Property 'parent_id' should not be empty or 0");
-                }
-
-                if (!isset($this->nomor) || !$this->nomor) {
-                    throw new \Exception("Property 'nomor' should not be empty or 0");
-                }
-
-                if (!isset($this->bobot) || !$this->bobot) {
-                    throw new \Exception("Property 'bobot' should not be empty or 0");
-                }
-                break;
-        }
+        match($this->level_label) {
+            'survey' => $this->parent_id = 0,
+            'pertanyaan' => [
+                (!isset($this->parent_id) || intval($this->parent_id) == 0) && throw new \Exception("Property 'parent_id' should not be empty or 0"),
+                (!isset($this->nomor) || !$this->nomor) && throw new \Exception("Property 'nomor' should not be empty or 0"),
+            ],
+            'opsi' => [
+                (!isset($this->parent_id) || intval($this->parent_id) == 0) && throw new \Exception("Property 'parent_id' should not be empty or 0"),
+                (!isset($this->nomor) || !$this->nomor) && throw new \Exception("Property 'nomor' should not be empty or 0"),
+                (!isset($this->bobot) || !$this->bobot) && throw new \Exception("Property 'bobot' should not be empty or 0"),
+            ],
+            default => null,
+        };
     }
 
-    function __call ($name, $args)
+    /**
+     * Handle dynamic method calls for collections
+     */
+    public function __call(string $name, array $args): ?object
     {
         global $self;
 
         if (!isset($this->id) || !intval($this->id)) {
-            return $collection;
+            return null;
         }
 
-        switch ($name) {
-            case 'pertanyaan':
-                if ($this->level == 1) {
-                    return $self->sur->get_list($this->id, 'pertanyaan');
-                }
-                break;
-            case 'opsi':
-                if ($this->level == 2) {
-                    return $self->sur->get_list($this->id, 'opsi');
-                }
-                break;
-        }
+        return match ($name) {
+            'pertanyaan' => ($this->level == 1) ? $self->sur->get_list($this->id, 'pertanyaan') : null,
+            'opsi' => ($this->level == 2) ? $self->sur->get_list($this->id, 'opsi') : null,
+            default => null,
+        };
     }
 }
 
-
+/**
+ * Survey collection
+ */
 class SurveyCollection extends BaseSurveyCollection
 {
-    function __construct ($survey_list)
+    /**
+     * Initialize collection from array
+     */
+    public function __construct(array $survey_list): void
     {
         foreach($survey_list as $survey) {
             array_push($this->_items, new SurveyEntity($survey));
@@ -398,9 +442,15 @@ class SurveyCollection extends BaseSurveyCollection
     }
 }
 
+/**
+ * Survey question collection
+ */
 class SurveyPertanyaanCollection extends BaseSurveyCollection
 {
-    function __construct ($pertanyaan_list)
+    /**
+     * Initialize collection from array
+     */
+    public function __construct(array $pertanyaan_list): void
     {
         foreach($pertanyaan_list as $pertanyaan) {
             array_push($this->_items, new SurveyPertanyaan($pertanyaan));
@@ -408,9 +458,15 @@ class SurveyPertanyaanCollection extends BaseSurveyCollection
     }
 }
 
+/**
+ * Survey option collection
+ */
 class SurveyOpsiCollection extends BaseSurveyCollection
 {
-    function __construct ($opsi_list)
+    /**
+     * Initialize collection from array
+     */
+    public function __construct(array $opsi_list): void
     {
         foreach($opsi_list as $opsi) {
             array_push($this->_items, new SurveyOpsi($opsi));
@@ -418,31 +474,36 @@ class SurveyOpsiCollection extends BaseSurveyCollection
     }
 }
 
-
+/**
+ * Survey entity
+ */
 class SurveyEntity extends BaseSurvey
 {
-    public $id;
-    public $parent_id;
-    public $service_id;
-    public $unit_id;
-    public $referensi_id;
-    public $app;
-    public $nama;
-    public $level = 1;
-    public $level_label = 'survey';
-    public $status;
-    public $date_start;
-    public $date_end;
-    public $children;
-    public $created_at;
-    public $created_by;
-    public $modify_at;
-    public $modify_by;
+    public int $id = 0;
+    public int $parent_id = 0;
+    public int $service_id = 0;
+    public int $unit_id = 0;
+    public int $referensi_id = 0;
+    public string $app = '';
+    public string $nama = '';
+    public int $level = 1;
+    public string $level_label = 'survey';
+    public string $status = '';
+    public string $date_start = '';
+    public string $date_end = '';
+    public array $children = [];
+    public string $created_at = '';
+    public int $created_by = 0;
+    public string $modify_at = '';
+    public int $modify_by = 0;
 
-    function __construct($item = [])
+    /**
+     * Initialize survey entity
+     */
+    public function __construct(array $item = []): void
     {
         if (count($item)) {
-            if ($item['level_label'] === 'survey' && intval($item['level']) == 1) {
+            if (($item['level_label'] ?? null) === 'survey' && intval($item['level'] ?? 0) == 1) {
                 foreach($item as $key => $val) {
                     $this->{$key} = $val;
                 }
@@ -453,29 +514,34 @@ class SurveyEntity extends BaseSurvey
     }
 }
 
-
+/**
+ * Survey question entity
+ */
 class SurveyPertanyaan extends BaseSurvey
 {
-    public $id;
-    public $parent_id;
-    public $service_id;
-    public $unit_id;
-    public $app;
-    public $nomor;
-    public $nama;
-    public $level = 2;
-    public $level_label = 'pertanyaan';
-    public $survey_id;
-    public $status;
-    public $children;
-    public $created_at;
-    public $created_by;
-    public $modify_at;
-    public $modify_by;
+    public int $id = 0;
+    public int $parent_id = 0;
+    public int $service_id = 0;
+    public int $unit_id = 0;
+    public string $app = '';
+    public int $nomor = 0;
+    public string $nama = '';
+    public int $level = 2;
+    public string $level_label = 'pertanyaan';
+    public int $survey_id = 0;
+    public string $status = '';
+    public array $children = [];
+    public string $created_at = '';
+    public int $created_by = 0;
+    public string $modify_at = '';
+    public int $modify_by = 0;
 
-    function __construct($item = [])
+    /**
+     * Initialize survey question entity
+     */
+    public function __construct(array $item = []): void
     {
-        if ($item['level_label'] === 'pertanyaan' && intval($item['level']) == 2) {
+        if (($item['level_label'] ?? null) === 'pertanyaan' && intval($item['level'] ?? 0) == 2) {
             foreach($item as $key => $val) {
                 $this->{$key} = $val;
             }
@@ -485,30 +551,35 @@ class SurveyPertanyaan extends BaseSurvey
     }
 }
 
-
+/**
+ * Survey option entity
+ */
 class SurveyOpsi extends BaseSurvey
 {
-    public $id;
-    public $parent_id;
-    public $service_id;
-    public $unit_id;
-    public $app;
-    public $nomor;
-    public $nama;
-    public $bobot;
-    public $level = 3;
-    public $level_label = 'opsi';
-    public $survey_id;
-    public $pertanyaan_id;
-    public $status;
-    public $created_at;
-    public $created_by;
-    public $modify_at;
-    public $modify_by;
+    public int $id = 0;
+    public int $parent_id = 0;
+    public int $service_id = 0;
+    public int $unit_id = 0;
+    public string $app = '';
+    public int $nomor = 0;
+    public string $nama = '';
+    public int $bobot = 0;
+    public int $level = 3;
+    public string $level_label = 'opsi';
+    public int $survey_id = 0;
+    public int $pertanyaan_id = 0;
+    public string $status = '';
+    public string $created_at = '';
+    public int $created_by = 0;
+    public string $modify_at = '';
+    public int $modify_by = 0;
 
-    function __construct($item = [])
+    /**
+     * Initialize survey option entity
+     */
+    public function __construct(array $item = []): void
     {
-        if ($item['level_label'] === 'opsi' && intval($item['level']) == 3) {
+        if (($item['level_label'] ?? null) === 'opsi' && intval($item['level'] ?? 0) == 3) {
             foreach($item as $key => $val) {
                 $this->{$key} = $val;
             }

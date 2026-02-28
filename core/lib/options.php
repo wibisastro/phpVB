@@ -1,30 +1,43 @@
-<?php namespace Gov2lib;
-    
-class options {
-    function __construct () {
-        global $self,$vars,$cmdID, $pageID;
-		$self->takeAll("components");
+<?php
+
+namespace Gov2lib;
+
+/**
+ * Options controller
+ */
+class options
+{
+    /**
+     * Initialize options controller
+     */
+    public function __construct(): void
+    {
+        global $self, $vars, $cmdID, $pageID;
+        $self->takeAll("components");
         if ($pageID !== 'rokuone') {
             $self->ses->takeAll('rokuone');
         }
-//        $self->take("dpdraft2","draft");
-//        $self->take($vars['app'],"index","dependencies");
-        $self->ses->authenticate("webmaster"); //---perlu direview
+        $self->ses->authenticate("webmaster");
     }
-    
-    function index () {
-        global $self,$doc,$vars,$cmdID;
+
+    /**
+     * Display options page
+     */
+    public function index(): void
+    {
+        global $self, $doc, $vars, $cmdID;
         $self->gov2nav->setDefaultNavCustom();
         $role = isset($vars['role']) ? $vars['role'] : 'Options';
-        $doc->body("pageTitle",ucwords($vars['app'])." " .ucwords($role));
-        if ($cmdID=='setup') {
-            $self->content("option_setup.html");
-        } elseif ($cmdID === 'view' || $cmdID === 'view_services') {
-            $doc->body('view_type', $cmdID);
-            $self->content("option_view.html");
-        } elseif ($cmdID === 'controlpanel') {
-            $self->content("option_controlpanel.html");
-        }
-        
+        $doc->body("pageTitle", ucwords($vars['app']) . " " . ucwords($role));
+
+        match ($cmdID) {
+            'setup' => $self->content("option_setup.html"),
+            'view', 'view_services' => [
+                $doc->body('view_type', $cmdID),
+                $self->content("option_view.html"),
+            ],
+            'controlpanel' => $self->content("option_controlpanel.html"),
+            default => null,
+        };
     }
 }

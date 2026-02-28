@@ -1,299 +1,421 @@
-<?php namespace Gov2lib;
-    
-class crudModel extends dsnSource {
-	function __construct ($_dsn="") {
-        parent::__construct(); 
-        list($_link_id,$_name)=$this->connectDB($_dsn);
-	}
-    
-    function doBrowseTags ($source_id,$_source,$_target,$_target2="",$_caption="") {
-        try {
-            $query="SELECT *,
-            ".$_target."_".$_caption." AS target_".$_caption.",
-            ".$_target."_id AS target_id,
-            ".$_source."_id AS source_id";
-            if ($_target2) {
-                $query.=",".$_target2."_id AS target2_id ";
-            }
-            $query.=" FROM ".$this->tbl->table." WHERE ".$_source."_parent=%i";
-            if ($_target2) {
-                $query.=" AND ".$_target2."_id=%i";
-            }
-            $results = \DB::query($query,$source_id,$this->ses->val[$_target2."_id"]);
-        } catch (\MeekroDBException $e) {
-			$this->exceptionHandler('doBrowseTags:'.$e->getMessage());
-		}
-	    return $results;
-	}
-    
-    function doTagging ($data,$_source,$_target,$_target2,$_caption) {
-        try {
-            if ($_target2) {
-                $query="SELECT * FROM ".$this->tbl->table." WHERE ".$_source."_id=%i AND ".$_target."_id=%i AND ".$_target2."_id=%i";
-                $_tagged=\DB::queryFirstRow($query,$data['source_id'],$data['target_id'],$this->ses->val[$_target2."_id"]);            
-            } else {
-                $query="SELECT * FROM ".$this->tbl->table." WHERE ".$_source."_id=%i AND ".$_target."_id=%i";
-                $_tagged=\DB::queryFirstRow($query,$data['source_id'],$data['target_id']);
-            }
-            
-            if ($_tagged['id']) {
-                throw new \Exception('AlreadyTagged: '.$_tagged[$_target.'_'.$_caption].' source_id='.$data['source_id']);
-            } else {
-                $query="SELECT * FROM ".$this->tbl->source." WHERE id=%i";
-                
-                $_sourceData=\DB::queryFirstRow($query,$data['source_id']);
-                
-                $query="SELECT * FROM ".$this->tbl->target." WHERE id=%i";
-                $_targetData=\DB::queryFirstRow($query,$data['target_id']);
-                
-                $_insert[$_source.'_id']= intval($data['source_id']);
-                $_insert[$_source.'_parent']=$_sourceData['parent_id'];     
-                
-                $_insert[$_source.'_nama']=$_sourceData['nama'];
-                $_insert[$_source.'_level']=intval($_sourceData['level_label']);
-                $_insert[$_target.'_id']=intval($data['target_id']);
-                $_insert[$_target.'_'.$_caption]=$_targetData[$_caption];
-                
-                if ($_target2) {
-                    $query="SELECT * FROM ".$this->tbl->$_target2." WHERE id=%i";
-                    $_target2Data=\DB::queryFirstRow($query,$this->ses->val[$_target2.'_id']);
-                }
-                $columns = \DB::columnList($this->tbl->table);
-                if (in_array($_target.'_level',$columns)) {
-                    $_insert[$_target.'_level']=$_targetData['level_label'];
-                }
-                if (in_array($_target2.'_id',$columns)) {
-                    $_insert[$_target2.'_id']=$this->ses->val[$_target2.'_id'];
-                }
-                if (in_array($_target2.'_'.$_caption,$columns)) {
-                    $_insert[$_target2.'_'.$_caption]=$_target2Data[$_caption];
-                }
-                if (in_array($_target2.'_level',$columns)) {
-                    $_insert[$_target2.'_level']=$_target2Data['level_label'];
-                }
-                if (in_array($_target2.'_parent',$columns)) {
-                    $_insert[$_target2.'_parent']=$_target2Data['parent_id'];
-                }
-                if ($_source=='wilayah') {
-                    $_query_w="SELECT * FROM ".$this->tbl->wilayah." WHERE id=%i";
-                    $_wilayah = \DB::queryFirstRow($_query_w,$data['source_id']);
-                    switch ($_wilayah['level']) {
-                        case "3":
-                            $_query_w="SELECT 0 AS kel_id, kec.id AS kec_id, 
-                            kab.id AS kab_id, kab.parent_id AS prov_id
-                            FROM ".$this->tbl->wilayah." AS kec
-                            LEFT JOIN ".$this->tbl->wilayah." AS kab
-                            ON kec.parent_id=kab.id
-                            WHERE kec.id=%i";
-                        break;
-                        case "4":
-                            $_query_w="SELECT kel.id AS kel_id, 
-                            kec.id AS kec_id, kab.id AS kab_id, 
-                            kab.parent_id AS prov_id 
-                            FROM ".$this->tbl->wilayah." AS kel
-                            LEFT JOIN ".$this->tbl->wilayah." AS kec
-                            ON kel.parent_id=kec.id
-                            LEFT JOIN ".$this->tbl->wilayah." AS kab
-                            ON kec.parent_id=kab.id
-                            WHERE kel.id=%i";
-                        break;
-                    }
-                    if ($_wilayah['level'] == '2') {
-                        $_insert['provinsi_id']=$_wilayah['parent_id'];
-                        $_insert['kabupaten_id']=$_wilayah['id'];
-                    } else {
-                        try {
-                            $_wilayah = \DB::queryFirstRow($_query_w,$_wilayah['id']);
-                            $_insert['provinsi_id']=$_wilayah['prov_id']+0;
-                            $_insert['kabupaten_id']=$_wilayah['kab_id']+0;
-                            $_insert['kecamatan_id']=$_wilayah['kec_id']+0;
-                            $_insert['kelurahan_id']=$_wilayah['kel_id']+0;
-                        } catch (\MeekroDBException $e) {
-                            $this->exceptionHandler($e->getMessage().":".$uri);
-                        }   
-                    }
-                }
-                
-                \DB::insert($this->tbl->table, $_insert);
-                $_id = \DB::insertId();
-                return $_id;
-            }
-        } catch (\MeekroDBException $e) {
-			$this->exceptionHandler('doTagging:'.$e->getMessage());
-        } catch (\Exception $e) {
-			$this->exceptionHandler($e->getMessage());
-		}
-	}
-    
-    function setBreadcrumb ($_id=0,$_caption="",$_code="") {
-        static $_c;
-        try {
-            $query="SELECT * FROM ".$this->tbl->table." WHERE id=%i";
-            $results = \DB::query($query,$_id);
-            if (is_array($results)) {
-                foreach ($results as $row) {
-                    $_c++;
-                    if ($_caption) {
-                        $this->breadcrumb[$_c]['caption']=$row[$_caption];
-                    } else {
-                        $this->breadcrumb[$_c]['caption']=$row['nama'];    
-                    }
-                    if ($_code) {
-                        $this->breadcrumb[$_c]['code']=$row[$_code];
-                    }
-                    $this->breadcrumb[$_c]['id']=$row['id'];
-                    $this->breadcrumb[$_c]['level']=$row['level'];
-                    $this->breadcrumb[$_c]['level_label']=$row['level_label'];
-                    if ($row['parent_id']>0) {
-                        $this->setBreadcrumb($row['parent_id'],$_caption,$_code);
-                    }
-                }
-            }
-        } catch (\MeekroDBException $e) {
-			$this->exceptionHandler($e->getMessage());
-		}
-	}
-    
-	function doUpdate($data) {
-        unset($data['cmd']);
-        $_fields=$data;
-        $columns = \DB::columnList($this->tbl->table);
-        if (in_array("parent_id",$columns)) {
-            // if ($data['parent_id']) {
+<?php
 
-            // -----PR untuk mencegah memasukkan level_label secara sembarangan
-  
-            // 'level_label' => $this->gov2formfield->getLevel($this->fields,$data['level']),
-  
-                $_recursive=array(
-                    'parent_id' => $data['parent_id']+0,
-                    'level_label' => $data['level_label'],
-                    'level' => $data['level'],
-                    'created_at' => date('Y-m-d H:i:s')
-                );
-                $_fields=array_merge($_fields,$_recursive);
-            // }
-        } else {
-            unset($_fields['parent_id']);
+namespace Gov2lib;
+
+/**
+ * Data model implementing CRUD operations with hierarchical data support.
+ *
+ * @version 2.0 - PHP 8.3 refactor
+ */
+class crudModel extends dsnSource
+{
+    /** @var array<int, array<string, mixed>> Breadcrumb data */
+    protected array $breadcrumb = [];
+
+    public function __construct(string $dsn = '')
+    {
+        parent::__construct();
+        $this->connectDB($dsn);
+    }
+
+    /**
+     * Browse tags linked to a source entity.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    public function doBrowseTags(
+        int $sourceId,
+        string $source,
+        string $target,
+        string $target2 = '',
+        string $caption = ''
+    ): ?array {
+        try {
+            $query = "SELECT *,
+                {$target}_{$caption} AS target_{$caption},
+                {$target}_id AS target_id,
+                {$source}_id AS source_id";
+
+            if ($target2) {
+                $query .= ",{$target2}_id AS target2_id ";
+            }
+
+            $query .= " FROM " . $this->tbl->table . " WHERE {$source}_parent=%i";
+
+            if ($target2) {
+                $query .= " AND {$target2}_id=%i";
+            }
+
+            return \DB::query($query, $sourceId, $this->ses->val[$target2 . '_id'] ?? 0);
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler("doBrowseTags:{$e->getMessage()}");
+            return null;
         }
+    }
+
+    /**
+     * Create a tag linking source to target entities.
+     */
+    public function doTagging(
+        array $data,
+        string $source,
+        string $target,
+        string $target2,
+        string $caption
+    ): ?int {
         try {
-            \DB::update($this->tbl->table, $_fields, "id=%i", $data['id']+0);
-            if ($data['id'] && in_array("parent_id",$columns)) {
-                $this->updateChildren($data['id']);    
+            // Check if already tagged
+            if ($target2) {
+                $query = "SELECT * FROM " . $this->tbl->table
+                    . " WHERE {$source}_id=%i AND {$target}_id=%i AND {$target2}_id=%i";
+                $tagged = \DB::queryFirstRow(
+                    $query,
+                    $data['source_id'],
+                    $data['target_id'],
+                    $this->ses->val[$target2 . '_id'] ?? 0
+                );
+            } else {
+                $query = "SELECT * FROM " . $this->tbl->table
+                    . " WHERE {$source}_id=%i AND {$target}_id=%i";
+                $tagged = \DB::queryFirstRow($query, $data['source_id'], $data['target_id']);
+            }
+
+            if (!empty($tagged['id'])) {
+                throw new \Exception("AlreadyTagged: {$tagged[$target . '_' . $caption]} source_id={$data['source_id']}");
+            }
+
+            // Get source and target data
+            $sourceData = \DB::queryFirstRow("SELECT * FROM " . $this->tbl->source . " WHERE id=%i", $data['source_id']);
+            $targetData = \DB::queryFirstRow("SELECT * FROM " . $this->tbl->target . " WHERE id=%i", $data['target_id']);
+
+            $insert = [
+                "{$source}_id" => (int) $data['source_id'],
+                "{$source}_parent" => $sourceData['parent_id'] ?? 0,
+                "{$source}_nama" => $sourceData['nama'] ?? '',
+                "{$source}_level" => (int) ($sourceData['level_label'] ?? 0),
+                "{$target}_id" => (int) $data['target_id'],
+                "{$target}_{$caption}" => $targetData[$caption] ?? '',
+            ];
+
+            // Handle target2 data
+            if ($target2) {
+                $target2Data = \DB::queryFirstRow(
+                    "SELECT * FROM " . $this->tbl->{$target2} . " WHERE id=%i",
+                    $this->ses->val[$target2 . '_id'] ?? 0
+                );
+            }
+
+            // Check columns and add optional fields
+            $columns = \DB::columnList($this->tbl->table);
+
+            if (in_array("{$target}_level", $columns)) {
+                $insert["{$target}_level"] = $targetData['level_label'] ?? '';
+            }
+            if ($target2 && in_array("{$target2}_id", $columns)) {
+                $insert["{$target2}_id"] = $this->ses->val[$target2 . '_id'] ?? 0;
+            }
+            if ($target2 && in_array("{$target2}_{$caption}", $columns) && isset($target2Data)) {
+                $insert["{$target2}_{$caption}"] = $target2Data[$caption] ?? '';
+            }
+            if ($target2 && in_array("{$target2}_level", $columns) && isset($target2Data)) {
+                $insert["{$target2}_level"] = $target2Data['level_label'] ?? '';
+            }
+            if ($target2 && in_array("{$target2}_parent", $columns) && isset($target2Data)) {
+                $insert["{$target2}_parent"] = $target2Data['parent_id'] ?? 0;
+            }
+
+            // Handle wilayah hierarchy
+            if ($source === 'wilayah') {
+                $insert = $this->resolveWilayahHierarchy($insert, (int) $data['source_id']);
+            }
+
+            \DB::insert($this->tbl->table, $insert);
+            return \DB::insertId();
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler("doTagging:{$e->getMessage()}");
+            return null;
+        } catch (\Exception $e) {
+            $this->exceptionHandler($e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Resolve wilayah geographic hierarchy for tagging.
+     */
+    private function resolveWilayahHierarchy(array $insert, int $sourceId): array
+    {
+        $wilayah = \DB::queryFirstRow(
+            "SELECT * FROM " . $this->tbl->wilayah . " WHERE id=%i",
+            $sourceId
+        );
+
+        if (!$wilayah) {
+            return $insert;
+        }
+
+        if ($wilayah['level'] == '2') {
+            $insert['provinsi_id'] = $wilayah['parent_id'];
+            $insert['kabupaten_id'] = $wilayah['id'];
+            return $insert;
+        }
+
+        $hierarchyQuery = match ($wilayah['level']) {
+            '3' => "SELECT 0 AS kel_id, kec.id AS kec_id,
+                    kab.id AS kab_id, kab.parent_id AS prov_id
+                    FROM " . $this->tbl->wilayah . " AS kec
+                    LEFT JOIN " . $this->tbl->wilayah . " AS kab ON kec.parent_id=kab.id
+                    WHERE kec.id=%i",
+            '4' => "SELECT kel.id AS kel_id,
+                    kec.id AS kec_id, kab.id AS kab_id,
+                    kab.parent_id AS prov_id
+                    FROM " . $this->tbl->wilayah . " AS kel
+                    LEFT JOIN " . $this->tbl->wilayah . " AS kec ON kel.parent_id=kec.id
+                    LEFT JOIN " . $this->tbl->wilayah . " AS kab ON kec.parent_id=kab.id
+                    WHERE kel.id=%i",
+            default => null,
+        };
+
+        if ($hierarchyQuery) {
+            try {
+                $resolved = \DB::queryFirstRow($hierarchyQuery, $wilayah['id']);
+                $insert['provinsi_id'] = (int) ($resolved['prov_id'] ?? 0);
+                $insert['kabupaten_id'] = (int) ($resolved['kab_id'] ?? 0);
+                $insert['kecamatan_id'] = (int) ($resolved['kec_id'] ?? 0);
+                $insert['kelurahan_id'] = (int) ($resolved['kel_id'] ?? 0);
+            } catch (\MeekroDBException $e) {
+                $this->exceptionHandler($e->getMessage());
+            }
+        }
+
+        return $insert;
+    }
+
+    /**
+     * Build a breadcrumb trail from a hierarchical record.
+     */
+    public function setBreadcrumb(int $id = 0, string $caption = '', string $code = ''): void
+    {
+        static $counter = 0;
+
+        try {
+            $query = "SELECT * FROM " . $this->tbl->table . " WHERE id=%i";
+            $results = \DB::query($query, $id);
+
+            if (!is_array($results)) {
+                return;
+            }
+
+            foreach ($results as $row) {
+                $counter++;
+                $this->breadcrumb[$counter] = [
+                    'caption' => $caption ? ($row[$caption] ?? '') : ($row['nama'] ?? ''),
+                    'id' => $row['id'],
+                    'level' => $row['level'] ?? '',
+                    'level_label' => $row['level_label'] ?? '',
+                ];
+
+                if ($code) {
+                    $this->breadcrumb[$counter]['code'] = $row[$code] ?? '';
+                }
+
+                if (!empty($row['parent_id']) && $row['parent_id'] > 0) {
+                    $this->setBreadcrumb((int) $row['parent_id'], $caption, $code);
+                }
             }
         } catch (\MeekroDBException $e) {
-			$this->exceptionHandler($e->getMessage());
-		}
-	}
-    
-	function doDel($_id=0) {
-        try {
-            $data=$this->doRead($_id);
-            \DB::delete($this->tbl->table, "id=%i", $_id);
-            if ($data['parent_id']) {
-                $this->updateChildren($data['parent_id']);    
-            }        
-        } catch (\MeekroDBException $e) {
-			$this->exceptionHandler($e->getMessage());
-		}
-	}
+            $this->exceptionHandler($e->getMessage());
+        }
+    }
 
-    function updateChildren($_id) {
-        $_children=$this->doCountChildren($_id);
-        $_fields=array("children"=>$_children['totalRecord']);
-        try {
-            \DB::update($this->tbl->table, $_fields, "id=%i", $_id+0);
-        } catch (\MeekroDBException $e) {
-			$this->exceptionHandler($e->getMessage());
-		}
-	}
-    
-    function doAdd($data) {
-        global $scriptID;
-        $_account_id = isset($this->ses->val['account_id']) ? trim((string)$this->ses->val['account_id']) : '';
+    /**
+     * Update a record with optional hierarchical data support.
+     */
+    public function doUpdate(array $data): void
+    {
         unset($data['cmd']);
-        $_fields=$data;
+        $fields = $data;
+        $columns = \DB::columnList($this->tbl->table);
+
+        if (in_array('parent_id', $columns)) {
+            $recursive = [
+                'parent_id' => (int) ($data['parent_id'] ?? 0),
+                'level_label' => $data['level_label'] ?? '',
+                'level' => $data['level'] ?? '',
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+            $fields = array_merge($fields, $recursive);
+        } else {
+            unset($fields['parent_id']);
+        }
+
+        try {
+            \DB::update($this->tbl->table, $fields, "id=%i", (int) ($data['id'] ?? 0));
+
+            if (!empty($data['id']) && in_array('parent_id', $columns)) {
+                $this->updateChildren((int) $data['id']);
+            }
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler($e->getMessage());
+        }
+    }
+
+    /**
+     * Delete a record and update parent's child count.
+     */
+    public function doDel(int $id = 0): void
+    {
+        try {
+            $data = $this->doRead($id);
+            \DB::delete($this->tbl->table, "id=%i", $id);
+
+            if (!empty($data['parent_id'])) {
+                $this->updateChildren((int) $data['parent_id']);
+            }
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler($e->getMessage());
+        }
+    }
+
+    /**
+     * Update the children count of a parent record.
+     */
+    public function updateChildren(int $id): void
+    {
+        $children = $this->doCountChildren($id);
+        $fields = ['children' => $children['totalRecord'] ?? 0];
+
+        try {
+            \DB::update($this->tbl->table, $fields, "id=%i", $id);
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler($e->getMessage());
+        }
+    }
+
+    /**
+     * Add a new record with optional hierarchical data support.
+     */
+    public function doAdd(array $data): ?int
+    {
+        $accountId = isset($this->ses->val['account_id'])
+            ? trim((string) $this->ses->val['account_id'])
+            : '';
+
+        unset($data['cmd']);
+        $fields = $data;
+
         try {
             $columns = array_keys(\DB::columnList($this->tbl->table));
-            if (in_array("parent_id",$columns)) {
-                $level_label=$this->gov2formfield->getLevel($this->fields,$data['level'],$data['level_label']);
-                $_parent=$this->doRead($data['parent_id']);
-                for ($i = $_parent['level'] ; $i >= 1; $i--) {
-                    if ($i == $_parent['level']) {
-                        $_fields[$_parent['level_label']."_id"]=$_parent['id'];
+
+            if (in_array('parent_id', $columns)) {
+                $levelLabel = $this->gov2formfield->getLevel(
+                    $this->fields,
+                    $data['level'] ?? '',
+                    $data['level_label'] ?? ''
+                );
+                $parent = $this->doRead((int) ($data['parent_id'] ?? 0));
+
+                for ($i = ($parent['level'] ?? 0); $i >= 1; $i--) {
+                    if ($i == ($parent['level'] ?? 0)) {
+                        $fields[($parent['level_label'] ?? '') . '_id'] = $parent['id'] ?? 0;
                     } else {
-                        $_grandparent=$this->doRead($_parent['parent_id']);
-                        $_parent_label=$this->gov2formfield->getLevel($this->fields,$i,$_grandparent['level_label']);
-                        
-                        $_fields[$_parent_label."_id"]=$_parent[$_parent_label."_id"];
-                        $_parent=$_grandparent;
-                        /*
-                        if ($scriptID=='instance_keuangan') {
-                            print_r($_fields);
-                        }
-                        */
+                        $grandparent = $this->doRead((int) ($parent['parent_id'] ?? 0));
+                        $parentLabel = $this->gov2formfield->getLevel(
+                            $this->fields,
+                            $i,
+                            $grandparent['level_label'] ?? ''
+                        );
+                        $fields[$parentLabel . '_id'] = $parent[$parentLabel . '_id'] ?? 0;
+                        $parent = $grandparent;
                     }
                 }
-                $_recursive=array('parent_id' => $data['parent_id']+0,
-                                  'level_label' => $level_label,
-                                  'level' => $data['level'],
-                                  'created_at' => date('Y-m-d H:i:s')
-                                 );
-                $_fields=array_merge($_fields,$_recursive);
-            } else {    
-                unset($_fields['parent_id']);
-                $_flat=array('created_by' => is_numeric($_account_id) ? (int)$_account_id : 0,
-                            'created_at' => date('Y-m-d H:i:s'));
-                $_fields=array_merge($_fields,$_flat);
+
+                $recursive = [
+                    'parent_id' => (int) ($data['parent_id'] ?? 0),
+                    'level_label' => $levelLabel,
+                    'level' => $data['level'] ?? '',
+                    'created_at' => date('Y-m-d H:i:s'),
+                ];
+                $fields = array_merge($fields, $recursive);
+            } else {
+                unset($fields['parent_id']);
+                $flat = [
+                    'created_by' => is_numeric($accountId) ? (int) $accountId : 0,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ];
+                $fields = array_merge($fields, $flat);
             }
-            
-            \DB::insert($this->tbl->table, $_fields);
-            
-            $_id = \DB::insertId();
-            if ($data['parent_id'] && in_array("parent_id",$columns)) {
-                $this->updateChildren($data['parent_id']);    
+
+            \DB::insert($this->tbl->table, $fields);
+            $id = \DB::insertId();
+
+            if (!empty($data['parent_id']) && in_array('parent_id', $columns)) {
+                $this->updateChildren((int) $data['parent_id']);
             }
-            return $_id;
+
+            return $id;
         } catch (\MeekroDBException $e) {
-			$this->exceptionHandler($e->getMessage());
-		} catch (\Exception $e) {
-			$this->exceptionHandler($e->getMessage());
-		}
-	}
-    
-    function doRead ($id=0) {
-        global $doc;
-		$_query="SELECT * FROM ".$this->tbl->table." WHERE id=%i";
-        try {
-           $_response=\DB::queryFirstRow($_query,$id); 
-        } catch (\MeekroDBException $e) {
-			$doc->exceptionHandler($e->getMessage());
-		}
-	    return $_response;
-	}
-    
-    function doCountChildren ($parent_id="") {
-        if (isset($parent_id)) {$WHERE="WHERE parent_id=%i";}
-		$query="SELECT count(id) as totalRecord FROM ".$this->tbl->table." $WHERE";	
-	   return \DB::queryFirstRow($query,$parent_id);
-	}
-    
-    function doBrowse ($scroll,$parent_id="",$parent_id_name="") {
-        global $uri;
-        try {
-            $scrolled=$this->scroll($scroll);
-            if ($parent_id_name) {$_parent=$parent_id_name."_id";}
-            else {$_parent="parent_id";}
-            if (isset($parent_id)) {$WHERE="WHERE $_parent=%i";}
-            $query="SELECT * FROM ".$this->tbl->table." $WHERE LIMIT $scrolled";
-            // echo \DB::$dbName;
-            // echo \DB::$host;
-            $results = \DB::query($query,$parent_id);
+            $this->exceptionHandler($e->getMessage());
+            return null;
         } catch (\Exception $e) {
-			$this->exceptionHandler($e->getMessage());
-		} catch (\MeekroDBException $e) {
-			$this->exceptionHandler($e->getMessage().":".$uri);
-		}
-	    return $results;
-	}
+            $this->exceptionHandler($e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Read a single record by ID.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function doRead(int $id = 0): ?array
+    {
+        global $doc;
+
+        $query = "SELECT * FROM " . $this->tbl->table . " WHERE id=%i";
+
+        try {
+            return \DB::queryFirstRow($query, $id);
+        } catch (\MeekroDBException $e) {
+            $doc->exceptionHandler($e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Count children of a parent record.
+     *
+     * @return array{totalRecord: int}|null
+     */
+    public function doCountChildren(int|string $parentId = 0): ?array
+    {
+        $where = $parentId ? 'WHERE parent_id=%i' : '';
+        $query = "SELECT count(id) as totalRecord FROM " . $this->tbl->table . " {$where}";
+
+        return \DB::queryFirstRow($query, $parentId);
+    }
+
+    /**
+     * Browse records with pagination.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    public function doBrowse(int|string $scroll = 0, int|string $parentId = 0, string $parentIdName = ''): ?array
+    {
+        try {
+            $scrolled = $this->scroll((int) $scroll);
+            $parentCol = $parentIdName ? "{$parentIdName}_id" : 'parent_id';
+            $where = $parentId ? "WHERE {$parentCol}=%i" : '';
+
+            $query = "SELECT * FROM " . $this->tbl->table . " {$where} LIMIT {$scrolled}";
+
+            return \DB::query($query, $parentId);
+        } catch (\Exception $e) {
+            $this->exceptionHandler($e->getMessage());
+            return null;
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler($e->getMessage());
+            return null;
+        }
+    }
 }

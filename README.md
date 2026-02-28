@@ -1,139 +1,202 @@
-# gov2framework
-gov2 is a framework for develop government project
+# phpVB
 
-## Get the repo
-- `clone the code from repository https://github.com/anggunwibowo/gov2framework.git`
-- `or download the zip file from master branch`
+Framework PHP untuk pengembangan aplikasi pemerintahan (government e-services) dengan arsitektur **Component-Based MVC**, konfigurasi XML-driven, dan frontend Vue.js interaktif.
 
-## Set development environment
-### Windows (Apache)
-- `install packaged (XAMMP/WAMP/Laragon) recommended Laragon with PHP 8.1 version`
-- `install composer refering to PHP 8.1`
-- `clone or zip download from repository`
-- `make sure 7-Zip already installed in your machine`
-- `go to your app root C:/laragon/www/gov2framework`
-  ```bash
-  composer install
-  ```
-- `insert 3 lines into sergeytsalkov/meekrodb/db.class.php to line 92 :`
-    ```php
-    # gov2 conf
-    public static $error_handler;
-    public static $throw_exception_on_error;
-    public static $throw_exception_on_nonsql_error;
-    ```
-- `run sql file in /gov2framework/apps/home/sql/sql.sql`
-- `set credential (domain,host,user,pass,dbname) apps/home/xml/dsnSource.local.xml`
-- `create local domain name e.g. gov2core.local`
-   - `insert code in C:\Windows\System32\drivers\etc\hosts`
-   ```bash
-   127.0.0.1 gov2core.local
-   ```
-   - `defined configuration`
-   ```conf
-   <VirtualHost *:80>
-    DocumentRoot "C:/laragon/www/gov2framework/public"
-    ServerName gov2core.local
-    <Directory "C:/laragon/www/gov2framework/public">
-        AllowOverride All
-        Require all granted
-    </Directory>
-	  ErrorLog "C:/laragon/www/gov2framework/logs/gov2core_error.log"
-    CustomLog "C:/laragon/www/gov2framework/logs/gov2core_access.log" combined
-    </VirtualHost>
-    ```
-- `start/restart your web service apache`
-- `run domain gov2core.local in your browser`
+> **Versi saat ini:** v5.0.0-alpha (PHP 8.3 Foundation)
+> Lihat [Release Notes](release_notes/v5.0.0-alpha.md) untuk detail perubahan terbaru.
 
-### Linux Ubuntu (Apache)
-- `install PHP 8.1 version, MySQL, Apache, Composer in your machine`
-   ```bash
-   sudo apt update && sudo apt install -y apache2 mysql-server php8.1 libapache2-mod-php8.1 php8.1-mysql php8.1-cli php8.1-curl php8.1-xml php8.1-mbstring php8.1-zip unzip curl && curl -sS https://getcomposer.org/installer | php && sudo mv composer.phar /usr/local/bin/composer
-   ```
-- `enabled and start service`
-  ```bash
-  sudo systemctl enable apache2
-  sudo systemctl start apache2
-  sudo systemctl enable mysql
-  sudo systemctl start mysql
-  ```
-- `verify installation`
-  ```bash
-  php -v
-  sudo systemctl status apache2
-  sudo systemctl status mysql
-  composer -vvv about
-  ```
-- `make sure composer refering to PHP 8.1, if not run this code below :`
-   ```bash
-   nano ~/.bashrc
-   ```
-   - `add this line at the end then save and exit`
-   ```conf
-   alias composer="php8.1 /usr/local/bin/composer"
-   ```
-   - `clear cache composer and verify`
-   ```bash
-  hash -r
-  composer clear-cache
-  composer -vvv about 
-  ```
-- `check PHP 8.1 Extension are installed and enabled (check the list), if missing install it first`
-   - `run this command if some of extention missing`
-   ```bash
-   sudo apt install php8.1-{common,cli,fpm,mbstring,xml,zip,curl,gd,sqlite3,opcache,intl,bcmath,mysqli,simplexml}
-   ```
-   - `enable all installed extensions automatically`
-   ```bash
-   sudo phpenmod -v 8.1 -s ALL *
-   ```
-- `clone or zip download from repository`
-- `go to your app root /var/www/gov2framework`
-  ```bash
-  composer install
-  ```
-- `insert 3 lines into sergeytsalkov/meekrodb/db.class.php to line 92 :`
-    ```php
-    # gov2 conf
-    public static $error_handler;
-    public static $throw_exception_on_error;
-    public static $throw_exception_on_nonsql_error;
-    ```
-- `run sql file in /gov2framework/apps/home/sql/sql.sql`
-- `set credential (domain,host,user,pass,dbname) apps/home/xml/dsnSource.local.xml`
-- `create local domain e.g. gov2core.local`
-   ```bash
-   # Define a new local domain
-    sudo tee -a /etc/hosts <<EOF
-    127.0.0.1 gov2core.local
-    EOF
-   ```
-- `setup domain configuration`
-   ```bash
-    sudo touch /etc/apache2/sites-available/gov2core.local.conf
-   ```
-   ```bash
-    sudo nano /etc/apache2/sites-available/gov2core.local.conf
-   ```
-   ```conf
-    # domain configuration file gov2core.local.conf
-    <VirtualHost *:80>
-    ServerName gov2core.local
-    ServerAlias www.gov2core.local
-    DocumentRoot /var/www/gov2framework/public
+---
 
-    <Directory /var/www/gov2framework/public>
-        AllowOverride All
-        Require all granted
-    </Directory>
+## Tech Stack
 
-    ErrorLog ${APACHE_LOG_DIR}/gov2core_error.log
-    CustomLog ${APACHE_LOG_DIR}/gov2core_access.log combined
-    </VirtualHost>
-   ```
-   ```bash
-    sudo a2enmod proxy proxy_http
-    sudo a2ensite gov2core.local.conf
-    sudo systemctl restart apache2
-   ```
-- `run domain gov2core.local in your browser`
+| Layer | Teknologi | Versi |
+|-------|-----------|-------|
+| **Runtime** | PHP | ^8.3 |
+| **Routing** | nikic/fast-route | ^1.3 |
+| **HTTP Client** | Guzzle | ^7.8 |
+| **Database** | MySQL/MariaDB via MeekroDB | 2.5.1 |
+| **Template** | Twig | ^3.20 |
+| **Auth** | JWT (firebase/php-jwt) + OAuth2/Keycloak SSO | ^6.11 / ^2.7 |
+| **Email** | Mailgun SDK | ^4.0 |
+| **Frontend** | Vue 2 + Bootstrap 4 + httpVueLoader | 2.6.11 |
+| **Testing** | PHPUnit + PHPStan + PHP CS Fixer | ^11.0 / ^2.0 / ^3.0 |
+
+---
+
+## Arsitektur
+
+phpVB menggunakan arsitektur Component-Based MVC dengan XML Configuration. Alur request:
+
+```
+Browser Request
+  -> public/index.php (CORS, session init)
+    -> core/init/index.php (bootstrap config, router, template)
+      -> core/init/route.php (FastRoute dispatcher)
+        -> Handler class (apps/{app}/{handler}.php)
+          -> Model operations (apps/{app}/model/{model}.php)
+            -> Response: JSON (AJAX) atau Twig HTML (page render)
+```
+
+### Class Hierarchy (Gov2lib)
+
+```
+Gov2lib\customException
+  └── Gov2lib\document          # Twig rendering, body data, error pages
+       └── Gov2lib\dsnSource    # DB connection via XML DSN
+            └── Gov2lib\checkExist    # Directory/file validation
+                 └── Gov2lib\crudModel     # doAdd, doUpdate, doDel, doRead, doBrowse
+                      └── Gov2lib\crudHandler   # HTTP request mapping + response
+                           └── App\{module}\model\{class}  # App-specific logic
+```
+
+### Namespace & Autoloading (PSR-4)
+
+```
+Gov2lib\               -> core/lib/
+Gov2lib\Enums\         -> core/lib/Enums/
+Gov2lib\Exceptions\    -> core/lib/Exceptions/
+App\                   -> apps/
+Tests\                 -> tests/
+```
+
+---
+
+## Struktur Direktori
+
+```
+phpVB/
+├── public/                 # Web root (index.php, .htaccess, static assets)
+│   ├── index.php           # Entry point: CORS headers, session, bootstrap
+│   ├── js/                 # Shared JavaScript (gov2form, gov2helper, Vue libs)
+│   └── css/                # Shared stylesheets
+├── core/
+│   ├── config/             # XML config per environment (local, dev, prod)
+│   ├── init/               # Bootstrap: index.php, route.php, template.php
+│   ├── lib/                # 32+ library classes (Gov2lib namespace)
+│   │   ├── Enums/          # PHP 8.3 enums (UserRole, UserStatus, HttpMethod, NotificationType)
+│   │   ├── Exceptions/     # Typed exceptions (Http, Auth, Validation, NotFound, DB, Config)
+│   │   └── *.php           # Core classes (document, crudModel, crudHandler, dll)
+│   ├── template/           # Twig templates (bootstrap, bulma, krisna, cube)
+│   └── scripts/            # Vue build pipeline
+├── apps/
+│   ├── home/               # Homepage module
+│   ├── gov2login/          # Auth & SSO (Keycloak OAuth2, JWT session)
+│   ├── gov2option/         # System configuration/options
+│   ├── gov2survey/         # Survey & kuesioner
+│   ├── gov2pipe/           # Data pipeline & workflow
+│   └── components/         # Shared Vue components (26 files)
+├── tests/
+│   ├── Unit/               # Unit tests (Enums, Exceptions)
+│   └── Integration/        # Integration tests
+├── release_notes/          # Catatan rilis per versi
+├── composer.json
+├── phpunit.xml
+└── .env                    # Environment variables
+```
+
+### Pola Modular per App
+
+Setiap app mengikuti struktur konsisten:
+
+```
+apps/{module}/
+├── {module}.php             # Controller/handler utama
+├── model/                   # Model classes (extends crudModel/crudHandler)
+├── view/                    # Twig HTML templates
+├── vue/                     # Vue SFC components (.vue)
+├── json/                    # Konfigurasi form/fields
+├── xml/                     # Route, DSN, table config, menu
+└── sql/                     # Schema SQL
+```
+
+---
+
+## Kekuatan Arsitektur
+
+**Modular & Konsisten** -- Setiap app adalah module mandiri dengan struktur yang sama (controller, model, view, vue, xml, sql), memudahkan onboarding developer baru dan penambahan fitur.
+
+**Namespace PSR-4** -- Autoloading terstandar untuk `Gov2lib\` dan `App\`, mempermudah penemuan class dan menghindari konflik nama.
+
+**Parameterized Queries** -- MeekroDB menggunakan parameterized queries (`%i`, `%s`, `%b`) secara konsisten di seluruh codebase, memberikan perlindungan dari SQL injection.
+
+**JWT Session Management** -- Autentikasi menggunakan firebase/php-jwt dengan cookie-based session (`Gov2Session`), mendukung SSO via OAuth2/Keycloak.
+
+**Multi-Environment Config** -- Konfigurasi XML per environment (`dsnSource.local.xml`, `dsnSource.dev.xml`, `dsnSource.siap.xml`) memungkinkan deployment fleksibel tanpa mengubah kode.
+
+**Hierarchical Data Support** -- Built-in support untuk data hierarkis (parent-child, breadcrumb, wilayah geographic hierarchy) di crudModel dan crudHandler.
+
+**Multi-Theme Templates** -- Empat tema tersedia (Bootstrap, Bulma, Krisna, Cube) dengan Twig template engine, mendukung switching tema tanpa perubahan logic.
+
+**PHP 8.3 Modern Syntax** -- Core library sudah direfactor ke PHP 8.3 dengan typed properties, return types, match expressions, null-safe operator, dan PHPDoc lengkap.
+
+**Typed Enums & Exceptions** -- PHP 8.3 backed enums (UserRole, UserStatus, HttpMethod, NotificationType) dan typed exception hierarchy menggantikan string-based patterns lama, dengan backward compatibility methods.
+
+**Testing Infrastructure** -- PHPUnit 11, PHPStan level 5, dan PHP CS Fixer tersedia via composer scripts untuk code quality assurance.
+
+---
+
+## Quick Start
+
+Untuk panduan instalasi lengkap (Windows/Laragon dan Linux Ubuntu/Apache), lihat:
+
+**[Setup Guide](docs/SETUP.md)**
+
+Quick commands setelah setup:
+
+```bash
+# Install dependencies
+composer install
+
+# Jalankan tests
+composer test
+
+# Static analysis
+composer lint
+
+# Code style fix
+composer cs-fix
+
+# Lint + test sekaligus
+composer check
+```
+
+---
+
+## Roadmap
+
+phpVB sedang dalam proses refactoring besar menuju arsitektur modern. Rencana dibagi dalam 7 fase:
+
+| Versi | Fase | Fokus | Status |
+|-------|------|-------|--------|
+| **v5.0.0-alpha** | **1 -- Foundation** | PHP 8.3, tooling, testing, modern syntax | **Selesai** |
+| v5.1.0-alpha | 2 -- Arsitektur | DI container, interfaces, routing bersih | Planned |
+| v5.2.0-beta | 3 -- Frontend | Vue 3, Vite, Bootstrap 5, TypeScript | Planned |
+| v5.3.0-beta | 4 -- Supabase | API abstraction layer, PostgreSQL migration | Planned |
+| v5.4.0-beta | 5 -- Template | Design system, dark mode, SCSS | Planned |
+| v5.5.0-rc | 6 -- PWA | Service worker, offline support, installable | Planned |
+| v5.6.0 | 7 -- Finalisasi | Migration system, CI/CD, cleanup | Planned |
+
+Estimasi total: 18 minggu untuk 1 developer full-time.
+
+Detail lengkap tersedia di [REFACTORING_PLAN.md](REFACTORING_PLAN.md).
+
+---
+
+## Dokumentasi
+
+| Dokumen | Isi |
+|---------|-----|
+| [Setup Guide](docs/SETUP.md) | Panduan instalasi Windows & Linux |
+| [Codebase Review](CODEBASE_REVIEW.md) | Review arsitektur dan analisis teknis |
+| [Refactoring Plan](REFACTORING_PLAN.md) | Rencana refactoring 7 fase lengkap |
+| [Release Notes](release_notes/) | Catatan rilis per versi |
+
+---
+
+## Lisensi
+
+Hak cipta dilindungi. Framework ini dikembangkan untuk kebutuhan proyek pemerintahan.
+
+## Kontak
+
+Wibisono Sastrodiwiryo -- wibi@alumni.ui.ac.id
