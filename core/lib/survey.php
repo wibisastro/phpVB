@@ -10,7 +10,7 @@ class survey
     /**
      * Initialize survey controller
      */
-    public function __construct(): void
+    public function __construct()
     {
         global $self, $vars, $cmdID;
         $self->takeAll("components");

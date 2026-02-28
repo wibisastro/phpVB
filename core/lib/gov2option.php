@@ -15,14 +15,15 @@ use Gov2lib\DBConnector;
  */
 class gov2option
 {
+    public mixed $dsn = null;
     /**
      * Initialize options handler with database connection
      */
-    public function __construct(): void
+    public function __construct()
     {
         global $doc, $config;
         try {
-            $cookies = $doc->envRead($_COOKIE['Gov2Session']);
+            $cookies = $doc->envRead($_COOKIE['Gov2Session'] ?? '');
             $this->dsn = $cookies['portal'];
             if (!$this->dsn) {
                 $this->dsn = $config->domain->attr['dsn'];
@@ -209,7 +210,7 @@ class MVC
     /**
      * Initialize MVC with optional class name
      */
-    public function __construct(string $className = ""): void
+    public function __construct(string $className = "")
     {
         global $self;
         $this->name = $className ?: $self->className;

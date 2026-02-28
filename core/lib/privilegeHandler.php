@@ -10,7 +10,7 @@ class privilegeHandler extends checkExist
     /**
      * Initialize privilege handler
      */
-    public function __construct(): void
+    public function __construct()
     {
         global $vars, $config;
         parent::__construct($config->domain->attr['dsn']);

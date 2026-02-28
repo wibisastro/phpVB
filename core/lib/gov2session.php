@@ -16,21 +16,24 @@ use Firebase\JWT\Key;
  */
 class gov2session extends dsnSource
 {
+    public \GuzzleHttp\Client $client;
+    public int $timeout = 0;
+    public array $val = [];
     /**
      * Initialize session with optional authentication data
      */
-    public function __construct(string $_auth = ""): void
+    public function __construct(string|array $_auth = "")
     {
         parent::__construct();
         $this->client = new \GuzzleHttp\Client();
         $this->timeout = time() + (24 * 60 * 60);
 
         if (isset($_GET['view'])) {
-            match($_GET['view']) {
-                'cases' => echo json_encode($cases ?? []),
-                'cookie' => echo json_encode($_COOKIE),
-                'session' => echo json_encode($_SESSION),
-                default => null,
+            echo match($_GET['view']) {
+                'cases' => json_encode($cases ?? []),
+                'cookie' => json_encode($_COOKIE),
+                'session' => json_encode($_SESSION),
+                default => '',
             };
             exit;
         }

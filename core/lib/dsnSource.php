@@ -14,6 +14,7 @@ class dsnSource extends document
     protected ?\stdClass $tbl = null;
     protected string $dsnName = 'master';
     protected int $scrollInterval = 1000;
+    public ?array $api = null;
 
     public function __construct()
     {
@@ -22,10 +23,6 @@ class dsnSource extends document
         parent::__construct();
 
         require_once __DIR__ . '/../../vendor/sergeytsalkov/meekrodb/db.class.php';
-
-        \DB::$error_handler = false;
-        \DB::$throw_exception_on_error = true;
-        \DB::$throw_exception_on_nonsql_error = true;
 
         $this->loadTableConfig($pageID);
     }

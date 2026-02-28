@@ -10,7 +10,7 @@ class role
     /**
      * Initialize role controller
      */
-    public function __construct(): void
+    public function __construct()
     {
         global $self, $vars, $pageID;
         $self->takeAll("components");

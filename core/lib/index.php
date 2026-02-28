@@ -10,7 +10,7 @@ class index
     /**
      * Initialize index controller
      */
-    public function __construct(): void
+    public function __construct()
     {
     }
 

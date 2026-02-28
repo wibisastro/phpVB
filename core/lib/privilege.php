@@ -10,7 +10,7 @@ class privilege
     /**
      * Initialize privilege controller
      */
-    public function __construct(): void
+    public function __construct()
     {
         global $self, $vars;
         $self->takeAll("components");

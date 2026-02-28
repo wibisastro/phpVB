@@ -10,7 +10,7 @@ class vue extends checkExist
     /**
      * Initialize Vue handler
      */
-    public function __construct(): void
+    public function __construct()
     {
         global $vars;
         $_app = $this->checkAppDir($vars["app"]);

@@ -28,7 +28,7 @@
     </googleoauth>
     <webroot></webroot>
     <domain>
-        <gov2core.local>home</gov2core.local>
+        <ayam.gov2.web.id>home</ayam.gov2.web.id>
     </domain>
 	<css>
         <warning>warning</warning>

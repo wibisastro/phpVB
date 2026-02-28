@@ -10,7 +10,7 @@ class options
     /**
      * Initialize options controller
      */
-    public function __construct(): void
+    public function __construct()
     {
         global $self, $vars, $cmdID, $pageID;
         $self->takeAll("components");

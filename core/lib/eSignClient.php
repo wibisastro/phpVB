@@ -22,7 +22,7 @@ class eSignClient
     /**
      * Initialize eSign client
      */
-    public function __construct(string $username = '', string $password = ''): void
+    public function __construct(string $username = '', string $password = '')
     {
         global $config;
 

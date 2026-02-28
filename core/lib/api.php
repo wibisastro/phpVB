@@ -15,7 +15,7 @@ class api extends document
     /**
      * Initialize API client
      */
-    public function __construct(string $_dsn = "master"): void
+    public function __construct(string $_dsn = "master")
     {
         parent::__construct();
         $this->client = new \GuzzleHttp\Client(['verify' => false]);

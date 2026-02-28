@@ -10,7 +10,7 @@ class loginHandler extends checkExist
     /**
      * Initialize login handler
      */
-    public function __construct(): void
+    public function __construct()
     {
         global $vars, $config, $scriptID;
         parent::__construct($config->domain->attr['dsn']);

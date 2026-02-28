@@ -15,11 +15,12 @@ use WhereClause;
 class gov2survey
 {
     public string $table = 'survey_kuesioner_local';
+    public mixed $dsn = null;
 
     /**
      * Initialize survey handler with database connection
      */
-    public function __construct(): void
+    public function __construct()
     {
         global $doc, $config;
         try {
@@ -434,7 +435,7 @@ class SurveyCollection extends BaseSurveyCollection
     /**
      * Initialize collection from array
      */
-    public function __construct(array $survey_list): void
+    public function __construct(array $survey_list)
     {
         foreach($survey_list as $survey) {
             array_push($this->_items, new SurveyEntity($survey));
@@ -450,7 +451,7 @@ class SurveyPertanyaanCollection extends BaseSurveyCollection
     /**
      * Initialize collection from array
      */
-    public function __construct(array $pertanyaan_list): void
+    public function __construct(array $pertanyaan_list)
     {
         foreach($pertanyaan_list as $pertanyaan) {
             array_push($this->_items, new SurveyPertanyaan($pertanyaan));
@@ -466,7 +467,7 @@ class SurveyOpsiCollection extends BaseSurveyCollection
     /**
      * Initialize collection from array
      */
-    public function __construct(array $opsi_list): void
+    public function __construct(array $opsi_list)
     {
         foreach($opsi_list as $opsi) {
             array_push($this->_items, new SurveyOpsi($opsi));
@@ -500,7 +501,7 @@ class SurveyEntity extends BaseSurvey
     /**
      * Initialize survey entity
      */
-    public function __construct(array $item = []): void
+    public function __construct(array $item = [])
     {
         if (count($item)) {
             if (($item['level_label'] ?? null) === 'survey' && intval($item['level'] ?? 0) == 1) {
@@ -539,7 +540,7 @@ class SurveyPertanyaan extends BaseSurvey
     /**
      * Initialize survey question entity
      */
-    public function __construct(array $item = []): void
+    public function __construct(array $item = [])
     {
         if (($item['level_label'] ?? null) === 'pertanyaan' && intval($item['level'] ?? 0) == 2) {
             foreach($item as $key => $val) {
@@ -577,7 +578,7 @@ class SurveyOpsi extends BaseSurvey
     /**
      * Initialize survey option entity
      */
-    public function __construct(array $item = []): void
+    public function __construct(array $item = [])
     {
         if (($item['level_label'] ?? null) === 'opsi' && intval($item['level'] ?? 0) == 3) {
             foreach($item as $key => $val) {

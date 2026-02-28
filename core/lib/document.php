@@ -15,6 +15,7 @@ use Firebase\JWT\Key;
  * @since 2009-11-22
  * @version 5.0 - PHP 8.4 refactor
  */
+#[\AllowDynamicProperties]
 class document extends customException
 {
     /** @var array<string, mixed> Template body data */
@@ -46,6 +47,33 @@ class document extends customException
 
     /** @var string Base body template file */
     public string $baseBody = '';
+
+    /** @var string Current page ID */
+    public string $pageID = '';
+
+    /** @var string Template directory path */
+    public string $templateDir = '';
+
+    /** @var string Class name identifier */
+    public string $className = '';
+
+    /** @var array|null Collected menu items */
+    public ?array $collectMenu = null;
+
+    /** @var string Controller file path */
+    public string $controller = '';
+
+    /** @var string Component name */
+    public string $componentName = '';
+
+    /** @var gov2session|null Session handler */
+    public ?gov2session $ses = null;
+
+    /** @var gov2option|null Options handler */
+    public ?gov2option $opt = null;
+
+    /** @var gov2survey|null Survey handler */
+    public ?gov2survey $sur = null;
 
     public function __construct()
     {
@@ -523,9 +551,13 @@ class document extends customException
     /**
      * Decode a JWT-encoded environment value.
      */
-    public function envRead(string $data): array
+    public function envRead(?string $data = null): array
     {
         global $publickey;
+
+        if (empty($data)) {
+            return [];
+        }
 
         $result = JWT::decode($data, new Key($publickey, 'HS256'));
 
