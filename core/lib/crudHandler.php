@@ -6,7 +6,7 @@ namespace Gov2lib;
  * Request handler for CRUD operations.
  * Processes form data, validation, and generates responses.
  *
- * @version 2.0 - PHP 8.3 refactor
+ * @version 2.0 - PHP 8.4 refactor
  */
 class crudHandler extends crudModel
 {

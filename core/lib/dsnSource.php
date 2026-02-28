@@ -7,7 +7,7 @@ namespace Gov2lib;
  *
  * @author Wibisono Sastrodiwiryo <wibi@alumni.ui.ac.id>
  * @since 2017-09-29
- * @version 2.0 - PHP 8.3 refactor
+ * @version 2.0 - PHP 8.4 refactor
  */
 class dsnSource extends document
 {

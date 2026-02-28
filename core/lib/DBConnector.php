@@ -7,7 +7,7 @@ namespace Gov2lib;
  * Provides an easy DB access which works with the existing system.
  *
  * @since 2023
- * @version 2.0 - PHP 8.3 refactor
+ * @version 2.0 - PHP 8.4 refactor
  */
 class DBConnector
 {

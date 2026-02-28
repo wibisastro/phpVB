@@ -13,7 +13,7 @@ use Firebase\JWT\Key;
  *
  * @author Wibisono Sastrodiwiryo <wibi@alumni.ui.ac.id>
  * @since 2009-11-22
- * @version 5.0 - PHP 8.3 refactor
+ * @version 5.0 - PHP 8.4 refactor
  */
 class document extends customException
 {

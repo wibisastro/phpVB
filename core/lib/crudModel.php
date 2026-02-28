@@ -5,7 +5,7 @@ namespace Gov2lib;
 /**
  * Data model implementing CRUD operations with hierarchical data support.
  *
- * @version 2.0 - PHP 8.3 refactor
+ * @version 2.0 - PHP 8.4 refactor
  */
 class crudModel extends dsnSource
 {
