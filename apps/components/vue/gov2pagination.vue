@@ -1,107 +1,124 @@
 <template>
-<nav class="pagination is-right" role="navigation" aria-label="pagination">
-  <!--span class="pagination-previous">Prev</span>
-<span class="pagination-next">Next</span-->
-  <ul class="pagination-list">
-    <li v-if="pages > pageInterval">
-      <a :disabled="firstPageOn" :class="{ 'is-current': currentPage === firstPage }" class="pagination-link" @click="gotoPage(firstPage)">{{ firstPage }}</a>
-    </li>
-    <li v-if="pages > pageInterval">
-      <a class="pagination-link" @click="scrollPrev()" :disabled="intervalWindow-1<1">&lt;</a>
-    </li>
-    <li v-if="pages > pageInterval">
-      <span class="pagination-ellipsis">&hellip;</span>
-    </li>
-    <li v-for="page in pages" v-if="toggleVisibility(page + firstPage - 1)">
-      <a class="pagination-link" :class="{ 'is-current': currentPage === page + firstPage - 1 }"  @click="gotoPage(page + firstPage - 1)">{{ page + firstPage - 1 }}</a>
-    </li>
-    <li v-if="pages > pageInterval">
-      <span class="pagination-ellipsis">&hellip;</span>
-    </li>
-    <li v-if="pages > pageInterval">
-      <a class="pagination-link" @click="scrollNext()" :disabled="(intervalWindow+1)*pageInterval>lastPage">&gt;</a>
-    </li>
-    <li v-if="pages > pageInterval">
-      <a :disabled="lastPageOn" :class="{ 'is-current': currentPage === lastPage }" class="pagination-link" @click="gotoPage(lastPage)">{{ lastPage }}</a>
-    </li>
-  </ul>
+<nav aria-label="Page Navigation" :data-test="`pagination${'-' + instance}`">
+    <ul class="pagination float-right">
+        <li class="page-item"
+            :class="{'disabled': firstPageOn}"
+            v-if="pages > 1">
+            <a class="page-link" @click="prev()"><i class="fa fa-chevron-left"></i></a>
+        </li>
+
+        <li v-if="pages > pageInterval && !(intervalWindow-1<1)" class="page-item">
+            <a class="page-link" @click="scrollPrev()"><i class="fa fa-ellipsis-h"></i></a>
+        </li>
+
+        <li class="page-item" v-for="page in pages"
+            v-if="toggleVisibility(page + firstPage)"
+            :class="{'active': currentPage === page + firstPage - 1}">
+            <a class="page-link" @click="gotoPage(page + firstPage - 1)">
+                {{ page + firstPage - 1 }}
+            </a>
+        </li>
+
+        <li class="page-item"
+            v-if="pages > pageInterval && !((intervalWindow+1)*pageInterval>lastPage)">
+            <a class="page-link" @click="scrollNext()"><i class="fa fa-ellipsis-h"></i></a>
+        </li>
+
+        <li class="page-item"
+            :class="{'disabled': lastPageOn}"
+            v-if="pages > 1">
+            <a class="page-link" @click="next()"><i class="fa fa-chevron-right"></i></a>
+        </li>
+    </ul>
 </nav>
 </template>
 
 <script>
 module.exports = {
-  name: 'gov2pagination',
-  props: {
-    instance: String,
-    records: Number,
-    itemPerPage: Number,
-    scrollInterval: Number
-  },
-  computed: {
-    scrolls: function () {
-        var totalScroll=Math.floor(this.totalRecord / this.scrollInterval);
-        var mod=this.totalRecord % this.scrollInterval;
-        if (mod) {totalScroll++;}
-        return totalScroll; 
+    name: 'gov2pagination',
+    props: {
+        instance: {
+            type: String,
+            default: ''
+        },
+        records: Number,
+        itemPerPage: Number,
+        scrollInterval: Number
     },
-    pages: function () {
-        var totalPage=Math.floor(this.records / this.itemPerPage);
-        var mod=this.records % this.itemPerPage;
-        if (mod) {totalPage++;}
-        return totalPage; 
+    computed: {
+        scrolls: function () {
+            let totalScroll = Math.floor(this.totalRecord / this.scrollInterval);
+            if (this.totalRecord % this.scrollInterval) { totalScroll++; }
+            return totalScroll;
+        },
+        pages: function () {
+            let totalPage = Math.floor(this.records / this.itemPerPage);
+            if (this.records % this.itemPerPage > 0) { totalPage++; }
+            return totalPage;
+        },
+        lastPage: function () {
+            return this.firstPage + this.pages - 1;
+        },
+        firstPageOn: function () {
+            return this.currentPage === this.firstPage;
+        },
+        lastPageOn: function () {
+            return this.currentPage === this.lastPage;
+        },
+        maxInterval: function () {
+            return this.intervalWindow * this.pageInterval + 1;
+        },
+        minInterval: function () {
+            return this.maxInterval - this.pageInterval + 1;
+        }
     },
-    lastPage: function () {
-        return this.firstPage+this.pages-1;
-    },
-    firstPageOn: function () {
-        this.currentPage === this.firstPage;
-    },
-    lastPageOn: function () {
-        this.currentPage === this.lastPage;
-    },
-    maxInterval: function () {
-        return this.intervalWindow*this.pageInterval+1;
-    },
-    minInterval: function () {
-        return this.maxInterval-this.pageInterval+1;
-    }
-  },
     methods: {
         setFirstPage(data) {
-            this.firstPage=data;
+            this.firstPage = data;
         },
         setTotalRecord(data) {
-            this.totalRecord=data['totalRecord'];
-            eventBus.$emit('setScroll',this.scrolls);
+            this.totalRecord = data['totalRecord'];
+            eventBus.$emit('setScroll', this.scrolls);
         },
         gotoPage(page) {
-            this.currentPage=page;
-            eventBus.$emit('changepage',page);
+            this.currentPage = page;
+            eventBus.$emit('changepage', page);
+        },
+        prev() {
+            if (this.currentPage > 1) {
+                this.currentPage -= 1;
+                this.gotoPage(this.currentPage);
+            }
+        },
+        next() {
+            if (this.currentPage < this.pages) {
+                this.currentPage += 1;
+                this.gotoPage(this.currentPage);
+            }
         },
         scrollPrev() {
-            this.intervalWindow=this.intervalWindow-1;
+            this.intervalWindow = this.intervalWindow - 1;
         },
         scrollNext() {
-            this.intervalWindow=this.intervalWindow+1;
+            this.intervalWindow = this.intervalWindow + 1;
         },
         toggleVisibility(page) {
             if (this.pages <= this.pageInterval) {
                 return true;
-            } else if (page > this.firstPage && page < this.lastPage) {
-                if (page >= this.minInterval && page <= this.maxInterval) {
-                    return true;
-                }
+            } else if (page >= this.minInterval && page <= this.maxInterval) {
+                return true;
             }
+            return false;
         }
     },
     data: function () {
-      return {
-          currentPage: 1,
-          pageInterval: 3,
-          intervalWindow:1,
-          totalRecord: 10,
-          firstPage: 1
-      }
+        return {
+            currentPage: 1,
+            pageInterval: 3,
+            intervalWindow: 1,
+            totalRecord: 10,
+            firstPage: 1
+        }
     },
     created: function () {
         eventBus.$on('setCurrentPage', this.gotoPage);
@@ -110,6 +127,8 @@ module.exports = {
 }
 </script>
 
-<style>
-
+<style scoped>
+li a {
+    cursor: pointer;
+}
 </style>
