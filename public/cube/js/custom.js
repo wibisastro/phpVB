@@ -1,6 +1,22 @@
 $.sidebarMenu = function (menu) {
   var animationSpeed = 300;
 
+  // Restore saved submenu state across page navigations
+  var savedMenu = localStorage.getItem('openSubmenu');
+  if (savedMenu) {
+    $(menu).find('li').each(function () {
+      var $a = $(this).children('a').first();
+      var menuKey = $a.find('.menu-text').text().trim() || $a.text().trim();
+      if (menuKey === savedMenu) {
+        var $sub = $a.next('.treeview-menu');
+        if ($sub.length) {
+          $sub.show().addClass('menu-open');
+          $(this).addClass('active');
+        }
+      }
+    });
+  }
+
   $(menu).on("click", "li a", function (e) {
     var $this = $(this);
     var checkElement = $this.next();
@@ -10,6 +26,7 @@ $.sidebarMenu = function (menu) {
         checkElement.removeClass("menu-open");
       });
       checkElement.parent("li").removeClass("active");
+      localStorage.removeItem('openSubmenu');
     }
 
     //If the menu is not visible
@@ -33,6 +50,9 @@ $.sidebarMenu = function (menu) {
         parent.find("li.active").removeClass("active");
         parent_li.addClass("active");
       });
+
+      // Save which submenu was opened
+      localStorage.setItem('openSubmenu', $this.find('.menu-text').text().trim() || $this.text().trim());
     }
     //if this isn't a link, prevent the page from being redirected
     if (checkElement.is(".treeview-menu")) {
@@ -44,11 +64,6 @@ $.sidebarMenu($(".sidebar-menu"));
 
 // Custom Sidebar JS
 jQuery(function ($) {
-  // Restore sidebar state from last visit
-  if (localStorage.getItem('sidebarToggled') === 'true') {
-    $(".page-wrapper").addClass("toggled");
-  }
-
   //toggle sidebar
   $(".toggle-sidebar").on("click", function () {
     $(".page-wrapper").toggleClass("toggled");
