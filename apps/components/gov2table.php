@@ -22,14 +22,14 @@ class gov2table {
     function count ($vars) {
         global $self,$doc;
         $data=$self->count();
-		$response=$doc->responseAjax($data);
+		$response=$doc->responseGet($data);
         return $response; 
     }
 	
     function table ($vars) {
         global $self,$doc;
         $data=$self->browse($vars['scroll']);
-		$response=$doc->responseAjax($data);
+		$response=$doc->responseGet($data);
         return $response; 
     }
 }
