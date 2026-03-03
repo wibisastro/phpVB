@@ -36,6 +36,6 @@ class gov2formfield {
 	
 	function fields ($vars="") {
         global $doc;
-        return $this->fields;
+        return $doc->responseGet($this->fields);
     }
 }

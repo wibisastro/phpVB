@@ -39,8 +39,8 @@ class gov2formfield extends \Gov2lib\document {
     } 
     
 	function demo () {
-        $GLOBALS['vueData']['action']='/gov2formfield';
-        $GLOBALS['vueData']['fieldurl']='/gov2formfield/fields';
+        $GLOBALS['vueData']['action']='/components/gov2formfield';
+        $GLOBALS['vueData']['fieldurl']='/components/gov2formfield/fields';
 	}
     
     function checkRequired ($data,$fields) {
