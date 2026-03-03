@@ -48,12 +48,6 @@
 
           {% if className != 'index' %}
           <div class="px-3 mb-2">
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item"><a href="https://{{ _SERVER['SERVER_NAME'] }}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ pageTitle }}</li>
-              </ol>
-            </nav>
             {% block pagetitle %} {% endblock %}
           </div>
           {% endif %}

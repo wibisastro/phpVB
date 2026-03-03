@@ -1,6 +1,6 @@
 <template>
 <div>
-<div class="card" v-show="isOpen" id="myForm">
+<div class="card" v-show="isOpen" id="myForm" style="width: 32ch">
   <div class="card-header d-flex justify-content-between align-items-center">
     Form
     <button type="button" class="btn-close" @click="isOpen=false"></button>

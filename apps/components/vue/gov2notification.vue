@@ -38,59 +38,47 @@ module.exports = {
         loadingDone () {
             this.isLoading=false;
         },
-        openNotif: function(data) { //console.log(data);  
-            let callback = ['infoSnackbar','toggleForm','resetButton','confirmClose'];         
+        toAlertClass: function(cls) {
+            const map = {
+                'is-success': 'alert-success',
+                'is-danger':  'alert-danger',
+                'is-warning': 'alert-warning',
+                'is-info':    'alert-info',
+            };
+            return map[cls] || cls || 'alert-info';
+        },
+        showAlert: function(data, autoDismiss) {
+            this.isNotif = true;
+            this.notifText = data['notification'];
+            this.notifClass = this.toAlertClass(data['class']);
+            if (autoDismiss) {
+                setTimeout(() => { this.isNotif = false; }, 5000);
+            }
+        },
+        openNotif: function(data) {
+            let snackbarCallbacks = ['infoSnackbar','openSnackbar','toggleForm','resetButton','confirmClose'];
             if (data['callback']) {
-                if (callback.includes(data['callback'])) {
-                    this.infoSnackbar(data);
-                } else if (data['callback']=='openSnackbar') {
-                    this.openSnackbar(data);
-                } else if (data['callback']=='errorSnackbar') {
-                    this.errorSnackbar(data);
-                } else if (data['callback']=='openErr') {
-                    this.isNotif=true;
-                    this.notifText=data['notification'];
-                    this.notifClass=data['class'];    
+                if (snackbarCallbacks.includes(data['callback'])) {
+                    this.showAlert(data, true);
+                } else if (data['callback'] == 'openSnackbar') {
+                    this.showAlert(data, true);
+                } else if (data['callback'] == 'errorSnackbar') {
+                    this.showAlert(data, false);
+                } else if (data['callback'] == 'openErr') {
+                    this.showAlert(data, false);
                 }
             } else {
-                this.isNotif=true;
-                this.notifText=data['notification'];
-                this.notifClass=data['class'];    
+                this.showAlert(data, false);
             }
-            
         },
         infoSnackbar: function(data) {
-            this.$snackbar.open({
-                duration: 5000,
-                message: data['notification'],
-                type: data['class'],
-                position: 'is-bottom-right',
-                actionText: 'Dismiss'
-            })
+            this.showAlert(data, true);
         },
         openSnackbar: function(data) {
-            this.$snackbar.open({
-                duration: 5000,
-                message: data['notification'],
-                type: data['class'],
-                position: 'is-bottom-right',
-                actionText: 'Dismiss',
-                /*
-                actionText: 'Create Session',
-                onAction: () => {
-                    eventBus.$emit('openCreateSession',data['server'])
-                }
-                */
-            })
+            this.showAlert(data, true);
         },
         errorSnackbar: function(data) {
-            this.$snackbar.open({
-                duration: 5000,
-                message: data['notification'],
-                type: data['class'],
-                position: 'is-bottom-right',
-                actionText: 'OK'
-            })
+            this.showAlert(data, false);
         },
         
     },
