@@ -6,6 +6,9 @@
     <button type="button" class="btn-close" @click="isOpen=false"></button>
   </div>
   <div class="card-body">
+      <div class="alert alert-warning py-2 px-3 mb-2" v-if="warningMessage">
+        <small>{{ warningMessage }}</small>
+      </div>
       <form @submit.prevent="onSubmit" @keydown="form.errors.clear($event.target.name)">
         <div class="form-group row"
              v-for="(val, key) in fields"
@@ -152,7 +155,8 @@ module.exports = {
             },
             selected: [],
             customButton:[],
-            hideButton:false
+            hideButton:false,
+            warningMessage: ''
         }
     },
     methods: {
@@ -170,9 +174,10 @@ module.exports = {
             this.isOpen = !this.isOpen;
             if (this.customButton.length==0) {
                 this.form['cmd'] = 'add';
-                this.submit = 'Add';   
+                this.submit = 'Add';
             }
             this.form.reset();
+            this.warningMessage = '';
         },
         onSubmit: function () { //console.log(this.action);
             this.form.submit('post',this.action)
@@ -186,13 +191,13 @@ module.exports = {
             location.reload();  
         },
         formSuccess: function (data) {
-            //console.log(data);
+            this.warningMessage = '';
             eventBus.$emit('refreshData',data['parent_id']);
             eventBus.$emit('openNotif',data);
             if (data['callback']) {this[data['callback']](data);}
         },
         formFail: function (data) {
-            console.log(data);
+            this.warningMessage = data['notification'] || '';
             eventBus.$emit('openNotif',data);
             if (data['callback']) {this[data['callback']]();}
         },
