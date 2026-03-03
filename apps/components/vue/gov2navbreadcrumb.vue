@@ -1,10 +1,11 @@
 <template>
-<nav class="breadcrumb has-arrow-separator" aria-label="breadcrumbs">
-    <ul>
-        <li v-for="path in pathData" :class="{ 'is-active': isActive }">
-            <a :href="path['url']" v-text="path['caption']"></a>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li v-for="(path, index) in pathData" class="breadcrumb-item" :class="{ 'active': index === pathData.length - 1 }">
+            <a v-if="index < pathData.length - 1" :href="path['url']" v-text="path['caption']"></a>
+            <span v-else v-text="path['caption']"></span>
         </li>
-    </ul>
+    </ol>
 </nav>
 </template>
 
