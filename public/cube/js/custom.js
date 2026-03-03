@@ -44,9 +44,15 @@ $.sidebarMenu($(".sidebar-menu"));
 
 // Custom Sidebar JS
 jQuery(function ($) {
+  // Restore sidebar state from last visit
+  if (localStorage.getItem('sidebarToggled') === 'true') {
+    $(".page-wrapper").addClass("toggled");
+  }
+
   //toggle sidebar
   $(".toggle-sidebar").on("click", function () {
     $(".page-wrapper").toggleClass("toggled");
+    localStorage.setItem('sidebarToggled', $(".page-wrapper").hasClass("toggled") ? 'true' : 'false');
   });
 
   // Pin sidebar on click

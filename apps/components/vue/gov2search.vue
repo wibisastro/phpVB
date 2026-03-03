@@ -1,5 +1,5 @@
 <template>
-<div class="input-group">
+<div class="input-group" style="width: 32ch">
     <input class="form-control" type="text" placeholder="Search..." v-model="searchQuery" @keyup="setQuery">
 </div>
 </template>

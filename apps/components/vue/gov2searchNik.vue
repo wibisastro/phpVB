@@ -1,5 +1,5 @@
 <template>
-<div class='card card-body'>
+<div class='card card-body' style="width: fit-content">
     <div class="input-group">
         <input class="form-control" type="text" placeholder="Masukkan NIK" v-model="nik">
         <a class="btn btn-info" @click="submitSearch">
