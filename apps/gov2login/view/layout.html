@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
     {% block head %}
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
         <meta name="author" content="Wibisono Sastrodiwiryo">
      {% endblock %}
     </head>
 <body>
 <div id="app">
-    <section class="section">
+    <div class="py-4">
         <div class="container">
-            <div class="columns is-centered">
-              <div class="column">
+            <div class="row justify-content-center">
+              <div class="col">
                     {% block content %} {% endblock %}
               </div>
             </div>
         </div>
-    </section>
+    </div>
 </div>
-    
+
 <script type="text/javascript">
   new Vue({
 {% block js %}
@@ -36,7 +36,7 @@
   });
 </script>
 {% block externalJS %}
-    
+
 {% endblock %}
 <script>
 iFrameResize({

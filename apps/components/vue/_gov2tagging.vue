@@ -1,7 +1,7 @@
 <template>
 <div>
     <b-dropdown :class="{ 'is-active' : isActive}" class="is-bottom-left">
-        <button class="button is-primary" slot="trigger" @click="getData()">
+        <button class="btn btn-primary" slot="trigger" @click="getData()">
             <span>Tags</span>
             <b-icon icon="menu-down"></b-icon>
         </button>

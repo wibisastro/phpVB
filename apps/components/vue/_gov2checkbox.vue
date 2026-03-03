@@ -1,7 +1,7 @@
 <template>
-<div class="field has-addons is-grouped">
+<div class="d-flex flex-wrap gap-1">
   <p class="control" v-for="item in tags">
-    <a class="button" @click="setTag(source_id,item['id'])" :class="{ 'is-info': setChecked(source_id,item['id']) }">
+    <a class="btn btn-outline-secondary" @click="setTag(source_id,item['id'])" :class="{ 'btn-info': setChecked(source_id,item['id']) }">
       <span class="icon">
         <i class="fa fa-check"></i>
       </span>

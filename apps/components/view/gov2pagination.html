@@ -1,15 +1,15 @@
-<div class="columns" v-if="isTableActive">
-  <div class="column">
-      <gov2itemperpage :interval="interval"></gov2itemperpage>  
+<div class="row" v-if="isTableActive">
+  <div class="col">
+      <gov2itemperpage :interval="interval"></gov2itemperpage>
     </div>
-    <div class="column">
-      <gov2scroll></gov2scroll> 
+    <div class="col">
+      <gov2scroll></gov2scroll>
     </div>
-          
-  <div class="column is-9">
-      <gov2pagination 
-        instance="{{ className }}" 
-        :records="records" 
+
+  <div class="col-md-9">
+      <gov2pagination
+        instance="{{ className }}"
+        :records="records"
         :scroll-interval="scrollInterval"
         :item-per-page="itemPerPage"></gov2pagination>
     </div>

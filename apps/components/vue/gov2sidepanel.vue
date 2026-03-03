@@ -2,7 +2,7 @@
 <div>
     <div class="quickview" :class="{ 'is-active': isActive }">
       <header class="quickview-header is-primary">
-        <p class="title">Gov2 Cloud: {{ instance }}</p>
+        <p class="h5 fw-semibold">Gov2 Cloud: {{ instance }}</p>
         <span class="delete" data-dismiss="quickview" @click="closeSidePanel()"></span>
       </header>
 
@@ -10,7 +10,7 @@
         <div class="quickview-block">
             <widget :is-horizontal="true" path-url="aktif/breadcrumb" get-url="aktif" instance="aktif" :independent="true" v-if="instance=='Push'"></widget>
             <widget :is-horizontal="true" path-url="pindah/breadcrumb" get-url="pindah" instance="pindah" :independent="true" v-if="instance=='PullReq'"></widget>
-            <table class="table is-striped is-narrow is-hoverable is-fullwidth" v-if="instance=='Push'">
+            <table class="table table-striped table-sm table-hover w-100" v-if="instance=='Push'">
                   <thead>
                     <tr>
                         <th>No</th>
@@ -26,7 +26,7 @@
                     </tr>
                 </tbody>
             </table>
-            <table class="table is-striped is-narrow is-hoverable is-fullwidth" v-if="instance=='PullReq'">
+            <table class="table table-striped table-sm table-hover w-100" v-if="instance=='PullReq'">
                   <thead>
                     <tr>
                         <th>No</th>
@@ -42,7 +42,7 @@
                     </tr>
                 </tbody>
             </table>
-            <table class="table is-striped is-narrow is-hoverable is-fullwidth" v-if="instance=='Pull'">
+            <table class="table table-striped table-sm table-hover w-100" v-if="instance=='Pull'">
                   <thead>
                     <tr>
                         <th>No</th>
@@ -66,12 +66,12 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="columns">
-                <div class="column is-6">
+            <div class="row">
+                <div class="col-md-6">
                     
                 </div>
-                <div class="column is-6">
-                    <a class="button is-block is-warning" @click="onSubmit" v-if="instance=='Push'">
+                <div class="col-md-6">
+                    <a class="btn btn-warning d-block" @click="onSubmit" v-if="instance=='Push'">
                        <b-tooltip is-small label="Pindah memilih akan diberi kode 31">
                         <span class="icon">
                           <i class="fa fa-cut"></i>
@@ -79,7 +79,7 @@
                         <span>Pindahkan Pemilih</span>
                         </b-tooltip>
                     </a>
-                    <a class="button is-block is-warning" @click="onApproved" v-if="instance=='Pull'">
+                    <a class="btn btn-warning d-block" @click="onApproved" v-if="instance=='Pull'">
                        <b-tooltip is-small label="Pindah memilih akan diberi kode 31">
                         <span class="icon">
                           <i class="fa fa-check"></i>
@@ -87,7 +87,7 @@
                         <span>Setujui Tarik Data</span>
                         </b-tooltip>
                     </a>
-                    <a class="button is-block is-warning" @click="onPullRequest" v-if="instance=='PullReq'">
+                    <a class="btn btn-warning d-block" @click="onPullRequest" v-if="instance=='PullReq'">
                        <b-tooltip is-small label="Kirim Permintaan Tarik Data ke Wilayah di atas">
                         <span class="icon">
                           <i class="fa fa-check"></i>
@@ -174,6 +174,6 @@ module.exports = {
 }
 </script>
 
-<style src="/css/bulma-quickview.min.css">
+<style>
 
 </style>

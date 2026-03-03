@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div class="notification" v-if="isNotif" :class="notifClass">
+    <div class="alert" v-if="isNotif" :class="notifClass">
       <button class="delete" @click="isNotif=false"></button>
         <p v-text="notifText"></p>
     </div>

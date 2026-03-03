@@ -52,9 +52,9 @@
             &nbsp;
         </td>
         <td v-if="!readonly">
-            <a class="tag is-warning" @click="edit(entry['id'])">Edit</a>
-            <a class="tag is-danger" @click="del(entry['id'])" v-if="entry['children'] == 0 || !entry['children']">Del</a>
-            <a class="tag is-warning" @click="hasChildren(entry['children'])" v-if="entry['children'] > 0">Del</a>
+            <a class="badge bg-warning text-dark" @click="edit(entry['id'])">Edit</a>
+            <a class="badge bg-danger" @click="del(entry['id'])" v-if="entry['children'] == 0 || !entry['children']">Del</a>
+            <a class="badge bg-warning text-dark" @click="hasChildren(entry['children'])" v-if="entry['children'] > 0">Del</a>
         </td>
         <td v-if="childComponent && childComponent['type'] == 'dropdown'">
             <gov2tagging :post-url="postUrl" :get-url="childComponent['instance']" :source_id="parseInt(entry['id'])" :instance="instance" v-if="showTagging(entry['level'],entry['id'])" :tag-limit="tagLimit" :tags="tags"></gov2tagging>

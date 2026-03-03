@@ -1,21 +1,21 @@
 <template>
-<div class='box'>
-    <div class="field has-addons">
+<div class='card card-body'>
+    <div class="input-group">
       <div class="control">
         <input class="input" type="text" placeholder="Masukkan NIK" v-model="nik">
       </div>
       <div class="control">
-        <a class="button is-info" @click="submitSearch">
+        <a class="btn btn-info" @click="submitSearch">
           Cari Pemilih
         </a>
       </div>
     </div>
-    <div class="notification" v-if="isNotif" :class="notifClass">
+    <div class="alert" v-if="isNotif" :class="notifClass">
       <button class="delete" @click="isNotif=false"></button>
         <p v-text="notifText"></p>
     </div>
     <div v-if="isResult">
-    <table class="table is-striped">
+    <table class="table table-striped">
         <thead><th></th><th></th><th><button class="delete" @click="isResult=false"></button></th></thead>
       <tbody>
         <tr v-for="(val,key) in results">
@@ -93,7 +93,7 @@ module.exports = {
   }
 </script>
 
-<style src="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css"></style>
+<!-- Bulma CSS removed, using Bootstrap via cube theme -->
 
 <style>   
     .hero.is-warning {

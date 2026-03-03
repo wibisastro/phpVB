@@ -2,7 +2,7 @@
 <div v-if="isActive" class="table-container-outer">
 <div class="table-container-fade" v-if="wideTable"></div>
 <div class="table-container" :style="{ width: setWideTable() }">
-  <table class="table table-striped" :class="{ 'is-bordered': isBordered }">
+  <table class="table table-striped" :class="{ 'table-bordered': isBordered }">
     <thead>
       <tr v-if="headers">
         <th v-for="(val,key) in headers" :colspan="val['colspan']"  :rowspan="isHeader(key)">
@@ -64,7 +64,7 @@
       </tr>
     </tfoot>
     <tbody> 
-      <tr v-for="entry in filteredData" :class="{ 'is-selected': checked[entry['id']] }">
+      <tr v-for="entry in filteredData" :class="{ 'table-active': checked[entry['id']] }">
         <td>
             <input
                 type="checkbox"
@@ -76,7 +76,7 @@
             <a v-if="recursive == true" @click="getChildren(entry['id'])">{{ entry[key] }}</a>
             <!--a v-if="showLink(entry['id'])" @click="getChildren(entry['id'])">{{ entry[key] }}</a-->
             <span v-if="recursive == false">{{ entry[key] }}</span>
-            <span v-if="entry['tag'] && entry['tag']['field']==key" class="tag" :class="entry['tag']['color']">{{ entry['tag']['caption'] }}</span> 
+            <span v-if="entry['tag'] && entry['tag']['field']==key" class="badge" :class="entry['tag']['color']">{{ entry['tag']['caption'] }}</span> 
             <span v-for="(tags,dataset) in taggedData" v-if="isTaggedData">
                 <b-taglist>
                     <span v-for="tag in tags" v-if="tagUrl==dataset">
@@ -90,9 +90,9 @@
             &nbsp;
         </td>        
         <td v-if="!readonly">
-            <a class="tag is-warning" @click="edit(entry['id'])">Edit</a>
-            <a class="tag is-danger" @click="del(entry['id'])" v-if="entry['children'] == 0 || !entry['children']">Del</a>
-            <a class="tag is-warning" @click="hasChildren(entry['children'])" v-if="entry['children'] > 0">Del</a>
+            <a class="badge bg-warning text-dark" @click="edit(entry['id'])">Edit</a>
+            <a class="badge bg-danger" @click="del(entry['id'])" v-if="entry['children'] == 0 || !entry['children']">Del</a>
+            <a class="badge bg-warning text-dark" @click="hasChildren(entry['children'])" v-if="entry['children'] > 0">Del</a>
         </td>
         <td v-if="childComponent && childComponent['type'] == 'dropdown'">
             <gov2tagging :post-url="postUrl" :get-url="childComponent['instance']" :source_id="parseInt(entry['id'])" :instance="instance" v-if="showTagging(entry['level'],entry['id'])" :tag-limit="tagLimit" :tags="tags" :tag-caption="tagCaption"></gov2tagging>

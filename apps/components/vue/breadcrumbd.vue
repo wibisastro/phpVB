@@ -1,13 +1,13 @@
 <template>
-<div :class="{'box' : isHorizontal}" v-if="isActive">
-    <div class="field" v-for="path in pathData" :class="{'is-horizontal' : isHorizontal}">
-      <div :class="{'field-label' : isHorizontal}">
+<div :class="{'card card-body' : isHorizontal}" v-if="isActive">
+    <div class="field" v-for="path in pathData" :class="{'row' : isHorizontal}">
+      <div :class="{'col-auto' : isHorizontal}">
         <label class="label">{{ setLevel(path['level_label']) }}</label>
       </div>
-      <div class="field-body">
+      <div class="col">
         <div class="field">
           <div class="control">
-            <a :class="{'button is-light' : isHorizontal}" @click="getBack(path['id'])" v-text="path['caption']"></a>
+            <a :class="{'btn btn-light' : isHorizontal}" @click="getBack(path['id'])" v-text="path['caption']"></a>
           </div>
         </div>
       </div>

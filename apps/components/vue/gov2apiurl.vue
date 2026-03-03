@@ -1,6 +1,6 @@
 <template>
-<div class="notification is-info">
-    <a :href="host+url" target="_blank" class="button is-info" v-if="url!='Invalid'">{{ host }}{{ url }}</a>
+<div class="alert alert-info">
+    <a :href="host+url" target="_blank" class="btn btn-info" v-if="url!='Invalid'">{{ host }}{{ url }}</a>
     <span v-if="url=='Invalid'">Klik link di bawah ini untuk tampilkan URL API</span>
 </div>
 </template>

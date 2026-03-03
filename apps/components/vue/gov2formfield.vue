@@ -1,20 +1,20 @@
 <template>
 <div>
-<article class="is-info" v-show="isOpen" id="myForm">
+<article class="alert alert-info" v-show="isOpen" id="myForm">
   <div class="message-header">
     Form
     <button class="delete" @click="isOpen=false"></button>
   </div>
   <div class="message-body">
       <form @submit.prevent="onSubmit" @keydown="form.errors.clear($event.target.name)">
-        <div class="field is-horizontal" 
+        <div class="form-group row" 
              v-for="(val, key) in fields" 
              v-if="val.name != 'cmd'">
-          <div class="field-label is-normal">
-              <label class="label" v-if="val.type != 'checkbox' && val.type != 'hidden'">{{ val.label }}</label>
+          <div class="col-auto">
+              <label class="col-form-label fw-semibold" v-if="val.type != 'checkbox' && val.type != 'hidden'">{{ val.label }}</label>
               <input class="input" type="checkbox" :placeholder="val.placeholder" v-model="form[val.name]" :disabled="val.disabled" v-if="val.type == 'checkbox'">
           </div>
-          <div class="field-body">
+          <div class="col">
             <div class="field">
               <div class="control has-icons-right">
                 <input 
@@ -61,25 +61,25 @@
                             v-model="form[val.name]"
                             v-if="val.type == 'textarea'"></textarea>
                   <label 
-                         class="label" 
+                         class="col-form-label fw-semibold" 
                          v-if="val.type == 'checkbox'">{{ val.label }}</label>
                     <span 
-                          class="icon is-small is-right" 
+                          class="text-warning" 
                           v-if="val.required">
                       <i class="fa fa-warning"></i>
                     </span>
               </div>
-              <p class="help is-danger" 
+              <p class="text-danger small" 
                  v-text="form.errors.get(val.name)" 
                  v-if="form.errors.has(val.name)"></p>
             </div>
           </div>
         </div>
-        <div class="field is-horizontal" v-if="!hideButton">
-          <div class="field-body">
-            <div class="field is-grouped is-grouped-right">
+        <div class="form-group row" v-if="!hideButton">
+          <div class="col">
+            <div class="d-flex justify-content-end gap-2">
               <div class="control">
-                <button class="button is-primary" :disabled="form.errors.any()">
+                <button class="btn btn-primary" :disabled="form.errors.any()">
                   {{ submit }}
                 </button>
               </div>
@@ -89,24 +89,24 @@
     </form>
     </div>
 </article>
-  <div class="modal" :class="{ 'is-active': isConfirm }">
+  <div class="modal" :class="{ 'show d-block': isConfirm }">
     <form @submit.prevent="onSubmit">
       <div class="modal-background" @click="isConfirm=false"></div>
-      <div class="modal-content box">
+      <div class="modal-content card card-body">
           <span v-if="isDel">
             Data dengan nomor ID "{{ delData }}" akan dihapus
           </span>
           <span v-if="isHasChildren">
             Data ini tidak bisa dihapus karena memiliki sub-data sebanyak {{ childrenData }} baris.
           </span>
-          <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field is-grouped is-grouped-right">
+          <div class="form-group row">
+          <div class="col">
+            <div class="d-flex justify-content-end gap-2">
               <div class="control">
-                <button class="button is-primary" @click="delProceed" v-if="isDel">
+                <button class="btn btn-primary" @click="delProceed" v-if="isDel">
                   Delete
                 </button>
-                <a class="button is-light" @click="isConfirm=false">Cancel</a>
+                <a class="btn btn-light" @click="isConfirm=false">Cancel</a>
               </div>
             </div>
           </div>

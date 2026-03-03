@@ -1,6 +1,6 @@
 <template>
 <div class="control">
-    <a class="button is-block is-primary" @click="toggleClick" :class="{ 'is-warning': isPressed, 'is-large': buttonSize=='large' }" >
+    <a class="btn btn-primary d-block" @click="toggleClick" :class="{ 'btn-warning': isPressed, 'btn-lg': buttonSize=='large' }" >
         <span class="icon">
           <i :class="{'fa fa-minus': isPressed}" class="fa fa-plus"></i>
         </span>

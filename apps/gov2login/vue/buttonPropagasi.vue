@@ -1,6 +1,6 @@
 <template>
 <div class="control">
-    <a class="button is-block is-info" @click="onSubmit" :disabled="isEmpty">
+    <a class="btn btn-info d-block" @click="onSubmit" :disabled="isEmpty">
         <span class="icon">
           <i class="fa fa-check"></i>
         </span>
