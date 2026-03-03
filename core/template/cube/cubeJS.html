@@ -10,13 +10,22 @@
 {% endif %}
 {% if vueMethods %}
     methods: {
+        togelNav: function(data) {
+            this.isNavToggle = !this.isNavToggle;
+        },
         {{ vueMethods|raw }}
     },
 {% endif %}
 {% if vueCreated %}
     created: function () {
+        eventBus.$on('togelParent', this.togelNav);
         {{ vueCreated|raw }}
     },
+{% endif %}
+{% if vueWatch %}
+    watch: {
+        {{ vueWatch|raw }}
+    }
 {% endif %}
 {% if vueMounted %}
 {% endif %}

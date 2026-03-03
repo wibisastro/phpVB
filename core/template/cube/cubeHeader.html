@@ -1,47 +1,75 @@
-<div class="container">
-	<a href="/bootstrap" id="logo" class="navbar-brand">
-		<img src="{{ webroot }}/images/logo-krisna.png" alt="" class="normal-logo logo-white"/>
-		<img src="{{ webroot }}/images/logo-krisna.png" alt="" class="normal-logo logo-black"/>
-		<img src="{{ webroot }}/images/logo-krisna.png" alt="" class="small-logo hidden-xs hidden-sm hidden"/>
-	</a>
-	
-	<div class="clearfix">
-		<button class="navbar-toggle" data-target=".navbar-ex1-collapse" data-toggle="collapse" type="button">
-			<span class="sr-only">Toggle navigation</span>
-			<span class="fa fa-bars"></span>
-		</button>
-
-		<div class="nav-no-collapse navbar-left pull-left hidden-sm hidden-xs">
-			<ul class="nav navbar-nav pull-left">
-				<li>
-					<a class="btn" id="make-small-nav">
-						<i class="fa fa-bars"></i>
-					</a>
-				</li>
-			</ul>
-		</div>
-		
-		<div class="nav-no-collapse navbar-left pull-left hidden-sm hidden-xs">
-			<ul class="nav navbar-nav pull-left">
-
-			</ul>
-		</div>
-		
-		<div class="nav-no-collapse pull-right" id="header-nav">
-			<ul class="nav navbar-nav pull-right">
-				<li class="dropdown profile-dropdown" id="profile-dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						<img src="{{ webroot }}/images/user.png" alt=""/>
-						<span class="hidden-xs">KRISNA</span> <b class="caret"></b>
-					</a>
-					<ul class="dropdown-menu dropdown-menu-right">
-						<li><a href="user-profile.html"><i class="fa fa-user"></i>Profile</a></li>
-						<li><a href="#"><i class="fa fa-cog"></i>Settings</a></li>
-						<li><a href="#"><i class="fa fa-envelope-o"></i>Messages</a></li>
-						<li><a href="#"><i class="fa fa-power-off"></i>Logout</a></li>
-					</ul>
-				</li>
-			</ul>
-		</div>
-	</div>
+<!-- Toggle buttons starts -->
+<div class="d-flex">
+  <button type="button" class="toggle-sidebar">
+    <i class="bi bi-list lh-1"></i>
+  </button>
+  <button type="button" class="pin-sidebar">
+    <i class="bi bi-list lh-1"></i>
+  </button>
 </div>
+<!-- Toggle buttons ends -->
+
+<!-- App brand sm starts -->
+<div class="app-brand-sm d-lg-none d-flex">
+  <a href="https://{{ _SERVER['SERVER_NAME'] }}">
+    <img src="{{ webroot }}/cube/images/logo-sm.svg" class="logo" alt="{{ pageTitle }}">
+  </a>
+</div>
+<!-- App brand sm ends -->
+
+<!-- Page title starts -->
+<h5 class="m-0 ms-2 fw-semibold">{{ pageTitle }}</h5>
+<!-- Page title ends -->
+
+<!-- App header actions starts -->
+<div class="header-actions">
+
+  <!-- Search container start -->
+  <div class="search-container d-xl-block d-none me-3">
+    <input type="text" class="form-control" id="searchData" placeholder="Search" />
+    <i class="bi bi-search"></i>
+  </div>
+  <!-- Search container ends -->
+
+  <!-- Header action bar starts -->
+  <div class="header-actions-container rounded-4 d-flex align-items-center">
+
+    <!-- User settings start -->
+    <div class="dropdown">
+    {% if _SESSION['account_id'] %}
+      <a id="userSettings" class="dropdown-toggle user-settings" href="#!" role="button"
+        data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="me-2 text-truncate d-lg-block d-none">
+          {{ _SESSION['fullname'] }}
+        </span>
+        <div class="header-actions-avatar fw-bold bg-primary-subtle text-primary">
+          {{ _SESSION['fullname']|first|upper }}
+        </div>
+      </a>
+      <div class="dropdown-menu dropdown-menu-end shadow-lg">
+        <a class="dropdown-item d-flex align-items-center" href="/gov2login">
+          <i class="bi bi-person fs-5 me-2"></i>Profile
+        </a>
+        <a class="dropdown-item d-flex align-items-center" href="#">
+          <i class="bi bi-gear fs-5 me-2"></i>Settings
+        </a>
+        <div class="mx-3 my-2 d-grid">
+          <a href="/gov2login.php?cmd=logout" class="btn btn-danger">Logout</a>
+        </div>
+      </div>
+    {% else %}
+      <a class="btn btn-sm btn-outline-primary me-2" href="/gov2login/signup">
+        <i class="bi bi-person-plus me-1"></i>Signup
+      </a>
+      <a class="btn btn-sm btn-primary" href="/gov2login">
+        <i class="bi bi-box-arrow-in-right me-1"></i>Login
+      </a>
+    {% endif %}
+    </div>
+    <!-- User settings end -->
+
+  </div>
+  <!-- Header action bar ends -->
+
+</div>
+<!-- App header actions ends -->

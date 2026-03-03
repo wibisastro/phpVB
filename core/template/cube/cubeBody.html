@@ -13,6 +13,10 @@
 	{% include('cubePageTitle.html') %}
 {% endblock %}
 
+{% block notification %}
+	{% include('cubeNotification.html') %}
+{% endblock %}
+
 {% block sidebar %}
     {% for item in sidebars %}
        {% include[item,'cubeMissingFile.html'] %}
@@ -21,10 +25,9 @@
 
 {% block content %}
     {% for item in contents %}
-       {% include[item,'bulmaMissingFile.html'] %}
+       {% include[item,'cubeMissingFile.html'] %}
 	{% endfor %}
 {% endblock %}
-
 
 {% block footer %}
 	{% include('cubeFooter.html') %}
@@ -32,10 +35,9 @@
 
 {% block js %}
 	{{ parent() }}
-	{% include('cubeJS.html') %}
+	{% include('vueJS.html') %}
 {% endblock %}
 
-{% block cubeJQueryJS %}
-	{{ parent() }}
-	{% include('cubeJQueryJS.html') %}
+{% block externalJS %}
+	{% include('externalJS.html') %}
 {% endblock %}

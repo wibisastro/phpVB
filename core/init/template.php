@@ -24,7 +24,7 @@ try {
     if (file_exists($self->templateDir."/body.html")) {
         $doc->baseBody="@$pageID/body.html";
     } else {
-        $doc->baseBody="bulmaBody.html";
+        $doc->baseBody="cubeBody.html";
     }
 
     if ($doc->error) {
@@ -44,9 +44,9 @@ try {
 
     }
 
-    $templates=array(__DIR__.'/../template/bulma',
+    $templates=array(__DIR__.'/../template/cube',
                      __DIR__.'/../template/bootstrap',
-                     __DIR__.'/../template/cube',
+                     __DIR__.'/../template/bulma',
                      __DIR__.'/../template/krisna',
                      __DIR__.'/../template/general');
 
