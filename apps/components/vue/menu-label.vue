@@ -1,5 +1,5 @@
 <template>
-  <p class="menu-label">
+  <p class="text-uppercase fw-bold small text-muted px-3 mb-1">
       <slot>{{ menuLabel }}</slot>
   </p>
 </template>

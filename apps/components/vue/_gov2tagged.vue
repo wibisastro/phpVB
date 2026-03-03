@@ -1,12 +1,12 @@
 <template>
 <div>
-    <b-tag v-if="taggedData != 'empty'" rounded
-        :type="tagCloseable ? 'is-info' : 'is-warning'"
-        :closable="tagCloseable"
-        @close="unSetTag(taggedData['id'],taggedData['source_id'])">
-        <b-tooltip :label="setDesc(taggedData)" multilined v-text="setLabel(taggedData[caption])">
-        </b-tooltip>
-    </b-tag>
+    <span v-if="taggedData != 'empty'"
+        class="badge rounded-pill"
+        :class="tagCloseable ? 'bg-info' : 'bg-warning text-dark'"
+        :title="setDesc(taggedData)">
+        {{ setLabel(taggedData[caption]) }}
+        <button type="button" class="btn-close btn-close-white ms-1" style="font-size:0.5em;" v-if="tagCloseable" @click="unSetTag(taggedData['id'],taggedData['source_id'])"></button>
+    </span>
 </div>
 </template>
 

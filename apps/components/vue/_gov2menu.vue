@@ -1,18 +1,18 @@
 <template>
-<aside class="menu">
+<nav>
     <div class="menuspace" v-for="mainmenu in menus">
         <div class="menuspace" v-for="menu in mainmenu['menu']">
-            <p class="menu-label">
+            <p class="text-uppercase fw-bold small text-muted px-3 mb-1">
                 {{ menu['caption'] }}
             </p>
-             <ul class="menu-list">
-                <li v-for="item in menu['menu']">
-                    <a href="{{ webroot+item['url'] }}">{{ item['caption'] }}</a>
+            <ul class="nav flex-column mb-2">
+                <li class="nav-item" v-for="item in menu['menu']">
+                    <a class="nav-link" href="{{ webroot+item['url'] }}">{{ item['caption'] }}</a>
                 </li>
             </ul>
         </div>
     </div>
-</aside> 
+</nav>
 </template>
 
 <script>

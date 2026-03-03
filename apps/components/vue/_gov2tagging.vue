@@ -1,15 +1,18 @@
 <template>
 <div>
-    <b-dropdown :class="{ 'is-active' : isActive}" class="is-bottom-left">
-        <button class="btn btn-primary" slot="trigger" @click="getData()">
+    <div class="dropdown" :class="{ 'show': isActive }">
+        <button class="btn btn-primary dropdown-toggle" type="button" @click="getData()">
             <span>Tags</span>
-            <b-icon icon="menu-down"></b-icon>
         </button>
-
-        <b-dropdown-item v-for="(item,key) in gridData" :key="key"  @click="setTag('setTag',source_id,item['id'])">
-            {{ item[tagCaption] }}
-        </b-dropdown-item>
-    </b-dropdown>
+        <ul class="dropdown-menu" :class="{ 'show': isActive }">
+            <li v-for="(item,key) in gridData" :key="key">
+                <a class="dropdown-item" @click="setTag('setTag',source_id,item['id'])">
+                    {{ item[tagCaption] }}
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
 </template>
 
 <script>

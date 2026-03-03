@@ -1,7 +1,7 @@
 <template>
    <div>
     <div v-if="rows > 1 && !noscroll">
-        <span class="button">{{ rows }} of total &nbsp;
+        <span class="badge bg-secondary">{{ rows }} of total &nbsp;
             <span v-if="totalRows > 0"> {{ totalRows }} </span>
             <span v-if="totalRows == 0"> 
                 <img src="../../images/working.gif"> 
@@ -14,7 +14,7 @@
          </span>
     </div>
     <div v-if="rows > 1 && noscroll">
-        <span class="button">{{ rows }} row(s)</span>
+        <span class="badge bg-secondary">{{ rows }} row(s)</span>
     </div>
  </div>
 </template>

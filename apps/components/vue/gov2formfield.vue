@@ -1,120 +1,106 @@
 <template>
 <div>
-<article class="alert alert-info" v-show="isOpen" id="myForm">
-  <div class="message-header">
+<div class="card" v-show="isOpen" id="myForm">
+  <div class="card-header d-flex justify-content-between align-items-center">
     Form
-    <button class="delete" @click="isOpen=false"></button>
+    <button type="button" class="btn-close" @click="isOpen=false"></button>
   </div>
-  <div class="message-body">
+  <div class="card-body">
       <form @submit.prevent="onSubmit" @keydown="form.errors.clear($event.target.name)">
-        <div class="form-group row" 
-             v-for="(val, key) in fields" 
+        <div class="form-group row"
+             v-for="(val, key) in fields"
              v-if="val.name != 'cmd'">
           <div class="col-auto">
               <label class="col-form-label fw-semibold" v-if="val.type != 'checkbox' && val.type != 'hidden'">{{ val.label }}</label>
-              <input class="input" type="checkbox" :placeholder="val.placeholder" v-model="form[val.name]" :disabled="val.disabled" v-if="val.type == 'checkbox'">
+              <input class="form-check-input" type="checkbox" :placeholder="val.placeholder" v-model="form[val.name]" :disabled="val.disabled" v-if="val.type == 'checkbox'">
           </div>
           <div class="col">
-            <div class="field">
-              <div class="control has-icons-right">
-                <input 
-                       class="input" 
-                       type="text" 
-                       :placeholder="val.placeholder" 
-                       v-model="form[val.name]" 
-                       :disabled="val.disabled" 
-                       v-if="!val.type">
-                <div class="select" 
-                     v-if="val.type == 'select' && !val.multiple">
-                    <select 
-                          v-model="form[val.name]" 
-                          :disabled="val.disabled" @change="form.errors.clear($event.target.name)">
-                    <option value="" disabled>Select dropdown</option>
-                    <option 
-                            :disabled="isDisabled[key2]" v-for="(val2, key2) in val.options" 
-                            :value="key2">{{ val2 }}</option>
-                    </select>
-                </div>
-                <b-field v-if="val.type == 'select' && val.multiple">
-                        <b-select
-                            multiple
-                            native-size="8"
-                            v-model="form[val.name]">
-                            <option 
-                            :disabled="isDisabled[key2]" v-for="(val2, key2) in val.options" 
-                            :value="key2">{{ val2 }}</option>
-                        </b-select>
-                    </b-field>
-                  <input 
-                         class="input" 
-                         type="password" 
-                         :placeholder="val.placeholder" 
-                         v-model="form[val.name]" 
-                         :disabled="val.disabled" 
-                         v-if="val.type == 'password'">
-                  <gov2component v-model="form[val.name]"
-                                 v-if="val.type == 'gov2component'" 
-                                 :component-name="val.name"></gov2component>
-                  <textarea :disabled="val.disabled" 
-                            class="textarea" 
-                            :placeholder="val.placeholder" 
-                            v-model="form[val.name]"
-                            v-if="val.type == 'textarea'"></textarea>
-                  <label 
-                         class="col-form-label fw-semibold" 
-                         v-if="val.type == 'checkbox'">{{ val.label }}</label>
-                    <span 
-                          class="text-warning" 
-                          v-if="val.required">
-                      <i class="fa fa-warning"></i>
-                    </span>
-              </div>
-              <p class="text-danger small" 
-                 v-text="form.errors.get(val.name)" 
-                 v-if="form.errors.has(val.name)"></p>
+            <div>
+              <input
+                     class="form-control"
+                     type="text"
+                     :placeholder="val.placeholder"
+                     v-model="form[val.name]"
+                     :disabled="val.disabled"
+                     v-if="!val.type">
+              <select class="form-select"
+                     v-if="val.type == 'select' && !val.multiple"
+                     v-model="form[val.name]"
+                     :disabled="val.disabled" @change="form.errors.clear($event.target.name)">
+                  <option value="" disabled>Select dropdown</option>
+                  <option
+                          :disabled="isDisabled[key2]" v-for="(val2, key2) in val.options"
+                          :value="key2">{{ val2 }}</option>
+              </select>
+              <select class="form-select"
+                      multiple
+                      size="8"
+                      v-if="val.type == 'select' && val.multiple"
+                      v-model="form[val.name]">
+                  <option
+                      :disabled="isDisabled[key2]" v-for="(val2, key2) in val.options"
+                      :value="key2">{{ val2 }}</option>
+              </select>
+              <input
+                     class="form-control"
+                     type="password"
+                     :placeholder="val.placeholder"
+                     v-model="form[val.name]"
+                     :disabled="val.disabled"
+                     v-if="val.type == 'password'">
+              <gov2component v-model="form[val.name]"
+                             v-if="val.type == 'gov2component'"
+                             :component-name="val.name"></gov2component>
+              <textarea :disabled="val.disabled"
+                        class="form-control"
+                        :placeholder="val.placeholder"
+                        v-model="form[val.name]"
+                        v-if="val.type == 'textarea'"></textarea>
+              <label
+                     class="col-form-label fw-semibold"
+                     v-if="val.type == 'checkbox'">{{ val.label }}</label>
+              <span class="text-warning" v-if="val.required">
+                  <i class="fa fa-warning"></i>
+              </span>
             </div>
+            <p class="text-danger small"
+               v-text="form.errors.get(val.name)"
+               v-if="form.errors.has(val.name)"></p>
           </div>
         </div>
         <div class="form-group row" v-if="!hideButton">
           <div class="col">
             <div class="d-flex justify-content-end gap-2">
-              <div class="control">
-                <button class="btn btn-primary" :disabled="form.errors.any()">
-                  {{ submit }}
-                </button>
-              </div>
+              <button class="btn btn-primary" :disabled="form.errors.any()">
+                {{ submit }}
+              </button>
             </div>
           </div>
         </div>
     </form>
     </div>
-</article>
+</div>
   <div class="modal" :class="{ 'show d-block': isConfirm }">
-    <form @submit.prevent="onSubmit">
-      <div class="modal-background" @click="isConfirm=false"></div>
-      <div class="modal-content card card-body">
-          <span v-if="isDel">
-            Data dengan nomor ID "{{ delData }}" akan dihapus
-          </span>
-          <span v-if="isHasChildren">
-            Data ini tidak bisa dihapus karena memiliki sub-data sebanyak {{ childrenData }} baris.
-          </span>
-          <div class="form-group row">
-          <div class="col">
-            <div class="d-flex justify-content-end gap-2">
-              <div class="control">
-                <button class="btn btn-primary" @click="delProceed" v-if="isDel">
-                  Delete
-                </button>
-                <a class="btn btn-light" @click="isConfirm=false">Cancel</a>
-              </div>
-            </div>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form @submit.prevent="onSubmit">
+          <div class="modal-body">
+              <span v-if="isDel">
+                Data dengan nomor ID "{{ delData }}" akan dihapus
+              </span>
+              <span v-if="isHasChildren">
+                Data ini tidak bisa dihapus karena memiliki sub-data sebanyak {{ childrenData }} baris.
+              </span>
           </div>
-        </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" @click="delProceed" v-if="isDel">Delete</button>
+            <a class="btn btn-light" @click="isConfirm=false">Cancel</a>
+          </div>
+        </form>
       </div>
-    <button class="modal-close" aria-label="close" @click="isConfirm=false"></button>
-    </form>
     </div>
+    <div class="modal-backdrop fade show" @click="isConfirm=false"></div>
+  </div>
 </div>
 </template>
 

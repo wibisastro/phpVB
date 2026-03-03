@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="alert" v-if="isNotif" :class="notifClass">
-      <button class="delete" @click="isNotif=false"></button>
+      <button type="button" class="btn-close float-end" @click="isNotif=false"></button>
         <p v-text="notifText"></p>
     </div>
     <gov2session></gov2session>

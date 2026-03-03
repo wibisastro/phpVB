@@ -78,14 +78,14 @@
             <span v-if="recursive == false">{{ entry[key] }}</span>
             <span v-if="entry['tag'] && entry['tag']['field']==key" class="badge" :class="entry['tag']['color']">{{ entry['tag']['caption'] }}</span> 
             <span v-for="(tags,dataset) in taggedData" v-if="isTaggedData">
-                <b-taglist>
+                <span class="d-flex flex-wrap gap-1">
                     <span v-for="tag in tags" v-if="tagUrl==dataset">
                         <gov2tagged :source_id="parseInt(entry['id'])" :tagged-data="tag" v-if="tag[instance+'_id'] == entry['id'] && key == dataset" :tag-closeable="tagCloseable" :tag-caption="tagCaption"></gov2tagged>
                     </span>
                     <span v-for="tag in tags" v-if="tagUrl!=dataset">
                         <gov2tagged :source_id="parseInt(entry['id'])" :tagged-data="tag" v-if="tag[instance+'_id'] == entry['id'] && key == dataset" :tag-caption="tagCaption"></gov2tagged>
                     </span>
-                </b-taglist>
+                </span>
             </span>
             &nbsp;
         </td>        

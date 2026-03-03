@@ -1,10 +1,8 @@
 <template>
-    <div class="select">
-      <select v-model="itemPerPage" @change="setItemPerPage()">
+    <select class="form-select form-select-sm w-auto" v-model="itemPerPage" @change="setItemPerPage()">
         <option disabled="disabled">Rows</option>
         <option v-for="item in interval" :value="item">{{ item }}</option>
-      </select>
-    </div>
+    </select>
 </template>
 <script>
 module.exports = {

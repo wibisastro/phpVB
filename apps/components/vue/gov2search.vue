@@ -1,8 +1,6 @@
 <template>
-<div class="field has-addons">
-  <div class="control">
-    <input class="input" type="text" placeholder="Search..." v-model="searchQuery" @keyup="setQuery">
-  </div>
+<div class="input-group">
+    <input class="form-control" type="text" placeholder="Search..." v-model="searchQuery" @keyup="setQuery">
 </div>
 </template>
 <script>

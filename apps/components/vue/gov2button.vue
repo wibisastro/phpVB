@@ -1,12 +1,8 @@
 <template>
-<div class="control">
-    <a class="btn btn-primary d-block" @click="toggleClick" :class="{ 'btn-warning': isPressed, 'btn-lg': buttonSize=='large' }" >
-        <span class="icon">
-          <i :class="{'fa fa-minus': isPressed}" class="fa fa-plus"></i>
-        </span>
-        <span>{{ buttonLabel }}</span>
-    </a>
-</div>
+<a class="btn btn-primary d-block" @click="toggleClick" :class="{ 'btn-warning': isPressed, 'btn-lg': buttonSize=='large' }">
+    <i :class="{'fa fa-minus': isPressed}" class="fa fa-plus"></i>
+    <span>{{ buttonLabel }}</span>
+</a>
 </template>
 
 <script>

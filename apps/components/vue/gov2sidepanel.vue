@@ -1,13 +1,12 @@
 <template>
 <div>
-    <div class="quickview" :class="{ 'is-active': isActive }">
-      <header class="quickview-header is-primary">
-        <p class="h5 fw-semibold">Gov2 Cloud: {{ instance }}</p>
-        <span class="delete" data-dismiss="quickview" @click="closeSidePanel()"></span>
-      </header>
+    <div class="offcanvas offcanvas-end" :class="{ 'show': isActive }" :style="{ visibility: isActive ? 'visible' : 'hidden' }">
+      <div class="offcanvas-header bg-primary text-white">
+        <h5 class="offcanvas-title fw-semibold">Gov2 Cloud: {{ instance }}</h5>
+        <button type="button" class="btn-close btn-close-white" @click="closeSidePanel()"></button>
+      </div>
 
-      <div class="quickview-body">
-        <div class="quickview-block">
+      <div class="offcanvas-body">
             <widget :is-horizontal="true" path-url="aktif/breadcrumb" get-url="aktif" instance="aktif" :independent="true" v-if="instance=='Push'"></widget>
             <widget :is-horizontal="true" path-url="pindah/breadcrumb" get-url="pindah" instance="pindah" :independent="true" v-if="instance=='PullReq'"></widget>
             <table class="table table-striped table-sm table-hover w-100" v-if="instance=='Push'">
@@ -67,43 +66,32 @@
                 </tbody>
             </table>
             <div class="row">
+                <div class="col-md-6"></div>
                 <div class="col-md-6">
-                    
-                </div>
-                <div class="col-md-6">
-                    <a class="btn btn-warning d-block" @click="onSubmit" v-if="instance=='Push'">
-                       <b-tooltip is-small label="Pindah memilih akan diberi kode 31">
-                        <span class="icon">
-                          <i class="fa fa-cut"></i>
-                        </span>
+                    <a class="btn btn-warning d-block" @click="onSubmit" v-if="instance=='Push'"
+                       title="Pindah memilih akan diberi kode 31">
+                        <i class="fa fa-cut"></i>
                         <span>Pindahkan Pemilih</span>
-                        </b-tooltip>
                     </a>
-                    <a class="btn btn-warning d-block" @click="onApproved" v-if="instance=='Pull'">
-                       <b-tooltip is-small label="Pindah memilih akan diberi kode 31">
-                        <span class="icon">
-                          <i class="fa fa-check"></i>
-                        </span>
+                    <a class="btn btn-warning d-block" @click="onApproved" v-if="instance=='Pull'"
+                       title="Pindah memilih akan diberi kode 31">
+                        <i class="fa fa-check"></i>
                         <span>Setujui Tarik Data</span>
-                        </b-tooltip>
                     </a>
-                    <a class="btn btn-warning d-block" @click="onPullRequest" v-if="instance=='PullReq'">
-                       <b-tooltip is-small label="Kirim Permintaan Tarik Data ke Wilayah di atas">
-                        <span class="icon">
-                          <i class="fa fa-check"></i>
-                        </span>
+                    <a class="btn btn-warning d-block" @click="onPullRequest" v-if="instance=='PullReq'"
+                       title="Kirim Permintaan Tarik Data ke Wilayah di atas">
+                        <i class="fa fa-check"></i>
                         <span>Tarik Data</span>
-                        </b-tooltip>
                     </a>
                 </div>
             </div>
-        </div>
       </div>
 
-      <footer class="quickview-footer">
+      <div class="p-3 border-top text-muted small">
           {{ footNote }}
-      </footer>
+      </div>
     </div>
+    <div class="offcanvas-backdrop fade show" v-if="isActive" @click="closeSidePanel()"></div>
 </div>
 </template>
 

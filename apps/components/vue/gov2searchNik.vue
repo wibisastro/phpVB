@@ -1,22 +1,18 @@
 <template>
 <div class='card card-body'>
     <div class="input-group">
-      <div class="control">
-        <input class="input" type="text" placeholder="Masukkan NIK" v-model="nik">
-      </div>
-      <div class="control">
+        <input class="form-control" type="text" placeholder="Masukkan NIK" v-model="nik">
         <a class="btn btn-info" @click="submitSearch">
           Cari Pemilih
         </a>
-      </div>
     </div>
     <div class="alert" v-if="isNotif" :class="notifClass">
-      <button class="delete" @click="isNotif=false"></button>
+      <button type="button" class="btn-close float-end" @click="isNotif=false"></button>
         <p v-text="notifText"></p>
     </div>
     <div v-if="isResult">
     <table class="table table-striped">
-        <thead><th></th><th></th><th><button class="delete" @click="isResult=false"></button></th></thead>
+        <thead><th></th><th></th><th><button type="button" class="btn-close" @click="isResult=false"></button></th></thead>
       <tbody>
         <tr v-for="(val,key) in results">
           <th>{{ key }}</th>
@@ -93,10 +89,4 @@ module.exports = {
   }
 </script>
 
-<!-- Bulma CSS removed, using Bootstrap via cube theme -->
-
-<style>   
-    .hero.is-warning {
-    background-color: coral;
-    }
-</style>
+<style></style>

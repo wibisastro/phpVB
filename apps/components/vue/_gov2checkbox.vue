@@ -1,14 +1,12 @@
 <template>
 <div class="d-flex flex-wrap gap-1">
-  <p class="control" v-for="item in tags">
+  <div v-for="item in tags">
     <a class="btn btn-outline-secondary" @click="setTag(source_id,item['id'])" :class="{ 'btn-info': setChecked(source_id,item['id']) }">
-      <span class="icon">
-        <i class="fa fa-check"></i>
-      </span>
-        <span>{{ item['nama'] }}</span>
+      <i class="fa fa-check"></i>
+      <span>{{ item['nama'] }}</span>
       <span v-if="counter<tags.length">{{ getTag(source_id,item['id']) }}</span>
     </a>
-  </p>
+  </div>
 </div>
 </template>
 

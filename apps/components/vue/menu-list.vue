@@ -1,5 +1,5 @@
 <template>
-     <li><slot><a :href="url" :class="{ 'is-active': isActive }">{{ caption }}</a></slot></li>
+     <li><slot><a :href="url" class="nav-link" :class="{ 'active': isActive }">{{ caption }}</a></slot></li>
 </template>
 
 <script>

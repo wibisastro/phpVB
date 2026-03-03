@@ -1,6 +1,9 @@
 <template>
 <div>
-<progress class="progress" :class="setColor()" :value="lo" :max="hi">{{ percent }}%</progress> {{ percent }}%
+    <div class="progress">
+        <div class="progress-bar" role="progressbar" :class="setColor()" :style="{ width: percent + '%' }" :aria-valuenow="percent" aria-valuemin="0" aria-valuemax="100">{{ percent }}%</div>
+    </div>
+    {{ percent }}%
 </div>
 </template>
 
@@ -13,7 +16,7 @@ module.exports = {
     },
     data() {
         return {
-           percent: 100 
+           percent: 100
         }
     },
     methods: {
@@ -22,14 +25,14 @@ module.exports = {
         },
         setColor: function () {
             var color;
-            if (this.percent<50) {color="is-danger";}
-            else if (this.percent>=50 && this.percent<80) {color="is-warning";}
-            else if (this.percent>=80 && this.lo<this.hi) {color="is-success";}
-            else if (this.lo==this.hi) {color="is-info";}
+            if (this.percent<50) {color="bg-danger";}
+            else if (this.percent>=50 && this.percent<80) {color="bg-warning";}
+            else if (this.percent>=80 && this.lo<this.hi) {color="bg-success";}
+            else if (this.lo==this.hi) {color="bg-info";}
             return color;
         }
     },
-    created: function () { 
+    created: function () {
         this.setPercent();
     },
     watch: {
