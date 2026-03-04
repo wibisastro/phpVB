@@ -7,6 +7,7 @@ composer.lock
 /logs/*
 /public/.htaccess
 /core/scripts/sql/*
+**/dsn*.xml
 
 # IDE and Editor
 .vscode/
