@@ -2,21 +2,27 @@
   {% for mainmenu in menus %}
     {% for menu in mainmenu.menu %}
       {% if menu.menu is iterable and menu.menu|length > 0 %}
-      <li class="treeview">
+      {% set has_active_child = false %}
+      {% for item in menu.menu %}
+        {% if item.url == '/' ~ pageID ~ '/' ~ className or (className == 'index' and item.url == '/' ~ pageID) %}
+          {% set has_active_child = true %}
+        {% endif %}
+      {% endfor %}
+      <li class="treeview{% if has_active_child %} active{% endif %}">
         <a href="#!">
           <i class="bi bi-folder"></i>
           <span class="menu-text">{{ menu.caption }}</span>
         </a>
         <ul class="treeview-menu">
           {% for item in menu.menu %}
-          <li{% if item.url == '/' ~ pageID ~ '/' ~ className %} class="active"{% endif %}>
-            <a href="{{ webroot }}{{ item.url }}">{{ item.caption }}</a>
+          <li{% if item.url == '/' ~ pageID ~ '/' ~ className or (className == 'index' and item.url == '/' ~ pageID) %} class="current-page"{% endif %}>
+            <a href="{{ webroot }}{{ item.url }}"{% if item.url == '/' ~ pageID ~ '/' ~ className or (className == 'index' and item.url == '/' ~ pageID) %} class="active-sub"{% endif %}>{{ item.caption }}</a>
           </li>
           {% endfor %}
         </ul>
       </li>
       {% else %}
-      <li{% if menu.url is defined and menu.url == '/' ~ pageID ~ '/' ~ className %} class="active"{% endif %}>
+      <li{% if menu.url is defined and (menu.url == '/' ~ pageID ~ '/' ~ className or (className == 'index' and menu.url == '/' ~ pageID)) %} class="current-page"{% endif %}>
         <a href="{{ webroot }}{{ menu.url|default('#') }}">
           <i class="bi bi-circle"></i>
           <span class="menu-text">{{ menu.caption }}</span>
