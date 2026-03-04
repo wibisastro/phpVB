@@ -6,7 +6,7 @@
 	<secure></secure>
     <platform>
         <apikey>http://gov2.local.mti08.vlsm.org</apikey>
-        <ssonode>http://sso.local.gov2.web.id</ssonode>
+        <ssonode>http://sso.gov2.web.id</ssonode>
         <ssoconn>http://sso.gov2.web.id</ssoconn>
     </platform>
     <apikey>
