@@ -17,9 +17,12 @@ class login
      */
     public function __construct()
     {
-        global $self, $vars;
+        global $self, $vars, $doc, $loader;
         $self->takeAll("components");
         $self->take($vars['app'], "index", "dependencies");
+
+        $loader->addPath(__DIR__ . '/../../apps/gov2login/view', 'gov2login');
+        $doc->baseBody = '@gov2login/body.html';
     }
 
     /**

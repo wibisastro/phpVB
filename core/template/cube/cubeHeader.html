@@ -35,11 +35,9 @@
   <div class="header-actions-container rounded-4 d-flex align-items-center">
 
     <!-- Options offcanvas trigger start -->
-    {% if _SESSION is defined and _SESSION['account_id'] is defined and _SESSION['account_id'] %}
     <button class="btn btn-link text-body p-1 me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#optionsOffcanvas" aria-controls="optionsOffcanvas" title="Options">
       <i class="bi bi-gear fs-5"></i>
     </button>
-    {% endif %}
     <!-- Options offcanvas trigger end -->
 
     <!-- User settings start -->
@@ -66,7 +64,7 @@
         </div>
       </div>
     {% else %}
-      <a class="btn btn-sm btn-outline-primary me-2" href="/gov2login/signup">
+      <a class="btn btn-sm btn-outline-primary me-2" href="/{{ pageID }}/signup">
         <i class="bi bi-person-plus me-1"></i>Signup
       </a>
       <a class="btn btn-sm btn-primary" href="/{{ pageID }}/login?type=gov2">
