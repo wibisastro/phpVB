@@ -128,6 +128,34 @@ class gov2option
     }
 
     /**
+     * Get all level 1 options for a given app
+     *
+     * @param string $app Application/pageID
+     * @param string $status Filter by status (default: 'on')
+     * @return array
+     */
+    public function getAll(string $app, string $status = 'on'): array
+    {
+        global $doc;
+        $res = [];
+
+        $q = "SELECT id, app, type, privilege, nama, keterangan, status, value FROM options WHERE app=%s AND level=1 AND status=%s ORDER BY id ASC";
+
+        try {
+            $res = DB::query($q, $app, $status);
+        } catch (MeekroDBException $e) {
+            if ($e->getCode() == 0) {
+                $connector = new DBConnector($this->dsn);
+                $res = $connector->db->query($q, $app, $status);
+            }
+        } catch (Exception $e) {
+            // Silently fail - options are non-critical for page rendering
+        }
+
+        return $res ?: [];
+    }
+
+    /**
      * Create MVC instance
      *
      * @return MVC

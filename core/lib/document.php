@@ -404,6 +404,16 @@ class document extends customException
         $this->body('sidebars', $this->sidebar);
         $this->body('sidebarsRight', $this->sidebarRight);
 
+        // Load top-bar options from database
+        if (isset($self) && isset($self->opt) && $pageID) {
+            try {
+                $this->body('_OPTIONS', $self->opt->getAll($pageID));
+            } catch (\Exception $e) {
+                $this->body('_OPTIONS', []);
+            }
+        }
+
+
         if (is_array($this->error)) {
             $this->body('pageTitle', 'Exception Occured');
             $this->body('subTitle', 'Please check exception list below ');
