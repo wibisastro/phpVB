@@ -8,17 +8,60 @@
         <meta name="author" content="Wibisono Sastrodiwiryo">
      {% endblock %}
     </head>
-<body>
+<body class="bg-light">
 <div id="app">
-    <div class="py-4">
-        <div class="container">
-            <div class="row justify-content-center">
-              <div class="col">
-                    {% block content %} {% endblock %}
-              </div>
-            </div>
+
+    <!-- Navbar starts -->
+    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm mb-4">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="https://{{ _SERVER['SERVER_NAME'] }}">
+          <img src="{{ webroot }}/cube/images/logo-krisna2.png" alt="phpVB" style="max-height: 32px;">
+          <span class="fw-bold" style="font-family: Garamond, 'EB Garamond', 'Cormorant Garamond', Georgia, serif; letter-spacing: 0.04em;">phpVB</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#loginNavMenu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="loginNavMenu">
+          <ul class="navbar-nav ms-auto">
+            {% if _SESSION is defined and _SESSION['account_id'] is defined and _SESSION['account_id'] %}
+              <li class="nav-item">
+                <a class="nav-link" href="/gov2login">
+                  <i class="bi bi-person-circle me-1"></i>{{ _SESSION['fullname'] }}
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-danger" href="/gov2login.php?cmd=logout">
+                  <i class="bi bi-box-arrow-right me-1"></i>Logout
+                </a>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="/gov2login/signup">
+                  <i class="bi bi-person-plus me-1"></i>Signup
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link fw-semibold" href="/gov2login">
+                  <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Navbar ends -->
+
+    {% block pagetitle %} {% endblock %}
+
+    <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-8 col-xl-6">
+                {% block content %} {% endblock %}
+          </div>
         </div>
     </div>
+
 </div>
 
 <script type="text/javascript">
@@ -40,12 +83,11 @@
 {% endblock %}
 <script>
 iFrameResize({
-    log                     : false,// Enable console logging
-    enablePublicMethods     : true,// Enable methods within iframe hosted page
-    resizedCallback         : function(messageData){ // Callback fn when message is received
-    }
+    log                     : false,
+    enablePublicMethods     : true,
+    resizedCallback         : function(messageData){ }
 });
 </script>
-<script type="text/javascript" src="/js/iframeResizer.contentWindow.min.js"></script>
+<script type="text/javascript" src="{{ webroot }}/js/iframeResizer.contentWindow.min.js"></script>
 </body>
 </html>

@@ -74,6 +74,43 @@
     </div>
     <!-- Page wrapper ends -->
 
+<!-- Options Offcanvas starts -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="optionsOffcanvas" aria-labelledby="optionsOffcanvasLabel">
+  <div class="offcanvas-header border-bottom">
+    <h6 class="offcanvas-title fw-semibold" id="optionsOffcanvasLabel">
+      <i class="bi bi-gear me-2"></i>Options
+    </h6>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body p-0">
+    {% if _OPTIONS is defined and _OPTIONS|length > 0 %}
+    <ul class="list-group list-group-flush">
+      {% for option in _OPTIONS %}
+      <li class="list-group-item d-flex justify-content-between align-items-start px-3 py-2">
+        <div class="me-auto">
+          <div class="fw-semibold small">{{ option.nama }}</div>
+          {% if option.keterangan %}
+          <small class="text-muted">{{ option.keterangan }}</small>
+          {% endif %}
+        </div>
+        {% if option.value %}
+        <span class="badge bg-primary-subtle text-primary rounded-pill">{{ option.value }}</span>
+        {% else %}
+        <span class="badge bg-success-subtle text-success rounded-pill">ON</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="text-center text-muted py-4">
+      <i class="bi bi-gear fs-1 d-block mb-2 opacity-25"></i>
+      <small>Belum ada options untuk aplikasi ini</small>
+    </div>
+    {% endif %}
+  </div>
+</div>
+<!-- Options Offcanvas ends -->
+
 <script>
   if (window.localStorage && localStorage.getItem('sidebarToggled') === 'true') {
     document.querySelector('.page-wrapper').classList.add('toggled');
