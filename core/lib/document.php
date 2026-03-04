@@ -439,6 +439,8 @@ class document extends customException
     {
         $errorBody = [];
 
+        $loader->addPath(__DIR__ . '/../../apps/components/view', 'components');
+
         if (isset($this->error['NotLogin'])) {
             $errorBody[] = 'errorMessage.html';
         } else {
