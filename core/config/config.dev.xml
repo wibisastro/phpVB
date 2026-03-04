@@ -3,11 +3,11 @@
     <comm>ok</comm>
     <title>SSO Node Gov2</title>
     <webmaster>wibi@alumni.ui.ac.id</webmaster>
-	<secure></secure>
+	<secure>true</secure>
     <platform>
         <apikey>http://gov2.local.mti08.vlsm.org</apikey>
-        <ssonode>http://sso.gov2.web.id</ssonode>
-        <ssoconn>http://sso.gov2.web.id</ssoconn>
+        <ssonode>https://sso.gov2.web.id</ssonode>
+        <ssoconn>https://sso.gov2.web.id</ssoconn>
     </platform>
     <apikey>
         <public>81d03a754448e774d706f0754acd88ff</public>
