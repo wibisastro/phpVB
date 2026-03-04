@@ -22,7 +22,7 @@
         </ul>
       </li>
       {% else %}
-      <li{% if menu.url is defined and (menu.url == '/' ~ pageID ~ '/' ~ className or (className == 'index' and menu.url == '/' ~ pageID)) %} class="current-page"{% endif %}>
+      <li{% if menu.url is defined and (menu.url == '/' ~ pageID ~ '/' ~ className or (className == 'index' and menu.url == '/' ~ pageID)) %} class="active current-page"{% endif %}>
         <a href="{{ webroot }}{{ menu.url|default('#') }}">
           <i class="bi bi-circle"></i>
           <span class="menu-text">{{ menu.caption }}</span>

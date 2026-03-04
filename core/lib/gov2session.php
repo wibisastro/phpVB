@@ -40,6 +40,10 @@ class gov2session extends dsnSource
 
         if ($_COOKIE['Gov2Session'] ?? false) {
             $this->sesRead($_COOKIE['Gov2Session']);
+            global $doc;
+            if (isset($doc) && !empty($this->val)) {
+                $doc->body['_SESSION'] = $this->val;
+            }
         } else {
             if (($_auth['cmd'] ?? null) !== 'sessave') {
                 $_token['userRole'] = "public";
