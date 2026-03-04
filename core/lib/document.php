@@ -484,6 +484,7 @@ class document extends customException
         } else {
             $loader->addPath(__DIR__ . '/../../apps/gov2login/view', 'gov2login');
             $errorBody[] = '@gov2login/notLogin.html';
+            $this->baseBody = '@gov2login/body.html';
         }
 
         $_SESSION['ssonode'] = trim((string) ($config->platform->ssonode ?? ''));
