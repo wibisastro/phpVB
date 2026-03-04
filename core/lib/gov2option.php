@@ -26,10 +26,10 @@ class gov2option
             $cookies = $doc->envRead($_COOKIE['Gov2Session'] ?? '');
             $this->dsn = $cookies['portal'];
             if (!$this->dsn) {
-                $this->dsn = $config->domain->attr['dsn'];
+                $this->dsn = $config->domain->attr['dsn'] ?? 'master';
             }
         } catch (Exception $e) {
-            $this->dsn = $config->domain->attr['dsn'];
+            $this->dsn = $config->domain->attr['dsn'] ?? 'master';
         }
     }
 
@@ -146,7 +146,9 @@ class gov2option
         } catch (MeekroDBException $e) {
             if ($e->getCode() == 0) {
                 $connector = new DBConnector($this->dsn);
-                $res = $connector->db->query($q, $app, $status);
+                if (isset($connector->db)) {
+                    $res = $connector->db->query($q, $app, $status);
+                }
             }
         } catch (Exception $e) {
             // Silently fail - options are non-critical for page rendering

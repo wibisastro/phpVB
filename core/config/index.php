@@ -67,8 +67,8 @@ try {
         foreach($config->domain->{$_SERVER["SERVER_NAME"]}->attributes() as $k => $v) {
             $config->domain->attr[$k]=$v;
         }
-        $config->domain->attr['dsn']=$_SERVER["SERVER_NAME"];
     }
+    $config->domain->attr['dsn']=$_SERVER["SERVER_NAME"];
 } catch (Exception $e) {
     $config->error=$e->getMessage();
 }
