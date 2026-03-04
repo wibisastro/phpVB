@@ -15,6 +15,9 @@ class gov2table extends \Gov2lib\dsnSource {
         parent::__construct(); 
 	}
 
+    function dependencies () {
+    }
+
     function demo () {
         $GLOBALS['vueData']['scrollInterval']=$this->scrollInterval;
         $GLOBALS['vueData']['itemPerPage']=1;

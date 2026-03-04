@@ -8,6 +8,9 @@ class gov2notification extends \Gov2lib\document {
 		$this->controller=__DIR__."/../".$this->className.".php";
 	}
     
+    function dependencies () {
+    }
+
     function demo () {
         $GLOBALS['vueCreated'].='eventBus.$on("toggleClick", this.demoNotif);';
         $GLOBALS['vueMethods'].='demoNotif: function(data) { 

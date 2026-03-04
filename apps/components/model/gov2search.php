@@ -10,6 +10,8 @@ class gov2search extends \Gov2lib\document {
         $GLOBALS['vueCreated'].='eventBus.$on("searchQuery", this.setQuery);';
         $GLOBALS['vueMethods'].='setQuery: function(data) {this.searchQuery=data;},';
 	}
-	
+
+	function dependencies () {
+	}
 }
 ?>

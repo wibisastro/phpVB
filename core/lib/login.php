@@ -76,4 +76,43 @@ class login
         $doc->body("pageTitle", 'Gov 2.0 SSO Forgot Password');
         $self->content("forgot.html");
     }
+
+    /**
+     * Logout and redirect to SSO logout
+     */
+    public function logout(): void
+    {
+        global $config, $self;
+        $self->ses->sesReset();
+
+        $logoutpath = (string) ($config->platform->logoutpath ?? '');
+        if (!$logoutpath) {
+            $logoutpath = '/slogout.php';
+        }
+
+        $keycloak = $config->keycloak ?? null;
+        if ($keycloak && (int) ($keycloak->active ?? 0)) {
+            $client = new \GuzzleHttp\Client();
+            $endpoint = str_replace(
+                '{realm}',
+                (string) ($config->domain->attr['realm'] ?? ''),
+                (string) ($keycloak->urlPurgeToken ?? '')
+            );
+            try {
+                $client->post($endpoint, [
+                    'form_params' => [
+                        'client_id' => (string) ($config->domain->attr['clientId'] ?? ''),
+                        'client_secret' => (string) ($config->domain->attr['clientSecret'] ?? ''),
+                        'refresh_token' => $_SESSION['refresh_token'] ?? '',
+                    ],
+                ]);
+            } catch (\Exception $e) {
+                // Log but don't block logout
+            }
+        }
+
+        $_target_url = $config->platform->ssonode . $logoutpath . "?client={$_SERVER['SERVER_NAME']}";
+        header("Location: " . $_target_url);
+        exit;
+    }
 }

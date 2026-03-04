@@ -10,5 +10,8 @@ class gov2button extends \Gov2lib\document {
         $GLOBALS['vueCreated'].='eventBus.$on("toggleClick", this.toggleClick);';
         $GLOBALS['vueMethods'].='toggleClick: function(data) {this.isPressed=data;},';
 	}
+
+	function dependencies () {
+	}
 }
 ?>

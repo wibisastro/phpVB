@@ -12,6 +12,9 @@ class gov2pagination extends \Gov2lib\document {
         $GLOBALS['vueMethods'].='pagination: function(data) {this.records=data["records"];this.itemPerPage=data["itemPerPage"];},';
 	}
     
+    function dependencies () {
+    }
+
     function demo () {
         $GLOBALS['vueData']['records']=100;
         $GLOBALS['vueData']['itemPerPage']=10;

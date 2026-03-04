@@ -12,6 +12,9 @@ class gov2nav extends \Gov2lib\document {
         $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/$className", '/');
 	}
 
+	function dependencies () {
+	}
+
 	function setDefaultNav ($_menuFile="") {
         global $pageID,$config,$self;
         $this->menus=$this->menubar($pageID,$_menuFile);
