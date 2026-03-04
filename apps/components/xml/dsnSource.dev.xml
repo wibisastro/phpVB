@@ -3,8 +3,8 @@
 	<dsn>
 		<name>master</name>
 		<host>localhost</host>
-		<user>root</user>
+		<user>gov2ayam</user>
 		<pass></pass>
-		<db>framework</db>
+		<db>gov2ayam</db>
 	</dsn>
 </list>
