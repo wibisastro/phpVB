@@ -140,6 +140,9 @@ try {
                                 break;
                                 case "loginHandler":
                                     $controller = "Gov2lib\\login";
+                                    if ($scriptID && $scriptID !== 'login' && empty($vars['cmd'])) {
+                                        $vars['cmd'] = $scriptID;
+                                    }
                                 break;
                                 case "loginKeycloakHandler":
                                     $controller = "Gov2lib\\loginkeycloak";

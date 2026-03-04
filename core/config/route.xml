@@ -39,6 +39,11 @@
 	</route>
     <route>
 		<method>GET</method>
+		<uri>/{app}/signup</uri>
+		<handler>Gov2lib\loginHandler</handler>
+	</route>
+    <route>
+		<method>GET</method>
 		<uri>/login</uri>
 		<handler>Gov2lib\loginHandler</handler>
 	</route>
