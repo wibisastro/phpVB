@@ -26,8 +26,24 @@
         <client_id></client_id>
         <client_secret></client_secret>
     </googleoauth>
-    <webroot>/phpFramewerk/public</webroot>
+    <webroot></webroot>
     <domain>
-        <localhost>home</localhost>
+        <ayam.gov2.web.id>home</ayam.gov2.web.id>
     </domain>
+    <css>
+        <warning>warning</warning>
+        <danger>alert alert-danger alert-dismissible fade show</danger>
+    </css>
+    <pageroles>
+        <guest>1</guest>
+        <member>2</member>
+        <admin>3</admin>
+        <webmaster>4</webmaster>
+        <closed>5</closed>
+        <developer>6</developer>
+    </pageroles>
+    <dataroles>
+        <level>prov</level>
+        <level>kab</level>
+    </dataroles>
 </gov2config>

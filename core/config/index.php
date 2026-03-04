@@ -10,7 +10,7 @@ try {
     error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
     $publickey="c65ca73ce4c38dcec21151aa64f1590c";
     /**Defined app name that you want to create*/
-    $stages=array('local');
+    $stages=array('dev');
     foreach($stages AS $stage) {
         if (file_exists(__DIR__."/config.".$stage.".xml")) {
             $config = simplexml_load_file(__DIR__."/config.".$stage.".xml");

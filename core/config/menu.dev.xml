@@ -33,27 +33,21 @@
 		</menu>
 		<menu>
 	        <caption>SSO</caption>
-			<url>/components/gov2sso</url>
+			<url>#</url>
 		</menu>
 		<menu>
 	        <caption>Login</caption>
-			<url>/components/gov2login</url>
+			<url>#</url>
 		</menu>
 	</menu>
 	<menu>
 		<caption>Examples</caption>
-        <url>/examples</url>
+        <url>/home</url>
 		<menu>
-	        <caption>Janji Presiden</caption>
-			<url>/examples/presiden</url>
+	        <caption>CRUD</caption>
+			<url>/home/crud</url>
 		</menu>
-		<menu>
-	        <caption>OPD</caption>
-			<url>/examples/opd</url>
-		</menu>
-        <menu>
-	        <caption>Wilayah</caption>
-			<url>/examples/wilayah</url>
+		<menu>	       
 		</menu>
 	</menu>
 </mainmenu>
