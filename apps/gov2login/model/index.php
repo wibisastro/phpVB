@@ -11,5 +11,8 @@ class index extends \Gov2lib\crudHandler {
         $this->tbl->table=$this->tbl->member;
         $this->tbl->wilayah=$this->tbl->wilayah;
     }
+
+    function dependencies () {
+    }
 }
 ?>
