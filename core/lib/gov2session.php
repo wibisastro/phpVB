@@ -129,7 +129,7 @@ class gov2session extends dsnSource
         try {
             if ($_privilege == "Selesai") {
                 throw new \Exception("Selesai: Semua fungsi ditutup karena proses kerja telah selesai");
-            } elseif (STAGE != 'dev') {
+            } elseif (STAGE != 'local') {
                 if (($config->domain->attr['shift'] ?? false)
                     && $config->domain->attr['shift'] != date("A")
                     && $config->domain->attr['shift'] != 'ALL') {
@@ -379,7 +379,7 @@ class gov2session extends dsnSource
         }
 
         try {
-            if (STAGE != 'dev') {
+            if (STAGE != 'local') {
                 $_userRole = $this->getRoleLevel('member', 'role');
                 $_privilege = $this->privilegeRead($id, $structure, $level);
 
