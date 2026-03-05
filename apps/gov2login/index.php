@@ -31,7 +31,7 @@ class index {
     function profile () {
         global $self,$doc;
         $doc->body("pageTitle",'Gov 2.0 SSO Profile');
-        $self->ses->authenticate('guest');
+  //      $self->ses->authenticate('guest');
         $self->content("profile.html");
     }
     
