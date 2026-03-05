@@ -1,9 +1,13 @@
-<div class="alert alert-danger alert-dismissible d-flex align-items-start fade show" role="alert">
-  <i class="bi bi-exclamation-triangle-fill fs-5 me-2 mt-1 flex-shrink-0"></i>
-  <div>
-    {% for item in errors|keys %}
-      <strong>{{ item }}</strong>: {{ errors[item] }}<br>
-    {% endfor %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-6">
+    <div class="alert alert-danger alert-dismissible d-flex align-items-start fade show" role="alert">
+      <i class="bi bi-exclamation-triangle-fill fs-5 me-2 mt-1 flex-shrink-0"></i>
+      <div>
+        {% for item in errors|keys %}
+          <strong>{{ item }}</strong>: {{ errors[item] }}<br>
+        {% endfor %}
+      </div>
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
   </div>
-  <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
