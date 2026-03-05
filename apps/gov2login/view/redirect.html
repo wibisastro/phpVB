@@ -41,33 +41,14 @@
 </style>
 <body>
 <div class="spinner" id="spinner"></div>
-<a target="_parent" href="https://{{ _SERVER['SERVER_NAME'] }}/gov2login/auth/session/{{ token }}"></a>
+<a target="_parent" href="https://{{ _SERVER['SERVER_NAME'] }}/gov2login/auth/session/{{ token }}">redirect</a>
 <div id="parent_href"></div>
 </body>
 <script>
-    /*
-    let parent_href = null;
-    window.parent.postMessage('check_href', 'https://renobiro.bkn.kl2.web.id');
-    window.parent.postMessage('check_href', 'https://reno.bkn.go.id');
-
-    window.addEventListener('message', event => {
-        // IMPORTANT: check the origin of the data!
-        if (event.origin.startsWith('https://renobiro.bkn.kl2.web.id') ||
-            event.origin.startsWith('https://reno.bkn.go.id')) {
-            parent_href = event.data;
-        }
-    });
-
-     const el = document.getElementById('parent_href');
-     el.innerHTML += parent_href;
-*/
-    
-//    if (parent_href === 'https://renobiro.bkn.kl2.web.id/gov2pipe' || parent_href === 'https://reno.bkn.go.id/gov2pipe') {
-        // window.parent.postMessage(`{{_SERVER['SERVER_NAME']}}`, 'https://renobiro.bkn.kl2.web.id');
     if ('{{ ssonode }}' === 'sso.krisna.men' || '{{ ssonode }}' === 'sso.kl.krisna.systems') {
         window.parent.location.href = "https://{{ _SERVER['SERVER_NAME'] }}/gov2login/auth/pipe/{{ token }}";
     } else {
-        window.parent.location.href = "https://{{ _SERVER['SERVER_NAME'] }}/gov2login/auth/session/{{ token }}";
+//        window.parent.location.href = "https://{{ _SERVER['SERVER_NAME'] }}/gov2login/auth/session/{{ token }}";
     }
 </script>
 </html>
