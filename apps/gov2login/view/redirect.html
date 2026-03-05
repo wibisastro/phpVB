@@ -41,14 +41,14 @@
 </style>
 <body>
 <div class="spinner" id="spinner"></div>
-<a target="_parent" href="https://{{ _SERVER['SERVER_NAME'] }}/gov2login/auth/session/{{ token }}">redirect</a>
+<a target="_parent" href="{{ _SERVER['REQUEST_SCHEME'] ?? 'https' }}://{{ _SERVER['HTTP_HOST'] }}/gov2login/auth/session/{{ token }}">redirect</a>
 <div id="parent_href"></div>
 </body>
 <script>
     if ('{{ ssonode }}' === 'sso.krisna.men' || '{{ ssonode }}' === 'sso.kl.krisna.systems') {
-        window.parent.location.href = "https://{{ _SERVER['SERVER_NAME'] }}/gov2login/auth/pipe/{{ token }}";
+        window.parent.location.href = "{{ _SERVER['REQUEST_SCHEME'] ?? 'https' }}://{{ _SERVER['HTTP_HOST'] }}/gov2login/auth/pipe/{{ token }}";
     } else {
-//        window.parent.location.href = "https://{{ _SERVER['SERVER_NAME'] }}/gov2login/auth/session/{{ token }}";
+        window.parent.location.href = "{{ _SERVER['REQUEST_SCHEME'] ?? 'https' }}://{{ _SERVER['HTTP_HOST'] }}/gov2login/auth/session/{{ token }}";
     }
 </script>
 </html>
