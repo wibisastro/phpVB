@@ -232,6 +232,7 @@ class gov2session extends dsnSource
         $WHERE = is_string($id) ? "account_id=%s" : "account_id=%i";
 
         try {
+            $this->connectDB('master');
             $_role = $this->checkSuperuser();
             $_query = "SELECT * FROM member WHERE {$WHERE}";
             $_result = \DB::queryFirstRow($_query, $id);
