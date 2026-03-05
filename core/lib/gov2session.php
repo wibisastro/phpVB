@@ -147,7 +147,9 @@ class gov2session extends dsnSource
                             if ($pageID != "gov2login") {
                                 $_gov2session['pageID'] = $pageID;
                             }
-                            $this->sesSave($_gov2session, 1);
+                            $this->sesSave($_gov2session);
+                            header("Location: " . $_SERVER['REQUEST_URI']);
+                            exit;
                         }
                     } else {
                         if ((isset($this->val['account_id']) && !isset($this->val['id']))) {
@@ -159,7 +161,9 @@ class gov2session extends dsnSource
                                 if ($pageID != "gov2login") {
                                     $_gov2session['pageID'] = $pageID;
                                 }
-                                $this->sesSave($_gov2session, 1);
+                                $this->sesSave($_gov2session);
+                                header("Location: " . $_SERVER['REQUEST_URI']);
+                                exit;
                             }
                         }
 
