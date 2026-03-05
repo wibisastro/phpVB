@@ -229,7 +229,6 @@ class gov2session extends dsnSource
      */
     public function memberRead(int|string $id = 0): ?array
     {
-        global $doc;
         $WHERE = is_string($id) ? "account_id=%s" : "account_id=%i";
 
         try {
@@ -247,7 +246,7 @@ class gov2session extends dsnSource
                 $_result['role'] = $_role;
             }
         } catch (\MeekroDBException $e) {
-            $doc->exceptionHandler($e->getMessage());
+            throw new \Exception('DatabaseError:' . $e->getMessage());
         }
 
         return $_result;
