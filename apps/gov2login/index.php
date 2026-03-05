@@ -18,9 +18,8 @@ class index {
         global $self,$doc;
         $doc->body("pageTitle",'Gov 2.0 SSO Login');
         $self->ses->authenticate('guest');
-echo $self->ses->val['account_id'];
-        if ($self->ses->val['account_id']) {echo "ada";$self->content("profile.html");}
-        else {$self->content("notLogin.html");echo "gak ada";}
+        if ($self->ses->val['account_id']) {;$self->content("profile.html");}
+        else {$self->content("notLogin.html");}
     }
     
     function signup () {
