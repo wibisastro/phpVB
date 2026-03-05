@@ -317,6 +317,10 @@ class gov2session extends dsnSource
         $getPageID = $newPageID ?? $pageID;
         $_superuser = $this->readXML($getPageID, "superuser");
 
+        if (!$_superuser) {
+            return false;
+        }
+
         if ($config->domain->attr['level'] == 2) {
             $_id = $this->parentRead(trim($config->domain->attr['table']), trim($config->domain->attr['id']));
         } else {
