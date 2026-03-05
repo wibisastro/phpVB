@@ -14,11 +14,15 @@
         <hr>
         <div class="text-start">
           <small class="text-muted d-block mb-1"><strong>Account ID:</strong> {{ _SESSION['account_id'] }}</small>
-          {% if _SESSION['facebook'] %}
-          <small class="text-muted d-block mb-1"><strong>Facebook:</strong> {{ _SESSION['facebook'] }}</small>
+          <small class="text-muted d-block mb-1"><strong>Full Name:</strong> {{ _SESSION['fullname'] }}</small>
+          <small class="text-muted d-block mb-1"><strong>Email:</strong> {{ _SESSION['email'] }}</small>
+          {% if _SESSION['email_verified'] is defined %}
+          <small class="text-muted d-block mb-1"><strong>Email Verified:</strong> {{ _SESSION['email_verified'] ? 'true' : 'false' }}</small>
           {% endif %}
-          <small class="text-muted d-block mb-1"><strong>SSO Key:</strong> {{ _SESSION['ssokey'] }}</small>
-          <small class="text-muted d-block"><strong>SSO Node:</strong> {{ SSONODE }}</small>
+          <small class="text-muted d-block mb-1"><strong>Role:</strong> {{ _SESSION['userRole'] }}</small>
+          {% if _SESSION['expired_in'] %}
+          <small class="text-muted d-block mb-1"><strong>Token Expired in:</strong> {{ _SESSION['expired_in'] }}</small>
+          {% endif %}
         </div>
       </div>
       <div class="card-footer text-center d-flex justify-content-center gap-2">
