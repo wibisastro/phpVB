@@ -12,7 +12,6 @@ class index {
         global $self;
         $self->take("components","gov2notification");
         $self->externalJS('js.html');
-        $self->ses->authenticate('guest');
     }
     
     function index () {
