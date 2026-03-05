@@ -18,7 +18,7 @@ class index {
         global $self,$doc;
         $doc->body("pageTitle",'Gov 2.0 SSO Login');
         $self->ses->authenticate('guest');
-        if ($self->ses->val['account_id']) {;$self->content("profile.html");}
+        if ($self->ses->val['account_id']) {$self->content("profile.html");}
         else {$self->content("notLogin.html");}
     }
     
