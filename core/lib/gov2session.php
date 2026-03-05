@@ -56,9 +56,8 @@ class gov2session extends dsnSource
      */
     public function sesReset(): void
     {
-        global $publickey;
         unset($_COOKIE['Gov2Session']);
-        setcookie("Gov2Session");
+        setcookie("Gov2Session", "", time() - 3600, "/");
     }
 
     /**
