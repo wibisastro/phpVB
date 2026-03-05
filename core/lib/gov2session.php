@@ -144,6 +144,9 @@ class gov2session extends dsnSource
                             $this->val['id'] = $_member['id'];
                             $this->val['userRole'] = $_member['role'];
                             $this->val['status'] = $_member['status'];
+                            $this->val['created_at'] = $_member['created_at'];
+                            $this->val['lastlogin_at'] = $_member['lastlogin_at'];
+                            $this->val['counter'] = $_member['counter'];
                             if ($pageID != "gov2login") {
                                 $this->val['pageID'] = $pageID;
                             }
@@ -162,6 +165,9 @@ class gov2session extends dsnSource
                                 $this->val['id'] = $_member['id'];
                                 $this->val['userRole'] = $_member['role'];
                                 $this->val['status'] = $_member['status'];
+                                $this->val['created_at'] = $_member['created_at'];
+                                $this->val['lastlogin_at'] = $_member['lastlogin_at'];
+                                $this->val['counter'] = $_member['counter'];
                                 if ($pageID != "gov2login") {
                                     $this->val['pageID'] = $pageID;
                                 }

@@ -20,6 +20,15 @@
           <small class="text-muted d-block mb-1"><strong>Email Verified:</strong> {{ _SESSION['email_verified'] ? 'true' : 'false' }}</small>
           {% endif %}
           <small class="text-muted d-block mb-1"><strong>Role:</strong> {{ _SESSION['userRole'] }}</small>
+          {% if _SESSION['created_at'] is defined %}
+          <small class="text-muted d-block mb-1"><strong>Terdaftar:</strong> {{ _SESSION['created_at'] }}</small>
+          {% endif %}
+          {% if _SESSION['lastlogin_at'] is defined %}
+          <small class="text-muted d-block mb-1"><strong>Login Terakhir:</strong> {{ _SESSION['lastlogin_at'] }}</small>
+          {% endif %}
+          {% if _SESSION['counter'] is defined %}
+          <small class="text-muted d-block mb-1"><strong>Jumlah Login:</strong> {{ _SESSION['counter'] }}</small>
+          {% endif %}
           {% if _SESSION['expired_in'] %}
           <small class="text-muted d-block mb-1"><strong>Token Expired in:</strong> {{ _SESSION['expired_in'] }}</small>
           {% endif %}
