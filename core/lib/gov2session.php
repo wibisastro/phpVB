@@ -148,6 +148,12 @@ class gov2session extends dsnSource
                                 $this->val['pageID'] = $pageID;
                             }
                             $this->sesSave($this->val);
+                            $this->memberUpdateCounter($this->val['id']);
+                            match ($this->val['status']) {
+                                'pending' => throw new \Exception("Pending:Akun Anda belum aktif, silahkan aktivasi terlebih dahulu"),
+                                'suspended' => throw new \Exception("Suspended:Akun Anda terblokir, silakan hubungi Admin"),
+                                default => $this->handleAuthorization($pageID, $doc, $config, $_privilege),
+                            };
                         }
                     } else {
                         if ((isset($this->val['account_id']) && !isset($this->val['id']))) {
