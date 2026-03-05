@@ -17,9 +17,13 @@ class index {
     function index () {
         global $self,$doc;
         $doc->body("pageTitle",'Gov 2.0 SSO Login');
-        $self->ses->authenticate('public');
-        if ($self->ses->val['account_id']) {$self->content("profile.html");}
-        else {$self->content("notLogin.html");}
+        if ($self->ses->val['account_id'] ?? false) {
+            $self->ses->authenticate('guest');
+            $self->content("profile.html");
+        } else {
+            $self->ses->authenticate('public');
+            $self->content("notLogin.html");
+        }
     }
     
     function signup () {
