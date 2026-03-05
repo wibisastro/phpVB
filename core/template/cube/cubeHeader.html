@@ -34,12 +34,6 @@
   <!-- Header action bar starts -->
   <div class="header-actions-container rounded-4 d-flex align-items-center">
 
-    <!-- Options offcanvas trigger start -->
-    <button class="btn btn-link text-body p-1 me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#optionsOffcanvas" aria-controls="optionsOffcanvas" title="Options">
-      <i class="bi bi-gear fs-5"></i>
-    </button>
-    <!-- Options offcanvas trigger end -->
-
     <!-- User settings start -->
     <div class="dropdown">
     {% if _SESSION['account_id'] %}
@@ -56,7 +50,7 @@
         <a class="dropdown-item d-flex align-items-center" href="/gov2login">
           <i class="bi bi-person fs-5 me-2"></i>Profile
         </a>
-        <a class="dropdown-item d-flex align-items-center" href="#">
+        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="offcanvas" data-bs-target="#optionsOffcanvas" aria-controls="optionsOffcanvas">
           <i class="bi bi-gear fs-5 me-2"></i>Settings
         </a>
         <div class="mx-3 my-2 d-grid">
