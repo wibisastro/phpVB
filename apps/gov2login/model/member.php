@@ -615,5 +615,7 @@ class member extends \Gov2lib\crudHandler {
         }
         return $_pageroles;
     }
+    function dependencies () {
+    }
 }
 ?>

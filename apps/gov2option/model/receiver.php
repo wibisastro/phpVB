@@ -84,4 +84,6 @@ class receiver extends \Gov2lib\crudHandler
         }
         return $data;
     }
+    function dependencies () {
+    }
 }

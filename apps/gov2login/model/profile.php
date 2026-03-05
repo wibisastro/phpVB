@@ -8,5 +8,7 @@ class profile extends \Gov2lib\document {
         $this->className=$path[sizeof($path)-1];
         $doc->body("className",$this->className);
     }
+    function dependencies () {
+    }
 }
 ?>

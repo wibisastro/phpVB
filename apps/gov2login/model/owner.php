@@ -46,5 +46,7 @@ class owner extends \Gov2lib\crudHandler {
         $_where->add('role!=%s', 'admin');
     return $_where;
     }
+    function dependencies () {
+    }
 }
 ?>

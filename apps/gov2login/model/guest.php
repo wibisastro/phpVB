@@ -46,5 +46,7 @@ class guest extends \Gov2lib\crudHandler {
         $_where->add('role!=%s', 'developer');
     return $_where;
     }
+    function dependencies () {
+    }
 }
 ?>

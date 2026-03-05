@@ -20,5 +20,7 @@ class ref_unitkerja extends \Gov2lib\crudHandler {
         $GLOBALS['vueData']['readOnly']=false;
         $GLOBALS['vueData']['fieldurl']=$this->className.'/fields'; //<-overwrite default
 	}
+    function dependencies () {
+    }
 }
 ?>

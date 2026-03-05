@@ -333,4 +333,6 @@ class kuesioner extends \Gov2lib\crudHandler {
             $this->exceptionHandler($e->getMessage().':'.$uri);
         }
     }
+    function dependencies () {
+    }
 }

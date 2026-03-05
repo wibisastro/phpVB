@@ -62,5 +62,7 @@ class privilege extends \Gov2lib\crudHandler {
 		}
 	    return $results;
 	}
+    function dependencies () {
+    }
 }
 ?>

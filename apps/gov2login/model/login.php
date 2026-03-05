@@ -253,5 +253,7 @@ class login extends \Gov2lib\document {
         return $response;
     }
 
+    function dependencies () {
+    }
 }
 ?>

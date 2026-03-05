@@ -130,5 +130,7 @@ class admin extends \Gov2lib\crudHandler {
 		}
         return $_result;
 	}
+    function dependencies () {
+    }
 }
 ?>

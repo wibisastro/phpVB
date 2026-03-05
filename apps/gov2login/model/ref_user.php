@@ -35,5 +35,7 @@ class ref_user extends \Gov2lib\crudHandler {
         }
         return $result;
     }
+    function dependencies () {
+    }
 }
 ?>

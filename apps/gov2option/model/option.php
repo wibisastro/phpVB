@@ -157,5 +157,7 @@ class option extends \Gov2lib\crudHandler {
         }
         return $res;
     }
+    function dependencies () {
+    }
 }
 ?>

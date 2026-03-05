@@ -293,5 +293,7 @@ class api extends \Gov2lib\crudHandler {
         }
     }
     
+    function dependencies () {
+    }
 }
 ?>

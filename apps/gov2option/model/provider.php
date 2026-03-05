@@ -34,4 +34,6 @@ class provider extends \Gov2lib\crudHandler
         }
         return $result;
     }
+    function dependencies () {
+    }
 }

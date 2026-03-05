@@ -48,4 +48,6 @@ class crud extends \Gov2lib\crudHandler
 	    return $_response;
     }
 
+    function dependencies () {
+    }
 }

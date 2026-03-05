@@ -7,4 +7,6 @@ class error extends \Gov2lib\document {
         $this->className=$path[sizeof($path)-1];
 		$this->controller=__DIR__."/../".$this->className.".php";
 	}
+    function dependencies () {
+    }
 }
