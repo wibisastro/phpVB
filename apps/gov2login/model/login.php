@@ -47,7 +47,9 @@ class login extends \Gov2lib\document {
                     $_token["ssokey"]=$_data['ssokey'];
 
                     // var_dump($_data);exit;
-                    $self->ses->sesSave($_token,1);
+                    $self->ses->sesSave($_token,0);
+                    header('location: /gov2login');
+                    exit;
                     /*
                 //    if ($servicepage) {$_SESSION["servicepage"]=$servicepage;}
                     if (!$landingpage) {$landingpage=$doc->pageID;}
