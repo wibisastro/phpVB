@@ -141,29 +141,25 @@ class gov2session extends dsnSource
                     if (!($this->val['id'] ?? false) && $_privilege != 'public') {
                         $_member = $this->memberRead($this->val['account_id']);
                         if ($_member['id'] ?? false) {
-                            $_gov2session['id'] = $_member['id'];
-                            $_gov2session['userRole'] = $_member['role'];
-                            $_gov2session['status'] = $_member['status'];
+                            $this->val['id'] = $_member['id'];
+                            $this->val['userRole'] = $_member['role'];
+                            $this->val['status'] = $_member['status'];
                             if ($pageID != "gov2login") {
-                                $_gov2session['pageID'] = $pageID;
+                                $this->val['pageID'] = $pageID;
                             }
-                            $this->sesSave($_gov2session);
-                            header("Location: " . $_SERVER['REQUEST_URI']);
-                            exit;
+                            $this->sesSave($this->val);
                         }
                     } else {
                         if ((isset($this->val['account_id']) && !isset($this->val['id']))) {
                             $_member = $this->memberRead($this->val['account_id']);
                             if ($_member['id'] ?? false) {
-                                $_gov2session['id'] = $_member['id'];
-                                $_gov2session['userRole'] = $_member['role'];
-                                $_gov2session['status'] = $_member['status'];
+                                $this->val['id'] = $_member['id'];
+                                $this->val['userRole'] = $_member['role'];
+                                $this->val['status'] = $_member['status'];
                                 if ($pageID != "gov2login") {
-                                    $_gov2session['pageID'] = $pageID;
+                                    $this->val['pageID'] = $pageID;
                                 }
-                                $this->sesSave($_gov2session);
-                                header("Location: " . $_SERVER['REQUEST_URI']);
-                                exit;
+                                $this->sesSave($this->val);
                             }
                         }
 
