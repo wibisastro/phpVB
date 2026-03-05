@@ -44,10 +44,8 @@ class login extends \Gov2lib\document {
                     $_token["facebook"]=$_data['facebook'];
                     $_token["email"]=$_data['email'];
                     $_token["photourl"]=$_data['photourl'];
-                    $_token["ssokey"]=$_data['ssokey'];
+                    $_token["ssokey"]=$_data['ssokey'] ?: ($_data['session'] ?? '');
 
-                     var_dump($_data);exit;
-                    exit;
                     $self->ses->sesSave($_token,1);
                     /*
                 //    if ($servicepage) {$_SESSION["servicepage"]=$servicepage;}
