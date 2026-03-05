@@ -24,7 +24,7 @@ class css extends checkExist
 
         $this->templateDir = __DIR__ . "/../../apps/" . $_app . "/css";
         $_style = $this->checkAppFile($_app . "/css", $vars["style"]);
-        $this->componentName = $_style;
+        $this->componentName = $_style ?? '';
         header('Content-Type: text/css');
     }
 }
