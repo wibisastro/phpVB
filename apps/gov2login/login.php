@@ -40,10 +40,6 @@ class login {
     
     function session ($vars) {
         global $self;
-        if ($self->ses->val['account_id'] ?? false) {
-            header('location: /gov2login');
-            exit;
-        }
         $self->createSession($vars);
     }
 
