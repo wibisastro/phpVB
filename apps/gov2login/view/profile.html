@@ -14,10 +14,17 @@
         <hr>
         <div class="text-start">
           <small class="text-muted d-block mb-1"><strong>Account ID:</strong> {{ _SESSION['account_id'] }}</small>
+          {% if _SESSION['facebook'] %}
+          <small class="text-muted d-block mb-1"><strong>Facebook:</strong> {{ _SESSION['facebook'] }}</small>
+          {% endif %}
+          <small class="text-muted d-block mb-1"><strong>SSO Key:</strong> {{ _SESSION['ssokey'] }}</small>
           <small class="text-muted d-block"><strong>SSO Node:</strong> {{ SSONODE }}</small>
         </div>
       </div>
-      <div class="card-footer text-center">
+      <div class="card-footer text-center d-flex justify-content-center gap-2">
+        <a href="{{ SSONODE }}/spassword.php?client={{ _SERVER['SERVER_NAME'] }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+          <i class="bi bi-key me-1"></i>Ganti Password
+        </a>
         <a href="/{{ pageID }}/login.php?cmd=logout" class="btn btn-sm btn-outline-danger">
           <i class="bi bi-box-arrow-right me-1"></i>Logout
         </a>
