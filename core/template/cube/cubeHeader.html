@@ -40,7 +40,7 @@
       <a id="userSettings" class="dropdown-toggle user-settings" href="#!" role="button"
         data-bs-toggle="dropdown" aria-expanded="false">
         <span class="me-2 text-truncate d-lg-block d-none">
-          {{ _SESSION['fullname'] }}
+          {{ _SESSION['fullname'] }} [{{ _SESSION['role'] }}]
         </span>
         <div class="header-actions-avatar fw-bold bg-primary-subtle text-primary">
           {{ _SESSION['fullname']|first|upper }}
