@@ -189,9 +189,6 @@ module.exports  = {
             this.submit = 'Simpan';
             this.form.reset();
             this.applyTypeRestrictions(this.currentLevel);
-            if (parseInt(this.currentLevel) === 1) {
-                this.form['type'] = 'option';
-            }
         },
         onSubmit: function () {
             let url = this.action;
@@ -291,15 +288,16 @@ module.exports  = {
         },
         applyTypeRestrictions: function (level) {
             let data = this.fields;
+            var clusterTypes = ['option', 'service'];
             for (let field in data) {
                 if (data[field]['name'] === 'type') {
                     for (let option in data[field]['options']) {
                         if (parseInt(level) === 1) {
-                            // Level 1 (cluster): hanya 'option' yang boleh dipilih
-                            this.isDisabled[option] = (option !== 'option');
+                            // Level 1 (cluster): hanya 'option' dan 'service' yang boleh dipilih
+                            this.isDisabled[option] = (clusterTypes.indexOf(option) === -1);
                         } else {
-                            // Level 2 (item): semua boleh kecuali 'option'
-                            this.isDisabled[option] = (option === 'option');
+                            // Level 2 (item): tidak boleh pilih 'option' atau 'service'
+                            this.isDisabled[option] = (clusterTypes.indexOf(option) !== -1);
                         }
                     }
                 }
@@ -326,9 +324,7 @@ module.exports  = {
                 }
             }
             this.applyTypeRestrictions(level);
-            if (parseInt(level) === 1) {
-                this.form['type'] = 'option';
-            } else if (this.form['type'] === 'option') {
+            if (parseInt(level) !== 1 && ['option', 'service'].indexOf(this.form['type']) !== -1) {
                 this.form['type'] = '';
             }
         },

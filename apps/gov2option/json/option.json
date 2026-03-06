@@ -30,11 +30,12 @@
 		"required": "true",
 		"error_message": "Pilih Type",
 		"options": {
-			"checkbox":"Checkbox",
-			"radio":"Radio",
-			"option":"Option",
+			"option":"Option (cluster)",
+			"service":"Service (cluster)",
 			"text":"Text",
-			"textbox":"Textbox"
+			"textbox":"Textbox",
+			"checkbox":"Checkbox",
+			"radio":"Radio"
 		},
 		"type": "select"
 	},{
