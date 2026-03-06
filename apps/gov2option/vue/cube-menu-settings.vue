@@ -69,13 +69,24 @@ module.exports = {
       services: []
     }
   },
+  methods: {
+    loadData() {
+      axios.get('/gov2option/index/getList')
+        .then(resp => {
+          this.options = resp.data.options || [];
+          this.services = resp.data.services || [];
+        })
+        .catch(e => console.log('cube-menu-settings:', e.message));
+    }
+  },
   created() {
-    axios.get('/gov2option/index/getList')
-      .then(resp => {
-        this.options = resp.data.options || [];
-        this.services = resp.data.services || [];
-      })
-      .catch(e => console.log('cube-menu-settings:', e.message));
+    this.loadData();
+  },
+  mounted() {
+    var el = document.getElementById('optionsOffcanvas');
+    if (el) {
+      el.addEventListener('show.bs.offcanvas', () => this.loadData());
+    }
   }
 }
 </script>

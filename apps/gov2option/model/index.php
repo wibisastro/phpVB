@@ -13,8 +13,8 @@ class index extends \Gov2lib\crudHandler {
 	}
 
     function getList() {
-        $q = "SELECT DISTINCT(app) FROM {$this->tbl->options} WHERE level=1 AND type='option' AND status='ON'";
-        $qs = "SELECT DISTINCT(app) FROM {$this->tbl->options} WHERE level=1 AND type='service' AND status='ON'";
+        $q = "SELECT DISTINCT(app) FROM {$this->tbl->options} WHERE level=1 AND type='option' AND UPPER(status)='ON'";
+        $qs = "SELECT DISTINCT(app) FROM {$this->tbl->options} WHERE level=1 AND type='service' AND UPPER(status)='ON'";
         $res = [];
 
         try {

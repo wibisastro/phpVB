@@ -47,6 +47,8 @@ class option {
         unset($_POST['children']);
         unset($_POST['created_at']);
         unset($_POST['created_by']);
+        unset($_POST['modify_at']);
+        unset($_POST['modify_by']);
         $_POST['created_by'] = $self->ses->val['account_id'];
         $_POST['app'] = $scriptID;
         $_POST['level'] = 1;
