@@ -112,7 +112,7 @@ class option extends \Gov2lib\crudHandler {
         return $doc->responseGet($data);
     }
 
-    function doBrowse ($scroll,$parent_id="",$parent_id_name="") {
+    function doBrowse (string|int $scroll = 0, string|int $parent_id = 0, string $parent_id_name = ''): ?array {
         global $uri, $scriptID;
         $WHERE = "WHERE app='{$scriptID}' ";
         try {
