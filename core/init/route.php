@@ -70,12 +70,12 @@ try {
                 $pageID="home";
             } elseif ($pageID=="gov2login.php") {
                 $pageID="gov2login";
-                $req=json_decode(stripslashes($_POST["req"]),true);
-                $_POST=array_merge($_POST,$req);
+                $req=json_decode(stripslashes($_POST["req"] ?? ''),true);
+                if (is_array($req)) { $_POST=array_merge($_POST,$req); }
             } elseif ($pageID=="install.php") {
                 $pageID="gov2config";
-                $req=json_decode(stripslashes($_POST["req"]),true);
-                $_POST=array_merge($_POST,$req);
+                $req=json_decode(stripslashes($_POST["req"] ?? ''),true);
+                if (is_array($req)) { $_POST=array_merge($_POST,$req); }
             } else {
                 $pageID=trim($config->domain->{$_SERVER["SERVER_NAME"]});
             }
