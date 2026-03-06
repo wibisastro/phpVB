@@ -104,10 +104,10 @@ class option extends \Gov2lib\crudHandler {
         return $response;
     }
 
-    function getRecords ($vars,$parent_name="") {
+    function getRecords (array $vars, string $parentName = ''): mixed {
         global $doc,$self;
         $_id=$this->setRememberId($vars['id']);
-        $data=$this->doBrowse($vars['scroll'],$_id,$parent_name);
+        $data=$this->doBrowse($vars['scroll'],$_id,$parentName);
         if (sizeof($data)==0) {$data=array("data"=>"empty","level"=>"1");}
         return $doc->responseGet($data);
     }
