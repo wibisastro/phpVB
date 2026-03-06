@@ -46,7 +46,7 @@ class option extends \Gov2lib\crudHandler {
             $ORDER = "ORDER BY id ASC";
         } else {
             if ($type === 'service') {
-                $WHERE = "WHERE level=1 and type='service'";
+                $WHERE = "WHERE app='{$scriptID}' AND level=1 AND type='service'";
             } else {
                 $WHERE = "WHERE app='{$scriptID}' ";
                 $WHERE .= "AND type='{$type}' AND level=1";
