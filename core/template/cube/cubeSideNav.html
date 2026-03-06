@@ -5,4 +5,12 @@
       <span class="menu-text">Dashboard</span>
     </a>
   </li>
+  {% if _SESSION['account_id'] %}
+  <li>
+    <a href="#" data-bs-toggle="offcanvas" data-bs-target="#optionsOffcanvas" aria-controls="optionsOffcanvas">
+      <i class="bi bi-gear"></i>
+      <span class="menu-text">Pengaturan</span>
+    </a>
+  </li>
+  {% endif %}
 </ul>
