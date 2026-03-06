@@ -13,6 +13,12 @@ composer.lock
 .vscode/
 .claude/
 
+# ownCloud sync files
+.owncloudsync.log
+.sync_journal.db
+.sync_journal.db-wal
+.sync_journal.db-shm
+
 # OS generated files
 .DS_Store
 .DS_Store?
