@@ -76,7 +76,7 @@ class option extends \Gov2lib\crudHandler {
         }
     }
 
-    function postAdd ($_data) {
+    function postAdd (array $_data, mixed $fields = null): array {
         global $doc,$config,$scriptID,$requester;
         $errors=$this->gov2formfield->checkRequired($_data,$this->fields);
         if (is_array($errors)) {
