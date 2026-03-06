@@ -103,7 +103,9 @@
         const originComponent = originAppPath + `/vue/${componentPath[componentPath.length-1]}`;
         return axios.get(originComponent)
                 .then(function(res) {
-                    if (res.data !== "") {
+                    var data = String(res.data || '').trim();
+                    var isVueSfc = data.startsWith('<template') || data.startsWith('<script') || data.startsWith('<style');
+                    if (isVueSfc) {
                         return res.data;
                     } else {
                         return axios.get(url)
@@ -145,9 +147,8 @@
 
 <!-- iFrame resize for saas-frame embeds -->
 <script>
-  var _saasIframes = document.querySelectorAll('.saas-frame iframe');
-  if (_saasIframes.length > 0) {
-    iFrameResize({ log: false }, _saasIframes);
+  if (document.querySelector('.saas-frame iframe')) {
+    iFrameResize({ log: false }, '.saas-frame iframe');
   }
 </script>
 
