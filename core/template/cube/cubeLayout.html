@@ -71,22 +71,22 @@
       </div>
       <!-- Main container ends -->
 
+<!-- Options Offcanvas starts -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="optionsOffcanvas" aria-labelledby="optionsOffcanvasLabel">
+      <div class="offcanvas-header border-bottom">
+        <h6 class="offcanvas-title fw-semibold" id="optionsOffcanvasLabel">
+          <i class="bi bi-gear me-2"></i>Pengaturan
+        </h6>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body p-0">
+        <cube-menu-settings></cube-menu-settings>
+      </div>
+    </div>
+    <!-- Options Offcanvas ends -->
+
     </div>
     <!-- Page wrapper ends -->
-
-<!-- Options Offcanvas starts -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="optionsOffcanvas" aria-labelledby="optionsOffcanvasLabel">
-  <div class="offcanvas-header border-bottom">
-    <h6 class="offcanvas-title fw-semibold" id="optionsOffcanvasLabel">
-      <i class="bi bi-gear me-2"></i>Pengaturan
-    </h6>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body p-0">
-    <cube-menu-settings></cube-menu-settings>
-  </div>
-</div>
-<!-- Options Offcanvas ends -->
 
 <script>
   if (window.localStorage && localStorage.getItem('sidebarToggled') === 'true') {
