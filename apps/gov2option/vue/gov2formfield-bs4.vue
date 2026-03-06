@@ -162,6 +162,7 @@ module.exports  = {
             isDel: true,
             isHasChildren: false,
             isDisabled: [],
+            currentLevel: 1,
             form: new Form(this.fields),
             scrollOptions: {
                 easing: 'ease-in',
@@ -187,6 +188,10 @@ module.exports  = {
             this.form['cmd'] = 'add';
             this.submit = 'Simpan';
             this.form.reset();
+            this.applyTypeRestrictions(this.currentLevel);
+            if (parseInt(this.currentLevel) === 1) {
+                this.form['type'] = 'option';
+            }
         },
         onSubmit: function () {
             let url = this.action;
@@ -228,6 +233,9 @@ module.exports  = {
             this.form['cmd'] = 'update';
             this.submit = 'Simpan';
             this.scrollTo();
+            if (fields.hasOwnProperty('level')) {
+                this.applyTypeRestrictions(fields['level']);
+            }
         },
         formConfirmSoftDel: function (data) {
             this.isConfirm = true;
@@ -281,7 +289,24 @@ module.exports  = {
                 this.form['parent_id'] = id;
             }
         },
+        applyTypeRestrictions: function (level) {
+            let data = this.fields;
+            for (let field in data) {
+                if (data[field]['name'] === 'type') {
+                    for (let option in data[field]['options']) {
+                        if (parseInt(level) === 1) {
+                            // Level 1 (cluster): hanya 'option' yang boleh dipilih
+                            this.isDisabled[option] = (option !== 'option');
+                        } else {
+                            // Level 2 (item): semua boleh kecuali 'option'
+                            this.isDisabled[option] = (option === 'option');
+                        }
+                    }
+                }
+            }
+        },
         setLevel: function (level) {
+            this.currentLevel = level;
             let data = this.fields;
 
             for (let field in data)
@@ -299,6 +324,12 @@ module.exports  = {
                         }
                     }
                 }
+            }
+            this.applyTypeRestrictions(level);
+            if (parseInt(level) === 1) {
+                this.form['type'] = 'option';
+            } else if (this.form['type'] === 'option') {
+                this.form['type'] = '';
             }
         },
         listenComponent: function () {
