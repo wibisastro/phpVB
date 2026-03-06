@@ -145,7 +145,10 @@
 
 <!-- iFrame resize for saas-frame embeds -->
 <script>
-  iFrameResize({ log: false }, '.saas-frame iframe');
+  var _saasIframes = document.querySelectorAll('.saas-frame iframe');
+  if (_saasIframes.length > 0) {
+    iFrameResize({ log: false }, _saasIframes);
+  }
 </script>
 
 </body>
