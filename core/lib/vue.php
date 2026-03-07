@@ -15,7 +15,7 @@ class vue extends checkExist
         global $vars;
         $_app = $this->checkAppDir($vars["app"]);
         $this->baseName = $_app;
-        $this->baseBody = 'bulmaJsBody.html';
+        $this->baseBody = 'jsBody.html';
 
         if (!isset($vars["component"])) {
             $vars["component"] = "";

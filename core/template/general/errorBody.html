@@ -2,37 +2,37 @@
 
 {% block head %}
 	{{ parent() }}
-	{% include('bulmaHead.html') %}
+	{% include('cubeHead.html') %}
 {% endblock %}
 
 {% block header %}
-	{% include('bulmaHeader.html') %}
+	{% include('cubeHeader.html') %}
 {% endblock %}
 
 {% block pagetitle %}
-	{% include('bulmaPageTitle.html') %}
+	{% include('cubePageTitle.html') %}
 {% endblock %}
 
 {% block sidebar %}
     {% for item in sidebars %}
-       {% include[item,'bulmaMissingFile.html'] %}
+       {% include[item,'cubeMissingFile.html'] %}
 	{% endfor %}
 {% endblock %}
 
 {% block content %}
     {% for item in contents %}
         <span>&nbsp;</span>
-       {% include[item,'bulmaMissingFile.html'] %}
+       {% include[item,'cubeMissingFile.html'] %}
 	{% endfor %}
 {% endblock %}
 
 {% block footer %}
-	{% include('bulmaFooter.html') %}
+	{% include('cubeFooter.html') %}
 {% endblock %}
 
 {% block js %}
 	{{ parent() }}
-	{% include('bulmaJS.html') %}
+	{% include('cubeJS.html') %}
 {% endblock %}
 
 {% block externalJS %}
