@@ -128,6 +128,7 @@
         el: '#app',
         components: {
         'cube-menu-settings': httpVueLoader('{{ webroot }}/gov2option/vue/cube-menu-settings.vue'),
+        'gov2navbreadcrumb': httpVueLoader('{{ webroot }}/components/vue/gov2navbreadcrumb.vue'),
         {% for component in components %}
             {% for item in component %}
            '{{ item.tag }}': httpVueLoader('{{ webroot }}/{{ item.pageID }}/vue/{{ item.component }}'),

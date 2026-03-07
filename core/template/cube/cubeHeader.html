@@ -18,17 +18,13 @@
 <!-- App brand sm ends -->
 
 <!-- Breadcrumb starts -->
-<ol class="breadcrumb d-none d-lg-flex ms-3 mb-0 align-items-center">
-  <li class="breadcrumb-item">
-    <a href="/"><i class="bi bi-house lh-1"></i></a>
-  </li>
-  {% if breadcrumbs %}
-    {% for crumb in breadcrumbs %}
-    <li class="breadcrumb-item"><a href="{{ crumb.url }}">{{ crumb.label }}</a></li>
-    {% endfor %}
+<div class="d-none d-lg-flex align-items-center ms-3">
+  <a href="/" class="text-muted"><i class="bi bi-house lh-1"></i></a>
+  <gov2navbreadcrumb path-url="{{ pathurl }}"></gov2navbreadcrumb>
+  {% if not pathurl %}
+  <span class="breadcrumb-item active ms-0 ps-0">{{ pageTitle }}</span>
   {% endif %}
-  <li class="breadcrumb-item active" aria-current="page">{{ pageTitle }}</li>
-</ol>
+</div>
 <!-- Breadcrumb ends -->
 
 <!-- App header actions starts -->
