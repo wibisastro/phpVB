@@ -1,10 +1,11 @@
 <template>
-<ol class="breadcrumb mb-0" v-if="pathData.length">
-    <li v-for="(path, index) in pathData" class="breadcrumb-item" :class="{ 'active': index === pathData.length - 1 }">
-        <a v-if="index < pathData.length - 1" :href="path['url']" v-text="path['caption']"></a>
-        <span v-else v-text="path['caption']"></span>
-    </li>
-</ol>
+<span v-if="pathData.length" class="d-flex align-items-center">
+    <template v-for="(path, index) in pathData">
+        <i class="bi bi-chevron-right small text-muted mx-1"></i>
+        <a v-if="index < pathData.length - 1" :href="path['url']" class="text-muted small" v-text="path['caption']"></a>
+        <span v-else class="small" v-text="path['caption']"></span>
+    </template>
+</span>
 </template>
 
 <script>
