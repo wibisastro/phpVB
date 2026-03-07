@@ -1,9 +1,11 @@
 <template>
-<span v-if="pathData.length" class="d-flex align-items-center">
+<span v-if="pathData.length > 1" class="d-flex align-items-center">
     <template v-for="(path, index) in pathData">
-        <i class="bi bi-chevron-right small text-muted mx-1"></i>
-        <a v-if="index < pathData.length - 1" :href="path['url']" class="text-muted small" v-text="path['caption']"></a>
-        <span v-else class="small" v-text="path['caption']"></span>
+        <template v-if="index > 0">
+            <i class="bi bi-chevron-right small text-muted mx-1"></i>
+            <a v-if="index < pathData.length - 1" :href="path['url']" class="text-muted small" v-text="path['caption']"></a>
+            <span v-else class="small" v-text="path['caption']"></span>
+        </template>
     </template>
 </span>
 </template>
