@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<list>
-	<route>
-		<method>GET</method>
-		<uri>/krisna</uri>
-		<handler>latihan\krisna\index</handler>
-	</route>
-</list>
