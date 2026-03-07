@@ -155,6 +155,23 @@ class index extends \Gov2lib\api {
         return $data;
     }
 
+    function getYearOptions($vars) {
+        global $self, $doc;
+        $pageID = $vars['id'] ?? ($_GET['pageID'] ?? '');
+        $data = $self->getYearOptions($pageID);
+        return $doc->responseGet($data);
+    }
+
+    function setYear($vars) {
+        global $self, $doc;
+        $pageID = $vars['pageID'] ?? ($_POST['pageID'] ?? '');
+        $year   = $vars['year']   ?? ($_POST['year']   ?? '');
+        if ($year) {
+            $self->setYear($pageID, $year);
+        }
+        return $doc->responseGet(['status' => 'ok', 'year' => $year]);
+    }
+
     function getPageroles() {
         $path = __DIR__.'/xml/pageroles.xml';
         if (file_exists($path)) {

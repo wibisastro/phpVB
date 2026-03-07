@@ -13,6 +13,7 @@ class index extends \Gov2lib\crudHandler {
 	}
 
     function getList() {
+        global $self;
         $q = "SELECT DISTINCT(app) FROM {$this->tbl->options} WHERE level=1 AND type='option' AND UPPER(status)='ON'";
         $qs = "SELECT DISTINCT(app) FROM {$this->tbl->options} WHERE level=1 AND type='service' AND UPPER(status)='ON'";
         $res = [];
@@ -23,7 +24,69 @@ class index extends \Gov2lib\crudHandler {
         } catch (\MeekroDBException $e) {
             $this->exceptionHandler($e->getMessage());
         }
+
+        $res['userRole'] = $self->ses->val['userRole'] ?? '';
         return $res;
+    }
+
+    function getYearOptions(string $pageID): array
+    {
+        global $self;
+        $res = ['optionTahun' => [], 'activeYear' => null];
+
+        if (empty($pageID)) {
+            return $res;
+        }
+
+        $q = "SELECT child.nama, child.value as is_active
+              FROM {$this->tbl->options} parent
+              JOIN {$this->tbl->options} child ON child.parent_id = parent.id
+              WHERE parent.app=%s AND parent.nama LIKE '%Tahun%' AND parent.level=1
+              ORDER BY child.nama DESC";
+
+        try {
+            $rows = \DB::query($q, $pageID);
+            foreach ($rows as $row) {
+                $res['optionTahun'][] = ['nama' => $row['nama']];
+                if ($row['is_active'] == '1' && $res['activeYear'] === null) {
+                    $res['activeYear'] = $row['nama'];
+                }
+            }
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler($e->getMessage());
+        }
+
+        // Fallback: activeYear from member attr
+        if ($res['activeYear'] === null && !empty($res['optionTahun'])) {
+            $member = $self->opt->getMember();
+            if (!empty($member['attr'])) {
+                $xmlArray = json_decode(json_encode(simplexml_load_string($member['attr'])), true);
+                if (!empty($xmlArray['tahun'])) {
+                    $res['activeYear'] = (string)$xmlArray['tahun'];
+                }
+            }
+        }
+
+        return $res;
+    }
+
+    function setYear(string $pageID, string $year): void
+    {
+        global $self;
+
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $member = $dom->createElement('member');
+        $tahun = $dom->createElement('tahun', htmlspecialchars($year, ENT_XML1));
+        $member->appendChild($tahun);
+        $dom->appendChild($member);
+        $dom->formatOutput = true;
+        $xmlString = $dom->saveXML();
+
+        try {
+            \DB::update('member', ['attr' => $xmlString], 'account_id=%i', $self->ses->val['account_id']);
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler($e->getMessage());
+        }
     }
 
     function dependencies () {
