@@ -156,7 +156,7 @@ class member extends \Gov2lib\crudHandler {
         return $doc->responseGet($data);        
     }
 
-    function doBrowseTags ($source_id,$_source,$_target,$_target2="",$_caption="")
+    function doBrowseTags (int $sourceId, string $source, string $target, string $target2 = '', string $caption = ''): ?array
     {
         global $config, $vars;
         $role = $_GET['role'] ?? '';
@@ -164,13 +164,13 @@ class member extends \Gov2lib\crudHandler {
 
         try {
             $query="SELECT *,
-            ".$_target."_".$_caption." AS target_" .$_caption.",
-            ".$_target."_id AS target_id,
-            ".$_source."_id AS source_id";
+            ".$target."_".$caption." AS target_" .$caption.",
+            ".$target."_id AS target_id,
+            ".$source."_id AS source_id";
 
-            $query.=" FROM ".$this->tbl->role." WHERE ".$_source."_parent=%i AND member_role=%s";
+            $query.=" FROM ".$this->tbl->role." WHERE ".$source."_parent=%i AND member_role=%s";
 
-            $results = $connector->db->query($query,$source_id, $role);
+            $results = $connector->db->query($query, $sourceId, $role);
         } catch (\MeekroDBException $e) {
 			$this->exceptionHandler('doBrowseTags:'.$e->getMessage());
 		}
@@ -203,8 +203,9 @@ class member extends \Gov2lib\crudHandler {
         return $response;
     }
 
-    function doTagging ($data, $_source, $_target, $_target2, $_caption)
+    function doTagging (array $data, string $source, string $target, string $target2, string $caption): ?int
     {
+        $_source = $source; $_target = $target; $_target2 = $target2; $_caption = $caption;
         global $uri, $self, $vars, $config;
         $role = $_GET['role'] ?? '';
         $account_id = $self->ses->val['account_id'];
