@@ -177,9 +177,10 @@ class member extends \Gov2lib\crudHandler {
 	    return $results;
 	}
 
-    function postTagging ($_data, $_source, $_target, $_target2="", $_caption="")
+    function postTagging (array $data, string $source, string $target, string $target2 = '', string $caption = ''): array
     {
         global $doc, $config, $self;
+        $_data = $data; $_source = $source; $_target = $target; $_target2 = $target2; $_caption = $caption;
         if (!$_data['source_id'] || !$_data['target_id']) {
             $response["class"] = $config->css->attr['is-warning'];
             $response["notification"] = "Pasangan ID tidak lengkap";
