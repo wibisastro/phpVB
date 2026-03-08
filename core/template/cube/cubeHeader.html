@@ -54,7 +54,7 @@
 
   {% if _SESSION['account_id'] %}
     <!-- Notification icon (dummy) start -->
-    <a href="#" class="position-relative me-2 text-muted" title="Notifikasi" style="text-decoration:none">
+    <a href="#" class="position-relative mx-3 text-muted" title="Notifikasi" style="text-decoration:none">
       <i class="bi bi-bell fs-5"></i>
       <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.6rem">
         3
@@ -76,9 +76,9 @@
         </div>
       </a>
       <div class="dropdown-menu dropdown-menu-end shadow-lg">
-        <div class="px-3 py-2 border-bottom">
-          <span class="badge bg-primary">{{ _SESSION['userRole'] }}</span>
-        </div>
+        <a class="dropdown-item d-flex align-items-center" href="/gov2login">
+          <i class="bi bi-person-badge fs-5 me-2"></i>{{ _SESSION['userRole'] }}
+        </a>
         <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="offcanvas" data-bs-target="#sidePanelOffcanvas" aria-controls="sidePanelOffcanvas" data-panel-view="pengaturan">
           <i class="bi bi-gear fs-5 me-2"></i>Pengaturan
         </a>
