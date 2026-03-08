@@ -91,6 +91,101 @@ class index extends \Gov2lib\crudHandler {
         }
     }
 
+    #---coded by claude
+    function getUnitKerjaList(int $parentId = 0): array
+    {
+        $fields = "id, parent_id, nama, kode, level_label, portal";
+        $result = [];
+
+        try {
+            if ($parentId > 0) {
+                $q = "SELECT {$fields} FROM {$this->tbl->kementerian} WHERE parent_id=%i ORDER BY kode ASC";
+                $result = \DB::query($q, $parentId);
+                foreach ($result as $i => $row) {
+                    $qc = "SELECT COUNT(*) FROM {$this->tbl->kementerian} WHERE parent_id=%i";
+                    $cnt = \DB::queryFirstField($qc, $row['id']);
+                    $result[$i]['has_children'] = (int)$cnt > 0;
+                }
+            } else {
+                $q = "SELECT {$fields} FROM {$this->tbl->kementerian} WHERE level_label='eselon1' ORDER BY kode ASC";
+                $result = \DB::query($q);
+                foreach ($result as $i => $row) {
+                    $qc = "SELECT COUNT(*) FROM {$this->tbl->kementerian} WHERE parent_id=%i";
+                    $cnt = \DB::queryFirstField($qc, $row['id']);
+                    $result[$i]['has_children'] = (int)$cnt > 0;
+                }
+            }
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler($e->getMessage());
+        }
+
+        return $result;
+    }
+
+    #---coded by claude
+    function searchUnitKerja(string $keyword): array
+    {
+        $fields = "id, parent_id, nama, kode, level_label, portal";
+        $result = [];
+
+        try {
+            $q = "SELECT {$fields} FROM {$this->tbl->kementerian}
+                  WHERE (nama LIKE %ss OR kode LIKE %ss)
+                  ORDER BY kode ASC LIMIT 50";
+            $result = \DB::query($q, $keyword, $keyword);
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler($e->getMessage());
+        }
+
+        return $result;
+    }
+
+    #---coded by claude
+    function getUnitKerjaConfig(): array
+    {
+        global $self;
+        $result = ['userRole' => '', 'locked' => false, 'unit_nama' => '', 'unit_id' => null, 'portal' => ''];
+
+        $result['userRole'] = $self->ses->val['userRole'] ?? '';
+        $result['unit_nama'] = $self->ses->val['unit_nama'] ?? '';
+        $result['unit_id'] = $self->ses->val['opd_id'] ?? null;
+        $result['portal'] = $self->ses->val['opd'] ?? '';
+
+        // Lock logic: member role cannot change unit
+        $role = $result['userRole'];
+        if ($role === '' || $role === 'member') {
+            $result['locked'] = true;
+        }
+
+        return $result;
+    }
+
+    #---coded by claude
+    function changePortal(int $unitId, string $portal, string $unitNama): void
+    {
+        global $self;
+        $self->ses->val['opd_id'] = $unitId;
+        $self->ses->val['opd'] = $portal;
+        $self->ses->val['portal_nama'] = $unitNama;
+        $self->ses->val['unit_nama'] = $unitNama;
+        $self->ses->val['unit_id'] = $unitId;
+        $self->ses->val['change_portal'] = 1;
+        $self->ses->sesSave($self->ses->val);
+    }
+
+    #---coded by claude
+    function resetPortal(): void
+    {
+        global $self;
+        $self->ses->val['opd_id'] = null;
+        $self->ses->val['opd'] = null;
+        $self->ses->val['portal_nama'] = null;
+        $self->ses->val['unit_nama'] = null;
+        $self->ses->val['unit_id'] = null;
+        $self->ses->val['change_portal'] = null;
+        $self->ses->sesSave($self->ses->val);
+    }
+
     function dependencies () {
         global $self;
         $self->take("dpdraft2","draft");

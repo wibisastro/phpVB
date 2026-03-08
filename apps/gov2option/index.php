@@ -188,6 +188,48 @@ class index extends \Gov2lib\api {
         return 0;
     }
 
+    #---coded by claude
+    function getUnitKerjaList($vars = []) {
+        global $self, $doc;
+        $parentId = (int)($vars['id'] ?? 0);
+        $data = $self->getUnitKerjaList($parentId);
+        return $doc->responseGet($data);
+    }
+
+    #---coded by claude
+    function searchUnitKerja($vars = []) {
+        global $self, $doc;
+        $keyword = $_GET['q'] ?? '';
+        $data = $self->searchUnitKerja($keyword);
+        return $doc->responseGet($data);
+    }
+
+    #---coded by claude
+    function getUnitKerjaConfig() {
+        global $self, $doc;
+        $data = $self->getUnitKerjaConfig();
+        return $doc->responseGet($data);
+    }
+
+    #---coded by claude
+    function changePortal($vars = []) {
+        global $self, $doc;
+        $unitId = (int)($vars['id'] ?? 0);
+        $portal = $_GET['portal'] ?? '';
+        $nama = $_GET['nama'] ?? '';
+        if ($unitId && $nama) {
+            $self->changePortal($unitId, $portal, $nama);
+        }
+        return $doc->responseGet(['status' => 'ok', 'unit_id' => $unitId, 'unit_nama' => $nama]);
+    }
+
+    #---coded by claude
+    function resetPortal() {
+        global $self, $doc;
+        $self->resetPortal();
+        return $doc->responseGet(['status' => 'ok']);
+    }
+
     function getRolePrivilege() {
         global $self, $doc;
         $response = $self->getRolePrivilege($self->ses->val['id']);

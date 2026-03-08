@@ -173,7 +173,7 @@ module.exports = {
     this.loadData();
   },
   mounted() {
-    var el = document.getElementById('optionsOffcanvas');
+    var el = document.getElementById('sidePanelOffcanvas');
     if (el) {
       el.addEventListener('show.bs.offcanvas', () => this.loadData());
     }
