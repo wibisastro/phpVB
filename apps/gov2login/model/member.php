@@ -90,8 +90,6 @@ class member extends \Gov2lib\crudHandler {
     */
     function roleBrowse ($superUser) {
         global $self, $uri;
-//        $role_level = ['guest' => 1, 'member' => 2, 'komisioner' => 3, 'admin' => 4, 'webmaster' => 5];
-        // $role_level = ['guest' => 1, 'member' => 2, 'pimpinan' => 3, 'admin' => 4, 'webmaster' => 5];
         $role_level = ['guest' => 1, 'member' => 2, 'admin' => 3, 'webmaster' => 4];
         $current_level = $role_level[$self->ses->val['userRole']];
         try {
