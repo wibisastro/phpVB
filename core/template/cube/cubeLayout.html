@@ -150,23 +150,26 @@
 
 {% endblock %}
 
-<!-- Side panel view switching (event delegation) -->
+<!-- Side panel view switching via offcanvas show event -->
 <script>
   (function() {
     var panelTitles = {
       unitkerja: '<i class="bi bi-building me-2"></i>Unit Kerja',
       pengaturan: '<i class="bi bi-gear me-2"></i>Pengaturan'
     };
-    document.addEventListener('click', function(e) {
-      var trigger = e.target.closest('[data-panel-view]');
-      if (!trigger) return;
-      var view = trigger.getAttribute('data-panel-view');
-      if (view && window.__vueApp) {
-        window.__vueApp.sidePanelView = view;
-        var label = document.getElementById('sidePanelLabel');
-        if (label) { label.innerHTML = panelTitles[view] || ''; }
-      }
-    });
+    var panel = document.getElementById('sidePanelOffcanvas');
+    if (panel) {
+      panel.addEventListener('show.bs.offcanvas', function(e) {
+        var trigger = e.relatedTarget;
+        if (!trigger) return;
+        var view = trigger.getAttribute('data-panel-view');
+        if (view && window.__vueApp) {
+          window.__vueApp.sidePanelView = view;
+          var label = document.getElementById('sidePanelLabel');
+          if (label) { label.innerHTML = panelTitles[view] || ''; }
+        }
+      });
+    }
   })();
 </script>
 
