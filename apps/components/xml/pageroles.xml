@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pageroles>
+    <guest>1</guest>
+    <member>2</member>
+    <admin>3</admin>
+    <webmaster>4</webmaster>
+</pageroles>
