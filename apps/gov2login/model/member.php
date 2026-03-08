@@ -258,8 +258,9 @@ class member extends \Gov2lib\crudHandler {
         }
     }
 
-    function postDelTag ($_data)
+    function postDelTag (array $data): array
     {
+        $_data = $data;
         global $doc;
         if (!$_data['id']) {
             $response['id']='No ID number';
