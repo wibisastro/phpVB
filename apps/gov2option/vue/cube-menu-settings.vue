@@ -151,7 +151,7 @@ module.exports = {
           })
           .catch(e => console.log('cube-menu-settings getYearOptions:', e.message));
 
-        axios.get('/' + this.pageID + '/index/getPageroles')
+        axios.get('/gov2option/index/getPageroles/' + this.pageID)
           .then(resp => {
             if (resp.data && typeof resp.data === 'object' && !Array.isArray(resp.data)) {
               this.myRoles = Object.keys(resp.data);

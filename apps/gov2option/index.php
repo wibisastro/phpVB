@@ -172,8 +172,13 @@ class index extends \Gov2lib\api {
         return $doc->responseGet(['status' => 'ok', 'year' => $year]);
     }
 
-    function getPageroles() {
-        $path = __DIR__.'/xml/pageroles.xml';
+    function getPageroles($vars = []) {
+        $appID = $vars['id'] ?? '';
+        if ($appID) {
+            $path = __DIR__.'/../'.$appID.'/xml/pageroles.xml';
+        } else {
+            $path = __DIR__.'/xml/pageroles.xml';
+        }
         if (file_exists($path)) {
             return json_encode(simplexml_load_file($path));
         }
