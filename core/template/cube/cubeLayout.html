@@ -78,10 +78,10 @@
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="offcanvas-body p-0">
-        <div v-show="sidePanelView === 'unitkerja'" class="h-100">
+        <div id="sidePanel-unitkerja" class="h-100">
           <cube-unitkerja></cube-unitkerja>
         </div>
-        <div v-show="sidePanelView === 'pengaturan'">
+        <div id="sidePanel-pengaturan" style="display:none">
           <cube-menu-settings></cube-menu-settings>
         </div>
       </div>
@@ -129,9 +129,6 @@
   window.__vueApp = new Vue({
     {% block js %}
         el: '#app',
-        data: {
-          sidePanelView: 'unitkerja'
-        },
         components: {
         'cube-menu-settings': httpVueLoader('{{ webroot }}/gov2option/vue/cube-menu-settings.vue'),
         'cube-unitkerja': httpVueLoader('{{ webroot }}/gov2option/vue/cube-unitkerja.vue'),
@@ -157,11 +154,16 @@
       unitkerja: '<i class="bi bi-building me-2"></i>Unit Kerja',
       pengaturan: '<i class="bi bi-gear me-2"></i>Pengaturan'
     };
-    if (window.__vueApp) {
-      window.__vueApp.sidePanelView = view;
-    }
+    // Toggle panels via DOM
+    var views = ['unitkerja', 'pengaturan'];
+    views.forEach(function(v) {
+      var el = document.getElementById('sidePanel-' + v);
+      if (el) { el.style.display = (v === view) ? '' : 'none'; }
+    });
+    // Update title
     var label = document.getElementById('sidePanelLabel');
     if (label) { label.innerHTML = titles[view] || ''; }
+    // Open offcanvas
     var panel = document.getElementById('sidePanelOffcanvas');
     if (panel) {
       var bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(panel);

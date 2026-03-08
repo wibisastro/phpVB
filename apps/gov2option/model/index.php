@@ -92,8 +92,10 @@ class index extends \Gov2lib\crudHandler {
     }
 
     #---coded by claude
-    function getUnitKerjaList(int $parentId = 0): array
+    function getUnitKerjaList($vars = [])
     {
+        global $doc;
+        $parentId = (int)($vars['id'] ?? 0);
         $fields = "id, parent_id, nama, kode, level_label, portal";
         $result = [];
 
@@ -101,30 +103,27 @@ class index extends \Gov2lib\crudHandler {
             if ($parentId > 0) {
                 $q = "SELECT {$fields} FROM {$this->tbl->kementerian} WHERE parent_id=%i ORDER BY kode ASC";
                 $result = \DB::query($q, $parentId);
-                foreach ($result as $i => $row) {
-                    $qc = "SELECT COUNT(*) FROM {$this->tbl->kementerian} WHERE parent_id=%i";
-                    $cnt = \DB::queryFirstField($qc, $row['id']);
-                    $result[$i]['has_children'] = (int)$cnt > 0;
-                }
             } else {
                 $q = "SELECT {$fields} FROM {$this->tbl->kementerian} WHERE level_label='eselon1' ORDER BY kode ASC";
                 $result = \DB::query($q);
-                foreach ($result as $i => $row) {
-                    $qc = "SELECT COUNT(*) FROM {$this->tbl->kementerian} WHERE parent_id=%i";
-                    $cnt = \DB::queryFirstField($qc, $row['id']);
-                    $result[$i]['has_children'] = (int)$cnt > 0;
-                }
+            }
+            foreach ($result as $i => $row) {
+                $qc = "SELECT COUNT(*) FROM {$this->tbl->kementerian} WHERE parent_id=%i";
+                $cnt = \DB::queryFirstField($qc, $row['id']);
+                $result[$i]['has_children'] = (int)$cnt > 0;
             }
         } catch (\MeekroDBException $e) {
             $this->exceptionHandler($e->getMessage());
         }
 
-        return $result;
+        return $doc->responseGet($result);
     }
 
     #---coded by claude
-    function searchUnitKerja(string $keyword): array
+    function searchUnitKerja($vars = [])
     {
+        global $doc;
+        $keyword = $_GET['q'] ?? '';
         $fields = "id, parent_id, nama, kode, level_label, portal";
         $result = [];
 
@@ -137,13 +136,13 @@ class index extends \Gov2lib\crudHandler {
             $this->exceptionHandler($e->getMessage());
         }
 
-        return $result;
+        return $doc->responseGet($result);
     }
 
     #---coded by claude
-    function getUnitKerjaConfig(): array
+    function getUnitKerjaConfig($vars = [])
     {
-        global $self;
+        global $self, $doc;
         $result = ['userRole' => '', 'locked' => false, 'unit_nama' => '', 'unit_id' => null, 'portal' => ''];
 
         $result['userRole'] = $self->ses->val['userRole'] ?? '';
@@ -151,32 +150,39 @@ class index extends \Gov2lib\crudHandler {
         $result['unit_id'] = $self->ses->val['opd_id'] ?? null;
         $result['portal'] = $self->ses->val['opd'] ?? '';
 
-        // Lock logic: member role cannot change unit
         $role = $result['userRole'];
         if ($role === '' || $role === 'member') {
             $result['locked'] = true;
         }
 
-        return $result;
+        return $doc->responseGet($result);
     }
 
     #---coded by claude
-    function changePortal(int $unitId, string $portal, string $unitNama): void
+    function changePortal($vars = [])
     {
-        global $self;
-        $self->ses->val['opd_id'] = $unitId;
-        $self->ses->val['opd'] = $portal;
-        $self->ses->val['portal_nama'] = $unitNama;
-        $self->ses->val['unit_nama'] = $unitNama;
-        $self->ses->val['unit_id'] = $unitId;
-        $self->ses->val['change_portal'] = 1;
-        $self->ses->sesSave($self->ses->val);
+        global $self, $doc;
+        $unitId = (int)($vars['id'] ?? 0);
+        $portal = $_GET['portal'] ?? '';
+        $unitNama = $_GET['nama'] ?? '';
+
+        if ($unitId && $unitNama) {
+            $self->ses->val['opd_id'] = $unitId;
+            $self->ses->val['opd'] = $portal;
+            $self->ses->val['portal_nama'] = $unitNama;
+            $self->ses->val['unit_nama'] = $unitNama;
+            $self->ses->val['unit_id'] = $unitId;
+            $self->ses->val['change_portal'] = 1;
+            $self->ses->sesSave($self->ses->val);
+        }
+
+        return $doc->responseGet(['status' => 'ok', 'unit_id' => $unitId, 'unit_nama' => $unitNama]);
     }
 
     #---coded by claude
-    function resetPortal(): void
+    function resetPortal($vars = [])
     {
-        global $self;
+        global $self, $doc;
         $self->ses->val['opd_id'] = null;
         $self->ses->val['opd'] = null;
         $self->ses->val['portal_nama'] = null;
@@ -184,6 +190,8 @@ class index extends \Gov2lib\crudHandler {
         $self->ses->val['unit_id'] = null;
         $self->ses->val['change_portal'] = null;
         $self->ses->sesSave($self->ses->val);
+
+        return $doc->responseGet(['status' => 'ok']);
     }
 
     function dependencies () {
