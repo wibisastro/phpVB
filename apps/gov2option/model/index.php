@@ -96,7 +96,7 @@ class index extends \Gov2lib\crudHandler {
     {
         global $doc;
         $parentId = (int)($vars['id'] ?? 0);
-        $fields = "id, parent_id, nama, kode, level_label, portal";
+        $fields = "id, parent_id, `level`, nama, kode, portal";
         $result = [];
 
         try {
@@ -104,7 +104,7 @@ class index extends \Gov2lib\crudHandler {
                 $q = "SELECT {$fields} FROM {$this->tbl->kementerian} WHERE parent_id=%i ORDER BY kode ASC";
                 $result = \DB::query($q, $parentId);
             } else {
-                $q = "SELECT {$fields} FROM {$this->tbl->kementerian} WHERE level_label='eselon1' ORDER BY kode ASC";
+                $q = "SELECT {$fields} FROM {$this->tbl->kementerian} WHERE parent_id=0 ORDER BY kode ASC";
                 $result = \DB::query($q);
             }
             foreach ($result as $i => $row) {
@@ -124,7 +124,7 @@ class index extends \Gov2lib\crudHandler {
     {
         global $doc;
         $keyword = $_GET['q'] ?? '';
-        $fields = "id, parent_id, nama, kode, level_label, portal";
+        $fields = "id, parent_id, `level`, nama, kode, portal";
         $result = [];
 
         try {
