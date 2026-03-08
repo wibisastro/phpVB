@@ -147,11 +147,11 @@ class member extends \Gov2lib\crudHandler {
 	    return $result;
     }
 
-    function getBrowseTags ($_id,$_source,$_target,$_target2="",$_caption="")
+    function getBrowseTags (int $id, string $source, string $target, string $target2 = '', string $caption = ''): mixed
     {
         global $doc,$config,$self;
-        $_id=$this->setRememberId($_id,$_source);
-        $data=$this->doBrowseTags($_id,$_source,$_target,$_target2,$_caption);
+        $_id=$this->setRememberId($id,$source);
+        $data=$this->doBrowseTags($_id,$source,$target,$target2,$caption);
         if (sizeof($data)==0) {$data=array("data"=>"empty");}
         return $doc->responseGet($data);        
     }
