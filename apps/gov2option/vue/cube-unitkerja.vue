@@ -29,8 +29,16 @@
       </div>
     </div>
 
+    <!-- Error alert -->
+    <div v-if="errorMsg" class="px-3 py-2">
+      <div class="alert alert-danger alert-dismissible mb-0 small">
+        <button type="button" class="btn-close btn-close-sm" @click="errorMsg=''"></button>
+        <i class="bi bi-exclamation-triangle me-1"></i>{{ errorMsg }}
+      </div>
+    </div>
+
     <!-- Content area -->
-    <div class="flex-grow-1 overflow-auto" v-if="!config.locked">
+    <div class="flex-grow-1 overflow-auto" v-if="!config.locked && !errorMsg">
 
       <!-- Search results -->
       <div v-if="searchMode">
@@ -109,7 +117,8 @@ module.exports = {
       searchResults: [],
       searchLoading: false,
       searchMode: false,
-      searchTimer: null
+      searchTimer: null,
+      errorMsg: ''
     }
   },
   methods: {
@@ -129,7 +138,7 @@ module.exports = {
           this.treeItems = resp.data || [];
           this.loading = false;
         })
-        .catch(e => { this.loading = false; console.log('unitkerja list:', e.message); });
+        .catch(e => { this.loading = false; this.handleError(e); });
     },
     drillDown(item) {
       this.breadcrumb.push({ id: item.id, kode: item.kode, nama: item.nama });
@@ -184,7 +193,7 @@ module.exports = {
             this.searchResults = resp.data || [];
             this.searchLoading = false;
           })
-          .catch(e => { this.searchLoading = false; });
+          .catch(e => { this.searchLoading = false; this.handleError(e); });
       }, 300);
     },
     updateTopbar() {
@@ -203,6 +212,20 @@ module.exports = {
           el.classList.remove('text-body');
         }
       }
+    },
+    handleError(e) {
+      var msg = 'Terjadi kesalahan';
+      if (e.response && e.response.data) {
+        var d = e.response.data;
+        if (typeof d === 'object' && d.notification) {
+          msg = d.notification;
+        } else if (typeof d === 'string') {
+          msg = d;
+        }
+      } else if (e.message) {
+        msg = e.message;
+      }
+      this.errorMsg = msg;
     },
     escapeHtml(str) {
       var div = document.createElement('div');
