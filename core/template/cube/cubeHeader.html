@@ -38,7 +38,7 @@
      class="d-none d-lg-flex align-items-center text-decoration-none small me-3 px-3 py-1 rounded-3 border"
      style="white-space:nowrap; max-width:320px; background:#fff"
      data-bs-toggle="offcanvas" data-bs-target="#sidePanelOffcanvas" aria-controls="sidePanelOffcanvas"
-     data-panel-tab="tab-unitkerja">
+     data-panel-view="unitkerja">
     {% if _SESSION['unit_nama'] %}
       <i class="bi bi-building me-1"></i>
       <span class="text-truncate" style="max-width:200px">{{ _SESSION['unit_nama'] }}</span>
@@ -68,7 +68,7 @@
         <a class="dropdown-item d-flex align-items-center" href="/gov2login">
           <i class="bi bi-person fs-5 me-2"></i>Profile
         </a>
-        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="offcanvas" data-bs-target="#sidePanelOffcanvas" aria-controls="sidePanelOffcanvas" data-panel-tab="tab-pengaturan">
+        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="offcanvas" data-bs-target="#sidePanelOffcanvas" aria-controls="sidePanelOffcanvas" data-panel-view="pengaturan">
           <i class="bi bi-gear fs-5 me-2"></i>Pengaturan
         </a>
         <div class="mx-3 my-2 d-grid">
