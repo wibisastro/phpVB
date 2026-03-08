@@ -37,8 +37,7 @@
   <a href="#" id="topbarUnitKerja"
      class="d-none d-lg-flex align-items-center text-decoration-none me-3 px-3 py-2 rounded-3 border"
      style="white-space:nowrap; max-width:320px; background:#fff"
-     data-bs-toggle="offcanvas" data-bs-target="#sidePanelOffcanvas" aria-controls="sidePanelOffcanvas"
-     data-panel-view="unitkerja">
+     onclick="event.preventDefault(); openSidePanel('unitkerja')">
     {% if _SESSION['unit_nama'] %}
       <i class="bi bi-building fs-5 me-2"></i>
       <span class="text-truncate" style="max-width:200px">{{ _SESSION['unit_nama'] }}</span>
@@ -79,7 +78,7 @@
         <a class="dropdown-item d-flex align-items-center" href="/gov2login">
           <i class="bi bi-person-badge fs-5 me-2"></i>{{ _SESSION['userRole'] }}
         </a>
-        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="offcanvas" data-bs-target="#sidePanelOffcanvas" aria-controls="sidePanelOffcanvas" data-panel-view="pengaturan">
+        <a class="dropdown-item d-flex align-items-center" href="#" onclick="event.preventDefault(); openSidePanel('pengaturan')">
           <i class="bi bi-gear fs-5 me-2"></i>Pengaturan
         </a>
         <div class="mx-3 my-2 d-grid">
