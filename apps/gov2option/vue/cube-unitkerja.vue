@@ -193,12 +193,12 @@ module.exports = {
       if (el) {
         var nama = this.config.unit_nama;
         if (nama) {
-          el.innerHTML = '<i class="bi bi-building me-1"></i>' +
+          el.innerHTML = '<i class="bi bi-building fs-5 me-2"></i>' +
             '<span class="text-truncate" style="max-width:200px">' + this.escapeHtml(nama) + '</span>';
           el.classList.remove('text-muted');
           el.classList.add('text-body');
         } else {
-          el.innerHTML = '<i class="bi bi-building me-1"></i><span class="text-muted">Pilih Unit Kerja</span>';
+          el.innerHTML = '<i class="bi bi-building fs-5 me-2"></i><span class="text-muted">Pilih Unit Kerja</span>';
           el.classList.add('text-muted');
           el.classList.remove('text-body');
         }
