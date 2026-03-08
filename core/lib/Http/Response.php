@@ -11,6 +11,7 @@ namespace Gov2lib\Http;
  * compatible with the phpVB frontend expectations. Handles JSON responses,
  * HTML responses, error formatting, success messages, redirects, and CORS headers.
  */
+#---coded by claude (seluruh file, 28 Feb 2026)
 class Response
 {
     /**

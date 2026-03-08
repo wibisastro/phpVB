@@ -29,6 +29,7 @@ class index extends \Gov2lib\crudHandler {
         return $res;
     }
 
+    #---coded by claude
     function getYearOptions(string $pageID): array
     {
         global $self;
@@ -70,6 +71,7 @@ class index extends \Gov2lib\crudHandler {
         return $res;
     }
 
+    #---coded by claude
     function setYear(string $pageID, string $year): void
     {
         global $self;

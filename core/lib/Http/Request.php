@@ -11,6 +11,7 @@ namespace Gov2lib\Http;
  * cookies, headers, and server variables. Handles URI parsing for route
  * extraction and supports both standard form requests and AJAX/JSON requests.
  */
+#---coded by claude (seluruh file, 28 Feb 2026)
 class Request
 {
     /**

@@ -2,6 +2,7 @@
 
 namespace Gov2lib\Enums;
 
+#---coded by claude (seluruh file, 28 Feb 2026)
 enum HttpMethod: string
 {
     case GET = 'GET';

@@ -17,6 +17,7 @@ use SimpleXMLElement;
  * 
  * All configuration is stored internally using dot-notation (e.g., 'database.host').
  */
+#---coded by claude (seluruh file, 28 Feb 2026)
 class AppConfig implements ConfigInterface
 {
     /**

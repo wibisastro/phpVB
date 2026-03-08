@@ -2,6 +2,7 @@
 
 namespace Gov2lib\Exceptions;
 
+#---coded by claude (seluruh file, 28 Feb 2026)
 class ConfigException extends HttpException
 {
     public function __construct(

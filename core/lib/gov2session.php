@@ -8,12 +8,19 @@ use GuzzleHttp\Psr7\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-/**
- * Session management class for Gov2 authentication and authorization
- *
- * @author Wibisono Sastrodiwiryo
- * @version 0.0.6
- */
+/*
+Author		: Wibisono Sastrodiwiryo
+Date		: 21 Dec 2017
+Copyleft	: eGov Lab UI
+Contact		: wibi@alumni.ui.ac.id
+Version		: 0.0.1
+Version		: 0.0.2 nambah error message role 6 Aug 2020
+Version		: 0.0.3 nambah propagasi superadmin per wilayah 10 Aug 2020
+Version		: 0.0.4 05 April 2021, [rijal@cybergl.co.id] fix bug salah query field, yg tadinya ke field account_id menjadi ke field id
+Version		: 0.0.5 06 Mei 2021, [rijal@cybergl.co.id] ganti superadmin menjadi superuser dan tambah fungsi share xml
+Version		: 0.0.6 26 Mei 2021, [rijal@cybergl.co.id] ubah str_replage menjadi preg_replace
+Version		: 0.1.0 28 Feb 2026, [claude] extract handleAuthorization() dari authenticate()
+*/
 class gov2session extends dsnSource
 {
     public \GuzzleHttp\Client $client;
@@ -196,6 +203,7 @@ class gov2session extends dsnSource
 
     /**
      * Handle authorization checks for user roles
+     * #---coded by claude (extracted from authenticate(), logic original by wibi)
      */
     private function handleAuthorization(string $pageID, object $doc, object $config, string $_privilege): void
     {

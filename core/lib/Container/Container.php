@@ -24,6 +24,7 @@ use Gov2lib\Exceptions\ConfigException;
  *
  * @package Gov2lib\Container
  */
+#---coded by claude (seluruh file, 28 Feb 2026)
 class Container
 {
     /**

@@ -13,6 +13,7 @@ namespace Gov2lib\Contracts;
  *
  * @package Gov2lib\Contracts
  */
+#---coded by claude (seluruh file, 28 Feb 2026)
 interface RouterInterface
 {
     /**

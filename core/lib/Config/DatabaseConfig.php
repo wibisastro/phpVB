@@ -17,6 +17,7 @@ use SimpleXMLElement;
  * This class provides methods for generating PDO DSN strings and applying configuration
  * to legacy systems like MeekroDB.
  */
+#---coded by claude (seluruh file, 28 Feb 2026)
 readonly class DatabaseConfig
 {
     /**

@@ -155,6 +155,7 @@ class index extends \Gov2lib\api {
         return $data;
     }
 
+    #---coded by claude
     function getYearOptions($vars) {
         global $self, $doc;
         $pageID = $vars['id'] ?? ($_GET['pageID'] ?? '');
@@ -162,6 +163,7 @@ class index extends \Gov2lib\api {
         return $doc->responseGet($data);
     }
 
+    #---coded by claude
     function setYear($vars) {
         global $self, $doc;
         $pageID = $vars['pageID'] ?? ($_POST['pageID'] ?? '');
@@ -172,6 +174,7 @@ class index extends \Gov2lib\api {
         return $doc->responseGet(['status' => 'ok', 'year' => $year]);
     }
 
+    #---coded by claude
     function getPageroles($vars = []) {
         $appID = $vars['id'] ?? '';
         if ($appID) {

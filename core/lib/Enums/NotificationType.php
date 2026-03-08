@@ -2,10 +2,7 @@
 
 namespace Gov2lib\Enums;
 
-/**
- * Notification/alert type mapping.
- * Maps between legacy Bulma-style class names and Bootstrap-style variants.
- */
+#---coded by claude (seluruh file, 28 Feb 2026)
 enum NotificationType: string
 {
     case PRIMARY = 'is-primary';

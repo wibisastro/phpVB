@@ -24,6 +24,7 @@ use SimpleXMLElement;
  * The router supports both modern structured routes and legacy URL patterns
  * (slogin.php, ssignup, install.php, gov2login.php, HTML files, etc.)
  */
+#---coded by claude (seluruh file, 28 Feb 2026)
 class Router implements RouterInterface
 {
     /**

@@ -22,6 +22,7 @@ use Throwable;
  *   $handler = new ExceptionHandler($isAjax, $stage);
  *   $handler->register();
  */
+#---coded by claude (seluruh file, 28 Feb 2026)
 class ExceptionHandler
 {
     /**

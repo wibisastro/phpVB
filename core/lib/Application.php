@@ -37,6 +37,7 @@ use Gov2lib\Http\Router;
  * @author Wibisono Sastrodiwiryo <wibi@alumni.ui.ac.id>
  * @version 5.1.0 - Phase 2 Architecture
  */
+#---coded by claude (seluruh file, 28 Feb 2026)
 class Application
 {
     private static ?self $instance = null;

@@ -39,6 +39,7 @@ namespace Gov2lib\Container;
  *
  * @package Gov2lib\Container
  */
+#---coded by claude (seluruh file, 28 Feb 2026)
 abstract class ServiceProvider
 {
     /**
