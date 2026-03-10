@@ -44,11 +44,18 @@ class login
     }
 
     /**
-     * Display signup page
+     * Display signup page — redirect to profile if already logged in
      */
     public function signup(): void
     {
-        global $self, $doc;
+        global $self, $doc, $pageID;
+
+        if ($self->ses->val['account_id'] ?? false) {
+            header("Location: /$pageID/profile");
+            exit;
+        }
+
+        $self->ses->authenticate('public');
         $doc->body("pageTitle", 'Gov 2.0 SSO Signup');
         $self->content("@gov2login/signup.html");
     }
