@@ -16,7 +16,7 @@ class option {
             $self->content();
         } elseif ($vars["privilege"] == "view" || $vars["privilege"] == "view_services") {
             $doc->body('app', $vars['pageID']);
-            $doc->body('view_type', $scriptID === 'services' ? 'view_services' : 'view');
+            $doc->body('view_type', $vars["privilege"] === 'view_services' ? 'view_services' : 'view');
             $self->content('option_view.html');
         }
     }
