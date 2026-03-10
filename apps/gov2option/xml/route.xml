@@ -68,22 +68,22 @@
     <route>
         <method>GET</method>
         <uri>/gov2option/instansi</uri>
-        <handler>gov2option\instansi</handler>
+        <handler>gov2option\model\instansi</handler>
     </route>
     <route>
         <method>GET</method>
         <uri>/gov2option/instansi/{cmd}[/{id}]</uri>
-        <handler>gov2option\instansi</handler>
+        <handler>gov2option\model\instansi</handler>
     </route>
     <route>
         <method>GET</method>
         <uri>/gov2option/instansi/{cmd}/{scroll}/[{id}]</uri>
-        <handler>gov2option\instansi</handler>
+        <handler>gov2option\model\instansi</handler>
     </route>
     <route>
         <method>POST</method>
         <uri>/gov2option/instansi</uri>
-        <handler>gov2option\instansi</handler>
+        <handler>gov2option\model\instansi</handler>
     </route>
 
     <route>

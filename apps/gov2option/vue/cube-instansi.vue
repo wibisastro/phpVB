@@ -57,28 +57,8 @@
         </ul>
       </div>
 
-      <!-- Tree view -->
+      <!-- Accordion tree: eselon1 → dropdown eselon2 -->
       <div v-else>
-        <!-- Breadcrumb navigation -->
-        <div v-if="breadcrumb.length > 0" class="px-3 py-1 border-bottom bg-light">
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0 small">
-              <li class="breadcrumb-item">
-                <a href="#" @click.prevent="drillTo(-1)" class="text-decoration-none">
-                  <i class="bi bi-house-door"></i>
-                </a>
-              </li>
-              <li v-for="(bc, idx) in breadcrumb" :key="bc.id"
-                  class="breadcrumb-item" :class="{ active: idx === breadcrumb.length - 1 }">
-                <a v-if="idx < breadcrumb.length - 1" href="#" @click.prevent="drillTo(idx)"
-                   class="text-decoration-none">{{ bc.kode }}</a>
-                <span v-else>{{ bc.kode }}</span>
-              </li>
-            </ol>
-          </nav>
-        </div>
-
-        <!-- Tree items -->
         <div v-if="loading" class="px-3 py-3 text-center text-muted small">
           <div class="spinner-border spinner-border-sm me-1"></div> Memuat...
         </div>
@@ -86,18 +66,39 @@
           <li v-if="treeItems.length === 0" class="list-group-item border-0 px-3 py-2 text-muted small">
             Tidak ada data
           </li>
-          <li v-for="item in treeItems" :key="item.id"
-              class="list-group-item border-0 px-3 py-1 list-group-item-action">
-            <div class="d-flex align-items-center" style="min-height:32px">
-              <div class="flex-grow-1 small" style="cursor:pointer" @click="selectUnit(item)">
-                <strong>{{ item.kode }}</strong> - {{ item.nama }}
+          <template v-for="item in treeItems">
+            <!-- Eselon 1 header (clickable to expand/collapse) -->
+            <li :key="'h-' + item.id"
+                class="list-group-item border-0 px-3 py-2 list-group-item-action"
+                style="cursor:pointer"
+                @click="toggleExpand(item)">
+              <div class="d-flex align-items-center">
+                <i class="bi me-2" :class="item.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"
+                   style="font-size:0.75rem; width:12px"></i>
+                <div class="flex-grow-1 small fw-semibold">
+                  <span>{{ item.kode }}</span> - {{ item.nama }}
+                </div>
               </div>
-              <button v-if="item.has_children" class="btn btn-sm text-muted py-0 px-1"
-                      @click.stop="drillDown(item)" title="Lihat sub instansi">
-                <i class="bi bi-chevron-right"></i>
-              </button>
-            </div>
-          </li>
+            </li>
+            <!-- Eselon 2 children (shown when expanded) -->
+            <template v-if="item.expanded">
+              <li v-if="item.childrenLoading" :key="'l-' + item.id"
+                  class="list-group-item border-0 ps-5 py-1 text-muted small">
+                <div class="spinner-border spinner-border-sm me-1"></div> Memuat...
+              </li>
+              <li v-for="child in item.childrenData" :key="'c-' + child.id"
+                  class="list-group-item border-0 ps-5 py-1 list-group-item-action"
+                  style="cursor:pointer"
+                  @click="selectUnit(child)">
+                <span class="small">{{ child.kode }} - {{ child.nama }}</span>
+              </li>
+              <li v-if="!item.childrenLoading && item.childrenData && item.childrenData.length === 0"
+                  :key="'e-' + item.id"
+                  class="list-group-item border-0 ps-5 py-1 text-muted small">
+                Tidak ada sub instansi
+              </li>
+            </template>
+          </template>
         </ul>
       </div>
     </div>
@@ -111,7 +112,6 @@ module.exports = {
     return {
       config: { userRole: '', locked: false, unit_nama: '', unit_id: null, portal: '' },
       treeItems: [],
-      breadcrumb: [],
       loading: false,
       search: '',
       searchResults: [],
@@ -130,29 +130,45 @@ module.exports = {
         })
         .catch(e => console.log('instansi config:', e.message));
     },
-    loadTree(parentId) {
+    loadTree() {
       this.loading = true;
-      var url = '/gov2option/index/getUnitKerjaList' + (parentId ? '/' + parentId : '');
-      axios.get(url)
+      axios.get('/gov2option/index/getUnitKerjaList')
         .then(resp => {
-          this.treeItems = resp.data || [];
+          var items = resp.data || [];
+          items.forEach(function(item) {
+            item.expanded = false;
+            item.childrenData = [];
+            item.childrenLoading = false;
+          });
+          this.treeItems = items;
           this.loading = false;
         })
         .catch(e => { this.loading = false; this.handleError(e); });
     },
-    drillDown(item) {
-      this.breadcrumb.push({ id: item.id, kode: item.kode, nama: item.nama });
-      this.loadTree(item.id);
-    },
-    drillTo(index) {
-      if (index < 0) {
-        this.breadcrumb = [];
-        this.loadTree(0);
-      } else {
-        var target = this.breadcrumb[index];
-        this.breadcrumb = this.breadcrumb.slice(0, index + 1);
-        this.loadTree(target.id);
+    toggleExpand(item) {
+      if (item.expanded) {
+        item.expanded = false;
+        return;
       }
+      // Collapse all others
+      this.treeItems.forEach(function(i) { i.expanded = false; });
+      item.expanded = true;
+      // Load children if not loaded yet
+      if (!item.childrenData || item.childrenData.length === 0) {
+        this.loadChildren(item);
+      }
+    },
+    loadChildren(item) {
+      this.$set(item, 'childrenLoading', true);
+      axios.get('/gov2option/index/getUnitKerjaList/' + item.id)
+        .then(resp => {
+          this.$set(item, 'childrenData', resp.data || []);
+          this.$set(item, 'childrenLoading', false);
+        })
+        .catch(e => {
+          this.$set(item, 'childrenLoading', false);
+          this.handleError(e);
+        });
     },
     selectUnit(item) {
       var url = '/gov2option/index/changePortal/' + item.id
@@ -234,7 +250,7 @@ module.exports = {
   },
   created() {
     this.loadConfig();
-    this.loadTree(0);
+    this.loadTree();
   },
   mounted() {
     var el = document.getElementById('sidePanelOffcanvas');
