@@ -127,6 +127,7 @@ module.exports = {
     loadConfig() {
       axios.get('/gov2option/index/getUnitKerjaConfig')
         .then(resp => {
+          console.log('loadConfig resp:', resp.data);
           this.config = resp.data || this.config;
           this.updateTopbar();
           this.autoExpandSelected();
@@ -220,25 +221,72 @@ module.exports = {
       }, 300);
     },
     autoExpandSelected() {
-      if (!this.config.unit_id || this.treeItems.length === 0) return;
+      var unitId = this.config.unit_id;
       var parentId = this.config.parent_id;
       var self = this;
-      // If no parent_id, selected is eselon1 itself — no expand needed
-      if (!parentId) return;
-      // Find the parent eselon1 item and expand it
-      for (var i = 0; i < this.treeItems.length; i++) {
-        if (this.treeItems[i].id == parentId) {
-          var parent = this.treeItems[i];
-          // Collapse all, expand this parent
-          this.treeItems.forEach(function(x) { self.$set(x, 'expanded', false); });
-          this.$set(parent, 'expanded', true);
-          // Load children if not yet loaded
-          if (!parent.childrenData || parent.childrenData.length === 0) {
-            this.loadChildren(parent);
+      console.log('autoExpandSelected:', { unitId: unitId, parentId: parentId, treeCount: this.treeItems.length });
+      if (!unitId || this.treeItems.length === 0) return;
+      // If parent_id available, use it directly
+      if (parentId) {
+        for (var i = 0; i < this.treeItems.length; i++) {
+          if (this.treeItems[i].id == parentId) {
+            var parent = this.treeItems[i];
+            this.treeItems.forEach(function(x) { self.$set(x, 'expanded', false); });
+            this.$set(parent, 'expanded', true);
+            if (!parent.childrenData || parent.childrenData.length === 0) {
+              this.loadChildren(parent);
+            }
+            console.log('autoExpand: found parent', parentId, 'expanded');
+            return;
           }
+        }
+      }
+      // Fallback: check if unitId is an eselon1 item
+      for (var i = 0; i < this.treeItems.length; i++) {
+        if (this.treeItems[i].id == unitId) {
+          console.log('autoExpand: unitId is eselon1, no expand needed');
           return;
         }
       }
+      // Fallback: search loaded children
+      for (var i = 0; i < this.treeItems.length; i++) {
+        var item = this.treeItems[i];
+        if (item.childrenData && item.childrenData.length > 0) {
+          for (var j = 0; j < item.childrenData.length; j++) {
+            if (item.childrenData[j].id == unitId) {
+              this.treeItems.forEach(function(x) { self.$set(x, 'expanded', false); });
+              this.$set(item, 'expanded', true);
+              console.log('autoExpand: found in loaded children of', item.id);
+              return;
+            }
+          }
+        }
+      }
+      // Fallback: load all children to find parent
+      console.log('autoExpand: loading all children to find parent');
+      var found = false;
+      this.treeItems.forEach(function(item) {
+        if (!item.childrenData || item.childrenData.length === 0) {
+          self.$set(item, 'childrenLoading', true);
+          axios.get('/gov2option/index/getUnitKerjaList/' + item.id)
+            .then(function(resp) {
+              var children = resp.data || [];
+              self.$set(item, 'childrenData', children);
+              self.$set(item, 'childrenLoading', false);
+              if (found) return;
+              for (var k = 0; k < children.length; k++) {
+                if (children[k].id == unitId) {
+                  found = true;
+                  self.treeItems.forEach(function(x) { self.$set(x, 'expanded', false); });
+                  self.$set(item, 'expanded', true);
+                  console.log('autoExpand: found parent via loading:', item.id);
+                  return;
+                }
+              }
+            })
+            .catch(function() { self.$set(item, 'childrenLoading', false); });
+        }
+      });
     },
     updateTopbar() {
       var el = document.getElementById('topbarUnitKerja');
