@@ -157,6 +157,8 @@ try {
                                     $controller = "Gov2lib\\index";
                             }
 
+                            $className = $scriptID;
+
                         } else {
                             list($p,$d,$className)=explode("\\",$routeInfo[1]);
                             $handler = "App\\".$pageID."\model\\".$className;
