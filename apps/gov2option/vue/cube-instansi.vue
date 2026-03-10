@@ -112,7 +112,7 @@ module.exports = {
   name: 'cube-instansi',
   data() {
     return {
-      config: { userRole: '', locked: false, unit_nama: '', unit_id: null, portal: '' },
+      config: { userRole: '', locked: false, unit_nama: '', unit_id: null, parent_id: null, portal: '' },
       treeItems: [],
       loading: false,
       search: '',
@@ -175,13 +175,16 @@ module.exports = {
         });
     },
     selectUnit(item) {
+      var parentId = item.parent_id || 0;
       var url = '/gov2option/index/changePortal/' + item.id
               + '?portal=' + encodeURIComponent(item.portal || '')
-              + '&nama=' + encodeURIComponent(item.nama);
+              + '&nama=' + encodeURIComponent(item.nama)
+              + '&parent_id=' + parentId;
       axios.get(url)
         .then(resp => {
           this.config.unit_nama = item.nama;
           this.config.unit_id = item.id;
+          this.config.parent_id = parentId;
           this.config.portal = item.portal || '';
           this.search = '';
           this.searchMode = false;
@@ -218,48 +221,24 @@ module.exports = {
     },
     autoExpandSelected() {
       if (!this.config.unit_id || this.treeItems.length === 0) return;
-      var unitId = this.config.unit_id;
+      var parentId = this.config.parent_id;
       var self = this;
-      // Check if selected is an eselon1 item itself
+      // If no parent_id, selected is eselon1 itself — no expand needed
+      if (!parentId) return;
+      // Find the parent eselon1 item and expand it
       for (var i = 0; i < this.treeItems.length; i++) {
-        if (this.treeItems[i].id == unitId) return; // eselon1 selected, no expand needed
-      }
-      // Find parent eselon1 that contains selected eselon2 (already loaded children)
-      for (var i = 0; i < this.treeItems.length; i++) {
-        var item = this.treeItems[i];
-        if (item.childrenData && item.childrenData.length > 0) {
-          for (var j = 0; j < item.childrenData.length; j++) {
-            if (item.childrenData[j].id == unitId) {
-              this.treeItems.forEach(function(x) { self.$set(x, 'expanded', false); });
-              this.$set(item, 'expanded', true);
-              return;
-            }
+        if (this.treeItems[i].id == parentId) {
+          var parent = this.treeItems[i];
+          // Collapse all, expand this parent
+          this.treeItems.forEach(function(x) { self.$set(x, 'expanded', false); });
+          this.$set(parent, 'expanded', true);
+          // Load children if not yet loaded
+          if (!parent.childrenData || parent.childrenData.length === 0) {
+            this.loadChildren(parent);
           }
+          return;
         }
       }
-      // Children not loaded yet — load each eselon1's children to find parent
-      var found = false;
-      this.treeItems.forEach(function(item) {
-        if (!item.childrenData || item.childrenData.length === 0) {
-          self.$set(item, 'childrenLoading', true);
-          axios.get('/gov2option/index/getUnitKerjaList/' + item.id)
-            .then(function(resp) {
-              var children = resp.data || [];
-              self.$set(item, 'childrenData', children);
-              self.$set(item, 'childrenLoading', false);
-              if (found) return;
-              for (var k = 0; k < children.length; k++) {
-                if (children[k].id == unitId) {
-                  found = true;
-                  self.treeItems.forEach(function(x) { self.$set(x, 'expanded', false); });
-                  self.$set(item, 'expanded', true);
-                  return;
-                }
-              }
-            })
-            .catch(function() { self.$set(item, 'childrenLoading', false); });
-        }
-      });
     },
     updateTopbar() {
       var el = document.getElementById('topbarUnitKerja');

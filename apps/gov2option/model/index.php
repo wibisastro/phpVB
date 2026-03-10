@@ -143,11 +143,12 @@ class index extends \Gov2lib\crudHandler {
     function getUnitKerjaConfig($vars = [])
     {
         global $self, $doc;
-        $result = ['userRole' => '', 'locked' => false, 'unit_nama' => '', 'unit_id' => null, 'portal' => ''];
+        $result = ['userRole' => '', 'locked' => false, 'unit_nama' => '', 'unit_id' => null, 'parent_id' => null, 'portal' => ''];
 
         $result['userRole'] = $self->ses->val['userRole'] ?? '';
         $result['unit_nama'] = $self->ses->val['unit_nama'] ?? '';
         $result['unit_id'] = $self->ses->val['opd_id'] ?? null;
+        $result['parent_id'] = $self->ses->val['unit_parent_id'] ?? null;
         $result['portal'] = $self->ses->val['opd'] ?? '';
 
         $role = $result['userRole'];
@@ -165,6 +166,7 @@ class index extends \Gov2lib\crudHandler {
         $unitId = (int)($vars['id'] ?? 0);
         $portal = $_GET['portal'] ?? '';
         $unitNama = $_GET['nama'] ?? '';
+        $parentId = (int)($_GET['parent_id'] ?? 0);
 
         if ($unitId && $unitNama) {
             $self->ses->val['opd_id'] = $unitId;
@@ -172,6 +174,7 @@ class index extends \Gov2lib\crudHandler {
             $self->ses->val['portal_nama'] = $unitNama;
             $self->ses->val['unit_nama'] = $unitNama;
             $self->ses->val['unit_id'] = $unitId;
+            $self->ses->val['unit_parent_id'] = $parentId;
             $self->ses->val['change_portal'] = 1;
             $self->ses->sesSave($self->ses->val);
         }
@@ -188,6 +191,7 @@ class index extends \Gov2lib\crudHandler {
         $self->ses->val['portal_nama'] = null;
         $self->ses->val['unit_nama'] = null;
         $self->ses->val['unit_id'] = null;
+        $self->ses->val['unit_parent_id'] = null;
         $self->ses->val['change_portal'] = null;
         $self->ses->sesSave($self->ses->val);
 
