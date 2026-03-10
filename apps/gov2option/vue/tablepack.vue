@@ -32,9 +32,10 @@
                 </div>
             </div>
 
-            <div class="ren-table table-responsive" :style="{ maxWidth:myWidth+'px' }">
-                <table class="table table-bordered table-hover">
-                    <thead style="text-align: center; background: #efefef;" >
+            <div class="table-container-outer">
+            <div class="table-container" :style="{ maxWidth:myWidth+'px' }">
+                <table class="table table-striped table-hover">
+                    <thead>
                     <tr v-if="headers">
                         <th v-for="(val,key) in headers" 
                             :colspan="val['colspan']"  
@@ -232,7 +233,7 @@
                         <td v-if="!readonly || childComponent"></td>
                     </tbody>
                     <!-- tfoot -->
-                    <tfoot v-if="!isTotal" style="text-align: center; background: #efefef; text-transform: uppercase; font-size: 14px;">
+                    <tfoot v-if="!isTotal">
                         <tr>
                             <th rowspan="2" style="vertical-align: middle;">
                                 <b-form-checkbox
@@ -265,6 +266,7 @@
                     </tfoot>
                     <!-- tfoot end-->
                 </table>
+            </div>
             </div>
 
             <div class="row"></div>
@@ -1155,39 +1157,102 @@
 </script>
 
 <style scoped>
+    /* Cube theme table wrapper */
+    .table-container-outer {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e5e6ec;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        margin: 0;
+        width: 100%;
+    }
+
+    .table-container::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 14px;
+        height: 14px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+        border-radius: 8px;
+        border: 3px solid #fff;
+        background-color: rgba(0, 0, 0, .3);
+    }
+
+    /* Table styling */
+    .table-container .table {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    .table-container .table thead th {
+        background-color: #f6f7fb;
+        border-bottom: 2px solid #e5e6ec;
+        font-weight: 600;
+        color: #333;
+        text-align: center;
+        vertical-align: middle;
+        white-space: nowrap;
+        padding: 0.6rem 0.75rem;
+    }
+
+    .table-container .table tbody td {
+        color: #616161;
+        vertical-align: middle;
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+    }
+
+    .table-container .table tfoot th {
+        background-color: #f6f7fb;
+        border-top: 2px solid #e5e6ec;
+        font-weight: 600;
+        text-align: center;
+        text-transform: uppercase;
+        padding: 0.6rem 0.75rem;
+    }
+
+    .table-container .table tr:last-child td {
+        border-bottom: 0;
+    }
+
+    /* Sort indicator */
+    th.active {
+        color: #5b4fb9;
+    }
+
+    /* Row selection */
+    .is-selected {
+        background-color: rgba(91, 79, 185, 0.12);
+        color: inherit;
+    }
+
+    /* Collapsible row icon */
     td > i.text-primary {
         cursor: pointer;
         font-size: 18px;
     }
     .text-primary {
-        color: #17a2b8 !important;
+        color: #5b4fb9 !important;
     }
+
     .row-detail {
         background-color: #f8f8f8;
     }
-    tfoot {
-        text-transform: uppercase;
-    }
 
-    thead > tr > th {
-        font-size : 14px;
-    }
-
-    tbody > tr > td {
-        font-weight: 500;
-    }
-    .is-selected {
-        background-color: rgba(255, 127, 80, 0.6);
-        color: #fff;
-    }
+    /* Checkbox accent */
     .custom-control-input:checked~.custom-control-label::before {
         color: #fff;
-        border-color: darkorange;
-        background-color: darkorange;
+        border-color: #5b4fb9;
+        background-color: #5b4fb9;
     }
     .custom-checkbox
     .custom-control-input:checked~
     .custom-control-label::after {
-        background-color: darkorange;
+        background-color: #5b4fb9;
     }
 </style>
