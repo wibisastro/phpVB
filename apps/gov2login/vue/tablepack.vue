@@ -33,8 +33,8 @@
             </div>
 
             <div class="ren-table table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead style="text-align: center; background: #efefef;" >
+                <table class="table table-striped table-hover table-bordered">
+                    <thead>
                     <tr v-if="headers">
                         <th v-for="(val,key) in headers" 
                             :colspan="val['colspan']"  
@@ -232,7 +232,7 @@
                         <td v-if="!readonly || childComponent"></td>
                     </tbody>
                     <!-- tfoot -->
-                    <tfoot v-if="!isTotal" style="text-align: center; background: #efefef; text-transform: uppercase; font-size: 14px;">
+                    <tfoot v-if="!isTotal">
                         <tr>
                             <th rowspan="2" style="vertical-align: middle;">
                                 <b-form-checkbox
@@ -1160,40 +1160,89 @@
 </script>
 
 <style scoped>
+    /* Cube theme table wrapper */
+    .ren-table {
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e5e6ec;
+    }
+
+    .ren-table .table {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    /* Header */
+    thead > tr > th {
+        background-color: #f6f7fb;
+        border-bottom: 2px solid #e5e6ec;
+        font-weight: 600;
+        color: #333;
+        text-align: center;
+        vertical-align: middle !important;
+        white-space: nowrap;
+        padding: 0.6rem 0.75rem;
+    }
+
+    /* Body */
+    tbody > tr > td {
+        color: #616161;
+        vertical-align: middle;
+        padding: 0.5rem 0.75rem;
+    }
+
+    /* Footer */
+    tfoot > tr > th {
+        background-color: #f6f7fb;
+        border-top: 2px solid #e5e6ec;
+        font-weight: 600;
+        text-align: center;
+        text-transform: uppercase;
+        padding: 0.6rem 0.75rem;
+    }
+
+    /* Sort active */
+    th.active {
+        color: #5b4fb9;
+    }
+
+    /* Collapsible row icon */
     td > i.text-primary {
         cursor: pointer;
         font-size: 18px;
     }
+
     .text-primary {
-        color: #17a2b8 !important;
+        color: #5b4fb9 !important;
     }
+
+    /* Expanded row detail */
     .row-detail {
-        background-color: #f8f8f8;
-    }
-    tfoot {
-        text-transform: uppercase;
+        background-color: #f8f9fa;
     }
 
-    thead > tr > th {
-        font-size : 14px;
-        vertical-align: middle!important;
-    }
-
-    tbody > tr > td {
-        font-weight: 500;
-    }
+    /* Selected row */
     .is-selected {
-        background-color: rgba(255, 127, 80, 0.6);
-        color: #fff;
+        background-color: rgba(91, 79, 185, 0.12);
     }
-    .custom-control-input:checked~.custom-control-label::before {
-        color: #fff;
-        border-color: darkorange;
-        background-color: darkorange;
+
+    /* Toolbar header */
+    .block-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 0;
     }
-    .custom-checkbox
-    .custom-control-input:checked~
-    .custom-control-label::after {
-        background-color: darkorange;
+
+    .block-title {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .filter-block {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 </style>
