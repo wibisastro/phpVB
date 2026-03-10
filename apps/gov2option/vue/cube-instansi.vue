@@ -298,12 +298,18 @@ module.exports = {
             '<span class="text-truncate d-none d-lg-inline ms-2" style="max-width:200px">' + this.escapeHtml(nama) + '</span>';
           el.classList.remove('text-muted');
           el.classList.add('text-body');
-          el.title = nama;
+          el.setAttribute('data-bs-title', nama);
+          var tip = bootstrap.Tooltip.getInstance(el);
+          if (tip) { tip.dispose(); }
+          new bootstrap.Tooltip(el);
         } else {
           el.innerHTML = '<i class="bi bi-building fs-5"></i><span class="text-muted d-none d-lg-inline ms-2">Pilih Instansi</span>';
           el.classList.add('text-muted');
           el.classList.remove('text-body');
-          el.title = 'Pilih Instansi';
+          el.setAttribute('data-bs-title', 'Pilih Instansi');
+          var tip = bootstrap.Tooltip.getInstance(el);
+          if (tip) { tip.dispose(); }
+          new bootstrap.Tooltip(el);
         }
       }
     },

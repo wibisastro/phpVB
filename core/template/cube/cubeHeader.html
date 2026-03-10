@@ -40,7 +40,8 @@
     <a href="#" id="topbarUnitKerja"
        class="d-flex align-items-center text-decoration-none mx-3"
        style="white-space:nowrap"
-       title="{{ _SESSION['unit_nama'] ?: 'Pilih Instansi' }}"
+       data-bs-toggle="tooltip" data-bs-placement="bottom"
+       data-bs-title="{{ _SESSION['unit_nama'] ?: 'Pilih Instansi' }}"
        onclick="event.preventDefault(); openSidePanel('instansi')">
       <i class="bi bi-building fs-5"></i>
       {% if _SESSION['unit_nama'] %}
