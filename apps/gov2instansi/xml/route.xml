@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+    <route>
+        <method>GET</method>
+        <uri>/gov2instansi</uri>
+        <handler>gov2instansi\model\index</handler>
+    </route>
+
+    <route>
+        <method>GET</method>
+        <uri>/gov2instansi/instansi</uri>
+        <handler>gov2instansi\model\instansi</handler>
+    </route>
+    <route>
+        <method>GET</method>
+        <uri>/gov2instansi/instansi/{cmd}[/{id}]</uri>
+        <handler>gov2instansi\model\instansi</handler>
+    </route>
+    <route>
+        <method>GET</method>
+        <uri>/gov2instansi/instansi/{cmd}/{scroll}/[{id}]</uri>
+        <handler>gov2instansi\model\instansi</handler>
+    </route>
+    <route>
+        <method>POST</method>
+        <uri>/gov2instansi/instansi</uri>
+        <handler>gov2instansi\model\instansi</handler>
+    </route>
+</list>

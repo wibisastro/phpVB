@@ -101,14 +101,14 @@ class index extends \Gov2lib\crudHandler {
 
         try {
             if ($parentId > 0) {
-                $q = "SELECT {$fields} FROM {$this->tbl->kementerian} WHERE parent_id=%i ORDER BY kode ASC";
+                $q = "SELECT {$fields} FROM {$this->tbl->instansi} WHERE parent_id=%i ORDER BY kode ASC";
                 $result = \DB::query($q, $parentId);
             } else {
-                $q = "SELECT {$fields} FROM {$this->tbl->kementerian} WHERE parent_id=0 ORDER BY kode ASC";
+                $q = "SELECT {$fields} FROM {$this->tbl->instansi} WHERE parent_id=0 ORDER BY kode ASC";
                 $result = \DB::query($q);
             }
             foreach ($result as $i => $row) {
-                $qc = "SELECT COUNT(*) FROM {$this->tbl->kementerian} WHERE parent_id=%i";
+                $qc = "SELECT COUNT(*) FROM {$this->tbl->instansi} WHERE parent_id=%i";
                 $cnt = \DB::queryFirstField($qc, $row['id']);
                 $result[$i]['has_children'] = (int)$cnt > 0;
             }
@@ -128,7 +128,7 @@ class index extends \Gov2lib\crudHandler {
         $result = [];
 
         try {
-            $q = "SELECT {$fields} FROM {$this->tbl->kementerian}
+            $q = "SELECT {$fields} FROM {$this->tbl->instansi}
                   WHERE (nama LIKE %ss OR kode LIKE %ss)
                   ORDER BY kode ASC LIMIT 50";
             $result = \DB::query($q, $keyword, $keyword);

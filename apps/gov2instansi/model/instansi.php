@@ -1,6 +1,6 @@
 <?php
 
-namespace App\gov2option\model;
+namespace App\gov2instansi\model;
 
 class instansi extends \Gov2lib\crudHandler
 {

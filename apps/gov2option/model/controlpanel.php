@@ -28,8 +28,8 @@ class controlpanel extends \Gov2lib\crudHandler {
         $result = [];
         $q = "SELECT a.id, a.nama, a.portal, a.level,  
                 IF(a.level = 3, CONCAT(b.kode, '.', a.kode), a.kode) AS kode 
-                FROM {$this->tbl->kementerian} a
-                LEFT JOIN {$this->tbl->kementerian} b ON b.id=a.parent_id
+                FROM {$this->tbl->instansi} a
+                LEFT JOIN {$this->tbl->instansi} b ON b.id=a.parent_id
                 WHERE a.level > 1 ORDER BY kode
                 ";
 
