@@ -127,7 +127,7 @@ module.exports = {
     loadConfig() {
       axios.get('/gov2option/index/getUnitKerjaConfig')
         .then(resp => {
-          console.log('loadConfig resp:', resp.data);
+          console.log('loadConfig resp:', JSON.stringify(resp.data));
           this.config = resp.data || this.config;
           this.updateTopbar();
           this.autoExpandSelected();
@@ -224,7 +224,8 @@ module.exports = {
       var unitId = this.config.unit_id;
       var parentId = this.config.parent_id;
       var self = this;
-      console.log('autoExpandSelected:', { unitId: unitId, parentId: parentId, treeCount: this.treeItems.length });
+      var treeIds = this.treeItems.map(function(x) { return x.id; });
+      console.log('autoExpandSelected:', JSON.stringify({ unitId: unitId, parentId: parentId, treeIds: treeIds }));
       if (!unitId || this.treeItems.length === 0) return;
       // If parent_id available, use it directly
       if (parentId) {
