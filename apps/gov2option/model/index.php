@@ -92,10 +92,10 @@ class index extends \Gov2lib\crudHandler {
     }
 
     #---coded by claude
-    function getUnitKerjaList($vars = [])
+    function getUnitKerjaList(array|int $vars = [])
     {
         global $doc;
-        $parentId = (int)($vars['id'] ?? 0);
+        $parentId = is_array($vars) ? (int)($vars['id'] ?? 0) : (int)$vars;
         $fields = "id, parent_id, `level`, nama, kode, portal";
         $result = [];
 
