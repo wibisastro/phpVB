@@ -18,7 +18,7 @@ class instansi extends \Gov2lib\api
     {
         global $self, $doc;
         $self->ses->authenticate('admin');
-        $self->take('components', 'gov2nav', 'setDefaultNav');
+        $self->take('components', 'gov2nav', 'setDefaultNav', 'menu.xml');
         $doc->body('pageTitle', 'Instansi');
         $doc->body('subTitle', 'Data Instansi');
         $self->loadTable();
