@@ -89,11 +89,13 @@
 
 {% endblock %}
 <script>
-iFrameResize({
-    log                     : false,
-    enablePublicMethods     : true,
-    resizedCallback         : function(messageData){ }
-});
+if (document.querySelector('.saas-frame iframe')) {
+    iFrameResize({
+        log                     : false,
+        enablePublicMethods     : true,
+        resizedCallback         : function(messageData){ }
+    }, '.saas-frame iframe');
+}
 </script>
 </body>
 </html>
