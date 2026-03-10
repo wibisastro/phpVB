@@ -94,7 +94,7 @@ class dsnSource extends document
 
         try {
             if (!file_exists($dsnsPath)) {
-                throw new \Exception("NoDSNConfigFile:{$dsnsPath}");
+                throw new \Exception("NoDSNConfigFile: apps/{$pageID}/xml/dsnSource." . STAGE . ".xml tidak ditemukan");
             }
 
             $list = simplexml_load_file($dsnsPath);
@@ -260,13 +260,13 @@ class dsnSource extends document
 
         try {
             if (!file_exists($dsnsPath)) {
-                throw new \Exception("NoDSNConfigFile:{$dsnsPath}");
+                throw new \Exception("NoDSNConfigFile: apps/{$pageID}/xml/dsnSource." . STAGE . ".xml tidak ditemukan");
             }
 
             $list = simplexml_load_file($dsnsPath);
 
             if (!is_object($list)) {
-                throw new \Exception("InvalidDSNConfigFile:{$dsnsPath}");
+                throw new \Exception("InvalidDSNConfigFile: apps/{$pageID}/xml/dsnSource." . STAGE . ".xml tidak valid");
             }
 
             $dsn = null;

@@ -34,7 +34,7 @@ class DBConnector
 
         try {
             if (!file_exists($dsnsPath)) {
-                throw new \Exception("NoDSNConfigFile:{$dsnsPath}");
+                throw new \Exception("NoDSNConfigFile: apps/{$pageID}/xml/dsnSource." . STAGE . ".xml tidak ditemukan");
             }
 
             $list = simplexml_load_file($dsnsPath);
@@ -54,13 +54,13 @@ class DBConnector
                 $sharedFile = __DIR__ . "/../../apps/{$list->share}/xml/dsnSource." . STAGE . '.xml';
 
                 if (!file_exists($sharedFile)) {
-                    throw new \Exception("DSNShareFileNotExist:{$sharedFile}");
+                    throw new \Exception("DSNShareFileNotExist: file DSN shared dari '{$list->share}' tidak ditemukan");
                 }
 
                 $sharedList = simplexml_load_file($sharedFile);
 
                 if (!is_object($sharedList)) {
-                    throw new \Exception("InvalidDSNShareFile:{$sharedFile}");
+                    throw new \Exception("InvalidDSNShareFile: file DSN shared dari '{$list->share}' tidak valid");
                 }
 
                 $list = $sharedList;
