@@ -47,6 +47,8 @@
 			<caption>Data Instansi</caption>
 			<url>/gov2instansi/instansi</url>
 		</menu>
+		<menu>
+		</menu>
 	</menu>
 	<menu>
 		<caption>Examples</caption>
