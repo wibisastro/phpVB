@@ -8,6 +8,7 @@ class instansi extends \Gov2lib\api
     {
         global $self, $doc;
         $self->takeAll('components');
+        $self->take('gov2option');
         parent::__construct();
         $self->scrollInterval = 100;
         $self->fields = $self->gov2formfield->getFields(__DIR__ . '/json/instansi.json');

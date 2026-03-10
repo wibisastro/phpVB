@@ -127,7 +127,6 @@ module.exports = {
     loadConfig() {
       axios.get('/gov2option/index/getUnitKerjaConfig')
         .then(resp => {
-          console.log('loadConfig resp:', JSON.stringify(resp.data));
           this.config = resp.data || this.config;
           this.updateTopbar();
           this.autoExpandSelected();
@@ -224,8 +223,6 @@ module.exports = {
       var unitId = this.config.unit_id;
       var parentId = this.config.parent_id;
       var self = this;
-      var treeIds = this.treeItems.map(function(x) { return x.id; });
-      console.log('autoExpandSelected:', JSON.stringify({ unitId: unitId, parentId: parentId, treeIds: treeIds }));
       if (!unitId || this.treeItems.length === 0) return;
       // If parent_id available, use it directly
       if (parentId) {
@@ -237,7 +234,6 @@ module.exports = {
             if (!parent.childrenData || parent.childrenData.length === 0) {
               this.loadChildren(parent);
             }
-            console.log('autoExpand: found parent', parentId, 'expanded');
             return;
           }
         }
@@ -245,7 +241,6 @@ module.exports = {
       // Fallback: check if unitId is an eselon1 item
       for (var i = 0; i < this.treeItems.length; i++) {
         if (this.treeItems[i].id == unitId) {
-          console.log('autoExpand: unitId is eselon1, no expand needed');
           return;
         }
       }
@@ -257,14 +252,12 @@ module.exports = {
             if (item.childrenData[j].id == unitId) {
               this.treeItems.forEach(function(x) { self.$set(x, 'expanded', false); });
               this.$set(item, 'expanded', true);
-              console.log('autoExpand: found in loaded children of', item.id);
               return;
             }
           }
         }
       }
       // Fallback: load all children to find parent
-      console.log('autoExpand: loading all children to find parent');
       var found = false;
       this.treeItems.forEach(function(item) {
         if (!item.childrenData || item.childrenData.length === 0) {
@@ -280,7 +273,6 @@ module.exports = {
                   found = true;
                   self.treeItems.forEach(function(x) { self.$set(x, 'expanded', false); });
                   self.$set(item, 'expanded', true);
-                  console.log('autoExpand: found parent via loading:', item.id);
                   return;
                 }
               }
