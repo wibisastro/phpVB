@@ -9,6 +9,17 @@
 </div>
 <!-- Toggle buttons ends -->
 
+<!-- Notification icon start -->
+{% if _SESSION['account_id'] %}
+<a href="#" class="position-relative d-flex align-items-center justify-content-center lh-1 text-muted" title="Notifikasi" style="padding:0.5rem; font-size:1.25rem; text-decoration:none">
+  <i class="bi bi-bell"></i>
+  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.6rem">
+    3
+  </span>
+</a>
+{% endif %}
+<!-- Notification icon end -->
+
 <!-- App brand sm starts -->
 <div class="app-brand-sm d-lg-none d-flex">
   <a href="https://{{ _SERVER['SERVER_NAME'] }}">
@@ -52,16 +63,6 @@
     </a>
     <!-- Instansi indicator ends -->
 
-    <!-- Notification icon (dummy) start — hidden until implemented -->
-    <!--
-    <a href="#" class="position-relative mx-3 text-muted" title="Notifikasi" style="text-decoration:none">
-      <i class="bi bi-bell fs-5"></i>
-      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.6rem">
-        3
-      </span>
-    </a>
-    -->
-    <!-- Notification icon (dummy) end -->
   {% endif %}
 
     <!-- User settings start -->
