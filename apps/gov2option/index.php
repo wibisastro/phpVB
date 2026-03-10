@@ -213,14 +213,8 @@ class index extends \Gov2lib\api {
 
     #---coded by claude
     function changePortal($vars = []) {
-        global $self, $doc;
-        $unitId = (int)($vars['id'] ?? 0);
-        $portal = $_GET['portal'] ?? '';
-        $nama = $_GET['nama'] ?? '';
-        if ($unitId && $nama) {
-            $self->changePortal($unitId, $portal, $nama);
-        }
-        return $doc->responseGet(['status' => 'ok', 'unit_id' => $unitId, 'unit_nama' => $nama]);
+        global $self;
+        return $self->changePortal($vars);
     }
 
     #---coded by claude
