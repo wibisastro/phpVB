@@ -17,8 +17,9 @@ class option extends \Gov2lib\crudHandler {
         $GLOBALS['vueData']['pathurl']=$config->webroot."/components/gov2nav/breadcrumb/$pageID/".$this->className."/menu";
         $GLOBALS['vueData']['kabid']=$config->domain->attr['id'];
         $GLOBALS['vueData']['itemPerPage']=100;
+        $GLOBALS['vueData']['scrollInterval']=$_scrollInterval;
         $GLOBALS['vueCreated'].='eventBus.$on("refreshTag", this.refreshTag);';
-        $GLOBALS['vueMethods'].='refreshTag: function(data) {            
+        $GLOBALS['vueMethods'].='refreshTag: function(data) {
 			eventBus.$emit("refreshDatawilayah",data);
 		},';
 	}
@@ -157,6 +158,14 @@ class option extends \Gov2lib\crudHandler {
         }
         return $res;
     }
+    public function doCountChildren(int|string $parentId = 0): ?array
+    {
+        global $scriptID;
+        $query = "SELECT count(id) as totalRecord FROM " . $this->tbl->table
+            . " WHERE app=%s AND parent_id=%i";
+        return \DB::queryFirstRow($query, $scriptID, $parentId);
+    }
+
     function dependencies () {
     }
 }

@@ -2,8 +2,8 @@
     <div class="main-box" id="mb" v-if="isActive">
         <div class="main-box-body">
             <div class="block no-bottom">
-                <div class="block-header">
-                    <div class="pull-left">
+                <div class="block-header d-flex justify-content-between align-items-center flex-wrap">
+                    <div>
                         <drillup
                             v-if="drillup"
                             :is-active="true"
@@ -13,9 +13,9 @@
                         <div class="block-title">
                             {{ title ? title : instance.split('_').join(' ').toUpperCase()}} {{ myBreadcrumb }}
                         </div>
-                        
+
                     </div>
-                    <div class="pull-right filter-block">
+                    <div class="d-flex align-items-center gap-2">
                         <b-button @click="refresh"
                                   v-show="!refreshState"
                                   variant="primary"
@@ -1186,7 +1186,6 @@
     /* Table styling */
     .table-container .table {
         margin-bottom: 0;
-        font-size: 0.9rem;
     }
 
     .table-container .table thead th {
