@@ -3,17 +3,14 @@
         <div class="main-box-body">
             <div class="block no-bottom">
                 <div class="block-header d-flex justify-content-between align-items-center flex-wrap">
-                    <div>
+                    <div class="d-flex align-items-center gap-2">
                         <drillup
                             v-if="drillup"
                             :is-active="true"
                             :is-horizontal="true"
                             path-url="proyek/breadcrumb"
                         ></drillup>
-                        <div class="block-title">
-                            {{ title ? title : instance.split('_').join(' ').toUpperCase()}} {{ myBreadcrumb }}
-                        </div>
-
+                        <gov2tablerows-bs4 :instance="instance"></gov2tablerows-bs4>
                     </div>
                     <div class="d-flex align-items-center gap-2">
                         <b-button @click="refresh"
@@ -437,6 +434,7 @@
             'gov2component': httpVueLoader('./gov2component.vue'),
             'gov2search-bs4': httpVueLoader('./gov2search-bs4.vue'),
             'gov2button-bs4': httpVueLoader('./gov2button-bs4.vue'),
+            'gov2tablerows-bs4': httpVueLoader('./gov2tablerows-bs4.vue'),
             'gov2pagination-bs4': httpVueLoader('./gov2pagination-bs4.vue'),
             'gov2itemperpage-bs4': httpVueLoader('./gov2itemperpage-bs4.vue'),
             'gov2scroll-bs4': httpVueLoader('./gov2scroll-bs4.vue'),
