@@ -294,16 +294,16 @@ module.exports = {
       if (el) {
         var nama = this.config.unit_nama;
         if (nama) {
-          el.innerHTML = '<i class="bi bi-building fs-5 me-2"></i>' +
-            '<span class="text-truncate" style="max-width:200px">' + this.escapeHtml(nama) + '</span>';
+          el.innerHTML = '<i class="bi bi-building fs-5"></i>' +
+            '<span class="text-truncate d-none d-lg-inline ms-2" style="max-width:200px">' + this.escapeHtml(nama) + '</span>';
           el.classList.remove('text-muted');
           el.classList.add('text-body');
           el.title = nama;
         } else {
-          el.innerHTML = '<i class="bi bi-building fs-5 me-2"></i><span class="text-muted">Pilih Instansi</span>';
+          el.innerHTML = '<i class="bi bi-building fs-5"></i><span class="text-muted d-none d-lg-inline ms-2">Pilih Instansi</span>';
           el.classList.add('text-muted');
           el.classList.remove('text-body');
-          el.title = '';
+          el.title = 'Pilih Instansi';
         }
       }
     },

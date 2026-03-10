@@ -32,27 +32,25 @@
 <!-- App header actions starts -->
 <div class="header-actions">
 
-  <!-- Instansi indicator start -->
-  {% if _SESSION['account_id'] %}
-  <a href="#" id="topbarUnitKerja"
-     class="d-none d-lg-flex align-items-center text-decoration-none me-3 px-3 py-2 rounded-3 border"
-     style="white-space:nowrap; max-width:320px; background:#fff"
-     title="{{ _SESSION['unit_nama'] }}"
-     onclick="event.preventDefault(); openSidePanel('instansi')">
-    {% if _SESSION['unit_nama'] %}
-      <i class="bi bi-building fs-5 me-2"></i>
-      <span class="text-truncate" style="max-width:200px">{{ _SESSION['unit_nama'] }}</span>
-    {% else %}
-      <i class="bi bi-building fs-5 me-2"></i><span class="text-muted">Pilih Instansi</span>
-    {% endif %}
-  </a>
-  {% endif %}
-  <!-- Instansi indicator ends -->
-
   <!-- Header action bar starts -->
   <div class="header-actions-container rounded-4 d-flex align-items-center">
 
   {% if _SESSION['account_id'] %}
+    <!-- Instansi indicator start -->
+    <a href="#" id="topbarUnitKerja"
+       class="d-flex align-items-center text-decoration-none mx-3"
+       style="white-space:nowrap"
+       title="{{ _SESSION['unit_nama'] ?: 'Pilih Instansi' }}"
+       onclick="event.preventDefault(); openSidePanel('instansi')">
+      <i class="bi bi-building fs-5"></i>
+      {% if _SESSION['unit_nama'] %}
+        <span class="text-truncate d-none d-lg-inline ms-2" style="max-width:200px">{{ _SESSION['unit_nama'] }}</span>
+      {% else %}
+        <span class="text-muted d-none d-lg-inline ms-2">Pilih Instansi</span>
+      {% endif %}
+    </a>
+    <!-- Instansi indicator ends -->
+
     <!-- Notification icon (dummy) start -->
     <a href="#" class="position-relative mx-3 text-muted" title="Notifikasi" style="text-decoration:none">
       <i class="bi bi-bell fs-5"></i>
