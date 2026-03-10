@@ -78,8 +78,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="offcanvas-body p-0">
-        <div id="sidePanel-unitkerja" class="h-100">
-          <cube-unitkerja></cube-unitkerja>
+        <div id="sidePanel-instansi" class="h-100">
+          <cube-instansi></cube-instansi>
         </div>
         <div id="sidePanel-pengaturan" style="display:none">
           <cube-menu-settings></cube-menu-settings>
@@ -131,7 +131,7 @@
         el: '#app',
         components: {
         'cube-menu-settings': httpVueLoader('{{ webroot }}/gov2option/vue/cube-menu-settings.vue'),
-        'cube-unitkerja': httpVueLoader('{{ webroot }}/gov2option/vue/cube-unitkerja.vue'),
+        'cube-instansi': httpVueLoader('{{ webroot }}/gov2option/vue/cube-instansi.vue'),
         'gov2navbreadcrumb': httpVueLoader('{{ webroot }}/components/vue/gov2navbreadcrumb.vue'),
         {% for component in components %}
             {% for item in component %}
@@ -151,11 +151,11 @@
 <script>
   window.openSidePanel = function(view) {
     var titles = {
-      unitkerja: '<i class="bi bi-building me-2"></i>Unit Kerja',
+      instansi: '<i class="bi bi-building me-2"></i>Instansi',
       pengaturan: '<i class="bi bi-gear me-2"></i>Pengaturan'
     };
     // Toggle panels via DOM
-    var views = ['unitkerja', 'pengaturan'];
+    var views = ['instansi', 'pengaturan'];
     views.forEach(function(v) {
       var el = document.getElementById('sidePanel-' + v);
       if (el) { el.style.display = (v === view) ? '' : 'none'; }

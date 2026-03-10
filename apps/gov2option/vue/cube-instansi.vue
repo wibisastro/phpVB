@@ -17,14 +17,14 @@
 
     <!-- Lock notice -->
     <div v-if="config.locked" class="px-3 py-2 text-muted small border-bottom">
-      <i class="bi bi-lock me-1"></i>Unit kerja dikunci sesuai role <strong>{{ config.userRole }}</strong>
+      <i class="bi bi-lock me-1"></i>Instansi dikunci sesuai role <strong>{{ config.userRole }}</strong>
     </div>
 
     <!-- Search -->
     <div v-if="!config.locked" class="px-3 py-2 border-bottom">
       <div class="position-relative">
         <input type="text" class="form-control form-control-sm ps-4" v-model="search"
-               placeholder="Cari unit kerja..." @input="onSearch">
+               placeholder="Cari instansi..." @input="onSearch">
         <i class="bi bi-search position-absolute" style="left:10px;top:7px;font-size:0.8rem;color:#aaa"></i>
       </div>
     </div>
@@ -93,7 +93,7 @@
                 <strong>{{ item.kode }}</strong> - {{ item.nama }}
               </div>
               <button v-if="item.has_children" class="btn btn-sm text-muted py-0 px-1"
-                      @click.stop="drillDown(item)" title="Lihat sub unit">
+                      @click.stop="drillDown(item)" title="Lihat sub instansi">
                 <i class="bi bi-chevron-right"></i>
               </button>
             </div>
@@ -106,7 +106,7 @@
 
 <script>
 module.exports = {
-  name: 'cube-unitkerja',
+  name: 'cube-instansi',
   data() {
     return {
       config: { userRole: '', locked: false, unit_nama: '', unit_id: null, portal: '' },
@@ -128,7 +128,7 @@ module.exports = {
           this.config = resp.data || this.config;
           this.updateTopbar();
         })
-        .catch(e => console.log('unitkerja config:', e.message));
+        .catch(e => console.log('instansi config:', e.message));
     },
     loadTree(parentId) {
       this.loading = true;
@@ -197,7 +197,6 @@ module.exports = {
       }, 300);
     },
     updateTopbar() {
-      // Update topbar unit kerja display
       var el = document.getElementById('topbarUnitKerja');
       if (el) {
         var nama = this.config.unit_nama;
@@ -207,7 +206,7 @@ module.exports = {
           el.classList.remove('text-muted');
           el.classList.add('text-body');
         } else {
-          el.innerHTML = '<i class="bi bi-building fs-5 me-2"></i><span class="text-muted">Pilih Unit Kerja</span>';
+          el.innerHTML = '<i class="bi bi-building fs-5 me-2"></i><span class="text-muted">Pilih Instansi</span>';
           el.classList.add('text-muted');
           el.classList.remove('text-body');
         }

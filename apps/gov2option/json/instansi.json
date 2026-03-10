@@ -1,0 +1,51 @@
+[{
+    "name": "cmd",
+    "value": "",
+    "label": "Submit"
+},{
+    "name": "id",
+    "value": "",
+    "label": "ID",
+    "placeholder": "Nomor ID",
+    "disabled": "true"
+},{
+    "name": "kode",
+    "value": "",
+    "label": "Kode",
+    "placeholder": "Masukan Kode",
+    "required": "true",
+    "error_message": "Kode wajib diisi"
+},{
+    "name": "portal",
+    "value": "",
+    "label": "Portal",
+    "placeholder": "Masukan Portal",
+    "required": "true",
+    "error_message": "Portal wajib diisi"
+},{
+    "name": "nama",
+    "value": "",
+    "label": "Nama",
+    "placeholder": "Masukan Nama Instansi",
+    "required": "true",
+    "error_message": "Nama wajib diisi"
+},{
+    "name": "tahun",
+    "value": "",
+    "label": "Tahun",
+    "placeholder": "Masukan Tahun",
+    "required": "true",
+    "error_message": "Tahun wajib diisi",
+    "type": "number"
+},{
+    "name": "level",
+    "value": "level",
+    "label": "Level",
+    "placeholder": "Level",
+    "error_message": "Pilih Level",
+    "options": {
+        "1":"eselon1",
+        "2":"eselon2"
+    },
+    "type": "hidden"
+}]

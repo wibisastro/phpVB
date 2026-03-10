@@ -32,21 +32,21 @@
 <!-- App header actions starts -->
 <div class="header-actions">
 
-  <!-- Unit Kerja indicator start -->
+  <!-- Instansi indicator start -->
   {% if _SESSION['account_id'] %}
   <a href="#" id="topbarUnitKerja"
      class="d-none d-lg-flex align-items-center text-decoration-none me-3 px-3 py-2 rounded-3 border"
      style="white-space:nowrap; max-width:320px; background:#fff"
-     onclick="event.preventDefault(); openSidePanel('unitkerja')">
+     onclick="event.preventDefault(); openSidePanel('instansi')">
     {% if _SESSION['unit_nama'] %}
       <i class="bi bi-building fs-5 me-2"></i>
       <span class="text-truncate" style="max-width:200px">{{ _SESSION['unit_nama'] }}</span>
     {% else %}
-      <i class="bi bi-building fs-5 me-2"></i><span class="text-muted">Pilih Unit Kerja</span>
+      <i class="bi bi-building fs-5 me-2"></i><span class="text-muted">Pilih Instansi</span>
     {% endif %}
   </a>
   {% endif %}
-  <!-- Unit Kerja indicator ends -->
+  <!-- Instansi indicator ends -->
 
   <!-- Header action bar starts -->
   <div class="header-actions-container rounded-4 d-flex align-items-center">
