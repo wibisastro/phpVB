@@ -159,7 +159,7 @@ module.exports  = {
             fields: [],
             delData: '',
             isSoftDel: false,
-            isDel: true,
+            isDel: false,
             isHasChildren: false,
             isDisabled: [],
             currentLevel: 1,

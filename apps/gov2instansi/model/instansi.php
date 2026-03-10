@@ -18,10 +18,11 @@ class instansi extends \Gov2lib\crudHandler
 
     public function loadTable(): void
     {
+        $GLOBALS['vueData']['action'] = 'instansi';
+        $GLOBALS['vueData']['fieldurl'] = 'instansi/fields';
         $GLOBALS['vueData']['itemPerPage'] = 10;
         $GLOBALS['vueData']['interval'] = [10, 25, 50, 100];
         $GLOBALS['vueData']['scrollInterval'] = $this->scrollInterval;
-        $GLOBALS['vueData']['fieldurl'] = $this->className . '/fields';
     }
 
     public function getInstansi(): ?array
