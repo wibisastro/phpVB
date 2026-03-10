@@ -40,7 +40,7 @@ class login
         $self->ses->authenticate('public');
         $doc->body("pageTitle", 'Silakan Login');
         $_SESSION['ssonode'] = trim((string) ($config->platform->ssonode ?? ''));
-        $self->content("notLogin.html");
+        $self->content("@gov2login/notLogin.html");
     }
 
     /**
@@ -50,7 +50,7 @@ class login
     {
         global $self, $doc;
         $doc->body("pageTitle", 'Gov 2.0 SSO Signup');
-        $self->content("signup.html");
+        $self->content("@gov2login/signup.html");
     }
 
     /**
@@ -67,7 +67,7 @@ class login
 
         $self->ses->authenticate('guest');
         $doc->body("pageTitle", 'Profil');
-        $self->content("profile.html");
+        $self->content("@gov2login/profile.html");
     }
 
     /**
@@ -77,7 +77,7 @@ class login
     {
         global $self, $doc;
         $doc->body("pageTitle", 'Gov 2.0 SSO Forgot Password');
-        $self->content("forgot.html");
+        $self->content("@gov2login/forgot.html");
     }
 
     /**
