@@ -10,16 +10,14 @@ class option {
     }
     
     function index ($vars) {
-        global $self, $doc;
+        global $self, $doc, $scriptID;
         if ($vars["privilege"] == "setup") {
             $self->loadTable($self->scrollInterval);
             $self->content();
         } elseif ($vars["privilege"] == "view") {
             $doc->body('app', $vars['pageID']);
+            $doc->body('view_type', $scriptID === 'services' ? 'view_services' : 'view');
             $self->content('option_view.html');
-        } elseif ($vars["privilege"] == "view_services") {
-            $doc->body('app', $vars['pageID']);
-            $self->content('option_view_service.html');
         }
     }
 

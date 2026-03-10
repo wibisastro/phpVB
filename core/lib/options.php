@@ -25,15 +25,15 @@ class options
      */
     public function index(): void
     {
-        global $self, $doc, $vars, $cmdID;
+        global $self, $doc, $vars, $cmdID, $scriptID;
         $self->gov2nav->setDefaultNavCustom();
         $role = isset($vars['role']) ? $vars['role'] : 'Options';
         $doc->body("pageTitle", ucwords($vars['app']) . " " . ucwords($role));
 
         match ($cmdID) {
             'setup' => $self->content("option_setup.html"),
-            'view', 'view_services' => [
-                $doc->body('view_type', $cmdID),
+            'view' => [
+                $doc->body('view_type', $scriptID === 'services' ? 'view_services' : 'view'),
                 $self->content("option_view.html"),
             ],
             'controlpanel' => $self->content("option_controlpanel.html"),

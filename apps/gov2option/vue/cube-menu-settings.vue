@@ -42,7 +42,7 @@
           <div class="accordion-body p-0">
             <ul class="list-group list-group-flush" v-if="services.length > 0">
               <li class="list-group-item border-0 px-4 py-2" v-for="item in services" :key="item.app">
-                <a :href="`/${item.app}/services/view_services`"
+                <a :href="`/${item.app}/services/view`"
                    class="d-flex align-items-center text-decoration-none text-body">
                   <i class="bi bi-plug me-2 text-muted"></i>
                   <span class="small">{{ item.app.toUpperCase() }}</span>

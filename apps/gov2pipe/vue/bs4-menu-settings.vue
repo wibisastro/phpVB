@@ -35,7 +35,7 @@
                 </a>
                 <ul class="submenu" :class="[toggleMenu[1].open ? 'display-block' : 'display-none']" v-if="services.length > 0">
                     <li class="item" v-for="service in services">
-                        <a :href="`${root}/${service.app}/services/view_services`">
+                        <a :href="`${root}/${service.app}/services/view`">
                             <i :class="service.hasOwnProperty('icon') ? service.icon : 'fa fa-gears'"></i>
                           {{service.app | uppercase}}
                         </a>
