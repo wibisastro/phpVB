@@ -2,7 +2,7 @@
 <div v-if="isActive" class="table-container-outer">
 <div class="table-container-fade" v-if="wideTable"></div>
 <div class="table-container" :style="{ width: setWideTable() }">
-  <table class="table table-striped" :class="{ 'table-bordered': isBordered }">
+  <table class="table table-striped table-hover" :class="{ 'table-bordered': isBordered }">
     <thead>
       <tr v-if="headers">
         <th v-for="(val,key) in headers" :colspan="val['colspan']"  :rowspan="isHeader(key)">
@@ -642,8 +642,80 @@ module.exports = {
 
 <style>
 
+/* Cube theme table wrapper */
+.table-container-outer {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e6ec;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin: 0;
+  width: 100%;
+}
+
+.table-container::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  border: 3px solid #fff;
+  background-color: rgba(0, 0, 0, .3);
+}
+
+.table-container-fade {
+  position: absolute;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0), #fff);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Table styling */
+.table-container .table {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+.table-container .table thead th {
+  background-color: #f6f7fb;
+  border-bottom: 2px solid #e5e6ec;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  padding: 0.6rem 0.75rem;
+}
+
+.table-container .table tbody td {
+  color: #616161;
+  vertical-align: middle;
+  padding: 0.5rem 0.75rem;
+}
+
+.table-container .table tfoot th {
+  background-color: #f6f7fb;
+  border-top: 2px solid #e5e6ec;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.6rem 0.75rem;
+}
+
+.table-container .table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Sort indicator */
 th.active {
-  color: blue;
+  color: #5b4fb9;
 }
 
 th.active .arrow {
@@ -662,45 +734,13 @@ th.active .arrow {
 .arrow.asc {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  border-bottom: 4px solid blue;
+  border-bottom: 4px solid #5b4fb9;
 }
 
 .arrow.dsc {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  border-top: 4px solid blue;
-}
-    
-.table-container {
-	overflow-y: auto;
-	_overflow: auto;
-	margin: 0 0 1em;
-    width: 100%;
-}
-    
-.table-container::-webkit-scrollbar {
-	-webkit-appearance: none;
-	width: 14px;
-	height: 14px;
-}
-
-.table-container::-webkit-scrollbar-thumb {
-	border-radius: 8px;
-	border: 3px solid #fff;
-	background-color: rgba(0, 0, 0, .3);
-}
-    
-.table-container-outer { position: relative; }
-
-.table-container-fade {
-	position: absolute;
-	right: 0;
-	width: 20px;
-	height: 100%;
-	background-image: -webkit-linear-gradient(0deg, rgba(255,255,255,.5), #fff);
-	background-image: -moz-linear-gradient(0deg, rgba(255,255,255,.5), #fff);
-	background-image: -ms-linear-gradient(0deg, rgba(255,255,255,.5), #fff);
-	background-image: -o-linear-gradient(0deg, rgba(255,255,255,.5), #fff);
+  border-top: 4px solid #5b4fb9;
 }
 
 </style>
