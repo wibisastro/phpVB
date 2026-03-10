@@ -101,7 +101,7 @@ class login
 
         $self->ses->authenticate('public');
         $doc->body("pageTitle", 'Lupa Password');
-        $self->content("@gov2login/forgot.html");
+        $self->content("@gov2login/resetpass.html");
     }
 
     /**
@@ -118,7 +118,7 @@ class login
 
         $self->ses->authenticate('public');
         $doc->body("pageTitle", 'Aktivasi Akun');
-        $self->content("@gov2login/signup.html");
+        $self->content("@gov2login/activate.html");
     }
 
     /**
