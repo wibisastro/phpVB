@@ -415,8 +415,8 @@ class document extends customException
 
 
         if (is_array($this->error)) {
-            $this->body('pageTitle', 'Exception Occured');
-            $this->body('subTitle', 'Please check exception list below ');
+            $this->body('pageTitle', 'Terjadi Kesalahan');
+            $this->body('subTitle', 'Silakan periksa detail error berikut');
             $this->body('errors', $this->error);
 
             $errorBody = $this->buildErrorBody($config, $self, $loader);
