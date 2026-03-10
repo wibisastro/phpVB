@@ -32,7 +32,7 @@
           <ul class="navbar-nav ms-auto">
             {% if _SESSION is defined and _SESSION['account_id'] is defined and _SESSION['account_id'] %}
               <li class="nav-item">
-                <a class="nav-link" href="/gov2login">
+                <a class="nav-link" href="/{{ pageID }}/profile">
                   <i class="bi bi-person-circle me-1"></i>{{ _SESSION['fullname'] }}
                 </a>
               </li>
