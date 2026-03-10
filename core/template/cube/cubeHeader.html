@@ -76,14 +76,14 @@
         </div>
       </a>
       <div class="dropdown-menu dropdown-menu-end shadow-lg">
-        <a class="dropdown-item d-flex align-items-center" href="/gov2login">
+        <a class="dropdown-item d-flex align-items-center" href="/{{ pageID }}/profile">
           <i class="bi bi-person-badge fs-5 me-2"></i>{{ _SESSION['userRole'] }}
         </a>
         <a class="dropdown-item d-flex align-items-center" href="#" onclick="event.preventDefault(); openSidePanel('pengaturan')">
           <i class="bi bi-gear fs-5 me-2"></i>Pengaturan
         </a>
         <div class="mx-3 my-2 d-grid">
-          <a href="/{{ pageID }}/login.php?cmd=logout" class="btn btn-danger">Logout</a>
+          <a href="/{{ pageID }}/logout" class="btn btn-danger">Logout</a>
         </div>
       </div>
     {% else %}

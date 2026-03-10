@@ -39,6 +39,16 @@
 	</route>
     <route>
 		<method>GET</method>
+		<uri>/{app}/profile</uri>
+		<handler>Gov2lib\loginHandler</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/{app}/logout</uri>
+		<handler>Gov2lib\loginHandler</handler>
+	</route>
+    <route>
+		<method>GET</method>
 		<uri>/{app}/signup</uri>
 		<handler>Gov2lib\loginHandler</handler>
 	</route>

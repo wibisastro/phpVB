@@ -8,7 +8,7 @@ use League\OAuth2\Client\Provider\GenericProvider;
 /**
  * Login controller
  *
- * @version 4.1
+ * @version 4.2
  */
 class login
 {
@@ -26,24 +26,21 @@ class login
     }
 
     /**
-     * Display login page
+     * Display login page — redirect to profile if already logged in
      */
     public function index(): void
     {
-        global $self, $doc, $config;
-        $is_gov2 = (($_GET['type'] ?? null) === 'gov2');
+        global $self, $doc, $config, $pageID;
 
-        $self->ses->authenticate('guest');
-        $keycloak = $config->keycloak;
-
-        if ($keycloak && (int)$keycloak->active && !$is_gov2) {
-            $doc->body('_SESSION', $self->ses->val);
-            $doc->body("pageTitle", 'KeyCloak Profile');
-            $self->content("profile_keycloak.html");
-        } else {
-            $doc->body("pageTitle", 'Gov 2.0 SSO Profile');
-            $self->content("profile.html");
+        if ($self->ses->val['account_id'] ?? false) {
+            header("Location: /$pageID/profile");
+            exit;
         }
+
+        $self->ses->authenticate('public');
+        $doc->body("pageTitle", 'Silakan Login');
+        $_SESSION['ssonode'] = trim((string) ($config->platform->ssonode ?? ''));
+        $self->content("notLogin.html");
     }
 
     /**
@@ -57,13 +54,19 @@ class login
     }
 
     /**
-     * Display user profile page
+     * Display user profile page — redirect to login if not logged in
      */
     public function profile(): void
     {
-        global $self, $doc;
+        global $self, $doc, $pageID;
+
+        if (!($self->ses->val['account_id'] ?? false)) {
+            header("Location: /$pageID/login");
+            exit;
+        }
+
         $self->ses->authenticate('guest');
-        $doc->body("pageTitle", 'Gov 2.0 SSO Profile');
+        $doc->body("pageTitle", 'Profil');
         $self->content("profile.html");
     }
 
