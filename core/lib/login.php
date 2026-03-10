@@ -88,6 +88,40 @@ class login
     }
 
     /**
+     * Display reset password page — redirect to profile if already logged in
+     */
+    public function resetpass(): void
+    {
+        global $self, $doc, $pageID;
+
+        if ($self->ses->val['account_id'] ?? false) {
+            header("Location: /$pageID/profile");
+            exit;
+        }
+
+        $self->ses->authenticate('public');
+        $doc->body("pageTitle", 'Lupa Password');
+        $self->content("@gov2login/forgot.html");
+    }
+
+    /**
+     * Display activation page — redirect to profile if already logged in
+     */
+    public function activate(): void
+    {
+        global $self, $doc, $pageID;
+
+        if ($self->ses->val['account_id'] ?? false) {
+            header("Location: /$pageID/profile");
+            exit;
+        }
+
+        $self->ses->authenticate('public');
+        $doc->body("pageTitle", 'Aktivasi Akun');
+        $self->content("@gov2login/signup.html");
+    }
+
+    /**
      * Logout and redirect to SSO logout
      */
     public function logout(): void
