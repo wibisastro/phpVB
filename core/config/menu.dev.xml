@@ -41,6 +41,14 @@
 		</menu>
 	</menu>
 	<menu>
+		<caption>Instansi</caption>
+		<url>/gov2instansi</url>
+		<menu>
+			<caption>Data Instansi</caption>
+			<url>/gov2instansi/instansi</url>
+		</menu>
+	</menu>
+	<menu>
 		<caption>Examples</caption>
         <url>/home</url>
 		<menu>
