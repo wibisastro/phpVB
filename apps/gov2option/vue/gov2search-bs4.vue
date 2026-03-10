@@ -1,7 +1,7 @@
 <template>
-    <div class="form-group pull-left no-bottom search" v-if="isActive">
-            <input type="text" 
-                class="form-control" 
+    <div class="d-inline-flex align-items-center position-relative" v-if="isActive">
+            <input type="text"
+                class="form-control"
                 placeholder="Search..."
                 v-model="searchQuery"
                 @keyup="setQuery" :data-test="`search-box${'-' + instance}`"/>
@@ -31,8 +31,13 @@
         }
     }
 </script>
-<style>
-    .filter-block .form-group .search-icon {
-        top: 8px;
+<style scoped>
+    .search-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+        pointer-events: none;
     }
 </style>
