@@ -51,8 +51,9 @@
           </li>
           <li v-for="item in searchResults" :key="item.id"
               class="list-group-item border-0 px-3 py-2 list-group-item-action"
+              :class="{ 'bg-primary-subtle': config.unit_id == item.id }"
               style="cursor:pointer" @click="selectUnit(item)">
-            <span class="small"><strong>{{ item.kode }}</strong> - {{ item.nama }}</span>
+            <span class="small" :class="{ 'fw-bold': config.unit_id == item.id }"><strong>{{ item.kode }}</strong> - {{ item.nama }}</span>
           </li>
         </ul>
       </div>
@@ -88,9 +89,10 @@
               </li>
               <li v-for="child in item.childrenData" :key="'c-' + child.id"
                   class="list-group-item border-0 ps-5 py-1 list-group-item-action"
+                  :class="{ 'bg-primary-subtle': config.unit_id == child.id }"
                   style="cursor:pointer"
                   @click="selectUnit(child)">
-                <span class="small">{{ child.kode }} - {{ child.nama }}</span>
+                <span class="small" :class="{ 'fw-bold': config.unit_id == child.id }">{{ child.kode }} - {{ child.nama }}</span>
               </li>
               <li v-if="!item.childrenLoading && item.childrenData && item.childrenData.length === 0"
                   :key="'e-' + item.id"
@@ -127,6 +129,7 @@ module.exports = {
         .then(resp => {
           this.config = resp.data || this.config;
           this.updateTopbar();
+          this.autoExpandSelected();
         })
         .catch(e => console.log('instansi config:', e.message));
     },
@@ -212,6 +215,50 @@ module.exports = {
           .catch(e => { this.searchLoading = false; this.handleError(e); });
       }, 300);
     },
+    autoExpandSelected() {
+      if (!this.config.unit_id || this.treeItems.length === 0) return;
+      var unitId = this.config.unit_id;
+      // Check if selected is an eselon1 item itself
+      for (var i = 0; i < this.treeItems.length; i++) {
+        if (this.treeItems[i].id == unitId) return; // eselon1 selected, no expand needed
+      }
+      // Find parent eselon1 that contains selected eselon2, expand it
+      for (var i = 0; i < this.treeItems.length; i++) {
+        var item = this.treeItems[i];
+        if (item.childrenData && item.childrenData.length > 0) {
+          for (var j = 0; j < item.childrenData.length; j++) {
+            if (item.childrenData[j].id == unitId) {
+              this.treeItems.forEach(function(x) { x.expanded = false; });
+              item.expanded = true;
+              return;
+            }
+          }
+        }
+      }
+      // Children not loaded yet — try expanding each eselon1 to find parent
+      // Use the loadChildren approach: load all and check
+      this.treeItems.forEach(function(x) { x.expanded = false; });
+      var self = this;
+      this.treeItems.forEach(function(item) {
+        if (!item.childrenData || item.childrenData.length === 0) {
+          self.$set(item, 'childrenLoading', true);
+          axios.get('/gov2option/index/getUnitKerjaList/' + item.id)
+            .then(function(resp) {
+              var children = resp.data || [];
+              self.$set(item, 'childrenData', children);
+              self.$set(item, 'childrenLoading', false);
+              for (var k = 0; k < children.length; k++) {
+                if (children[k].id == unitId) {
+                  self.treeItems.forEach(function(x) { x.expanded = false; });
+                  item.expanded = true;
+                  return;
+                }
+              }
+            })
+            .catch(function() { self.$set(item, 'childrenLoading', false); });
+        }
+      });
+    },
     updateTopbar() {
       var el = document.getElementById('topbarUnitKerja');
       if (el) {
@@ -221,10 +268,12 @@ module.exports = {
             '<span class="text-truncate" style="max-width:200px">' + this.escapeHtml(nama) + '</span>';
           el.classList.remove('text-muted');
           el.classList.add('text-body');
+          el.title = nama;
         } else {
           el.innerHTML = '<i class="bi bi-building fs-5 me-2"></i><span class="text-muted">Pilih Instansi</span>';
           el.classList.add('text-muted');
           el.classList.remove('text-body');
+          el.title = '';
         }
       }
     },

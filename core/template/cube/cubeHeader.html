@@ -37,6 +37,7 @@
   <a href="#" id="topbarUnitKerja"
      class="d-none d-lg-flex align-items-center text-decoration-none me-3 px-3 py-2 rounded-3 border"
      style="white-space:nowrap; max-width:320px; background:#fff"
+     title="{{ _SESSION['unit_nama'] }}"
      onclick="event.preventDefault(); openSidePanel('instansi')">
     {% if _SESSION['unit_nama'] %}
       <i class="bi bi-building fs-5 me-2"></i>
