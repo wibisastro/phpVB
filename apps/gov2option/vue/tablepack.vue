@@ -1157,6 +1157,14 @@
 </script>
 
 <style scoped>
+    /* Block header above table */
+    .block.no-bottom {
+        margin-bottom: 0.75rem;
+    }
+    .block-header {
+        padding: 0.5rem 0;
+    }
+
     /* Cube theme table wrapper */
     .table-container-outer {
         position: relative;
