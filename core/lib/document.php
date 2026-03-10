@@ -415,8 +415,13 @@ class document extends customException
 
 
         if (is_array($this->error)) {
-            $this->body('pageTitle', 'Terjadi Kesalahan');
-            $this->body('subTitle', 'Silakan periksa detail error berikut');
+            if (isset($this->error['NotLogin'])) {
+                $this->body('pageTitle', 'Silakan Login');
+                $this->body('subTitle', 'Anda perlu login untuk mengakses halaman ini');
+            } else {
+                $this->body('pageTitle', 'Terjadi Kesalahan');
+                $this->body('subTitle', 'Silakan periksa detail error berikut');
+            }
             $this->body('errors', $this->error);
 
             $errorBody = $this->buildErrorBody($config, $self, $loader);
@@ -442,7 +447,7 @@ class document extends customException
         $loader->addPath(__DIR__ . '/../../apps/components/view', 'components');
 
         if (isset($this->error['NotLogin'])) {
-            $errorBody[] = 'errorMessage.html';
+            // Tidak tampilkan errorMessage untuk NotLogin — bukan error
         } else {
             $errorBody[] = '@components/gov2navBreadcrumb.html';
             $errorBody[] = 'errorMessage.html';
