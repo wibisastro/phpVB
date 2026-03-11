@@ -107,7 +107,7 @@
                                 <a v-if="recursive == true && key !== 'status' && key !== 'nama'
                                && !clickableCol.includes(key)" :class="{'cp text-info': key ===  'nama'}">{{ entry[key] }} </a>
                                 <span v-if="recursive == false && key !== 'status'" >{{ entry[key] }}</span>
-                                <b-tooltip :target="`recursive-link-${entry.id}`" triggers="hover" v-if="childrenTooltip">
+                                <b-tooltip :target="`recursive-link-${entry.id}`" triggers="hover" placement="top" v-if="childrenTooltip">
                                     Data ini memiliki {{entry['children']}} child(s)
                                 </b-tooltip>
                             </div>
