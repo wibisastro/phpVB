@@ -166,7 +166,7 @@ class gov2session extends dsnSource
                             };
                         }
                     } else {
-                        if ((isset($this->val['account_id']) && !isset($this->val['id']))) {
+                        if ($_privilege != 'public' && (isset($this->val['account_id']) && !isset($this->val['id']))) {
                             $_member = $this->memberRead($this->val['account_id']);
                             if ($_member['id'] ?? false) {
                                 $this->val['id'] = $_member['id'];
