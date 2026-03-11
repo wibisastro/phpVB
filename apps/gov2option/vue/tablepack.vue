@@ -103,13 +103,13 @@
                                    @click="getChildren(entry['id'])"
                                    :class="{'cp text-info': key ===  'nama' || clickableCol.includes(key)}"
                                    :id="`recursive-link-${entry.id}`"
-                                   :data-test="`recursive-link-${entry.id}`">{{ entry[key] }} </a>
+                                   :data-test="`recursive-link-${entry.id}`"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="top"
+                                   :title="childrenTooltip && entry['children'] ? 'Data ini memiliki ' + entry['children'] + ' child(s)' : ''">{{ entry[key] }} </a>
                                 <a v-if="recursive == true && key !== 'status' && key !== 'nama'
                                && !clickableCol.includes(key)" :class="{'cp text-info': key ===  'nama'}">{{ entry[key] }} </a>
                                 <span v-if="recursive == false && key !== 'status'" >{{ entry[key] }}</span>
-                                <b-tooltip :target="`recursive-link-${entry.id}`" triggers="hover" placement="top" v-if="childrenTooltip">
-                                    Data ini memiliki {{entry['children']}} child(s)
-                                </b-tooltip>
                             </div>
                             <!-- if row key == tag -->
                             <b-badge variant="primary"
@@ -565,6 +565,17 @@
             // this.$nextTick(function() {
             //     window.addEventListener('resize', this.setTableWidth);
             // });
+        },
+        updated() {
+            // Init BS5 tooltips on dynamic elements
+            this.$nextTick(function() {
+                var tooltipEls = this.$el.querySelectorAll('[data-bs-toggle="tooltip"]');
+                tooltipEls.forEach(function(el) {
+                    if (!bootstrap.Tooltip.getInstance(el)) {
+                        new bootstrap.Tooltip(el);
+                    }
+                });
+            });
         },
         methods: {
             isCheckbox: function (data) {
