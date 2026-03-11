@@ -3,7 +3,7 @@
   <p class="text-muted mb-4 small">Miniatur layout <code>cubeLayout.html</code>. Setiap area diberi warna berbeda.</p>
 
   <!-- Miniatur Layout -->
-  <div style="position:relative; border:2px solid #ccc; border-radius:10px; overflow:hidden; max-width:800px; height:500px; display:flex; font-family:'Courier New',monospace; font-size:11px">
+  <div style="position:relative; border:2px solid #ccc; border-radius:10px; overflow:visible; max-width:800px; height:500px; display:flex; font-family:'Courier New',monospace; font-size:11px">
 
     <!-- Sidebar -->
     <div style="width:200px; min-width:200px; background:#e8e5f7; display:flex; flex-direction:column; border-right:2px solid #ccc">
@@ -68,8 +68,8 @@
 
     </div>
 
-    <!-- Side Panel Offcanvas — floating overlay di kanan -->
-    <div style="position:absolute; top:0; right:0; width:260px; height:100%; background:#dbedf8; border-left:3px solid #2980b9; box-shadow:-4px 0 16px rgba(0,0,0,0.15); display:flex; flex-direction:column; z-index:10">
+    <!-- Side Panel Offcanvas — floating overlay geser ke bawah-kanan -->
+    <div style="position:absolute; top:50px; right:-20px; width:260px; height:calc(100% - 30px); background:#dbedf8; border:3px solid #2980b9; border-radius:8px 0 0 8px; box-shadow:-4px 4px 16px rgba(0,0,0,0.2); display:flex; flex-direction:column; z-index:10">
       <div style="padding:10px 14px; border-bottom:1px solid rgba(41,128,185,0.3); display:flex; align-items:center; justify-content:space-between">
         <div style="background:#2980b9; color:#fff; border-radius:4px; padding:3px 10px; font-size:10px; font-weight:bold">Side Panel Offcanvas</div>
         <span style="color:#999; font-size:14px; cursor:pointer">&times;</span>
