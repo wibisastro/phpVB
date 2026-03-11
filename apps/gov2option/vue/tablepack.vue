@@ -1156,10 +1156,12 @@
 
 <style>
     /* BS4→BS5 compat: BootstrapVue .dropdown-menu-right → Cube .dropdown-menu-end */
+    /* Override Popper.js inline transform agar posisi tetap di bawah tombol */
     .dropdown-menu-right {
         right: 0 !important;
         left: auto !important;
         top: 100% !important;
+        transform: none !important;
     }
     .dropdown-menu-right:after {
         left: inherit !important;
