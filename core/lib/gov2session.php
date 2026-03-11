@@ -245,6 +245,7 @@ class gov2session extends dsnSource
      */
     public function memberRead(int|string $id = 0): ?array
     {
+        global $pageID;
         $WHERE = is_string($id) ? "account_id=%s" : "account_id=%i";
 
         try {
@@ -263,7 +264,16 @@ class gov2session extends dsnSource
                 $_result['role'] = $_role;
             }
         } catch (\MeekroDBException $e) {
-            throw new \Exception('DatabaseError:' . $e->getMessage());
+            $msg = $e->getMessage();
+            $connKeywords = ['Unable to connect to MySQL', 'Access denied', 'Connection refused', "Can't connect to"];
+            foreach ($connKeywords as $keyword) {
+                if (stripos($msg, $keyword) !== false) {
+                    $stage = defined('STAGE') ? STAGE : 'dev';
+                    $msg = "Koneksi database gagal. Periksa file apps/{$pageID}/xml/dsnSource.{$stage}.xml";
+                    break;
+                }
+            }
+            throw new \Exception('DatabaseError:' . $msg);
         }
 
         return $_result;

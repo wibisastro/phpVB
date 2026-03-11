@@ -16,11 +16,22 @@ class customException extends \Exception
      */
     public function exceptionHandler(string $e): void
     {
-        global $doc;
+        global $doc, $pageID;
 
         $parts = explode(':', $e, 2);
         $code = $parts[0] ?? 'Error';
         $message = $parts[1] ?? $e;
+
+        // Detect MySQL connection errors and hint at dsnSource
+        $connKeywords = ['Unable to connect to MySQL', 'Access denied', 'Connection refused', "Can't connect to"];
+        foreach ($connKeywords as $keyword) {
+            if (stripos($e, $keyword) !== false) {
+                $stage = defined('STAGE') ? STAGE : 'dev';
+                $message = "Koneksi database gagal. Periksa file apps/{$pageID}/xml/dsnSource.{$stage}.xml";
+                $code = 'DatabaseConnection';
+                break;
+            }
+        }
 
         $doc->error($code, $message);
     }
