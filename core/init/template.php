@@ -65,6 +65,7 @@ try {
     // $escaper = new Twig_Extension_Escaper('html');
     // $twig->addExtension($escaper);
     $twig->addExtension(new \Twig\Extension\DebugExtension());
+    $twig->addExtension(new \Gov2lib\MarkdownExtension());
 
 } catch (Exception $e) {
     $doc->exceptionHandler($e->getMessage());
