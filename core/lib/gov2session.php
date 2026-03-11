@@ -184,13 +184,15 @@ class gov2session extends dsnSource
 
                         if ($this->val['id'] ?? false) {
                             $doc->body['_SESSION["userRole"]'] = $this->val['userRole'];
-                            $this->memberUpdateCounter($this->val['id']);
+                            if ($_privilege != 'public') {
+                                $this->memberUpdateCounter($this->val['id']);
 
-                            match ($this->val['status']) {
-                                'pending' => throw new \Exception("Pending:Akun Anda belum aktif, silahkan aktivasi terlebih dahulu"),
-                                'suspended' => throw new \Exception("Suspended:Akun Anda terblokir, silakan hubungi Admin"),
-                                default => $this->handleAuthorization($pageID, $doc, $config, $_privilege),
-                            };
+                                match ($this->val['status']) {
+                                    'pending' => throw new \Exception("Pending:Akun Anda belum aktif, silahkan aktivasi terlebih dahulu"),
+                                    'suspended' => throw new \Exception("Suspended:Akun Anda terblokir, silakan hubungi Admin"),
+                                    default => $this->handleAuthorization($pageID, $doc, $config, $_privilege),
+                                };
+                            }
                         }
                     }
                 }
