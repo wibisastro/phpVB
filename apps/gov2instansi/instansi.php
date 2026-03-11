@@ -39,12 +39,14 @@ class instansi extends \Gov2lib\api
 
     public function table(array $vars): mixed
     {
-        global $self, $doc;
-        $data = $self->getRecords($vars);
-        if (count($data) === 0) {
-            $data = ['data' => 'empty', 'level' => '1'];
-        }
-        return $doc->responseGet($data);
+        global $self;
+        return $self->getRecords($vars);
+    }
+
+    public function children(array $vars): array
+    {
+        global $self;
+        return (array) $self->getChildren((int) ($vars['id'] ?? 0));
     }
 
     public function edit(array $vars): array
@@ -90,9 +92,8 @@ class instansi extends \Gov2lib\api
 
     public function count(array $vars): mixed
     {
-        global $self, $doc;
-        $data = $self->getCount((int) ($vars['id'] ?? 0));
-        return $doc->responseGet($data);
+        global $self;
+        return $self->getCount((int) ($vars['id'] ?? 0));
     }
 
     public function getInstansi(): mixed

@@ -39,8 +39,11 @@ class member {
         // $self->ses->authenticate($role);
 
         $self->loadTable($self->scrollInterval);
-        $doc->body("pageTitle",'Gov 2.0 Member Admin'); 
-        $doc->body("roleName",$role);
+        $doc->body("pageTitle",'Gov 2.0 Member Admin');
+        $doc->body("roleName","/gov2login/user/" . $role);
+        // Override relative URLs to absolute paths (agar bekerja di cube theme)
+        $GLOBALS['vueData']['action'] = '/gov2login/user/' . $role;
+        $GLOBALS['vueData']['fieldurl'] = '/gov2login/user/' . $role . '/fields';
         $self->ses->val['userRole'] = $user['role'];
         $self->content('role-default.html');
     }
