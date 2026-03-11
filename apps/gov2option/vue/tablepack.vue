@@ -1157,9 +1157,10 @@
 <style>
     /* BS4→BS5 compat: dropdown-menu-right tidak dikenal BS5, harus pakai dropdown-menu-end */
     .dropdown-menu-right,
-    .dropdown-menu[x-placement="bottom-end"] {
-        right: 0;
-        left: auto;
+    .dropdown-menu[x-placement="bottom-end"],
+    .b-dropdown .dropdown-menu {
+        right: 0 !important;
+        left: auto !important;
     }
 
     /* Block header above table */

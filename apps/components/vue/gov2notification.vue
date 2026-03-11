@@ -1,8 +1,19 @@
 <template>
 <div>
-    <!-- BS5 Toast container (top-right, fixed) -->
+    <!-- Top-right: warning & danger -->
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
-        <div ref="toast" class="toast border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+        <div ref="toastTop" class="toast border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header text-white" :class="toastHeaderClass">
+                <i class="bi me-2" :class="toastIcon"></i>
+                <strong class="me-auto">{{ toastTitle }}</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" v-text="notifText"></div>
+        </div>
+    </div>
+    <!-- Bottom-right: success & info -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+        <div ref="toastBottom" class="toast border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header text-white" :class="toastHeaderClass">
                 <i class="bi me-2" :class="toastIcon"></i>
                 <strong class="me-auto">{{ toastTitle }}</strong>
@@ -57,6 +68,9 @@ module.exports = {
                 'primary': 'Info'
             };
             return map[this.notifType] || 'Info';
+        },
+        isTopPosition: function() {
+            return this.notifType === 'danger' || this.notifType === 'warning';
         }
     },
     methods: {
@@ -95,12 +109,15 @@ module.exports = {
             var vm = this;
             vm.notifText = data['notification'] || '';
             vm.notifType = vm.toNotifType(data['class']);
+
+            var delay = (vm.notifType === 'warning') ? 7000 : 5000;
+
             vm.$nextTick(function() {
-                var el = vm.$refs.toast;
+                var el = vm.isTopPosition ? vm.$refs.toastTop : vm.$refs.toastBottom;
                 if (el && typeof bootstrap !== 'undefined') {
                     var existing = bootstrap.Toast.getInstance(el);
                     if (existing) { existing.dispose(); }
-                    var opts = { autohide: !!autoDismiss, delay: 5000 };
+                    var opts = { autohide: !!autoDismiss, delay: delay };
                     var toast = new bootstrap.Toast(el, opts);
                     toast.show();
                 }
