@@ -50,9 +50,9 @@
     <!-- Wilayah indicator start -->
     <div class="dropdown d-inline-flex align-items-center">
       <a href="#" id="topbarWilayah"
-         class="d-flex align-items-center text-decoration-none text-body-secondary lh-1"
+         class="dropdown-toggle d-flex align-items-center text-decoration-none text-body-secondary lh-1"
          style="white-space:nowrap; padding:0.4rem 0.5rem; font-size:0.85rem"
-         data-bs-toggle="dropdown" data-bs-auto-close="true" data-bs-display="static" aria-expanded="false">
+         role="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
         <i class="bi bi-geo-alt{% if _SESSION['wilayah_nama'] %}-fill{% endif %}" style="font-size:1rem{% if _SESSION['wilayah_nama'] %}; color:#5b4fb9{% endif %}"></i>
         {% if _SESSION['wilayah_nama'] %}
           <span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:140px; font-size:0.8rem">{{ _SESSION['wilayah_nama'] }}</span>
@@ -60,7 +60,7 @@
           <span class="d-none d-lg-inline ms-1 text-muted" style="font-size:0.8rem">Wilayah</span>
         {% endif %}
       </a>
-      <div class="dropdown-menu dropdown-menu-end shadow-sm" id="topbarWilayahMenu" style="min-width:220px; font-size:0.8rem">
+      <div class="dropdown-menu dropdown-menu-end shadow-lg" id="topbarWilayahMenu" style="min-width:220px; font-size:0.8rem">
         {% if _SESSION['wilayah_nama'] %}
           <div class="px-3 py-2 small">
             <i class="bi bi-geo-alt-fill text-primary me-1"></i><strong>{{ _SESSION['wilayah_nama'] }}</strong>
