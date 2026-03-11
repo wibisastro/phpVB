@@ -448,6 +448,36 @@ form > .form-group > textarea  {
         color: red;
     }
 
+/* BootstrapVue b-modal close button — posisi kanan (BS4 .close di dalam BS5 context) */
+.modal-header .close,
+.modal-header button[aria-label="Close"] {
+    order: 2;
+    margin-left: auto;
+    padding: 0.5rem;
+    background: transparent;
+    border: 0;
+    font-size: 1.25rem;
+    opacity: 0.5;
+    cursor: pointer;
+}
+.modal-header .close:hover,
+.modal-header button[aria-label="Close"]:hover {
+    opacity: 1;
+}
+.modal-header .modal-title {
+    order: 1;
+}
+
+/* Validation error text — sesuai Cube/BS5 .invalid-feedback style */
+.help-block {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.8em;
+    color: #dc3545;
+    font-style: italic;
+}
+
 /* md-modal styles — fallback when nifty-component.css is not loaded (e.g. Cube theme) */
 .md-modal {
     position: fixed;
