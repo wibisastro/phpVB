@@ -2,13 +2,13 @@
 <div>
     <!-- BS5 Toast container (top-right, fixed) -->
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
-        <div ref="toast" class="toast border-0" :class="toastBgClass" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header" :class="toastBgClass">
+        <div ref="toast" class="toast border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header text-white" :class="toastHeaderClass">
                 <i class="bi me-2" :class="toastIcon"></i>
-                <strong class="me-auto" :class="toastTextClass">{{ toastTitle }}</strong>
-                <button type="button" class="btn-close" :class="{'btn-close-white': isWhiteText}" data-bs-dismiss="toast" aria-label="Close"></button>
+                <strong class="me-auto">{{ toastTitle }}</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <div class="toast-body" :class="toastTextClass" v-text="notifText"></div>
+            <div class="toast-body" v-text="notifText"></div>
         </div>
     </div>
     <gov2session></gov2session>
@@ -28,21 +28,15 @@ module.exports = {
         }
     },
     computed: {
-        toastBgClass: function() {
+        toastHeaderClass: function() {
             var map = {
-                'success': 'bg-success text-white',
-                'danger':  'bg-danger text-white',
-                'warning': 'bg-warning text-white',
-                'info':    'bg-info text-white',
-                'primary': 'bg-primary text-white'
+                'success': 'bg-success',
+                'danger':  'bg-danger',
+                'warning': 'bg-warning',
+                'info':    'bg-info',
+                'primary': 'bg-primary'
             };
-            return map[this.notifType] || 'bg-info text-white';
-        },
-        toastTextClass: function() {
-            return 'text-white';
-        },
-        isWhiteText: function() {
-            return true;
+            return map[this.notifType] || 'bg-info';
         },
         toastIcon: function() {
             var map = {
