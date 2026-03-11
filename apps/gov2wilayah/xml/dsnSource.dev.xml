@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+	<dsn>
+		<name>master</name>
+		<host>localhost</host>
+		<user>gov2ayam</user>
+		<pass>S6KSrFF7pyJSsJhX</pass>
+		<db>gov2ayam</db>
+	</dsn>
+	<dsn>
+		<name>ayam.gov2.web.id</name>
+		<host>localhost</host>
+		<user>gov2ayam</user>
+		<pass>S6KSrFF7pyJSsJhX</pass>
+		<db>gov2ayam</db>
+	</dsn>
+</list>
