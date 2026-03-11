@@ -90,6 +90,14 @@ class dsnSource extends document
             $dsnName = 'master';
         }
 
+        // DEBUG TEMPORARY: trace connectDB callers
+        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5);
+        $callers = [];
+        foreach ($bt as $t) {
+            $callers[] = basename($t['file'] ?? '') . ':' . ($t['line'] ?? '') . ' ' . ($t['class'] ?? '') . '::' . ($t['function'] ?? '');
+        }
+        error_log("[connectDB] pageID={$pageID} dsnName={$dsnName} | " . implode(' < ', $callers));
+
         $dsnsPath = __DIR__ . "/../../apps/{$pageID}/xml/dsnSource." . STAGE . '.xml';
 
         try {
