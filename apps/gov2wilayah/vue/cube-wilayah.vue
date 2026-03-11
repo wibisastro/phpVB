@@ -149,6 +149,7 @@ module.exports = {
           }
           this.loading = false;
           this.loadChildren();
+          this.updateTopbar();
         })
         .catch(e => { this.loading = false; this.handleError(e); });
     },
