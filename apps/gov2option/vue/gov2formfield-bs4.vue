@@ -448,4 +448,48 @@ form > .form-group > textarea  {
         color: red;
     }
 
+/* md-modal styles — fallback when nifty-component.css is not loaded (e.g. Cube theme) */
+.md-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 50%;
+    max-width: 500px;
+    min-width: 320px;
+    transform: translate(-50%, -50%);
+    visibility: hidden;
+    z-index: 2000;
+}
+.md-show {
+    visibility: visible;
+}
+.md-overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    visibility: hidden;
+    top: 0;
+    left: 0;
+    z-index: 1999;
+    opacity: 0;
+    background: rgba(0,0,0,0.5);
+    transition: all 0.3s;
+}
+.md-show ~ .md-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+.md-content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.md-content .modal-footer {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
 </style>

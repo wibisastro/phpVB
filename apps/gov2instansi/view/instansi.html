@@ -3,15 +3,14 @@
         {% if _SESSION[className ~ '_id'] %}
 :parent_id="{{ _SESSION[className ~ '_id'] }}"
 {% endif %}
-:field-url="fieldurl"
-:default-level="defaultLevel">
+:field-url="fieldurl">
 </gov2formfield-bs4>
 
 <div class="row">
   <div class="col-lg-12">
     <div class="main-box">
       <gov2breadcrumb
-              path-url="instansi/breadcrumb"
+              :path-url="breadcrumburl"
               :is-active="true"
               :is-horizontal="true">
       </gov2breadcrumb>
@@ -23,8 +22,8 @@
   <div class="col-lg-12">
     <tablepack
             :is-active="true"
-            get-url="instansi"
-            post-url="instansi"
+            :get-url="action"
+            :post-url="action"
             :columns="['id','kode','nama','portal','tahun','level_label']"
             :recursive="true"
             :filter-key="searchQuery"
