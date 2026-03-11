@@ -3,7 +3,7 @@
   <p class="text-muted mb-4 small">Miniatur layout <code>cubeLayout.html</code>. Setiap area diberi warna berbeda.</p>
 
   <!-- Miniatur Layout -->
-  <div style="border:2px solid #ccc; border-radius:10px; overflow:hidden; max-width:800px; height:500px; display:flex; font-family:'Courier New',monospace; font-size:11px">
+  <div style="position:relative; border:2px solid #ccc; border-radius:10px; overflow:hidden; max-width:800px; height:500px; display:flex; font-family:'Courier New',monospace; font-size:11px">
 
     <!-- Sidebar -->
     <div style="width:200px; min-width:200px; background:#e8e5f7; display:flex; flex-direction:column; border-right:2px solid #ccc">
@@ -68,24 +68,26 @@
 
     </div>
 
-  </div>
-
-  <!-- Side Panel -->
-  <div style="max-width:800px; margin-top:12px; border:2px solid #ccc; border-radius:10px; overflow:hidden; display:flex; font-family:'Courier New',monospace; font-size:11px">
-    <div style="flex:1; background:#dbedf8; padding:12px 14px">
-      <div style="background:rgba(41,128,185,0.3); border-radius:4px; padding:2px 8px; font-size:10px; color:#2980b9; font-weight:bold; display:inline-block; margin-bottom:6px">Side Panel Offcanvas</div>
-      <div style="color:#555; font-size:11px">offcanvas-end &middot; di dalam #app &middot; toggle via <code style="font-size:11px">openSidePanel(view)</code></div>
-      <div style="display:flex; gap:16px; margin-top:8px">
-        <div style="background:rgba(41,128,185,0.15); border-radius:6px; padding:8px 12px; flex:1">
+    <!-- Side Panel Offcanvas — floating overlay di kanan -->
+    <div style="position:absolute; top:0; right:0; width:260px; height:100%; background:#dbedf8; border-left:3px solid #2980b9; box-shadow:-4px 0 16px rgba(0,0,0,0.15); display:flex; flex-direction:column; z-index:10">
+      <div style="padding:10px 14px; border-bottom:1px solid rgba(41,128,185,0.3); display:flex; align-items:center; justify-content:space-between">
+        <div style="background:#2980b9; color:#fff; border-radius:4px; padding:3px 10px; font-size:10px; font-weight:bold">Side Panel Offcanvas</div>
+        <span style="color:#999; font-size:14px; cursor:pointer">&times;</span>
+      </div>
+      <div style="flex:1; padding:12px; overflow:auto">
+        <div style="color:#2980b9; font-size:10px; margin-bottom:10px">offcanvas-end &middot; di dalam #app</div>
+        <div style="background:rgba(41,128,185,0.12); border-radius:6px; padding:10px 12px; margin-bottom:8px">
           <div style="font-weight:bold; color:#2980b9; margin-bottom:2px">instansi</div>
           <div style="color:#666; font-size:10px">cube-instansi.vue</div>
         </div>
-        <div style="background:rgba(41,128,185,0.15); border-radius:6px; padding:8px 12px; flex:1">
+        <div style="background:rgba(41,128,185,0.12); border-radius:6px; padding:10px 12px">
           <div style="font-weight:bold; color:#2980b9; margin-bottom:2px">pengaturan</div>
           <div style="color:#666; font-size:10px">cube-menu-settings.vue</div>
         </div>
+        <div style="color:#999; font-size:10px; margin-top:12px">toggle via openSidePanel(view)</div>
       </div>
     </div>
+
   </div>
 
   <!-- Komponen Header detail -->
