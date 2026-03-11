@@ -12,9 +12,10 @@ class index {
         $readmePath = __DIR__ . '/README.md';
         if (file_exists($readmePath)) {
             $doc->body("readmeHtml", \Gov2lib\markdown::renderFile($readmePath));
+            $self->content();
+        } else {
+            $doc->baseBody = "error404.html";
         }
-
-        $self->content();
     }
 }
 /*

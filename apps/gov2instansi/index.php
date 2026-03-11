@@ -14,6 +14,13 @@ class index
         $self->take('components', 'gov2nav', 'setDefaultNav');
         $doc->body('pageTitle', 'Instansi');
         $doc->body('subTitle', 'Manajemen Data Instansi');
-        $self->content();
+
+        $readmePath = __DIR__ . '/README.md';
+        if (file_exists($readmePath)) {
+            $doc->body('readmeHtml', \Gov2lib\markdown::renderFile($readmePath));
+            $self->content();
+        } else {
+            $doc->baseBody = 'error404.html';
+        }
     }
 }
