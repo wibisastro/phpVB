@@ -27,7 +27,15 @@
     <h1 class="display-1 fw-bold text-muted">404</h1>
     <h4 class="fw-semibold mb-2">Halaman Tidak Ditemukan</h4>
     <p class="text-muted mb-4">
-      Halaman <strong>{{ pageID |upper }}</strong> tidak tersedia atau belum dikonfigurasi.
+      {% if errors.RouteNotFound is defined %}
+        Alamat <code>{{ errors.RouteNotFound }}</code> tidak tersedia.
+      {% elseif errors.MethodNotExist is defined %}
+        Method <code>{{ errors.MethodNotExist }}</code> tidak tersedia.
+      {% elseif errors.RouterConfigFileNotExist is defined %}
+        Aplikasi <strong>{{ pageID }}</strong> belum dikonfigurasi.
+      {% else %}
+        Halaman yang Anda tuju tidak tersedia.
+      {% endif %}
     </p>
     <a href="/" class="btn btn-primary">
       <i class="bi bi-house me-1"></i> Kembali ke Beranda
