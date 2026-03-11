@@ -127,6 +127,10 @@ class dsnSource extends document
                 $dsn = $this->credentialDB($list, $dsnName);
             }
 
+            if (!is_array($dsn)) {
+                throw new \Exception("DSNEntryNotFound: Entry '{$dsnName}' tidak ditemukan di apps/{$pageID}/xml/dsnSource." . STAGE . ".xml — periksa isi file dan pastikan tag <name>{$dsnName}</name> ada");
+            }
+
             $linkId = mysqli_connect(
                 $dsn['host'],
                 $dsn['user'],

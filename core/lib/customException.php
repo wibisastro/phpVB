@@ -27,7 +27,7 @@ class customException extends \Exception
         foreach ($connKeywords as $keyword) {
             if (stripos($e, $keyword) !== false) {
                 $stage = defined('STAGE') ? STAGE : 'dev';
-                $message = "Koneksi database gagal. Periksa file apps/{$pageID}/xml/dsnSource.{$stage}.xml";
+                $message = "Koneksi database gagal ({$message}). Periksa file apps/{$pageID}/xml/dsnSource.{$stage}.xml";
                 $code = 'DatabaseConnection';
                 break;
             }

@@ -269,7 +269,7 @@ class gov2session extends dsnSource
             foreach ($connKeywords as $keyword) {
                 if (stripos($msg, $keyword) !== false) {
                     $stage = defined('STAGE') ? STAGE : 'dev';
-                    $msg = "Koneksi database gagal. Periksa file apps/{$pageID}/xml/dsnSource.{$stage}.xml";
+                    $msg = "Koneksi database gagal ({$msg}). Periksa file apps/{$pageID}/xml/dsnSource.{$stage}.xml";
                     break;
                 }
             }
