@@ -1154,7 +1154,14 @@
     }
 </script>
 
-<style scoped>
+<style>
+    /* BS4→BS5 compat: dropdown-menu-right tidak dikenal BS5, harus pakai dropdown-menu-end */
+    .dropdown-menu-right,
+    .dropdown-menu[x-placement="bottom-end"] {
+        right: 0;
+        left: auto;
+    }
+
     /* Block header above table */
     .block.no-bottom {
         margin-bottom: 0.75rem;
