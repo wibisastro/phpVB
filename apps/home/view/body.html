@@ -40,4 +40,69 @@
 
 {% block externalJS %}
 	{% include('externalJS.html') %}
+<style>
+#sidebar.sidebar-wrapper {
+  background: rgba(91,79,185,0.12) !important;
+  outline: 3px dashed rgba(91,79,185,0.5) !important;
+  outline-offset: -3px;
+}
+#sidebar .app-brand {
+  background: rgba(91,79,185,0.18) !important;
+  border-radius: 8px;
+}
+#sidebar .sidebarMenuScroll {
+  background: rgba(91,79,185,0.08) !important;
+}
+.app-header {
+  background: rgba(230,126,34,0.15) !important;
+  outline: 3px dashed rgba(230,126,34,0.5) !important;
+  outline-offset: -3px;
+}
+.app-body {
+  background: rgba(39,174,96,0.08) !important;
+  outline: 3px dashed rgba(39,174,96,0.5) !important;
+  outline-offset: -3px;
+}
+.app-footer {
+  background: rgba(127,140,141,0.15) !important;
+  outline: 3px dashed rgba(127,140,141,0.5) !important;
+  outline-offset: -3px;
+}
+.lg-label {
+  display: inline-block;
+  color: #fff;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  padding: 3px 10px;
+  border-radius: 3px;
+  position: absolute;
+  z-index: 100;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-weight: bold;
+}
+</style>
+<script>
+(function() {
+  function addLabel(selector, text, bg, top, right) {
+    var el = document.querySelector(selector);
+    if (!el) return;
+    el.style.position = 'relative';
+    var lbl = document.createElement('div');
+    lbl.className = 'lg-label';
+    lbl.style.background = bg;
+    lbl.style.top = top;
+    lbl.style.right = right;
+    lbl.textContent = text;
+    el.appendChild(lbl);
+  }
+  addLabel('#sidebar', 'SIDEBAR', '#5b4fb9', '8px', '8px');
+  addLabel('#sidebar .app-brand', 'app-brand', 'rgba(91,79,185,0.7)', '4px', '4px');
+  addLabel('#sidebar .sidebarMenuScroll', 'block sidebar', 'rgba(91,79,185,0.7)', '4px', '4px');
+  addLabel('.app-header', 'HEADER — cubeHeader.html', '#e67e22', '4px', '8px');
+  addLabel('.app-body', 'CONTENT — block content', '#27ae60', '8px', '8px');
+  addLabel('.app-footer', 'FOOTER — cubeFooter.html', '#7f8c8d', '4px', '8px');
+})();
+</script>
 {% endblock %}
