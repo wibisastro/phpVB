@@ -2,11 +2,11 @@
 
 namespace Gov2lib;
 
-use League\CommonMark\CommonMarkConverter;
-use League\CommonMark\GithubFlavoredMarkdownConverter;
-
 /**
  * Markdown renderer — converts .md content to HTML.
+ *
+ * Requires: league/commonmark ^2.6 (composer require league/commonmark)
+ * Fallback: jika library belum terinstall, return plain text dalam <pre>.
  *
  * Usage dari controller:
  *   $html = Gov2lib\markdown::render($markdownString);
@@ -17,15 +17,19 @@ use League\CommonMark\GithubFlavoredMarkdownConverter;
  */
 class markdown
 {
-    private static ?GithubFlavoredMarkdownConverter $converter = null;
+    private static mixed $converter = null;
+    private static bool $available = false;
 
-    private static function getConverter(): GithubFlavoredMarkdownConverter
+    private static function getConverter(): mixed
     {
         if (self::$converter === null) {
-            self::$converter = new GithubFlavoredMarkdownConverter([
-                'html_input' => 'strip',
-                'allow_unsafe_links' => false,
-            ]);
+            if (class_exists(\League\CommonMark\GithubFlavoredMarkdownConverter::class)) {
+                self::$converter = new \League\CommonMark\GithubFlavoredMarkdownConverter([
+                    'html_input' => 'strip',
+                    'allow_unsafe_links' => false,
+                ]);
+                self::$available = true;
+            }
         }
         return self::$converter;
     }
@@ -35,7 +39,12 @@ class markdown
      */
     public static function render(string $markdown): string
     {
-        return self::getConverter()->convert($markdown)->getContent();
+        $converter = self::getConverter();
+        if (self::$available && $converter) {
+            return $converter->convert($markdown)->getContent();
+        }
+        // Fallback: plain text
+        return '<pre style="white-space:pre-wrap; font-family:inherit">' . htmlspecialchars($markdown) . '</pre>';
     }
 
     /**
