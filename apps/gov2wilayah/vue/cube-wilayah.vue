@@ -2,14 +2,18 @@
   <div class="h-100 d-flex flex-column">
 
     <!-- Current selection -->
-    <div class="px-3 py-2 border-bottom bg-light" v-if="config.wilayah_nama">
+    <div class="px-3 py-2 border-bottom bg-primary-subtle" v-if="config.wilayah_nama">
       <div class="d-flex align-items-center justify-content-between">
-        <div class="small">
-          <i class="bi bi-geo-alt text-success me-1"></i>
-          <strong>{{ config.wilayah_nama }}</strong>
-          <span v-if="config.wilayah_level" class="badge bg-secondary ms-1">{{ config.wilayah_level }}</span>
+        <div class="d-flex align-items-center small">
+          <div class="icon-box sm bg-primary text-white rounded-circle me-2" style="width:28px;height:28px;font-size:0.75rem">
+            <i class="bi bi-geo-alt-fill"></i>
+          </div>
+          <div>
+            <strong>{{ config.wilayah_nama }}</strong>
+            <span v-if="config.wilayah_level" class="badge bg-primary ms-1" style="font-size:0.65rem">{{ config.wilayah_level }}</span>
+          </div>
         </div>
-        <button v-if="!config.locked" class="btn btn-sm btn-outline-secondary py-0 px-1"
+        <button v-if="!config.locked" class="btn btn-sm btn-outline-danger py-0 px-1"
                 @click="resetWilayah" title="Reset">
           <i class="bi bi-x-lg small"></i>
         </button>
@@ -17,8 +21,8 @@
     </div>
 
     <!-- Lock notice -->
-    <div v-if="config.locked" class="px-3 py-2 text-muted small border-bottom">
-      <i class="bi bi-lock me-1"></i>Wilayah dikunci sesuai role <strong>{{ config.userRole }}</strong>
+    <div v-if="config.locked" class="px-3 py-2 text-muted small border-bottom bg-light">
+      <i class="bi bi-lock-fill me-1"></i>Wilayah dikunci sesuai role <strong>{{ config.userRole }}</strong>
     </div>
 
     <!-- Error alert -->
@@ -31,56 +35,63 @@
 
     <!-- Content area -->
     <div class="flex-grow-1 overflow-auto" v-if="!config.locked && !errorMsg">
-      <div class="px-3 py-2">
 
-        <!-- Loading -->
-        <div v-if="loading" class="py-3 text-center text-muted small">
-          <div class="spinner-border spinner-border-sm me-1"></div> Memuat...
+      <!-- Loading -->
+      <div v-if="loading" class="py-4 text-center text-muted">
+        <div class="spinner-border spinner-border-sm text-primary me-1"></div>
+        <span class="small">Memuat data...</span>
+      </div>
+
+      <div v-else>
+        <!-- Breadcrumb path -->
+        <div class="list-group list-group-flush">
+          <template v-for="(path, idx) in pathData">
+            <a v-if="path.level <= maxLevel && path.level > 0" :key="'p-'+idx" href="#"
+               class="list-group-item list-group-item-action d-flex align-items-center py-2"
+               :class="{ 'bg-success-subtle': config.wilayah_id == path.id }"
+               @click.prevent="goBack(path.id)">
+              <span class="badge bg-body-secondary text-muted me-2" style="min-width:70px;font-size:0.7rem">{{ levelName(path.level_label, path.level) }}</span>
+              <span class="small" :class="{ 'fw-bold text-success': config.wilayah_id == path.id }">{{ path.caption || path.nama }}</span>
+              <i class="bi bi-arrow-counterclockwise ms-auto text-muted small"></i>
+            </a>
+          </template>
         </div>
 
-        <div v-else>
-          <!-- Breadcrumb path -->
-          <div v-for="(path, idx) in pathData" :key="'p-'+idx" class="mb-2" v-if="path.level <= maxLevel">
+        <!-- Next level searchable list -->
+        <div v-if="pathData.length > 0 && pathData[pathData.length-1].level < maxLevel" class="border-top">
+          <div class="px-3 pt-2 pb-1">
             <div class="input-group input-group-sm">
-              <span class="input-group-text" style="min-width:90px;font-size:0.75rem">{{ levelName(path.level_label, path.level) }}</span>
-              <input type="text" class="form-control" :value="path.caption || path.nama" readonly
-                     @click="goBack(path.id)" style="cursor:pointer;font-size:0.8rem"
-                     :class="{ 'bg-success-subtle fw-bold': config.wilayah_id == path.id }">
-              <button class="btn btn-outline-primary" type="button" @click="goBack(path.id)" title="Kembali">
-                <i class="bi bi-arrow-counterclockwise"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Next level searchable list -->
-          <div v-if="pathData.length > 0 && pathData[pathData.length-1].level < maxLevel" class="mb-2">
-            <div class="input-group input-group-sm">
-              <span class="input-group-text" style="min-width:90px;font-size:0.75rem">{{ nextLevelName }}</span>
+              <span class="input-group-text bg-primary text-white" style="font-size:0.7rem">{{ nextLevelName }}</span>
               <input type="text" class="form-control" v-model="filter"
-                     :placeholder="'Pilih / ketik filter...'"
+                     :placeholder="'Ketik untuk filter...'"
                      @focus="showList = true"
-                     style="font-size:0.8rem; cursor:pointer">
-              <span class="input-group-text" style="font-size:0.75rem">{{ filteredChildList.length }}</span>
-            </div>
-            <div v-if="showList" class="border rounded-bottom overflow-auto" style="max-height:200px; margin-top:-1px">
-              <div v-if="filteredChildList.length === 0" class="px-3 py-2 text-muted small">Tidak ditemukan</div>
-              <a v-for="item in filteredChildList" :key="item.id" href="#"
-                 class="d-block px-3 py-1 text-decoration-none text-dark small wilayah-list-item"
-                 @click.prevent="pickChild(item.id)"
-                 style="font-size:0.8rem">
-                {{ item.nama }}
-              </a>
+                     style="font-size:0.8rem">
+              <span class="input-group-text" style="font-size:0.7rem">
+                <i class="bi bi-list-ul me-1"></i>{{ filteredChildList.length }}
+              </span>
             </div>
           </div>
+          <div v-if="showList" class="list-group list-group-flush overflow-auto" style="max-height:220px">
+            <div v-if="filteredChildList.length === 0" class="list-group-item text-muted small text-center py-3">
+              <i class="bi bi-search me-1"></i>Tidak ditemukan
+            </div>
+            <a v-for="item in filteredChildList" :key="item.id" href="#"
+               class="list-group-item list-group-item-action d-flex align-items-center py-2"
+               @click.prevent="pickChild(item.id)">
+              <i class="bi bi-geo text-muted me-2" style="font-size:0.75rem"></i>
+              <span class="small">{{ item.nama }}</span>
+              <span v-if="item.children > 0" class="badge bg-body-secondary text-muted ms-auto" style="font-size:0.65rem">{{ item.children }}</span>
+            </a>
+          </div>
+        </div>
 
-          <!-- Select button (selectable from level 1 / provinsi) -->
-          <div v-if="pathData.length > 0 && lastPath" class="mt-3">
-            <button class="btn btn-sm btn-success w-100" @click="selectFromPath(lastPath)"
-                    :disabled="config.wilayah_id == lastPath.id">
-              <i class="bi bi-check-lg me-1"></i>
-              Pilih: {{ lastPath.caption || lastPath.nama }} ({{ lastPath.level_label }})
-            </button>
-          </div>
+        <!-- Select button -->
+        <div v-if="pathData.length > 0 && lastPath" class="px-3 py-3">
+          <button class="btn btn-sm btn-primary w-100 rounded-3" @click="selectFromPath(lastPath)"
+                  :disabled="config.wilayah_id == lastPath.id">
+            <i class="bi bi-check-circle me-1"></i>
+            Pilih: {{ lastPath.caption || lastPath.nama }}
+          </button>
         </div>
       </div>
     </div>
@@ -316,7 +327,9 @@ module.exports = {
 </script>
 
 <style scoped>
-.wilayah-list-item:hover {
-  background-color: #f0f0f0;
+.icon-box.sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
