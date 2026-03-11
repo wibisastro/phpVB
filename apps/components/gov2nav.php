@@ -8,7 +8,7 @@ class gov2nav {
     function index () {
         global $doc,$self;
         $doc->body("pageTitle",'Navigation Component');
-        $self->ses->authenticate('guest');
+        $self->ses->authenticate('public');
 		$self->take("components","gov2nav", "setDefaultNav");
     }
     
