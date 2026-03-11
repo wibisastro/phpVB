@@ -286,23 +286,15 @@ module.exports = {
       if (el) {
         var nama = this.config.unit_nama;
         if (nama) {
-          el.innerHTML = '<i class="bi bi-building fs-5"></i>' +
-            '<span class="text-truncate d-none d-lg-inline ms-2" style="max-width:200px">' + this.escapeHtml(nama) + '</span>';
-          el.classList.remove('text-muted');
-          el.classList.add('text-body');
-          el.setAttribute('data-bs-title', nama);
-          var tip = bootstrap.Tooltip.getInstance(el);
-          if (tip) { tip.dispose(); }
-          new bootstrap.Tooltip(el);
+          el.innerHTML = '<i class="bi bi-building" style="font-size:1rem;color:#5b4fb9"></i>' +
+            '<span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:140px;font-size:0.8rem">' + this.escapeHtml(nama) + '</span>';
         } else {
-          el.innerHTML = '<i class="bi bi-building fs-5"></i><span class="text-muted d-none d-lg-inline ms-2">Pilih Instansi</span>';
-          el.classList.add('text-muted');
-          el.classList.remove('text-body');
-          el.setAttribute('data-bs-title', 'Pilih Instansi');
-          var tip = bootstrap.Tooltip.getInstance(el);
-          if (tip) { tip.dispose(); }
-          new bootstrap.Tooltip(el);
+          el.innerHTML = '<i class="bi bi-building" style="font-size:1rem"></i>';
         }
+        el.setAttribute('data-bs-title', nama || 'Pilih Instansi');
+        var tip = bootstrap.Tooltip.getInstance(el);
+        if (tip) { tip.dispose(); }
+        new bootstrap.Tooltip(el);
       }
     },
     handleError(e) {

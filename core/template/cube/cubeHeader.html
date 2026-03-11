@@ -49,33 +49,34 @@
   {% if _SESSION['account_id'] %}
     <!-- Wilayah indicator start -->
     <a href="#" id="topbarWilayah"
-       class="d-flex align-items-center text-decoration-none mx-2"
-       style="white-space:nowrap"
+       class="d-flex align-items-center text-decoration-none text-body-secondary lh-1"
+       style="white-space:nowrap; padding:0.4rem 0.5rem; font-size:0.85rem"
        data-bs-toggle="tooltip" data-bs-placement="bottom"
        data-bs-title="{{ _SESSION['wilayah_nama'] ?: 'Pilih Wilayah' }}"
        onclick="event.preventDefault(); openSidePanel('wilayah')">
       {% if _SESSION['wilayah_nama'] %}
-        <i class="bi bi-geo-alt-fill fs-5"></i>
-        <span class="text-truncate d-none d-lg-inline ms-2" style="max-width:180px">{{ _SESSION['wilayah_nama'] }}</span>
+        <i class="bi bi-geo-alt-fill" style="font-size:1rem; color:#5b4fb9"></i>
+        <span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:140px; font-size:0.8rem">{{ _SESSION['wilayah_nama'] }}</span>
       {% else %}
-        <i class="bi bi-geo-alt fs-5"></i>
-        <span class="text-muted d-none d-lg-inline ms-2">Pilih Wilayah</span>
+        <i class="bi bi-geo-alt" style="font-size:1rem"></i>
       {% endif %}
     </a>
     <!-- Wilayah indicator ends -->
 
+    <span class="vr mx-1 d-none d-lg-inline" style="opacity:0.15"></span>
+
     <!-- Instansi indicator start -->
     <a href="#" id="topbarUnitKerja"
-       class="d-flex align-items-center text-decoration-none mx-3"
-       style="white-space:nowrap"
+       class="d-flex align-items-center text-decoration-none text-body-secondary lh-1"
+       style="white-space:nowrap; padding:0.4rem 0.5rem; font-size:0.85rem"
        data-bs-toggle="tooltip" data-bs-placement="bottom"
        data-bs-title="{{ _SESSION['unit_nama'] ?: 'Pilih Instansi' }}"
        onclick="event.preventDefault(); openSidePanel('instansi')">
-      <i class="bi bi-building fs-5"></i>
       {% if _SESSION['unit_nama'] %}
-        <span class="text-truncate d-none d-lg-inline ms-2" style="max-width:200px">{{ _SESSION['unit_nama'] }}</span>
+        <i class="bi bi-building" style="font-size:1rem; color:#5b4fb9"></i>
+        <span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:140px; font-size:0.8rem">{{ _SESSION['unit_nama'] }}</span>
       {% else %}
-        <span class="text-muted d-none d-lg-inline ms-2">Pilih Instansi</span>
+        <i class="bi bi-building" style="font-size:1rem"></i>
       {% endif %}
     </a>
     <!-- Instansi indicator ends -->
