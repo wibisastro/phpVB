@@ -159,8 +159,8 @@
                         </td>
 
                         <td v-if="!readonly" style="text-align:center" >
-                            <b-dropdown 
-                                id="dropdown-right" right  variant="primary" size="sm"
+                            <b-dropdown
+                                dropleft variant="primary" size="sm"
                                 :data-test="`button-action-${entry.id}`">
                                 <template slot="button-content">
                                     <i class="fa fa-cog"></i>
@@ -174,7 +174,7 @@
                             </b-dropdown>
                         </td>
                         <td v-if="isRowHistory && readonly" style="text-align:center">
-                            <b-dropdown right variant="primary" size="sm">
+                            <b-dropdown dropleft variant="primary" size="sm">
                                 <template slot="button-content">
                                     <i class="fa fa-cog"></i>
                                 </template>
@@ -1155,12 +1155,15 @@
 </script>
 
 <style>
-    /* BS4→BS5 compat: dropdown-menu-right tidak dikenal BS5, harus pakai dropdown-menu-end */
-    .dropdown-menu-right,
-    .dropdown-menu[x-placement="bottom-end"],
-    .b-dropdown .dropdown-menu {
-        right: 0 !important;
+    /* BS4→BS5 compat: dropleft → dropdown buka ke kiri dari tombol */
+    .dropleft .dropdown-menu {
+        top: 0;
+        right: 100% !important;
         left: auto !important;
+        margin-right: 0.125rem;
+    }
+    .dropleft .dropdown-toggle::before {
+        display: none;
     }
 
     /* Block header above table */
