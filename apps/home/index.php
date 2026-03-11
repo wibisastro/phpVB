@@ -8,7 +8,6 @@ class index {
         global $self,$doc;
         $self->take("components","gov2nav", "setDefaultNav");
         $doc->body("pageTitle",'Home Page');
-                $self->ses->authenticate('member');
 
         $readmePath = __DIR__ . '/README.md';
         if (file_exists($readmePath)) {
