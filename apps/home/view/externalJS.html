@@ -1,0 +1,67 @@
+<!-- Layout Guide: overlay labels + dashed outline -->
+<style>
+.layout-label {
+  display: inline-block;
+  color: #fff;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  padding: 2px 8px;
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 10;
+}
+.sidebar-wrapper {
+  outline: 2px dashed rgba(91,79,185,0.5) !important;
+  outline-offset: -2px;
+}
+.app-header {
+  outline: 2px dashed rgba(230,126,34,0.5) !important;
+  outline-offset: -2px;
+}
+.app-body {
+  outline: 2px dashed rgba(39,174,96,0.5) !important;
+  outline-offset: -2px;
+  min-height: 300px !important;
+}
+.app-footer {
+  outline: 2px dashed rgba(127,140,141,0.5) !important;
+  outline-offset: -2px;
+}
+</style>
+<script>
+(function() {
+  function addLabel(selector, text, bgColor, pos) {
+    var el = document.querySelector(selector);
+    if (!el) return;
+    el.style.position = 'relative';
+    var lbl = document.createElement('div');
+    lbl.className = 'layout-label';
+    lbl.style.background = bgColor;
+    lbl.style.position = 'absolute';
+    lbl.textContent = text;
+    if (pos === 'top-right') {
+      lbl.style.top = '8px'; lbl.style.right = '8px';
+    } else if (pos === 'mid-right') {
+      lbl.style.top = '50%'; lbl.style.right = '8px'; lbl.style.transform = 'translateY(-50%)';
+    }
+    el.appendChild(lbl);
+  }
+
+  addLabel('.sidebar-wrapper', 'SIDEBAR', 'rgba(91,79,185,0.85)', 'top-right');
+  addLabel('.app-header', 'HEADER — cubeHeader.html', 'rgba(230,126,34,0.85)', 'mid-right');
+  addLabel('.app-body', 'CONTENT — block content', 'rgba(39,174,96,0.85)', 'top-right');
+  addLabel('.app-footer', 'FOOTER — cubeFooter.html', 'rgba(127,140,141,0.85)', 'mid-right');
+
+  // Label app-brand
+  var brand = document.querySelector('.app-brand');
+  if (brand) {
+    var lbl = document.createElement('div');
+    lbl.className = 'layout-label';
+    lbl.style.background = 'rgba(91,79,185,0.65)';
+    lbl.style.marginTop = '4px';
+    lbl.style.fontSize = '10px';
+    lbl.textContent = 'app-brand';
+    brand.appendChild(lbl);
+  }
+})();
+</script>
