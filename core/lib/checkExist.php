@@ -14,7 +14,9 @@ class checkExist extends dsnSource
     public function __construct(string $dsn = '')
     {
         parent::__construct();
-        $this->connectDB($dsn);
+        if ($dsn !== '') {
+            $this->connectDB($dsn);
+        }
     }
 
     /**

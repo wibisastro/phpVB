@@ -24,7 +24,7 @@ class js extends checkExist
 
         $this->templateDir = __DIR__ . "/../../apps/" . $_app . "/js";
         $_component = $this->checkAppFile($_app . "/js", $vars["component"]);
-        $this->componentName = $_component;
+        $this->componentName = $_component ?? '';
         header('Content-Type: application/javascript');
     }
 }

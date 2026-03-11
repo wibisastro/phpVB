@@ -23,6 +23,6 @@ class vue extends checkExist
 
         $this->templateDir = __DIR__ . "/../../apps/" . $_app . "/vue";
         $_component = $this->checkAppFile($_app . "/vue", $vars["component"]);
-        $this->componentName = $_component;
+        $this->componentName = $_component ?? '';
     }
 }
