@@ -30,7 +30,7 @@ try {
     if ($doc->error) {
         if ($doc->error['Forbidden']) {
             $doc->baseBody="error402.html";
-        } else if ($doc->error['RouterConfigFileNotExist']) {
+        } else if ($doc->error['RouterConfigFileNotExist'] || $doc->error['RouteNotFound'] || $doc->error['ControllerClassNotExist'] || $doc->error['MethodNotExist']) {
             $doc->baseBody="error404.html";
         } else if (
                     $doc->error['UnConfiguredDomain'] ||
