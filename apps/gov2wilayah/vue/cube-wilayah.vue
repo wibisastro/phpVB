@@ -273,10 +273,11 @@ module.exports = {
             if (p.level == 0) continue; // skip NASIONAL
             var lbl = (p.level_label || '').charAt(0).toUpperCase() + (p.level_label || '').slice(1);
             if (lbl === 'Kelurahan') lbl = 'Kel/Desa';
-            var isBold = (p.id == this.config.wilayah_id) ? ' fw-bold' : '';
-            html += '<div class="px-3 py-1 small' + isBold + '">' +
-              '<span class="text-muted" style="display:inline-block;min-width:65px">' + this.escapeHtml(lbl) + '</span> ' +
-              this.escapeHtml(p.caption || p.nama) + '</div>';
+            var isBold = (p.id == this.config.wilayah_id) ? ' fw-bold text-primary' : '';
+            html += '<div class="px-3 py-1">' +
+              '<div class="text-muted" style="font-size:0.65rem">' + this.escapeHtml(lbl) + '</div>' +
+              '<div class="' + isBold + '" style="font-size:0.8rem">' + this.escapeHtml(p.caption || p.nama) + '</div>' +
+              '</div>';
           }
         } else {
           html = '<div class="px-3 py-2 text-muted small">Belum dipilih</div>';
