@@ -88,7 +88,12 @@ module.exports = {
                 'is-danger':  'danger',
                 'is-warning': 'warning',
                 'is-info':    'info',
-                'is-primary': 'primary'
+                'is-primary': 'primary',
+                'success': 'success',
+                'danger':  'danger',
+                'warning': 'warning',
+                'info':    'info',
+                'primary': 'primary'
             };
             return map[cls] || 'info';
         },
