@@ -48,11 +48,11 @@
 
   {% if _SESSION['account_id'] %}
     <!-- Wilayah indicator start -->
-    <div class="dropdown d-flex align-items-center">
+    <div class="dropdown">
       <a href="#!" id="topbarWilayah"
-         class="dropdown-toggle d-flex align-items-center text-decoration-none lh-1"
+         class="dropdown-toggle d-flex align-items-center header-action-icon"
          role="button" data-bs-toggle="dropdown" aria-expanded="false"
-         style="white-space:nowrap; padding:0.5rem 0.5rem; font-size:0.85rem; color:inherit">
+         style="font-size:0.85rem; text-decoration:none; color:inherit">
         <i class="bi bi-geo-alt{% if _SESSION['wilayah_nama'] %}-fill{% endif %}" style="font-size:1rem{% if _SESSION['wilayah_nama'] %}; color:#5b4fb9{% endif %}"></i>
         {% if _SESSION['wilayah_nama'] %}
           <span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:140px; font-size:0.8rem">{{ _SESSION['wilayah_nama'] }}</span>
@@ -80,8 +80,8 @@
 
     <!-- Instansi indicator start -->
     <a href="#" id="topbarUnitKerja"
-       class="d-flex align-items-center text-decoration-none lh-1"
-       style="white-space:nowrap; padding:0.5rem 0.5rem; font-size:0.85rem"
+       class="d-flex align-items-center text-decoration-none header-action-icon"
+       style="white-space:nowrap; font-size:0.85rem"
        data-bs-toggle="tooltip" data-bs-placement="bottom"
        data-bs-title="{{ _SESSION['unit_nama'] ?: 'Pilih Instansi' }}"
        onclick="event.preventDefault(); openSidePanel('instansi')">
