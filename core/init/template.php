@@ -28,19 +28,75 @@ try {
     }
 
     if ($doc->error) {
-        if ($doc->error['Forbidden']) {
+
+        // 401 Unauthorized — belum login
+        if ($doc->error['NotLogin']) {
+            http_response_code(401);
+
+        // 403 Forbidden — akses ditolak
+        } else if ($doc->error['Forbidden'] || $doc->error['Unauthorized']) {
             http_response_code(403);
             $doc->baseBody="error403.html";
-        } else if ($doc->error['RouterConfigFileNotExist'] || $doc->error['ControllerClassNotExist'] || $doc->error['RouteNotFound'] || $doc->error['MethodNotExist']) {
+
+        // 404 Not Found — app/route/method tidak ditemukan
+        } else if (
+                    $doc->error['RouterConfigFileNotExist'] ||
+                    $doc->error['ControllerClassNotExist'] ||
+                    $doc->error['RouteNotFound'] ||
+                    $doc->error['MethodNotExist'] ||
+                    $doc->error['FunctionNotExist']
+                    ) {
             http_response_code(404);
             $doc->baseBody="error404.html";
+
+        // 409 Conflict — data duplikat
+        } else if ($doc->error['AlreadyTagged']) {
+            http_response_code(409);
+
+        // 422 Unprocessable Entity — validasi / data error
+        } else if (
+                    $doc->error['ErrToken'] ||
+                    $doc->error['ErrKeyRequest'] ||
+                    $doc->error['ErrKeyResponse'] ||
+                    $doc->error['IlegalAudience'] ||
+                    $doc->error['InvalidDomain'] ||
+                    $doc->error['UnlistedDomain']
+                    ) {
+            http_response_code(422);
+            $doc->baseBody="error422.html";
+
+        // 500 Internal Server Error — config / database / server
         } else if (
                     $doc->error['UnConfiguredDomain'] ||
                     $doc->error['InvalidConfigFile'] ||
-                    $doc->error['ConfigFileNotExist']
+                    $doc->error['ConfigFileNotExist'] ||
+                    $doc->error['DatabaseError'] ||
+                    $doc->error['DatabaseConnection'] ||
+                    $doc->error['CannotConnectDSN'] ||
+                    $doc->error['DBLinkError'] ||
+                    $doc->error['DBQueryError'] ||
+                    $doc->error['NoDSNConfigFile'] ||
+                    $doc->error['InvalidDSNConfigFile'] ||
+                    $doc->error['DSNEntryNotFound'] ||
+                    $doc->error['DSNShareFileNotExist'] ||
+                    $doc->error['InvalidDSNShareFile'] ||
+                    $doc->error['TableConfigFileNotExist'] ||
+                    $doc->error['InvalidTableConfigFile'] ||
+                    $doc->error['TableShareFileNotExist'] ||
+                    $doc->error['InvalidTableShareFile'] ||
+                    $doc->error['InvalidRouterConfigFile'] ||
+                    $doc->error['SuperUserShareFileNotExist'] ||
+                    $doc->error['InvalidSuperuserShareFile']
                     ) {
             http_response_code(500);
             $doc->baseBody="error500.html";
+
+        // 503 Service Unavailable — maintenance / waktu akses
+        } else if ($doc->error['Maintenance'] || $doc->error['WrongTime'] || $doc->error['Closed']) {
+            http_response_code(503);
+            $doc->baseBody="error503.html";
+
+        // Fallback
         } else {
             $doc->baseBody="errorBody.html";
         }

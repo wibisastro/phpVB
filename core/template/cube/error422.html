@@ -1,0 +1,56 @@
+{% extends "cubeLayout.html" %}
+
+{% block head %}
+	{{ parent() }}
+	{% include('cubeHead.html') %}
+{% endblock %}
+
+{% block header %}
+	{% include('cubeHeader.html') %}
+{% endblock %}
+
+{% block pagetitle %}
+{% endblock %}
+
+{% block notification %}
+{% endblock %}
+
+{% block sidebar %}
+    {% for item in sidebars %}
+       {% include[item,'cubeMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height: 60vh;">
+  <div class="text-center">
+    <h1 class="display-1 fw-bold text-muted">422</h1>
+    <h4 class="fw-semibold mb-2">Data Tidak Valid</h4>
+    <p class="text-muted mb-4">
+      Permintaan tidak dapat diproses karena data tidak valid.
+    </p>
+    {% if STAGE != 'prod' and errors is defined %}
+    <div class="text-start d-inline-block mb-4">
+      <ul class="list-unstyled text-muted small">
+        {% for key, value in errors %}
+          <li><code>{{ key }}</code>: {{ value }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    <div>
+      <a href="javascript:history.back()" class="btn btn-primary">
+        <i class="bi bi-arrow-left me-1"></i> Kembali
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+	{% include('cubeFooter.html') %}
+{% endblock %}
+
+{% block js %}
+	{{ parent() }}
+{% endblock %}

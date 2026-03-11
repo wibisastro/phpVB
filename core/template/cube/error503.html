@@ -1,0 +1,53 @@
+{% extends "cubeLayout.html" %}
+
+{% block head %}
+	{{ parent() }}
+	{% include('cubeHead.html') %}
+{% endblock %}
+
+{% block header %}
+	{% include('cubeHeader.html') %}
+{% endblock %}
+
+{% block pagetitle %}
+{% endblock %}
+
+{% block notification %}
+{% endblock %}
+
+{% block sidebar %}
+    {% for item in sidebars %}
+       {% include[item,'cubeMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height: 60vh;">
+  <div class="text-center">
+    <h1 class="display-1 fw-bold text-muted">503</h1>
+    <h4 class="fw-semibold mb-2">Layanan Tidak Tersedia</h4>
+    <p class="text-muted mb-4">
+      {% if errors.Maintenance is defined %}
+        Sistem sedang dalam pemeliharaan. Silakan coba lagi nanti.
+      {% elseif errors.WrongTime is defined %}
+        Akses hanya tersedia pada jam operasional.
+      {% elseif errors.Closed is defined %}
+        Layanan sedang ditutup sementara.
+      {% else %}
+        Layanan sedang tidak tersedia. Silakan coba lagi nanti.
+      {% endif %}
+    </p>
+    <a href="/" class="btn btn-primary">
+      <i class="bi bi-house me-1"></i> Kembali ke Beranda
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+	{% include('cubeFooter.html') %}
+{% endblock %}
+
+{% block js %}
+	{{ parent() }}
+{% endblock %}
