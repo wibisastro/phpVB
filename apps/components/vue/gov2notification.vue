@@ -1,7 +1,7 @@
 <template>
 <div>
-    <!-- Top-right: warning & danger -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+    <!-- Top-right: warning & danger (offset bawah agar tidak nutupi header/user) -->
+    <div class="toast-container position-fixed end-0 p-3" style="z-index: 1080; top: 70px;">
         <div ref="toastTop" class="toast border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header text-white" :class="toastHeaderClass">
                 <i class="bi me-2" :class="toastIcon"></i>
@@ -105,11 +105,13 @@ module.exports = {
             };
             return map[cls] || 'info';
         },
-        showToast: function(data, autoDismiss) {
+        showToast: function(data) {
             var vm = this;
             vm.notifText = data['notification'] || '';
             vm.notifType = vm.toNotifType(data['class']);
 
+            // danger = manual close, sisanya auto-hide
+            var autoHide = vm.notifType !== 'danger';
             var delay = (vm.notifType === 'warning') ? 7000 : 5000;
 
             vm.$nextTick(function() {
@@ -117,32 +119,23 @@ module.exports = {
                 if (el && typeof bootstrap !== 'undefined') {
                     var existing = bootstrap.Toast.getInstance(el);
                     if (existing) { existing.dispose(); }
-                    var opts = { autohide: !!autoDismiss, delay: delay };
+                    var opts = { autohide: autoHide, delay: delay };
                     var toast = new bootstrap.Toast(el, opts);
                     toast.show();
                 }
             });
         },
         openNotif: function(data) {
-            var snackbarCallbacks = ['infoSnackbar','openSnackbar','toggleForm','resetButton','confirmClose'];
-            if (data['callback']) {
-                if (snackbarCallbacks.indexOf(data['callback']) !== -1) {
-                    this.showToast(data, true);
-                } else if (data['callback'] === 'errorSnackbar' || data['callback'] === 'openErr') {
-                    this.showToast(data, false);
-                }
-            } else {
-                this.showToast(data, false);
-            }
+            this.showToast(data);
         },
         infoSnackbar: function(data) {
-            this.showToast(data, true);
+            this.showToast(data);
         },
         openSnackbar: function(data) {
-            this.showToast(data, true);
+            this.showToast(data);
         },
         errorSnackbar: function(data) {
-            this.showToast(data, false);
+            this.showToast(data);
         }
     },
     created: function () {

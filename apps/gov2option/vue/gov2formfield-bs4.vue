@@ -120,7 +120,7 @@
                 <form @submit.prevent="onSubmit">
                     <button type="submit" class="btn btn-danger" @click="softDelProceed" v-if="isSoftDel">Delete</button>
                     <button type="submit" class="btn btn-danger" @click="delProceed" v-if="isDel">Delete</button>
-                    <button class="btn btn-secondary" @click="isConfirm=false">Cancel</button>
+                    <button type="button" class="btn btn-secondary" @click="isConfirm=false">Cancel</button>
                 </form>
             </div>
         </div>
