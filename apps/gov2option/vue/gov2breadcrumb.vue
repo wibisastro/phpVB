@@ -1,21 +1,18 @@
 <template>
-    <div class="row" v-if="isActive" data-test="breadcrumb-box">
-        <div class="col-lg-12">
-            <div class="block no-bottom" style="margin: 10px;">
-                <div class="alert alert-info" style="margin-bottom: 10px;">
-                    <table>
-                        <tr v-for="path in pathData">
-                            <td><strong class="alert-link">{{ setLevel(path['level_label']) }}</strong></td>
-                            <td style="padding-left: 20px;">:
-                                <a v-if="link" class="use-pointer breadcrumb-text text-info"
-                                   @click="getBack(path['id'])"
-                                   v-text="path['caption']" ></a>
-                                <span v-else v-text="path['caption']" class="breadcrumb-text text-info" >
-                                </span>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+    <div class="breadcrumb-nav" v-if="isActive && pathData.length > 0" data-test="breadcrumb-box">
+        <div class="breadcrumb-trail">
+            <div v-for="(path, index) in pathData"
+                 :key="index"
+                 class="breadcrumb-item-row"
+                 :style="{ paddingLeft: (index * 1.5) + 'rem' }">
+                <i class="fa breadcrumb-icon"
+                   :class="index === 0 ? 'fa-building' : 'fa-folder-open'"></i>
+                <span class="breadcrumb-level">{{ setLevel(path['level_label']) }}</span>
+                <i class="fa fa-chevron-right breadcrumb-sep"></i>
+                <a v-if="link"
+                   class="breadcrumb-link"
+                   @click="getBack(path['id'])">{{ path['caption'] }}</a>
+                <span v-else class="breadcrumb-caption">{{ path['caption'] }}</span>
             </div>
         </div>
     </div>
@@ -155,11 +152,57 @@ module.exports = {
 </script>
 
 <style scoped>
-a {
-    cursor: pointer;
+.breadcrumb-nav {
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+    border: 1px solid #d4ddf7;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
 }
-.myAuto {
-    margin-top: auto;
-    margin-bottom: auto;
+.breadcrumb-trail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.breadcrumb-item-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+.breadcrumb-icon {
+    color: #5b4fb9;
+    font-size: 0.85rem;
+    width: 1rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+.breadcrumb-level {
+    font-weight: 700;
+    color: #1a1a2e;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+.breadcrumb-sep {
+    color: #b0b8d1;
+    font-size: 0.65rem;
+    flex-shrink: 0;
+}
+.breadcrumb-link {
+    color: #5b4fb9;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+}
+.breadcrumb-link:hover {
+    color: #4338a0;
+    text-decoration: underline;
+}
+.breadcrumb-caption {
+    color: #5b4fb9;
+    font-weight: 500;
 }
 </style>
