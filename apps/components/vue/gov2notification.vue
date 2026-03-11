@@ -98,14 +98,19 @@ module.exports = {
             return map[cls] || 'info';
         },
         showToast: function(data, autoDismiss) {
-            this.notifText = data['notification'] || '';
-            this.notifType = this.toNotifType(data['class']);
-            var el = this.$refs.toast;
-            if (el && typeof bootstrap !== 'undefined') {
-                var opts = { autohide: !!autoDismiss, delay: 5000 };
-                var toast = new bootstrap.Toast(el, opts);
-                toast.show();
-            }
+            var vm = this;
+            vm.notifText = data['notification'] || '';
+            vm.notifType = vm.toNotifType(data['class']);
+            vm.$nextTick(function() {
+                var el = vm.$refs.toast;
+                if (el && typeof bootstrap !== 'undefined') {
+                    var existing = bootstrap.Toast.getInstance(el);
+                    if (existing) { existing.dispose(); }
+                    var opts = { autohide: !!autoDismiss, delay: 5000 };
+                    var toast = new bootstrap.Toast(el, opts);
+                    toast.show();
+                }
+            });
         },
         openNotif: function(data) {
             var snackbarCallbacks = ['infoSnackbar','openSnackbar','toggleForm','resetButton','confirmClose'];
