@@ -1159,6 +1159,7 @@
     .dropdown-menu-right {
         right: 0 !important;
         left: auto !important;
+        top: 100% !important;
     }
     .dropdown-menu-right:after {
         left: inherit !important;
