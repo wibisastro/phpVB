@@ -101,10 +101,11 @@
                             <div v-else>
                                 <a v-if="recursive && (key === 'nama' || clickableCol.includes(key))"
                                    @click="getChildren(entry['id'])"
-                                   :class="{'cp text-info': key ===  'nama' || clickableCol.includes(key)}"
+                                   class="recursive-link text-info"
                                    :id="`recursive-link-${entry.id}`"
                                    :data-test="`recursive-link-${entry.id}`"
                                    data-bs-toggle="tooltip"
+                                   data-bs-trigger="hover"
                                    data-bs-placement="top"
                                    :title="childrenTooltip && entry['children'] ? 'Data ini memiliki ' + entry['children'] + ' child(s)' : ''">{{ entry[key] }} </a>
                                 <a v-if="recursive == true && key !== 'status' && key !== 'nama'
@@ -959,6 +960,11 @@
                 // localStorage[`count_${this.instance}`] = 'true';
             },
             getChildren: function (id) {
+                // Dispose semua BS5 tooltip sebelum navigate
+                this.$el.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
+                    var tip = bootstrap.Tooltip.getInstance(el);
+                    if (tip) tip.dispose();
+                });
                 this.setScroll(1);
                 this.getData(id);
                 
@@ -1166,6 +1172,15 @@
 </script>
 
 <style>
+    /* Recursive drilldown link */
+    .recursive-link {
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .recursive-link:hover {
+        text-decoration: underline;
+    }
+
     /* BS4→BS5 compat: BootstrapVue .dropdown-menu-right → Cube .dropdown-menu-end */
     /* Override Popper.js inline transform agar posisi tetap di bawah tombol */
     .dropdown-menu-right {
