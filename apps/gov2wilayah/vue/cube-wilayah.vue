@@ -52,21 +52,24 @@
             </div>
           </div>
 
-          <!-- Next level dropdown + filter -->
+          <!-- Next level searchable list -->
           <div v-if="pathData.length > 0 && pathData[pathData.length-1].level < maxLevel" class="mb-2">
-            <!-- Filter input -->
-            <div class="position-relative mb-1" v-if="childList.length > 10">
-              <input type="text" class="form-control form-control-sm ps-4" v-model="filter"
-                     :placeholder="'Filter ' + nextLevelName.toLowerCase() + '...'">
-              <i class="bi bi-funnel position-absolute" style="left:10px;top:7px;font-size:0.75rem;color:#aaa"></i>
-            </div>
             <div class="input-group input-group-sm">
               <span class="input-group-text" style="min-width:90px;font-size:0.75rem">{{ nextLevelName }}</span>
-              <select class="form-select" v-model="selectedId" @change="drillDown" style="font-size:0.8rem">
-                <option value="" disabled>Pilih...</option>
-                <option v-for="item in filteredChildList" :key="item.id" :value="item.id">{{ item.nama }}</option>
-              </select>
+              <input type="text" class="form-control" v-model="filter"
+                     :placeholder="'Pilih / ketik filter...'"
+                     @focus="showList = true"
+                     style="font-size:0.8rem; cursor:pointer">
               <span class="input-group-text" style="font-size:0.75rem">{{ filteredChildList.length }}</span>
+            </div>
+            <div v-if="showList" class="border rounded-bottom overflow-auto" style="max-height:200px; margin-top:-1px">
+              <div v-if="filteredChildList.length === 0" class="px-3 py-2 text-muted small">Tidak ditemukan</div>
+              <a v-for="item in filteredChildList" :key="item.id" href="#"
+                 class="d-block px-3 py-1 text-decoration-none text-dark small wilayah-list-item"
+                 @click.prevent="pickChild(item.id)"
+                 style="font-size:0.8rem">
+                {{ item.nama }}
+              </a>
             </div>
           </div>
 
@@ -94,6 +97,7 @@ module.exports = {
       childList: [],
       selectedId: '',
       filter: '',
+      showList: false,
       loading: false,
       maxLevel: 4,
       errorMsg: ''
@@ -139,6 +143,7 @@ module.exports = {
     loadBreadcrumb(id) {
       this.loading = true;
       this.filter = '';
+      this.showList = false;
       var url = '/gov2wilayah/sidepanel/breadcrumb';
       if (id !== undefined && id !== null) url += '/' + id;
       axios.get(url)
@@ -166,6 +171,12 @@ module.exports = {
           this.childList = Array.from(Object.keys(data), function(k) { return data[k]; });
         })
         .catch(e => this.handleError(e));
+    },
+    pickChild(id) {
+      this.selectedId = id;
+      this.showList = false;
+      this.filter = '';
+      this.drillDown();
     },
     drillDown() {
       if (!this.selectedId) return;
@@ -305,7 +316,7 @@ module.exports = {
 </script>
 
 <style scoped>
-.list-group-item-action:hover {
+.wilayah-list-item:hover {
   background-color: #f0f0f0;
 }
 </style>
