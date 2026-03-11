@@ -25,12 +25,18 @@
 <div class="d-flex align-items-center justify-content-center" style="min-height: 60vh;">
   <div class="text-center">
     <h1 class="display-1 fw-bold text-muted">404</h1>
-    <h4 class="fw-semibold mb-2">Aplikasi Tidak Ditemukan</h4>
+    <h4 class="fw-semibold mb-2">Route Tidak Ditemukan</h4>
     <p class="text-muted mb-4">
-      Aplikasi <strong>{{ pageID }}</strong> tidak tersedia atau belum dikonfigurasi.
+      {% if errors.RouteNotFound is defined %}
+        Alamat <code>{{ errors.RouteNotFound }}</code> tidak tersedia di aplikasi <strong>{{ pageID }}</strong>.
+      {% elseif errors.MethodNotExist is defined %}
+        Method <code>{{ errors.MethodNotExist }}</code> tidak tersedia di aplikasi <strong>{{ pageID }}</strong>.
+      {% else %}
+        Halaman yang Anda tuju tidak tersedia.
+      {% endif %}
     </p>
-    <a href="/" class="btn btn-primary">
-      <i class="bi bi-house me-1"></i> Kembali ke Beranda
+    <a href="/{{ pageID }}" class="btn btn-primary">
+      <i class="bi bi-arrow-left me-1"></i> Kembali ke {{ pageID }}
     </a>
   </div>
 </div>
