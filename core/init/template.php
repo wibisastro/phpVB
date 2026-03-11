@@ -29,16 +29,17 @@ try {
 
     if ($doc->error) {
         if ($doc->error['Forbidden']) {
-            $doc->baseBody="error402.html";
-        } else if ($doc->error['RouterConfigFileNotExist'] || $doc->error['ControllerClassNotExist']) {
+            http_response_code(403);
+            $doc->baseBody="error403.html";
+        } else if ($doc->error['RouterConfigFileNotExist'] || $doc->error['ControllerClassNotExist'] || $doc->error['RouteNotFound'] || $doc->error['MethodNotExist']) {
+            http_response_code(404);
             $doc->baseBody="error404.html";
-        } else if ($doc->error['RouteNotFound'] || $doc->error['MethodNotExist']) {
-            $doc->baseBody="errorRouteNotFound.html";
         } else if (
                     $doc->error['UnConfiguredDomain'] ||
                     $doc->error['InvalidConfigFile'] ||
                     $doc->error['ConfigFileNotExist']
                     ) {
+            http_response_code(500);
             $doc->baseBody="error500.html";
         } else {
             $doc->baseBody="errorBody.html";
