@@ -21,15 +21,6 @@
       <i class="bi bi-lock me-1"></i>Wilayah dikunci sesuai role <strong>{{ config.userRole }}</strong>
     </div>
 
-    <!-- Search -->
-    <div v-if="!config.locked" class="px-3 py-2 border-bottom">
-      <div class="position-relative">
-        <input type="text" class="form-control form-control-sm ps-4" v-model="search"
-               placeholder="Cari wilayah..." @input="onSearch">
-        <i class="bi bi-search position-absolute" style="left:10px;top:7px;font-size:0.8rem;color:#aaa"></i>
-      </div>
-    </div>
-
     <!-- Error alert -->
     <div v-if="errorMsg" class="px-3 py-2">
       <div class="alert alert-danger alert-dismissible mb-0 small">
@@ -40,30 +31,7 @@
 
     <!-- Content area -->
     <div class="flex-grow-1 overflow-auto" v-if="!config.locked && !errorMsg">
-
-      <!-- Search results -->
-      <div v-if="searchMode">
-        <div v-if="searchLoading" class="px-3 py-3 text-center text-muted small">
-          <div class="spinner-border spinner-border-sm me-1"></div> Mencari...
-        </div>
-        <ul v-else class="list-group list-group-flush">
-          <li v-if="searchResults.length === 0" class="list-group-item border-0 px-3 py-2 text-muted small">
-            Tidak ditemukan
-          </li>
-          <li v-for="item in searchResults" :key="item.id"
-              class="list-group-item border-0 px-3 py-2 list-group-item-action"
-              :class="{ 'bg-success-subtle': config.wilayah_id == item.id }"
-              style="cursor:pointer" @click="selectWilayah(item)">
-            <span class="small" :class="{ 'fw-bold': config.wilayah_id == item.id }">
-              {{ item.nama }}
-              <span class="badge bg-secondary ms-1">{{ item.level_label }}</span>
-            </span>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Breadcrumb navigator (Pilih Wilayah) -->
-      <div v-else class="px-3 py-2">
+      <div class="px-3 py-2">
 
         <!-- Loading -->
         <div v-if="loading" class="py-3 text-center text-muted small">
@@ -84,19 +52,25 @@
             </div>
           </div>
 
-          <!-- Next level dropdown -->
+          <!-- Next level dropdown + filter -->
           <div v-if="pathData.length > 0 && pathData[pathData.length-1].level < maxLevel" class="mb-2">
+            <!-- Filter input -->
+            <div class="position-relative mb-1" v-if="childList.length > 10">
+              <input type="text" class="form-control form-control-sm ps-4" v-model="filter"
+                     :placeholder="'Filter ' + nextLevelName.toLowerCase() + '...'">
+              <i class="bi bi-funnel position-absolute" style="left:10px;top:7px;font-size:0.75rem;color:#aaa"></i>
+            </div>
             <div class="input-group input-group-sm">
               <span class="input-group-text" style="min-width:90px;font-size:0.75rem">{{ nextLevelName }}</span>
               <select class="form-select" v-model="selectedId" @change="drillDown" style="font-size:0.8rem">
                 <option value="" disabled>Pilih...</option>
-                <option v-for="item in childList" :key="item.id" :value="item.id">{{ item.nama }}</option>
+                <option v-for="item in filteredChildList" :key="item.id" :value="item.id">{{ item.nama }}</option>
               </select>
-              <span class="input-group-text" style="font-size:0.75rem">{{ childList.length }}</span>
+              <span class="input-group-text" style="font-size:0.75rem">{{ filteredChildList.length }}</span>
             </div>
           </div>
 
-          <!-- Select button (when at a selectable level) -->
+          <!-- Select button (selectable from level 1 / provinsi) -->
           <div v-if="pathData.length > 0 && lastPath" class="mt-3">
             <button class="btn btn-sm btn-success w-100" @click="selectFromPath(lastPath)"
                     :disabled="config.wilayah_id == lastPath.id">
@@ -119,13 +93,9 @@ module.exports = {
       pathData: [],
       childList: [],
       selectedId: '',
+      filter: '',
       loading: false,
       maxLevel: 4,
-      search: '',
-      searchResults: [],
-      searchLoading: false,
-      searchMode: false,
-      searchTimer: null,
       errorMsg: ''
     }
   },
@@ -133,8 +103,8 @@ module.exports = {
     lastPath() {
       if (this.pathData.length === 0) return null;
       var last = this.pathData[this.pathData.length - 1];
-      // Selectable if level >= 2 (kabupaten or deeper)
-      return last.level >= 2 ? last : null;
+      // Selectable from level 1 (provinsi) and deeper
+      return last.level >= 1 ? last : null;
     },
     nextLevelName() {
       if (this.childList.length > 0 && this.childList[0].level_label) {
@@ -142,6 +112,13 @@ module.exports = {
         return label === 'KELURAHAN' ? 'KEL/DESA' : label;
       }
       return 'PILIH';
+    },
+    filteredChildList() {
+      if (!this.filter || this.filter.length < 1) return this.childList;
+      var q = this.filter.toLowerCase();
+      return this.childList.filter(function(item) {
+        return item.nama.toLowerCase().indexOf(q) !== -1;
+      });
     }
   },
   methods: {
@@ -161,6 +138,7 @@ module.exports = {
     },
     loadBreadcrumb(id) {
       this.loading = true;
+      this.filter = '';
       var url = '/gov2wilayah/sidepanel/breadcrumb';
       if (id !== undefined && id !== null) url += '/' + id;
       axios.get(url)
@@ -199,7 +177,6 @@ module.exports = {
       if (!id || id <= 0) {
         this.loadBreadcrumb(-2);
       } else {
-        // Go to parent of this level
         var idx = -1;
         for (var i = 0; i < this.pathData.length; i++) {
           if (this.pathData[i].id == id) { idx = i; break; }
@@ -223,8 +200,6 @@ module.exports = {
           this.config.wilayah_id = item.id;
           this.config.wilayah_level = item.level_label || '';
           this.config.wilayah_parent_id = parentId;
-          this.search = '';
-          this.searchMode = false;
           this.updateTopbar();
         })
         .catch(e => console.log('changeWilayah:', e.message));
@@ -244,41 +219,46 @@ module.exports = {
           this.config.wilayah_id = null;
           this.config.wilayah_level = '';
           this.config.wilayah_parent_id = null;
+          this.pathData = [];
+          this.childList = [];
+          this.loadBreadcrumb(-1);
           this.updateTopbar();
         })
         .catch(e => console.log('resetWilayah:', e.message));
     },
-    onSearch() {
-      clearTimeout(this.searchTimer);
-      if (!this.search || this.search.length < 2) {
-        this.searchMode = false;
-        return;
-      }
-      this.searchMode = true;
-      this.searchLoading = true;
-      this.searchTimer = setTimeout(() => {
-        axios.get('/gov2wilayah/sidepanel/searchWilayah?q=' + encodeURIComponent(this.search))
-          .then(resp => {
-            this.searchResults = resp.data || [];
-            this.searchLoading = false;
-          })
-          .catch(e => { this.searchLoading = false; this.handleError(e); });
-      }, 300);
-    },
     updateTopbar() {
+      // Update icon on trigger
       var el = document.getElementById('topbarWilayah');
       if (el) {
         var nama = this.config.wilayah_nama;
-        if (nama) {
-          el.innerHTML = '<i class="bi bi-geo-alt-fill" style="font-size:1rem;color:#5b4fb9"></i>' +
-            '<span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:140px;font-size:0.8rem">' + this.escapeHtml(nama) + '</span>';
+        var icon = nama
+          ? '<i class="bi bi-geo-alt-fill" style="font-size:1rem;color:#5b4fb9"></i>'
+          : '<i class="bi bi-geo-alt" style="font-size:1rem"></i>';
+        el.innerHTML = icon + '<span class="d-none d-lg-inline ms-1" style="font-size:0.8rem">Wilayah</span>';
+      }
+      // Update dropdown menu content with level breakdown
+      var menu = document.getElementById('topbarWilayahMenu');
+      if (menu) {
+        var html = '';
+        if (this.pathData.length > 0 && this.config.wilayah_nama) {
+          // Build level breakdown from pathData
+          for (var i = 0; i < this.pathData.length; i++) {
+            var p = this.pathData[i];
+            if (p.level == 0) continue; // skip NASIONAL
+            var lbl = (p.level_label || '').charAt(0).toUpperCase() + (p.level_label || '').slice(1);
+            if (lbl === 'Kelurahan') lbl = 'Kel/Desa';
+            var isBold = (p.id == this.config.wilayah_id) ? ' fw-bold' : '';
+            html += '<div class="px-3 py-1 small' + isBold + '">' +
+              '<span class="text-muted" style="display:inline-block;min-width:65px">' + this.escapeHtml(lbl) + '</span> ' +
+              this.escapeHtml(p.caption || p.nama) + '</div>';
+          }
         } else {
-          el.innerHTML = '<i class="bi bi-geo-alt" style="font-size:1rem"></i>';
+          html = '<div class="px-3 py-2 text-muted small">Belum dipilih</div>';
         }
-        el.setAttribute('data-bs-title', nama || 'Pilih Wilayah');
-        var tip = bootstrap.Tooltip.getInstance(el);
-        if (tip) { tip.dispose(); }
-        new bootstrap.Tooltip(el);
+        html += '<div class="dropdown-divider my-1"></div>';
+        html += '<a class="dropdown-item small" href="#" onclick="event.preventDefault(); openSidePanel(\'wilayah\')">' +
+          '<i class="bi bi-pencil-square me-2"></i>Pilih Wilayah</a>';
+        menu.innerHTML = html;
       }
     },
     handleError(e) {
@@ -306,12 +286,13 @@ module.exports = {
     this.loadBreadcrumb(-1);
   },
   mounted() {
+    var self = this;
     var el = document.getElementById('sidePanelOffcanvas');
     if (el) {
-      el.addEventListener('show.bs.offcanvas', () => {
+      el.addEventListener('show.bs.offcanvas', function() {
         var wilayahPanel = document.getElementById('sidePanel-wilayah');
         if (wilayahPanel && wilayahPanel.style.display !== 'none') {
-          this.loadConfig();
+          self.loadConfig();
         }
       });
     }
