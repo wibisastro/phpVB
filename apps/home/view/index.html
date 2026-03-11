@@ -1,8 +1,184 @@
-<div class="content">
-    <h2>About</h2>
-    Situs ini adalah situs development
-    <h2>Overview</h2>
-    {{ overview }}
-    <h2>Disclaimer</h2>
-    Tampilan yang ada di sini bukan User Interface yang akan dideliver tapi hanya tool untuk panduan develop prototype fungsi dan testing
+<style>
+/* Layout Guide - overlay labels */
+.layout-label {
+  display: inline-block;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.03em;
+  pointer-events: none;
+}
+.layout-label-purple { background: rgba(91,79,185,0.85); }
+.layout-label-orange { background: rgba(230,126,34,0.85); }
+.layout-label-green  { background: rgba(39,174,96,0.85); }
+.layout-label-gray   { background: rgba(127,140,141,0.85); }
+.layout-label-blue   { background: rgba(41,128,185,0.85); }
+
+/* Highlight areas */
+.sidebar-wrapper {
+  outline: 2px dashed rgba(91,79,185,0.5) !important;
+  outline-offset: -2px;
+  position: relative;
+}
+.app-header {
+  outline: 2px dashed rgba(230,126,34,0.5) !important;
+  outline-offset: -2px;
+  position: relative;
+}
+.app-body {
+  outline: 2px dashed rgba(39,174,96,0.5) !important;
+  outline-offset: -2px;
+  position: relative;
+  min-height: 300px !important;
+}
+.app-footer {
+  outline: 2px dashed rgba(127,140,141,0.5) !important;
+  outline-offset: -2px;
+  position: relative;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Label sidebar
+  var sidebar = document.querySelector('.sidebar-wrapper');
+  if (sidebar) {
+    var lbl = document.createElement('div');
+    lbl.className = 'layout-label layout-label-purple';
+    lbl.style.cssText = 'position:absolute; top:8px; right:8px; z-index:10';
+    lbl.textContent = 'SIDEBAR — {% block sidebar %}';
+    sidebar.style.position = 'relative';
+    sidebar.appendChild(lbl);
+  }
+
+  // Label app-brand
+  var brand = document.querySelector('.app-brand');
+  if (brand) {
+    var lbl = document.createElement('div');
+    lbl.className = 'layout-label layout-label-purple';
+    lbl.style.cssText = 'margin-top:4px; font-size:10px; opacity:0.8';
+    lbl.textContent = 'app-brand';
+    brand.appendChild(lbl);
+  }
+
+  // Label header
+  var header = document.querySelector('.app-header');
+  if (header) {
+    var lbl = document.createElement('div');
+    lbl.className = 'layout-label layout-label-orange';
+    lbl.style.cssText = 'position:absolute; top:50%; right:8px; transform:translateY(-50%); z-index:10';
+    lbl.textContent = '{% block header %} — cubeHeader.html';
+    header.style.position = 'relative';
+    header.appendChild(lbl);
+  }
+
+  // Label content
+  var content = document.querySelector('.app-body');
+  if (content) {
+    var lbl = document.createElement('div');
+    lbl.className = 'layout-label layout-label-green';
+    lbl.style.cssText = 'position:absolute; top:8px; right:8px; z-index:10';
+    lbl.textContent = '{% block content %}';
+    content.style.position = 'relative';
+    content.appendChild(lbl);
+  }
+
+  // Label footer
+  var footer = document.querySelector('.app-footer');
+  if (footer) {
+    var lbl = document.createElement('div');
+    lbl.className = 'layout-label layout-label-gray';
+    lbl.style.cssText = 'position:absolute; top:50%; right:8px; transform:translateY(-50%); z-index:10';
+    lbl.textContent = '{% block footer %} — cubeFooter.html';
+    footer.style.position = 'relative';
+    footer.appendChild(lbl);
+  }
+});
+</script>
+
+<div class="p-4">
+  <h4 class="fw-semibold mb-3" style="font-family:'Source Serif 4',serif">Layout Guide — Cube Theme</h4>
+  <p class="text-muted mb-4">Halaman ini menunjukkan struktur layout Cube theme. Setiap area ditandai dengan label dan garis putus-putus.</p>
+
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-semibold"><span class="layout-label layout-label-purple me-2">SIDEBAR</span> Sidebar</h6>
+          <p class="small text-muted mb-1">File: <code>cubeSideNav.html</code> | Block: <code>{% block sidebar %}</code></p>
+          <p class="small mb-0">App brand + menu items. Override via <code>setDefaultNav('menu.xml')</code>. Toggle & pin di-persist via localStorage.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-semibold"><span class="layout-label layout-label-orange me-2">HEADER</span> Header (Topbar)</h6>
+          <p class="small text-muted mb-1">File: <code>cubeHeader.html</code> | Block: <code>{% block header %}</code></p>
+          <p class="small mb-0">Toggle | Notifikasi | Home | Breadcrumb | Instansi | User Dropdown</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-semibold"><span class="layout-label layout-label-green me-2">CONTENT</span> Content Area</h6>
+          <p class="small text-muted mb-1">Block: <code>{% block content %}</code> | Container: <code>.app-body</code></p>
+          <p class="small mb-0">Area utama konten app. Di atas content ada block <code>notification</code> dan <code>pagetitle</code>.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-semibold"><span class="layout-label layout-label-gray me-2">FOOTER</span> Footer</h6>
+          <p class="small text-muted mb-1">File: <code>cubeFooter.html</code> | Block: <code>{% block footer %}</code></p>
+          <p class="small mb-0">&copy; Cyber Gov Labs | Powered by phpVB</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h6 class="fw-semibold"><span class="layout-label layout-label-blue me-2">SIDE PANEL</span> Side Panel Offcanvas</h6>
+          <p class="small text-muted mb-1">Di dalam <code>#app</code> div | ID: <code>sidePanelOffcanvas</code></p>
+          <p class="small mb-0">
+            <a href="#" onclick="event.preventDefault(); openSidePanel('instansi')">Buka Instansi Panel</a> |
+            <a href="#" onclick="event.preventDefault(); openSidePanel('pengaturan')">Buka Pengaturan Panel</a>
+            — Toggle via <code>openSidePanel(view)</code>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <h6 class="fw-semibold mb-2">Komponen Header</h6>
+    <table class="table table-sm table-bordered small">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Komponen</th>
+          <th>Icon</th>
+          <th>Desktop (≥992px)</th>
+          <th>Mobile (&lt;992px)</th>
+          <th>Auth</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Sidebar Toggle</td><td><i class="bi bi-list"></i> <i class="bi bi-layout-sidebar"></i></td><td>Tampil</td><td>Tampil</td><td>Semua</td></tr>
+        <tr><td>2</td><td>Notifikasi</td><td><i class="bi bi-bell"></i></td><td>Hidden *</td><td>Hidden *</td><td>Login</td></tr>
+        <tr><td>2a</td><td>Logo Mobile</td><td>img</td><td>Hidden</td><td>Tampil</td><td>Semua</td></tr>
+        <tr><td>3</td><td>Home</td><td><i class="bi bi-house"></i></td><td>Tampil</td><td>Hidden</td><td>Semua</td></tr>
+        <tr><td>4</td><td>Breadcrumb</td><td>Vue</td><td>Tampil</td><td>Hidden</td><td>Semua</td></tr>
+        <tr><td>5</td><td>Instansi</td><td><i class="bi bi-building"></i></td><td>Icon + teks</td><td>Icon only</td><td>Login</td></tr>
+        <tr><td>6</td><td>User Dropdown</td><td>Avatar</td><td>Nama + avatar</td><td>Avatar only</td><td>Login</td></tr>
+        <tr><td>6a</td><td>Signup / Login</td><td>btn</td><td>Tampil</td><td>Tampil</td><td>Guest</td></tr>
+      </tbody>
+    </table>
+    <p class="small text-muted">* Notifikasi placeholder — belum ada backend, sengaja di-hidden.</p>
+  </div>
 </div>
