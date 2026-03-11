@@ -227,14 +227,17 @@ module.exports = {
         .catch(e => console.log('resetWilayah:', e.message));
     },
     updateTopbar() {
-      // Update icon on trigger
+      // Update trigger: show selected name or default "Wilayah"
       var el = document.getElementById('topbarWilayah');
       if (el) {
         var nama = this.config.wilayah_nama;
         var icon = nama
           ? '<i class="bi bi-geo-alt-fill" style="font-size:1rem;color:#5b4fb9"></i>'
           : '<i class="bi bi-geo-alt" style="font-size:1rem"></i>';
-        el.innerHTML = icon + '<span class="d-none d-lg-inline ms-1" style="font-size:0.8rem">Wilayah</span>';
+        var label = nama
+          ? '<span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:140px;font-size:0.8rem">' + this.escapeHtml(nama) + '</span>'
+          : '<span class="d-none d-lg-inline ms-1 text-muted" style="font-size:0.8rem">Wilayah</span>';
+        el.innerHTML = icon + label;
       }
       // Update dropdown menu content with level breakdown
       var menu = document.getElementById('topbarWilayahMenu');

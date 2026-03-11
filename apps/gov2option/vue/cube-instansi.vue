@@ -282,30 +282,21 @@ module.exports = {
       });
     },
     updateTopbar() {
-      // Update icon on trigger
       var el = document.getElementById('topbarUnitKerja');
-      if (el) {
-        var nama = this.config.unit_nama;
-        var icon = nama
-          ? '<i class="bi bi-building-fill" style="font-size:1rem;color:#5b4fb9"></i>'
-          : '<i class="bi bi-building" style="font-size:1rem"></i>';
-        el.innerHTML = icon + '<span class="d-none d-lg-inline ms-1" style="font-size:0.8rem">Instansi</span>';
-      }
-      // Update dropdown menu content
-      var menu = document.getElementById('topbarInstansiMenu');
-      if (menu) {
-        var html = '';
-        var nama = this.config.unit_nama;
-        if (nama) {
-          html = '<div class="px-3 py-2 small"><i class="bi bi-building-fill text-primary me-1"></i><strong>' + this.escapeHtml(nama) + '</strong></div>';
-        } else {
-          html = '<div class="px-3 py-2 text-muted small">Belum dipilih</div>';
-        }
-        html += '<div class="dropdown-divider my-1"></div>';
-        html += '<a class="dropdown-item small" href="#" onclick="event.preventDefault(); openSidePanel(\'instansi\')">' +
-          '<i class="bi bi-pencil-square me-2"></i>Pilih Instansi</a>';
-        menu.innerHTML = html;
-      }
+      if (!el) return;
+      var nama = this.config.unit_nama;
+      var icon = nama
+        ? '<i class="bi bi-building-fill" style="font-size:1rem;color:#5b4fb9"></i>'
+        : '<i class="bi bi-building" style="font-size:1rem"></i>';
+      var label = nama
+        ? '<span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:160px;font-size:0.8rem">' + this.escapeHtml(nama) + '</span>'
+        : '<span class="d-none d-lg-inline ms-1 text-muted" style="font-size:0.8rem">Instansi</span>';
+      el.innerHTML = icon + label;
+      // Update tooltip
+      el.setAttribute('data-bs-title', nama || 'Pilih Instansi');
+      var tooltip = bootstrap.Tooltip.getInstance(el);
+      if (tooltip) { tooltip.dispose(); }
+      new bootstrap.Tooltip(el);
     },
     handleError(e) {
       var msg = 'Terjadi kesalahan';

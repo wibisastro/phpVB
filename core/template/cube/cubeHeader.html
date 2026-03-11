@@ -54,9 +54,13 @@
          style="white-space:nowrap; padding:0.4rem 0.5rem; font-size:0.85rem"
          data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
         <i class="bi bi-geo-alt{% if _SESSION['wilayah_nama'] %}-fill{% endif %}" style="font-size:1rem{% if _SESSION['wilayah_nama'] %}; color:#5b4fb9{% endif %}"></i>
-        <span class="d-none d-lg-inline ms-1" style="font-size:0.8rem">Wilayah</span>
+        {% if _SESSION['wilayah_nama'] %}
+          <span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:140px; font-size:0.8rem">{{ _SESSION['wilayah_nama'] }}</span>
+        {% else %}
+          <span class="d-none d-lg-inline ms-1 text-muted" style="font-size:0.8rem">Wilayah</span>
+        {% endif %}
       </a>
-      <div class="dropdown-menu dropdown-menu-end shadow-sm" id="topbarWilayahMenu" style="min-width:200px; font-size:0.8rem">
+      <div class="dropdown-menu dropdown-menu-end shadow-sm" id="topbarWilayahMenu" style="min-width:220px; font-size:0.8rem">
         {% if _SESSION['wilayah_nama'] %}
           <div class="px-3 py-2 small">
             <i class="bi bi-geo-alt-fill text-primary me-1"></i><strong>{{ _SESSION['wilayah_nama'] }}</strong>
@@ -75,28 +79,19 @@
     <span class="vr mx-1 d-none d-lg-inline" style="opacity:0.15"></span>
 
     <!-- Instansi indicator start -->
-    <div class="dropdown d-inline-flex align-items-center">
-      <a href="#" id="topbarUnitKerja"
-         class="d-flex align-items-center text-decoration-none text-body-secondary lh-1"
-         style="white-space:nowrap; padding:0.4rem 0.5rem; font-size:0.85rem"
-         data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
-        <i class="bi bi-building{% if _SESSION['unit_nama'] %}-fill{% endif %}" style="font-size:1rem{% if _SESSION['unit_nama'] %}; color:#5b4fb9{% endif %}"></i>
-        <span class="d-none d-lg-inline ms-1" style="font-size:0.8rem">Instansi</span>
-      </a>
-      <div class="dropdown-menu dropdown-menu-end shadow-sm" id="topbarInstansiMenu" style="min-width:200px; font-size:0.8rem">
-        {% if _SESSION['unit_nama'] %}
-          <div class="px-3 py-2 small">
-            <i class="bi bi-building-fill text-primary me-1"></i><strong>{{ _SESSION['unit_nama'] }}</strong>
-          </div>
-        {% else %}
-          <div class="px-3 py-2 text-muted small">Belum dipilih</div>
-        {% endif %}
-        <div class="dropdown-divider my-1"></div>
-        <a class="dropdown-item small" href="#" onclick="event.preventDefault(); openSidePanel('instansi')">
-          <i class="bi bi-pencil-square me-2"></i>Pilih Instansi
-        </a>
-      </div>
-    </div>
+    <a href="#" id="topbarUnitKerja"
+       class="d-flex align-items-center text-decoration-none mx-2 lh-1"
+       style="white-space:nowrap; padding:0.4rem 0.5rem; font-size:0.85rem"
+       data-bs-toggle="tooltip" data-bs-placement="bottom"
+       data-bs-title="{{ _SESSION['unit_nama'] ?: 'Pilih Instansi' }}"
+       onclick="event.preventDefault(); openSidePanel('instansi')">
+      <i class="bi bi-building{% if _SESSION['unit_nama'] %}-fill{% endif %}" style="font-size:1rem{% if _SESSION['unit_nama'] %}; color:#5b4fb9{% endif %}"></i>
+      {% if _SESSION['unit_nama'] %}
+        <span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:160px; font-size:0.8rem">{{ _SESSION['unit_nama'] }}</span>
+      {% else %}
+        <span class="d-none d-lg-inline ms-1 text-muted" style="font-size:0.8rem">Instansi</span>
+      {% endif %}
+    </a>
     <!-- Instansi indicator ends -->
 
   {% endif %}
