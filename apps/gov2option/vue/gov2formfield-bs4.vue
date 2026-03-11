@@ -436,7 +436,7 @@ module.exports  = {
 }
 </script>
 
-<style scoped>
+<style>
 
 form > .form-group > label,
 form > .form-group > input,
