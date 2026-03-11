@@ -200,15 +200,7 @@ module.exports = {
       if (!id || id <= 0) {
         this.loadBreadcrumb(-2);
       } else {
-        var idx = -1;
-        for (var i = 0; i < this.pathData.length; i++) {
-          if (this.pathData[i].id == id) { idx = i; break; }
-        }
-        if (idx > 0) {
-          this.loadBreadcrumb(this.pathData[idx - 1].id);
-        } else {
-          this.loadBreadcrumb(-2);
-        }
+        this.loadBreadcrumb(id);
       }
     },
     selectWilayah(item) {
