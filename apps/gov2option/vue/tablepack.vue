@@ -267,19 +267,12 @@
             </div>
             </div>
 
-            <div class="row"></div>
-
-            <b-row>
-                <b-col :cols="itemPerPageCols">
+            <div class="table-footer d-flex justify-content-between align-items-center flex-wrap">
+                <div class="d-flex align-items-center gap-2">
                     <gov2itemperpage-bs4 :interval="interval" :instance="instance" v-if="isItemPerPage"></gov2itemperpage-bs4>
-                </b-col>
-                <b-col :cols="scrollCols">
                     <gov2scroll-bs4 :instance="instance" :is-active="isActive"></gov2scroll-bs4>
-                </b-col>
-                <b-col v-if ="(12 - (itemPerPageCols+scrollCols+paginationCols)) > 0"
-                       :cols="12 - (itemPerPageCols+scrollCols+paginationCols)">
-                </b-col>
-                <b-col :cols="paginationCols">
+                </div>
+                <div>
                     <gov2pagination-bs4
                         :is-active="isActive"
                         :records="records"
@@ -288,9 +281,8 @@
                         :instance="instance"
                         v-if="isPagination">
                     </gov2pagination-bs4>
-                </b-col>
-            </b-row>
-            <b-row>&nbsp;</b-row>
+                </div>
+            </div>
         </div>
         <gov2resetpassword v-if="isRowResetPassword" :post-url="postUrl"></gov2resetpassword>
     </div>
@@ -1172,6 +1164,11 @@
 </script>
 
 <style>
+    /* Table footer — simetris dengan block-header */
+    .table-footer {
+        padding: 0.75rem 0;
+    }
+
     /* Recursive drilldown link */
     .recursive-link {
         cursor: pointer;
