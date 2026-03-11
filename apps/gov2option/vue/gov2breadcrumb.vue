@@ -7,7 +7,7 @@
                  :style="{ paddingLeft: (index * 1.5) + 'rem' }">
                 <i class="fa breadcrumb-icon"
                    :class="index === 0 ? 'fa-home' : 'fa-level-up fa-rotate-90'"></i>
-                <span class="breadcrumb-level">{{ setLevel(path['level_label']) }}</span>
+                <span v-if="index > 0" class="breadcrumb-level">{{ setLevel(path['level_label']) }}</span>
                 <i class="fa fa-chevron-right breadcrumb-sep"></i>
                 <a v-if="link"
                    class="breadcrumb-link"
