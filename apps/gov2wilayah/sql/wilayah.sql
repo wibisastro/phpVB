@@ -1,0 +1,21 @@
+CREATE TABLE `wilayah` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `parent_id` mediumint UNSIGNED DEFAULT NULL,
+  `provinsi_id` int DEFAULT NULL,
+  `kabupaten_id` int DEFAULT NULL,
+  `kecamatan_id` int DEFAULT NULL,
+  `kelurahan_id` int DEFAULT NULL,
+  `children` mediumint NOT NULL DEFAULT '0',
+  `nama` char(32) NOT NULL DEFAULT '',
+  `level` enum('1','2','3','4','5') NOT NULL DEFAULT '1',
+  `level_label` enum('provinsi','kabupaten','kecamatan','kelurahan','negara') NOT NULL,
+  `kode_pro` char(2) DEFAULT NULL,
+  `kode_kab` char(4) DEFAULT NULL,
+  `kode_kec` char(6) DEFAULT NULL,
+  `kode_kel` char(10) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_parent_id` (`parent_id`),
+  KEY `idx_level` (`level`),
+  KEY `idx_kabupaten_id` (`kabupaten_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Data wilayah administratif';

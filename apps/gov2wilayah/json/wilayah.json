@@ -1,0 +1,31 @@
+[{
+    "name": "cmd",
+    "value": "",
+    "label": "Submit"
+},{
+    "name": "id",
+    "value": "",
+    "label": "ID",
+    "placeholder": "Nomor ID",
+    "disabled": "true"
+},{
+    "name": "nama",
+    "value": "",
+    "label": "Nama",
+    "placeholder": "Masukan Nama Wilayah",
+    "required": "true",
+    "error_message": "Nama wajib diisi"
+},{
+    "name": "level",
+    "value": "level",
+    "label": "Level",
+    "placeholder": "Level",
+    "error_message": "Pilih Level",
+    "options": {
+        "1":"provinsi",
+        "2":"kabupaten",
+        "3":"kecamatan",
+        "4":"kelurahan"
+    },
+    "type": "hidden"
+}]

@@ -47,6 +47,23 @@
   <div class="header-actions-container rounded-4 d-flex align-items-center">
 
   {% if _SESSION['account_id'] %}
+    <!-- Wilayah indicator start -->
+    <a href="#" id="topbarWilayah"
+       class="d-flex align-items-center text-decoration-none mx-2"
+       style="white-space:nowrap"
+       data-bs-toggle="tooltip" data-bs-placement="bottom"
+       data-bs-title="{{ _SESSION['wilayah_nama'] ?: 'Pilih Wilayah' }}"
+       onclick="event.preventDefault(); openSidePanel('wilayah')">
+      {% if _SESSION['wilayah_nama'] %}
+        <i class="bi bi-geo-alt-fill fs-5"></i>
+        <span class="text-truncate d-none d-lg-inline ms-2" style="max-width:180px">{{ _SESSION['wilayah_nama'] }}</span>
+      {% else %}
+        <i class="bi bi-geo-alt fs-5"></i>
+        <span class="text-muted d-none d-lg-inline ms-2">Pilih Wilayah</span>
+      {% endif %}
+    </a>
+    <!-- Wilayah indicator ends -->
+
     <!-- Instansi indicator start -->
     <a href="#" id="topbarUnitKerja"
        class="d-flex align-items-center text-decoration-none mx-3"
