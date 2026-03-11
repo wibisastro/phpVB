@@ -160,7 +160,7 @@
 
                         <td v-if="!readonly" style="text-align:center" >
                             <b-dropdown
-                                dropleft variant="primary" size="sm"
+                                right variant="primary" size="sm"
                                 :data-test="`button-action-${entry.id}`">
                                 <template slot="button-content">
                                     <i class="fa fa-cog"></i>
@@ -174,7 +174,7 @@
                             </b-dropdown>
                         </td>
                         <td v-if="isRowHistory && readonly" style="text-align:center">
-                            <b-dropdown dropleft variant="primary" size="sm">
+                            <b-dropdown right variant="primary" size="sm">
                                 <template slot="button-content">
                                     <i class="fa fa-cog"></i>
                                 </template>
@@ -1155,15 +1155,14 @@
 </script>
 
 <style>
-    /* BS4→BS5 compat: dropleft → dropdown buka ke kiri dari tombol */
-    .dropleft .dropdown-menu {
-        top: 0;
-        right: 100% !important;
+    /* BS4→BS5 compat: BootstrapVue .dropdown-menu-right → Cube .dropdown-menu-end */
+    .dropdown-menu-right {
+        right: 0 !important;
         left: auto !important;
-        margin-right: 0.125rem;
     }
-    .dropleft .dropdown-toggle::before {
-        display: none;
+    .dropdown-menu-right:after {
+        left: inherit !important;
+        right: 1rem !important;
     }
 
     /* Block header above table */
