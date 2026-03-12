@@ -82,6 +82,8 @@ phpVB/
 │   ├── home/               # Homepage module
 │   ├── gov2login/          # Auth & SSO (Keycloak OAuth2, JWT session)
 │   ├── gov2option/         # System configuration/options
+│   ├── gov2wilayah/        # Wilayah geographic hierarchy (CRUD + sidepanel picker)
+│   ├── gov2instansi/       # Instansi/unit kerja management
 │   ├── gov2survey/         # Survey & kuesioner
 │   ├── gov2pipe/           # Data pipeline & workflow
 │   └── components/         # Shared Vue components (26 files)

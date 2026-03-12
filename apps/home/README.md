@@ -29,6 +29,7 @@ Layout Cube theme terdiri dari beberapa area:
 | `home` | Landing page |
 | `gov2login` | Login, signup, profile, logout |
 | `gov2option` | Options & services management |
+| `gov2wilayah` | CRUD wilayah + sidepanel navigator |
 | `gov2instansi` | CRUD data instansi |
 | `components` | Shared components (nav, breadcrumb, dll) |
 
