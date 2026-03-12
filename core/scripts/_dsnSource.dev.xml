@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Contoh file dsnSource.dev.xml
+	Salin ke: apps/{appID}/xml/dsnSource.dev.xml
+	Ganti nilai host, user, pass, db sesuai environment.
+	File ini di-gitignore (**/dsn*.xml) — JANGAN git add -f.
+-->
+<list>
+	<dsn>
+		<name>master</name>
+		<host>localhost</host>
+		<user>db_user</user>
+		<pass>GANTI_PASSWORD_DISINI</pass>
+		<db>nama_database</db>
+	</dsn>
+	<dsn>
+		<name>ayam.gov2.web.id</name>
+		<host>localhost</host>
+		<user>db_user</user>
+		<pass>GANTI_PASSWORD_DISINI</pass>
+		<db>nama_database</db>
+	</dsn>
+</list>
