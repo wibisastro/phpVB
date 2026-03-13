@@ -25,20 +25,23 @@ try {
         $detectedStage = 'local';
     }
 
-    // 2. XML multi-domain: cari domain di semua config.{stage}.xml
+    // 2. XML multi-domain: scan config.*.xml, cari domain yang cocok
     if (!$detectedStage) {
-        $availableStages = array('local', 'dev', 'prod');
-        foreach ($availableStages AS $stage) {
-            if (file_exists(__DIR__."/config.".$stage.".xml")) {
-                $testConfig = simplexml_load_file(__DIR__."/config.".$stage.".xml");
-                if (is_object($testConfig)) {
-                    if ($testConfig->domain->{$serverName}) {
-                        $detectedStage = $stage;
-                        break;
-                    }
-                } else {
-                    throw new Exception('InvalidConfigFile:config.'.$stage.'.xml');
+        $configFiles = glob(__DIR__."/config.*.xml");
+        foreach ($configFiles AS $configPath) {
+            // Extract stage name dari filename: config.{stage}.xml
+            preg_match('/config\.(.+)\.xml$/', basename($configPath), $matches);
+            $stage = $matches[1] ?? null;
+            if (!$stage) continue;
+
+            $testConfig = simplexml_load_file($configPath);
+            if (is_object($testConfig)) {
+                if ($testConfig->domain->{$serverName}) {
+                    $detectedStage = $stage;
+                    break;
                 }
+            } else {
+                throw new Exception('InvalidConfigFile:config.'.$stage.'.xml');
             }
         }
     }
