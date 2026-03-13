@@ -82,6 +82,7 @@ try {
             }
             break;
         case "dev":
+        default:
             ini_set("display_errors", 1);
             $_GET['error'] = isset($_GET['error']) ? $_GET['error'] : '';
             switch ($_GET['error']) {
@@ -97,7 +98,6 @@ try {
             }
             break;
         case "prod":
-        default:
             error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
             ini_set("display_errors", 0);
             break;
