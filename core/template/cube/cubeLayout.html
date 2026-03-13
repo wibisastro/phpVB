@@ -79,7 +79,7 @@
       </div>
       <div class="offcanvas-body p-0">
         <div id="sidePanel-wilayah" style="display:none">
-          <gov2wilayah></gov2wilayah>
+          <wilayah></wilayah>
         </div>
         <div id="sidePanel-instansi" style="display:none">
           <cube-instansi></cube-instansi>
@@ -135,7 +135,7 @@
         components: {
         'cube-menu-settings': httpVueLoader('{{ webroot }}/gov2option/vue/cube-menu-settings.vue'),
         'cube-instansi': httpVueLoader('{{ webroot }}/gov2option/vue/cube-instansi.vue'),
-        'gov2wilayah': httpVueLoader('{{ webroot }}/gov2wilayah/vue/gov2wilayah.vue'),
+        'wilayah': httpVueLoader('{{ webroot }}/gov2wilayah/vue/wilayah.vue'),
         'gov2navbreadcrumb': httpVueLoader('{{ webroot }}/components/vue/gov2navbreadcrumb.vue'),
         'gov2notification': httpVueLoader('{{ webroot }}/components/vue/gov2notification.vue'),
         {% for component in components %}

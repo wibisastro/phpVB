@@ -136,15 +136,18 @@ phpVB meminimalkan konfigurasi manual. Penamaan file, struktur folder, dan alur 
 
 Mau tambah stage baru (misal `staging`)? Cukup buat file `config.staging.xml` — tanpa ubah code.
 
-**Penamaan konsisten** — satu nama dipakai di semua layer:
+**Penamaan konsisten** — nama app (folder) dan nama MVC (file) adalah dua hal berbeda:
+
+- **Nama app** = nama folder, contoh: `gov2wilayah`. Prefix `gov2` menandakan ini modul bawaan framework.
+- **Nama MVC** = nama resource, contoh: `wilayah`. Satu nama yang sama dipakai di semua layer MVC.
 
 ```
-apps/gov2wilayah/                        # Nama app = nama folder
-├── gov2wilayah.php                      # Controller = nama folder
-├── model/gov2wilayah.php                # Model = nama folder
-├── view/gov2wilayah.html                # Template = nama model
-├── vue/gov2wilayah.vue                  # Vue component = nama folder → <gov2wilayah>
-├── json/gov2wilayah.json                # Form fields = nama folder
+apps/gov2wilayah/                        # App folder (gov2 = modul bawaan)
+├── wilayah.php                          # Controller — nama resource
+├── model/wilayah.php                    # Model — nama sama
+├── view/wilayah.html                    # Template — nama sama
+├── vue/wilayah.vue                      # Vue component — nama sama → <wilayah>
+├── json/wilayah.json                    # Form fields — nama sama
 └── xml/
     ├── route.xml                        # Route otomatis di-scan
     ├── dbTables.xml                     # Tabel di-map ke $this->tbl->*
@@ -152,20 +155,22 @@ apps/gov2wilayah/                        # Nama app = nama folder
     └── pageroles.xml                    # Hak akses, fallback ke global
 ```
 
+Framework menghubungkan semuanya secara otomatis: nama class di model → cari controller `.php` dengan nama sama → cari template `.html` dengan nama sama → URL `/gov2wilayah/wilayah/{cmd}`.
+
 **Auto-discovery** — framework scan dan registrasi otomatis:
 
 | Apa | Konvensi | Contoh |
 |-----|----------|--------|
 | Stage | `config.{stage}.xml` | `config.prod.xml` → stage `prod` |
 | Database | `dsnSource.{stage}.xml` | `dsnSource.dev.xml` untuk stage `dev` |
-| Model | File `.php` di `model/` | `model/gov2wilayah.php` → class `gov2wilayah` |
-| Vue component | File `.vue` di `vue/` | `gov2wilayah.vue` → tag `<gov2wilayah>` |
-| Template | `view/{model}.html` | `view/gov2wilayah.html` untuk model `gov2wilayah` |
+| Model → Controller | Nama class = nama file | class `wilayah` → `wilayah.php` controller |
+| Model → Template | Nama class = nama file | class `wilayah` → `view/wilayah.html` |
+| Vue component | File `.vue` di `vue/` | `wilayah.vue` → tag `<wilayah>` |
 | Command → method | Parameter `cmd` | `?cmd=browse` → panggil method `browse()` |
-| Asset routing | `/{app}/js/{file}` | `/gov2wilayah/js/custom.js` → `apps/gov2wilayah/js/custom.js` |
+| Asset routing | `/{app}/js/{file}` | `/gov2wilayah/js/custom.js` → `apps/gov2wilayah/js/` |
 | Hak akses | `pageroles.xml` per app | Ada → pakai, tidak ada → fallback global |
 
-Developer cukup ikuti struktur folder dan penamaan file — phpVB yang menghubungkan semuanya tanpa konfigurasi tambahan.
+Developer cukup ikuti penamaan file yang konsisten — phpVB yang menghubungkan semuanya tanpa konfigurasi tambahan.
 
 ### 2. Multi-Domain: Single Source
 

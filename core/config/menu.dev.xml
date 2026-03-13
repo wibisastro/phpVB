@@ -45,7 +45,7 @@
 		<url>/gov2wilayah</url>
 		<menu>
 			<caption>Data Wilayah</caption>
-			<url>/gov2wilayah/gov2wilayah</url>
+			<url>/gov2wilayah/wilayah</url>
 		</menu>
 		<menu>
 		</menu>

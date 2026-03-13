@@ -2,7 +2,7 @@
 
 namespace App\gov2wilayah\model;
 
-class gov2wilayah extends \Gov2lib\crudHandler
+class wilayah extends \Gov2lib\crudHandler
 {
     public function __construct()
     {
