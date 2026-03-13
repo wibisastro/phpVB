@@ -25,8 +25,8 @@ phpVB dirancang agar bisa berjalan dalam tiga tingkat kesiapan infrastruktur:
 | Tingkat | Kondisi | Penyimpanan Data | Cocok Untuk |
 |---------|---------|-------------------|-------------|
 | **Mandiri** | Tanpa database server | File teks (XML & JSON) | Prototipe, demo, daerah dengan keterbatasan server |
-| **Database Lokal** | Database di server sendiri | MySQL/MariaDB atau PostgreSQL | Instansi yang sudah punya data center atau server lokal |
-| **Database Cloud** | Database cloud via API | MySQL atau PostgreSQL | Instansi yang ingin skalabilitas dan kolaborasi antar-wilayah |
+| **Database Lokal** | Database di server sendiri | MySQL/MariaDB | Instansi yang sudah punya data center atau server lokal |
+| **Database Cloud** | Database cloud via API | PostgreSQL | Instansi yang ingin skalabilitas dan kolaborasi antar-wilayah |
 
 Satu basis kode yang sama bisa berjalan di ketiga kondisi. Ketika infrastruktur ditingkatkan, aplikasi tidak perlu ditulis ulang — cukup ubah sumber datanya.
 
@@ -93,7 +93,15 @@ Untuk tim pengembang, dokumentasi teknis lengkap tersedia di [phpVB Wiki](https:
 
 ## Lisensi
 
-Hak cipta dilindungi. Framework ini dikembangkan untuk kebutuhan proyek pemerintahan.
+phpVB dirilis di bawah **MIT License** — lisensi open-source yang paling permisif dan banyak digunakan di dunia.
+
+Artinya:
+- **Bebas digunakan** untuk proyek apapun, termasuk proyek pemerintahan
+- **Bebas dimodifikasi** sesuai kebutuhan instansi tanpa harus meminta izin
+- **Bebas didistribusikan** ke pihak lain, termasuk vendor dan mitra kerja
+- **Aplikasi yang dibangun di atas phpVB boleh menggunakan lisensi berbeda** — misalnya GPL untuk aplikasi pemerintahan yang dibangun dengan APBN, sesuai ketentuan yang berlaku
+
+Satu-satunya syarat: mencantumkan notice hak cipta asli phpVB di dalam kode sumber.
 
 ## Kontak
 

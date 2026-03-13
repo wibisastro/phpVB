@@ -199,7 +199,7 @@ Dokumentasi lengkap tersedia di [Wiki](../../wiki):
 
 ## Lisensi
 
-Hak cipta dilindungi. Framework ini dikembangkan untuk kebutuhan proyek pemerintahan.
+Dirilis di bawah [MIT License](LICENSE). Bebas digunakan, dimodifikasi, dan didistribusikan.
 
 ## Kontak
 
