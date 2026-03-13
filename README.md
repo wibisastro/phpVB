@@ -113,6 +113,91 @@ apps/{module}/
 
 ---
 
+## Prinsip Desain
+
+### 1. Convention over Configuration
+
+phpVB meminimalkan konfigurasi manual. Stage (local/dev/prod) ditentukan **otomatis** dari nama domain:
+
+```
+1. localhost           → stage "local"
+2. Scan config.*.xml   → stage dari nama file yang memuat domain
+3. Fallback            → stage "dev"
+```
+
+Cara kerja: taruh domain di file config yang sesuai stage-nya.
+
+```xml
+<!-- config.dev.xml → semua domain di sini = stage dev -->
+<domain>
+    <ayam.gov2.web.id>home</ayam.gov2.web.id>
+</domain>
+
+<!-- config.prod.xml → semua domain di sini = stage prod -->
+<domain>
+    <bandung.kota2.web.id>subsidibbm</bandung.kota2.web.id>
+    <sumenep.kab.web.id>sdi</sumenep.kab.web.id>
+</domain>
+```
+
+Mau tambah stage baru (misal `staging`)? Cukup buat file `config.staging.xml` — tanpa ubah code. phpVB scan otomatis semua `config.*.xml`.
+
+### 2. Multi-Domain: Single Source
+
+Satu instance phpVB bisa melayani **banyak domain** sekaligus, masing-masing dengan landing page dan database berbeda:
+
+```
+                    ┌─── bandung.kota2.web.id ────┐
+                    │  Landing: subsidibbm         │
+                    │  DB: gov2_bandung             │
+                    └──────────────────────────────┘
+
+ Satu instance      ┌─── sumenep.kab.web.id ──────┐
+ phpVB di server ──▶│  Landing: sdi                │
+                    │  DB: gov2_sumenep             │
+                    └──────────────────────────────┘
+
+                    ┌─── jabar.prov.web.id ────────┐
+                    │  Landing: home                │
+                    │  DB: gov2_jabar               │
+                    └──────────────────────────────┘
+```
+
+Keuntungan dibanding multi-instance:
+- Update framework sekali, semua domain ikut
+- Bug fix satu deploy, selesai
+- Tidak perlu maintain puluhan instalasi terpisah
+
+Setiap app menentukan koneksi database per domain lewat `dsnSource.{stage}.xml`:
+
+```xml
+<!-- apps/subsidibbm/xml/dsnSource.prod.xml -->
+<list>
+    <dsn>
+        <name>bandung.kota2.web.id</name>  <!-- cocokkan dengan SERVER_NAME -->
+        <host>db-server</host>
+        <user>subsidi</user>
+        <pass>secretpass</pass>
+        <db>gov2_bandung</db>
+        <port>3306</port>
+    </dsn>
+</list>
+```
+
+Framework yang mengarahkan ke database yang tepat — kode app sama persis untuk semua domain.
+
+> Detail lengkap: [Architecture — Multi-Domain](../../wiki/03-Architecture#multi-domain-satu-instance-banyak-domain)
+
+### 3. Separation of Concern (Hybrid Architecture)
+
+Kerangka (layout/nav/auth) di-render server via Twig. Isi (data/form/interaksi) di-render browser via Vue.js. Developer PHP bisa buat halaman tanpa menyentuh Vue, dan sebaliknya.
+
+### 4. Multi-Infrastruktur
+
+phpVB bisa berjalan di tiga mode: mandiri (XML/JSON tanpa database), database lokal (MySQL/MariaDB), atau database cloud (PostgreSQL/Supabase).
+
+---
+
 ## Kekuatan Arsitektur
 
 **Modular & Konsisten** -- Setiap app adalah module mandiri dengan struktur yang sama (controller, model, view, vue, xml, sql), memudahkan onboarding developer baru dan penambahan fitur.
@@ -122,8 +207,6 @@ apps/{module}/
 **Parameterized Queries** -- MeekroDB menggunakan parameterized queries (`%i`, `%s`, `%b`) secara konsisten di seluruh codebase, memberikan perlindungan dari SQL injection.
 
 **JWT Session Management** -- Autentikasi menggunakan firebase/php-jwt dengan cookie-based session (`Gov2Session`), mendukung SSO via OAuth2/Keycloak.
-
-**Multi-Environment Config** -- Konfigurasi XML per environment (`dsnSource.local.xml`, `dsnSource.dev.xml`, `dsnSource.siap.xml`) memungkinkan deployment fleksibel tanpa mengubah kode.
 
 **Hierarchical Data Support** -- Built-in support untuk data hierarkis (parent-child, breadcrumb, wilayah geographic hierarchy) di crudModel dan crudHandler.
 
