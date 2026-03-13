@@ -1,4 +1,4 @@
-# 4AGENT.md — Panduan Install & Update phpVB untuk AI Agent
+# 4AGENT-INSTALL.md — Panduan Install & Update phpVB untuk AI Agent
 
 File ini dibaca oleh **AI coding agent** (Claude Code, Gemini CLI, OpenClaw, dll) untuk setup framework phpVB dan install aplikasi pihak ketiga.
 Semua instruksi berbasis kode aktual.
