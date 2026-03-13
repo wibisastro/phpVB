@@ -147,20 +147,20 @@ Mau tambah stage baru (misal `staging`)? Cukup buat file `config.staging.xml` �
 Satu instance phpVB bisa melayani **banyak domain** sekaligus, masing-masing dengan landing page dan database berbeda:
 
 ```
-                    ┌─── bandung.kota2.web.id ────┐
-                    │  Landing: subsidibbm         │
-                    │  DB: gov2_bandung             │
-                    └──────────────────────────────┘
+                    ┌─── bandung.kota2.web.id ──────────┐
+                    │  Landing: subsidibbm               │
+                    │  Level: kab │ ID Dagri: 3273       │
+                    └────────────────────────────────────┘
 
- Satu instance      ┌─── sumenep.kab.web.id ──────┐
- phpVB di server ──▶│  Landing: sdi                │
-                    │  DB: gov2_sumenep             │
-                    └──────────────────────────────┘
+ Satu instance      ┌─── sumenep.kab.web.id ────────────┐
+ phpVB di server ──▶│  Landing: sdi                      │
+                    │  Level: kab │ ID Dagri: 3529       │
+                    └────────────────────────────────────┘
 
-                    ┌─── jabar.prov.web.id ────────┐
-                    │  Landing: home                │
-                    │  DB: gov2_jabar               │
-                    └──────────────────────────────┘
+                    ┌─── jabar.prov.web.id ─────────────┐
+                    │  Landing: home                      │
+                    │  Level: prov │ ID Dagri: 32         │
+                    └────────────────────────────────────┘
 ```
 
 Keuntungan dibanding multi-instance:
