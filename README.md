@@ -135,8 +135,8 @@ Cara kerja: taruh domain di file config yang sesuai stage-nya.
 
 <!-- config.prod.xml → semua domain di sini = stage prod -->
 <domain>
-    <bandung.kota2.web.id>subsidibbm</bandung.kota2.web.id>
-    <sumenep.kab.web.id>sdi</sumenep.kab.web.id>
+    <bandung.kota2.web.id level="kab" id="3273">subsidibbm</bandung.kota2.web.id>
+    <sumenep.kab.web.id level="kab" id="3529">sdi</sumenep.kab.web.id>
 </domain>
 ```
 

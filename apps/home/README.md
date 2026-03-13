@@ -44,28 +44,43 @@ Analoginya seperti gedung kantor pemerintahan: struktur bangunan (dinding, korid
 - Perubahan tampilan tidak mempengaruhi logika data, dan sebaliknya
 - Keamanan terjaga di level server — tidak bergantung pada browser pengguna
 
-### 4. Multi-Staging Otomatis
+### 4. Multi-Domain: Satu Sumber, Banyak Layanan
 
-phpVB mengenali lingkungan kerja secara otomatis — tanpa konfigurasi manual:
+Satu instalasi phpVB bisa melayani **banyak domain sekaligus**, masing-masing dengan halaman utama dan database yang berbeda.
+
+**Contoh:** satu server menjalankan phpVB, melayani tiga kabupaten/kota:
+
+| Domain | Halaman Utama | Database |
+|--------|--------------|----------|
+| `bandung.kota2.web.id` | Subsidi BBM | `gov2_bandung` |
+| `sumenep.kab.web.id` | SDI (Satu Data Indonesia) | `gov2_sumenep` |
+| `jabar.prov.web.id` | Home | `gov2_jabar` |
+
+Setiap domain otomatis diarahkan ke halaman dan database yang tepat — kode aplikasinya tetap sama untuk semua domain.
+
+**Keuntungan dibanding instalasi terpisah per daerah:**
+- Update framework **sekali**, semua domain ikut
+- Perbaikan bug **satu deploy**, selesai
+- Tidak perlu mengelola puluhan instalasi terpisah
+
+Cukup daftarkan domain di file konfigurasi, phpVB yang mengatur sisanya.
+
+### 5. Multi-Staging Otomatis
+
+phpVB mengenali lingkungan kerja secara otomatis berdasarkan **konvensi**:
 
 | Cara Deteksi | Lingkungan | Keterangan |
 |-------------|-----------|------------|
 | Domain `localhost` | **Lokal** | Otomatis, untuk pengembangan di komputer developer |
-| Variabel server `APP_STAGE` | **Sesuai nilai** | Eksplisit, untuk keamanan tambahan — domain tidak perlu mengikuti pola tertentu |
-| Prefix `dev.` pada domain | **Pengembangan** | Default convention jika `APP_STAGE` tidak diset |
-| Selain di atas | **Produksi** | Diakses oleh pengguna akhir |
+| Domain terdaftar di `config.dev.xml` | **Pengembangan** | Domain dev didaftarkan di file config dev |
+| Domain terdaftar di `config.prod.xml` | **Produksi** | Domain prod didaftarkan di file config prod |
+| Domain belum terdaftar | **Pengembangan** | Fallback aman untuk domain baru |
 
-**Ilustrasi:** jika domain produksi adalah `bandung.kota2.web.id`, maka:
-
-| Lingkungan | Domain | Deteksi |
-|-----------|--------|---------|
-| Lokal | `localhost` | Otomatis |
-| Pengembangan | `dev.bandung.kota2.web.id` | Convention prefix `dev.` |
-| Produksi | `bandung.kota2.web.id` | Selain di atas = produksi |
+**Prinsipnya sederhana:** taruh domain di file konfigurasi yang sesuai lingkungannya. Domain pengembangan masuk `config.dev.xml`, domain produksi masuk `config.prod.xml`. phpVB mendeteksi lingkungan dari file mana yang memuat domain tersebut — tanpa konfigurasi tambahan.
 
 Setiap lingkungan bisa memiliki sumber data dan tingkat keamanan yang berbeda, namun kode aplikasinya tetap sama. Ini menghilangkan risiko "di komputer saya jalan, di server tidak."
 
-Untuk instansi yang memerlukan keamanan lebih, disarankan menggunakan variabel server `APP_STAGE` agar alamat server pengembangan bebas menggunakan domain apapun tanpa harus mengikuti pola `dev.` yang mudah ditebak dari luar.
+Mau tambah lingkungan baru (misalnya `staging`)? Cukup buat file `config.staging.xml` — tanpa mengubah kode.
 
 ---
 
