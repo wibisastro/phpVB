@@ -4,7 +4,7 @@
 *	Author		: Wibisono Sastrodiwiryo
 *	Email		: wibi@alumni.ui.ac.id
 *	Copyleft	: eGov Lab UI
-*	Modified	: 13 Mar 2026 — APP_STAGE env var + stage detection
+*	Modified	: 13 Mar 2026 — convention-based stage detection
 *********************************************************************/
 try {
     error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
@@ -12,9 +12,10 @@ try {
 
     // Stage detection priority:
     // 1. localhost → local
-    // 2. dev.* prefix → dev (convention)
-    // 3. XML multi-domain → stage dari nama file config
-    // 4. fallback → dev (domain belum terdaftar)
+    // 2. XML multi-domain → stage dari nama file config
+    // 3. fallback → dev (domain belum terdaftar)
+    //
+    // Convention: domain dev masuk config.dev.xml, domain prod masuk config.prod.xml
 
     $detectedStage = null;
     $serverName = $_SERVER["SERVER_NAME"] ?? '';
@@ -24,12 +25,7 @@ try {
         $detectedStage = 'local';
     }
 
-    // 2. dev.* prefix → dev
-    if (!$detectedStage && strpos($serverName, 'dev.') === 0) {
-        $detectedStage = 'dev';
-    }
-
-    // 3. XML multi-domain: cari domain di semua config.{stage}.xml
+    // 2. XML multi-domain: cari domain di semua config.{stage}.xml
     if (!$detectedStage) {
         $availableStages = array('local', 'dev', 'prod');
         foreach ($availableStages AS $stage) {
@@ -47,7 +43,7 @@ try {
         }
     }
 
-    // 4. Fallback: domain belum terdaftar → dev
+    // 3. Fallback: domain belum terdaftar → dev
     if (!$detectedStage) {
         $detectedStage = 'dev';
     }
