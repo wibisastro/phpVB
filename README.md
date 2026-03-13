@@ -141,9 +141,10 @@ Mau tambah stage baru (misal `staging`)? Cukup buat file `config.staging.xml` �
 ```
 apps/gov2wilayah/                        # Nama app = nama folder
 ├── gov2wilayah.php                      # Controller = nama folder
-├── model/wilayah.php                    # Model class = nama file
-├── view/wilayah.html                    # Template = nama model
-├── vue/cube-wilayah.vue                 # Vue component = nama file → <cube-wilayah>
+├── model/gov2wilayah.php                # Model = nama folder
+├── view/gov2wilayah.html                # Template = nama model
+├── vue/gov2wilayah.vue                  # Vue component = nama folder → <gov2wilayah>
+├── json/gov2wilayah.json                # Form fields = nama folder
 └── xml/
     ├── route.xml                        # Route otomatis di-scan
     ├── dbTables.xml                     # Tabel di-map ke $this->tbl->*
@@ -157,9 +158,9 @@ apps/gov2wilayah/                        # Nama app = nama folder
 |-----|----------|--------|
 | Stage | `config.{stage}.xml` | `config.prod.xml` → stage `prod` |
 | Database | `dsnSource.{stage}.xml` | `dsnSource.dev.xml` untuk stage `dev` |
-| Model | File `.php` di `model/` | `model/wilayah.php` → class `wilayah` |
-| Vue component | File `.vue` di `vue/` | `cube-wilayah.vue` → tag `<cube-wilayah>` |
-| Template | `view/{model}.html` | `view/wilayah.html` untuk model `wilayah` |
+| Model | File `.php` di `model/` | `model/gov2wilayah.php` → class `gov2wilayah` |
+| Vue component | File `.vue` di `vue/` | `gov2wilayah.vue` → tag `<gov2wilayah>` |
+| Template | `view/{model}.html` | `view/gov2wilayah.html` untuk model `gov2wilayah` |
 | Command → method | Parameter `cmd` | `?cmd=browse` → panggil method `browse()` |
 | Asset routing | `/{app}/js/{file}` | `/gov2wilayah/js/custom.js` → `apps/gov2wilayah/js/custom.js` |
 | Hak akses | `pageroles.xml` per app | Ada → pakai, tidak ada → fallback global |

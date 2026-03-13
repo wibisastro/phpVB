@@ -8,23 +8,23 @@
 
     <route>
         <method>GET</method>
-        <uri>/gov2wilayah/wilayah</uri>
-        <handler>gov2wilayah\model\wilayah</handler>
+        <uri>/gov2wilayah/gov2wilayah</uri>
+        <handler>gov2wilayah\model\gov2wilayah</handler>
     </route>
     <route>
         <method>GET</method>
-        <uri>/gov2wilayah/wilayah/{cmd}[/{id}]</uri>
-        <handler>gov2wilayah\model\wilayah</handler>
+        <uri>/gov2wilayah/gov2wilayah/{cmd}[/{id}]</uri>
+        <handler>gov2wilayah\model\gov2wilayah</handler>
     </route>
     <route>
         <method>GET</method>
-        <uri>/gov2wilayah/wilayah/{cmd}/{scroll}/[{id}]</uri>
-        <handler>gov2wilayah\model\wilayah</handler>
+        <uri>/gov2wilayah/gov2wilayah/{cmd}/{scroll}/[{id}]</uri>
+        <handler>gov2wilayah\model\gov2wilayah</handler>
     </route>
     <route>
         <method>POST</method>
-        <uri>/gov2wilayah/wilayah</uri>
-        <handler>gov2wilayah\model\wilayah</handler>
+        <uri>/gov2wilayah/gov2wilayah</uri>
+        <handler>gov2wilayah\model\gov2wilayah</handler>
     </route>
 
     <route>

@@ -2,7 +2,7 @@
 
 namespace App\gov2wilayah\model;
 
-class wilayah extends \Gov2lib\crudHandler
+class gov2wilayah extends \Gov2lib\crudHandler
 {
     public function __construct()
     {
@@ -19,7 +19,7 @@ class wilayah extends \Gov2lib\crudHandler
     public function loadTable(): void
     {
         global $doc;
-        $prefix = '/' . $doc->pageID . '/wilayah';
+        $prefix = '/' . $doc->pageID . '/' . $this->className;
         $GLOBALS['vueData']['action'] = $prefix;
         $GLOBALS['vueData']['fieldurl'] = $prefix . '/fields';
         $GLOBALS['vueData']['breadcrumburl'] = $prefix . '/breadcrumb';

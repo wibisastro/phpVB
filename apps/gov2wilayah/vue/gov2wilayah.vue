@@ -100,7 +100,7 @@
 
 <script>
 module.exports = {
-  name: 'cube-wilayah',
+  name: 'gov2wilayah',
   data() {
     return {
       config: { userRole: '', locked: false, wilayah_nama: '', wilayah_id: null, wilayah_level: '', wilayah_parent_id: null },

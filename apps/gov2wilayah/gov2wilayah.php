@@ -2,7 +2,7 @@
 
 namespace App\gov2wilayah;
 
-class wilayah extends \Gov2lib\api
+class gov2wilayah extends \Gov2lib\api
 {
     public function __construct()
     {
@@ -11,7 +11,7 @@ class wilayah extends \Gov2lib\api
         $doc->component('gov2option');
         parent::__construct();
         $self->scrollInterval = 100;
-        $self->fields = $self->gov2formfield->getFields(__DIR__ . '/json/wilayah.json');
+        $self->fields = $self->gov2formfield->getFields(__DIR__ . '/json/gov2wilayah.json');
     }
 
     public function index(): void
