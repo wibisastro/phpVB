@@ -11,31 +11,25 @@ try {
     $publickey="c65ca73ce4c38dcec21151aa64f1590c";
 
     // Stage detection priority:
-    // 1. APP_STAGE env var (most secure)
-    // 2. localhost domain
-    // 3. dev. prefix convention
-    // 4. XML config domain mapping (legacy)
-    // 5. fallback to prod
+    // 1. localhost → local
+    // 2. dev.* prefix → dev (convention)
+    // 3. XML multi-domain → stage dari nama file config
+    // 4. fallback → dev (domain belum terdaftar)
 
     $detectedStage = null;
     $serverName = $_SERVER["SERVER_NAME"] ?? '';
 
-    // 1. Check APP_STAGE env var
-    if (!$detectedStage && getenv('APP_STAGE')) {
-        $detectedStage = getenv('APP_STAGE');
-    }
-
-    // 2. Check localhost
-    if (!$detectedStage && $serverName === 'localhost') {
+    // 1. localhost → local
+    if ($serverName === 'localhost') {
         $detectedStage = 'local';
     }
 
-    // 3. Check dev. prefix
+    // 2. dev.* prefix → dev
     if (!$detectedStage && strpos($serverName, 'dev.') === 0) {
         $detectedStage = 'dev';
     }
 
-    // 4. Check XML config (legacy)
+    // 3. XML multi-domain: cari domain di semua config.{stage}.xml
     if (!$detectedStage) {
         $availableStages = array('local', 'dev', 'prod');
         foreach ($availableStages AS $stage) {
@@ -53,9 +47,9 @@ try {
         }
     }
 
-    // 5. Fallback to prod
+    // 4. Fallback: domain belum terdaftar → dev
     if (!$detectedStage) {
-        $detectedStage = 'prod';
+        $detectedStage = 'dev';
     }
 
     define('STAGE', $detectedStage);
