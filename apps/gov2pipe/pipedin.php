@@ -9,7 +9,6 @@ class pipedin extends \Gov2lib\api {
         $self->scrollInterval=100;
         $doc->body("className",$_className);
         $self->ses->authenticate('public');
-        $this->DEBUG_MODE = strpos($_SERVER['SERVER_NAME'], 'bkn.go.id') !== false;
     }
 
     function index () {

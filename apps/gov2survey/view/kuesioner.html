@@ -1,24 +1,26 @@
 <div class="row">
-	<div class="col-lg-12">
-		<div class="main-box">
-			<ren-breadcrumb
+	<div class="col-12">
+		<div class="card mb-3">
+			<div class="card-body">
+				<ren-breadcrumb
 					:is-active="true"
 					:is-horizontal="true"
 					path-url="{{ className }}/breadcrumb"
-			></ren-breadcrumb>
+				></ren-breadcrumb>
+			</div>
 		</div>
 	</div>
 </div>
 
-<b-row>
-    <b-col cols="4">
+<div class="row">
+    <div class="col-4">
         <bs4tablerows></bs4tablerows>
-    </b-col>
-</b-row>
-<b-row> &nbsp;</b-row>
+    </div>
+</div>
+<div class="row mb-3"></div>
 
 <div class="row" v-if="is_diklat">
-	<div class="col-md-12">
+	<div class="col-12">
 		<tablepack
 			title="Survey"
 			:is-active="true"
@@ -41,7 +43,7 @@
 
 <div v-if="is_pertanyaan">
 	<div class="row">
-		<div class="col-md-12">
+		<div class="col-12">
 			<tablepack
 				title="Pertanyaan"
 				:is-active="true"
@@ -66,7 +68,7 @@
 <div>
 	<div v-if="is_opsi">
 		<div class="row">
-			<div class="col-md-12">
+			<div class="col-12">
 				<tablepack
 					title="Jawaban"
 					:is-active="true"
@@ -88,15 +90,15 @@
 	</div>
 </div>
 
-<b-row v-if="is_diklat && !is_readonly">
-	<b-col cols="8"></b-col>
-	<b-col cols="2">
+<div class="row" v-if="is_diklat && !is_readonly">
+	<div class="col-8"></div>
+	<div class="col-2">
 		<submit get-url="{{className}}" btn-label="Publish Kuesioner" confirm-text="" confirm-title="Publis Kuesioner"></submit>
-	</b-col>
-	<b-col cols="2">
+	</div>
+	<div class="col-2">
 		<reset get-url="{{className}}" instance="kuesioner_diklat" :paged="true" button-label="Tarik Data Kuesioner" count-cmd="countServiceData"></reset>
-	</b-col>
-</b-row>
+	</div>
+</div>
 
 <bs4-formfield v-if="is_readonly === false"
 :action="action"

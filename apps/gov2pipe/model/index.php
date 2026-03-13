@@ -1,13 +1,11 @@
 <?php namespace App\gov2pipe\model;
 
-
 class index extends \Gov2lib\crudHandler {
 	function __construct () {
 		global $config, $doc;
 		$this->templateDir= __DIR__ . "/../view";
         $path=explode("\\",__CLASS__);
         $this->className=$path[sizeof($path)-1];
-        $this->controller= __DIR__ . "/renjakl/" .$this->className.".php";
         try {
             $cookies = $doc->envRead($_COOKIE['Gov2Session'] ?? null);
             $this->dsn = $cookies['portal'];
@@ -26,20 +24,8 @@ class index extends \Gov2lib\crudHandler {
 	function loadTable() {
 	    global $self;
     }
-    
-    function dependencies () {
-        
-    }
 
-    function getKlBkn($id=0){
-        global $doc;
-        $query = "SELECT * FROM ".$this->tbl->kementerian." WHERE id=%i";
-        try {
-            $_response = \DB::queryFirstRow($query, $id);
-        } catch (\MeekroDBException $DBException) {
-            $this->exceptionHandler($DBException->getMessage());
-        }
-        return $_response;
+    function dependencies () {
+
     }
 }
-?>

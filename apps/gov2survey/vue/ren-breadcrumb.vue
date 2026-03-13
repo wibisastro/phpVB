@@ -1,19 +1,17 @@
 <template>
     <div class="row" v-if="isActive" data-test="breadcrumb-box">
-        <div class="col-lg-12">
-            <div class="block no-bottom" style="margin: 10px;">
-                <div class="alert alert-info" style="margin-bottom: 10px;">
-                    <table>
-                        <tr v-for="(path, index) in pathData" v-bind:key="index + 1">
-                            <td><strong class="alert-link">{{ setLevel(path['level_label']) }}</strong></td>
-                            <td style="padding-left: 20px;">:
-                                <a class="use-pointer breadcrumb-text text-info"
-                                   @click="getBack(path['id'])"
-                                   v-text="path['caption']" ></a>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+        <div class="col-12">
+            <div class="alert alert-light border mb-2">
+                <table>
+                    <tr v-for="(path, index) in pathData" v-bind:key="index + 1">
+                        <td><strong class="text-primary">{{ setLevel(path['level_label']) }}</strong></td>
+                        <td style="padding-left: 20px;">:
+                            <a class="text-decoration-none" role="button"
+                               @click="getBack(path['id'])"
+                               v-text="path['caption']" ></a>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>

@@ -1,9 +1,8 @@
 <template>
-    <b-form-select v-model="id" :options="options"> 
-      <template #first>
-        <b-form-select-option :value="undefined" disabled>-- Pilih Dropdown --</b-form-select-option>
-      </template>
-    </b-form-select>
+    <select class="form-select" v-model="id">
+      <option :value="undefined" disabled>-- Pilih Dropdown --</option>
+      <option v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.text }}</option>
+    </select>
 </template>
 
 <script>
@@ -15,7 +14,7 @@
               type: String,
               default: "gov2survey"
             }
-        }, 
+        },
         data: function () {
           return {
             id: this.value,
@@ -56,7 +55,3 @@
         }
     }
 </script>
-
-<style scoped>
-  
-</style>

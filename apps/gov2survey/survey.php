@@ -1,16 +1,23 @@
 <?php namespace App\gov2survey;
 
 class survey extends \Gov2lib\api {
+    private string $serviceDomain = '';
+
     function __construct()
     {
         global $self;
         $self->ses->authenticate('guest');
         parent::__construct();
         $self->takeAll("components");
-        $self->takeAll("rokuone");
         $self->scrollInterval=100;
-        // $self->fields = $self->gov2formfield->getFields(__DIR__ . "/json/survey.json");
-        // $self->ses->authenticate('maintenance','5.30 AM');
+
+        $option = $self->opt->get(['nama' => 'survey_service']);
+        $this->serviceDomain = $option['value'] ?? '';
+    }
+
+    private function serviceUrl(string ...$parts): string
+    {
+        return join('/', array_merge(['http:/', $this->serviceDomain, 'gov2survey', 'api'], $parts));
     }
 
     function breadcrumb () {
@@ -30,7 +37,6 @@ class survey extends \Gov2lib\api {
     function table ($vars)
     {
         global $self, $doc;
-        // \DB::debugMode();
         $data = $self->browse($vars);
         return $doc->responseGet($data);
     }
@@ -46,26 +52,14 @@ class survey extends \Gov2lib\api {
     function countServiceData ($vars)
     {
         global $self, $scriptID;
-        
-        if (strpos($_SERVER['SERVER_NAME'], 'bkn.go.id') !== false) {
-            $domain = 'ppsiasndit.bkn.go.id';
-        } else {
-            // to dev server
-            $domain = 'ppsiasndit.bkn.kl2.web.id';
-        }
-
-        $app = 'gov2survey';
-        $mvc = 'api';
-        $cmd = 'countKuesioner';
 
         $id = join('-', [$scriptID, (string)$self->dsn_id]);
+        $endpoint = $this->serviceUrl('countKuesioner', $id);
 
-        $endpoint = join('/', ['http:/',$domain, $app, $mvc, $cmd, $id]);
-        
         $resp = $this->getdata($endpoint);
 
         $response = $resp;
-        if (array_key_exists('error', $resp)  || array_key_exists('class', $resp)) {
+        if (array_key_exists('error', $resp) || array_key_exists('class', $resp)) {
             $response = $resp['error'];
             if(array_key_exists('class', $resp)) {
                 $response = $resp;
@@ -79,18 +73,6 @@ class survey extends \Gov2lib\api {
     {
         global $self, $doc, $scriptID;
 
-        if (strpos($_SERVER['SERVER_NAME'], 'bkn.go.id') !== false) {
-            $domain = 'ppsiasndit.bkn.go.id';
-        } else {
-            // to dev server
-            $domain = 'ppsiasndit.bkn.kl2.web.id';
-        }
-
-        $app = 'gov2survey';
-        $mvc = 'api';
-        $cmd = 'getKuesioner';
-        $token = $vars['id'];
-
         $success = 'Berhasil Tarik Data data kuesioner';
         $response = array(
             'class'         => 'success',
@@ -102,8 +84,8 @@ class survey extends \Gov2lib\api {
         $page = $req_data['page'];
 
         $id = join('-', [$scriptID, (string)$self->dsn_id]);
-        
-        $url = join('/', ['http:/',$domain, $app, $mvc, $cmd, $page, $id]);
+
+        $url = $this->serviceUrl('getKuesioner', $page, $id);
         $resp = $this->getdata($url);
 
         if (array_key_exists('error', $resp)) {
@@ -130,7 +112,6 @@ class survey extends \Gov2lib\api {
                     return $doc->response('danger', 'infoSnackbar');
                 }
 
-                $cmd = 'getKuesionerChild';
                 $query = [
                     'id' => $kuesioner['service_id'],
                     'local_parent_id' => $kuesioner['id'],
@@ -139,8 +120,8 @@ class survey extends \Gov2lib\api {
                     'level' => 2,
                     'level_label' => 'pertanyaan'
                 ];
-                
-                $url_child = join('/', ['http:/',$domain, $app, $mvc, $cmd]);
+
+                $url_child = $this->serviceUrl('getKuesionerChild');
                 $url_child = $url_child.'?'. http_build_query($query);
 
                 $resp_pertanyaan = $this->getdata($url_child);
@@ -163,7 +144,7 @@ class survey extends \Gov2lib\api {
                         $query['level'] = 3;
                         $query['level_label'] = 'opsi';
 
-                        $url_child = join('/', ['http:/',$domain, $app, $mvc, $cmd]);
+                        $url_child = $this->serviceUrl('getKuesionerChild');
                         $url_child = $url_child.'?'. http_build_query($query);
 
                         $resp_answer = $this->getdata($url_child);
@@ -182,13 +163,12 @@ class survey extends \Gov2lib\api {
             }
         }
 
-        // BEGIN Fetching respondent survey data from service
-        $cmd = 'getSurvey';
+        // Fetch respondent survey data from service
         $query = [
             'kuesioner_unit_id' => intval($self->dsn_id),
             'app' => $scriptID
         ];
-        $url_survey = join('/', ['http:/',$domain, $app, $mvc, $cmd]);
+        $url_survey = $this->serviceUrl('getSurvey');
         $url_survey = $url_survey.'?'. http_build_query($query);
 
         $resp_survey = $this->getdata($url_survey);
@@ -197,9 +177,7 @@ class survey extends \Gov2lib\api {
             return $resp_survey['error'];
         }
 
-        $resp_survey_len = count($resp_survey);
-
-        if ($resp_survey_len) {
+        if (count($resp_survey)) {
             foreach($resp_survey as $survey) {
                 $self->save_data_survey_service($survey);
 
@@ -208,28 +186,13 @@ class survey extends \Gov2lib\api {
                 }
             }
         }
-        // END Fetching respondent survey data from service 
 
         return $doc->responseGet($response);
     }
 
     function submit ($data)
     {
-        global $self, $doc, $scriptID;
-
-        if (strpos($_SERVER['SERVER_NAME'], 'bkn.go.id') !== false) {
-            $domain = 'ppsiasndit.bkn.go.id';
-        } else {
-            // to dev server
-            $domain = 'ppsiasndit.bkn.kl2.web.id';
-        }
-
-        // $app = 'hhkbiro';
-        // $mvc = 'bulk';
-        $app = 'gov2survey';
-        $mvc = 'api';
-        $cmd = 'insert_survey';
-        $token = $vars['id'];
+        global $self, $doc;
 
         $success = 'Berhasil submit data survey';
         $response = array(
@@ -238,17 +201,14 @@ class survey extends \Gov2lib\api {
             'notification'  => $success
         );
 
-        $req_data = $vars['data'];
-        
-        $url = join('/', ['http:/',$domain, $app, $mvc]);
+        $url = $this->serviceUrl();
         $payload = [
-            'cmd' => $cmd,
+            'cmd' => 'insert_survey',
             'data' => $data
         ];
         $resp = $this->putdata($url, $payload);
-        // echo $url;exit;
         $resp = json_decode($resp, 1);
-        
+
         if (!array_key_exists('error', $resp)) {
             if ($resp) {
                 $saved = $self->update_service_id($resp);
@@ -259,9 +219,8 @@ class survey extends \Gov2lib\api {
                     $response['notification'] ='Gagal update survey_id';
                 }
             } else {
-                $notif = 'Tidak ada data response service insert_survey';
                 $response = $doc->response('warning', 'infoSnackbar');
-                $response['notification'] = $notif;
+                $response['notification'] = 'Tidak ada data response service insert_survey';
                 return $response;
             }
         } else {
@@ -281,7 +240,6 @@ class survey extends \Gov2lib\api {
 
         if ($response['class'] === 'success') {
             $survey = $self->doRead($_POST['answers'][0]['survey_id']);
-            // only submit answer if survey has been submitted to service.
             if (intval($survey['service_id'])) {
                 $this->remap_submit_payload($_POST['answers']);
                 $this->submit($_POST['answers']);
@@ -292,7 +250,7 @@ class survey extends \Gov2lib\api {
 
     function remap_submit_payload (&$anwers)
     {
-        global $self, $doc;
+        global $self;
 
         foreach($anwers as $i => $answer) {
             $survey = $self->doRead($answer['survey_id']);

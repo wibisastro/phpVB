@@ -7,11 +7,7 @@ class survey_view extends \Gov2lib\api {
         $self->ses->authenticate('member');
         parent::__construct();
         $self->takeAll("components");
-        $self->takeAll("rokuone");
         $self->scrollInterval=100;
-        // $self->ses->authenticate('maintenance','5.30 AM');
-        // var_dump(\DB::queryFirstRow('SELECT DATABASE() AS DB'));exit;
-        // \DB::debugMode();
     }
 
     function index ()

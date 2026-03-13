@@ -1,10 +1,5 @@
 <template>
-  <b-form-datepicker
-      v-model="id" 
-      :min="new Date()"
-      :max="''" 
-      locale="id">
-  </b-form-datepicker>
+  <input type="date" class="form-control" v-model="id">
 </template>
 
 <script>
@@ -12,16 +7,12 @@
         name: "field-datepicker",
         props: {
             value:0
-        }, 
+        },
         data: function () {
           return {
             id: this.value,
             proses: false
           }
-        },
-        methods: {
-        },
-        created: function () {
         },
         watch: {
           value(nv) {
@@ -34,7 +25,3 @@
         }
     }
 </script>
-
-<style scoped>
-  
-</style>

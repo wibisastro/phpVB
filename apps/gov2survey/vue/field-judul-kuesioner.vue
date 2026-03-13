@@ -1,5 +1,5 @@
 <template>
-    <b-form-input v-model="id"></b-form-input>
+    <input type="text" class="form-control" v-model="id">
 </template>
 
 <script>
@@ -7,7 +7,7 @@
         name: "field-judul-kuesioner",
         props: {
             value:0
-        }, 
+        },
         data: function () {
           return {
             id: this.value,
@@ -37,7 +37,3 @@
         }
     }
 </script>
-
-<style scoped>
-  
-</style>

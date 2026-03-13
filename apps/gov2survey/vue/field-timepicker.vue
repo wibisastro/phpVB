@@ -1,7 +1,5 @@
 <template>
-  <b-form-timepicker
-      v-model="id" >
-  </b-form-timepicker>
+  <input type="time" class="form-control" v-model="id">
 </template>
 
 <script>
@@ -9,16 +7,12 @@
         name: "field-timepicker",
         props: {
             value:0
-        }, 
+        },
         data: function () {
           return {
             id: this.value,
             proses: false
           }
-        },
-        methods: {
-        },
-        created: function () {
         },
         watch: {
           value(nv) {
@@ -31,7 +25,3 @@
         }
     }
 </script>
-
-<style scoped>
-  
-</style>

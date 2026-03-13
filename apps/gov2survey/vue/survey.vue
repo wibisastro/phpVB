@@ -2,16 +2,19 @@
 <div>
     <div class="row" v-if="survey.telah_mengisi">
         <div class="col-12">
-            <b-alert show dismissible fade variant="success">Terima kasih, Anda telah menyelesaikan survey ini.</b-alert>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Terima kasih, Anda telah menyelesaikan survey ini.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         </div>
     </div>
 
-    <div class="row" v-if="survey.telah_mengisi"><div class="col-12">&nbsp;</div></div>
-    
-    <div class="container mb-2" v-if="survey._pertanyaan && survey._pertanyaan.length">
+    <div class="row mb-3" v-if="survey.telah_mengisi"></div>
+
+    <div class="card mb-3 p-4" v-if="survey._pertanyaan && survey._pertanyaan.length">
         <div class="row">
             <div class="col-12 clearfix">
-                <div class="py-3 h5 text-center"><b>{{survey.kuesioner}}</b></div>
+                <div class="py-3 h5 text-center fw-bold">{{survey.kuesioner}}</div>
                 <div class="py-3 h5 text-center" v-if="timeLeft">Berakhir dalam {{timeLeft}}</div>
             </div>
         </div>
@@ -19,18 +22,18 @@
         <div class="row">
             <template v-for="(chunk, index) in survey.pertanyaan">
                 <div class="col-md-6 col-sm-12 bb-1" v-bind:key="index + 1">
-                    <div class="question ml-sm-2 pl-sm-2 pt-2" v-for="(pertanyaan, pindex) in chunk" v-bind:key="pindex + 1">
-                        <div class="py-2 h5"><b>{{pertanyaan.nomor}}. {{pertanyaan.nama}}</b></div>
+                    <div class="question ms-2 ps-2 pt-2" v-for="(pertanyaan, pindex) in chunk" v-bind:key="pindex + 1">
+                        <div class="py-2 h5 fw-bold">{{pertanyaan.nomor}}. {{pertanyaan.nama}}</div>
 
-                        <div class="ml-md-3 ml-sm-3 pl-md-5 pt-sm-0 pt-3" v-for="(opsi, optIndex) in pertanyaan.opsi"
-                            id="options" v-bind:key="optIndex + 1"> 
-                            <label class="options">{{opsi.nomor}}. {{opsi.nama}} 
-                                <input type="radio" 
-                                    :name="`_${opsi.survey_id}${opsi.pertanyaan_id}`" 
-                                    v-model="answers[`${opsi.survey_id}_${opsi.pertanyaan_id}`]" 
+                        <div class="ms-3 ps-5 pt-0" v-for="(opsi, optIndex) in pertanyaan.opsi"
+                            id="options" v-bind:key="optIndex + 1">
+                            <label class="options">{{opsi.nomor}}. {{opsi.nama}}
+                                <input type="radio"
+                                    :name="`_${opsi.survey_id}${opsi.pertanyaan_id}`"
+                                    v-model="answers[`${opsi.survey_id}_${opsi.pertanyaan_id}`]"
                                     :value="opsi.id"
-                                    :disabled="opsi.jawaban_id && survey.telah_mengisi"> 
-                                <span class="checkmark"></span> 
+                                    :disabled="opsi.jawaban_id && survey.telah_mengisi">
+                                <span class="checkmark"></span>
                             </label>
                         </div>
                     </div>
@@ -38,32 +41,73 @@
             </template>
         </div>
 
-        <div class="row"><div class="col-12">&nbsp;</div></div>
+        <div class="row mb-3"></div>
 
         <div class="row" v-if="Object.keys(answers).length && !survey.telah_mengisi">
             <div class="col-12">
-                <b-progress  :max="survey._pertanyaan.length" variant="success">
-                    <b-progress-bar :value="Object.keys(answers).length">
+                <div class="progress" role="progressbar"
+                     :aria-valuenow="Object.keys(answers).length"
+                     aria-valuemin="0"
+                     :aria-valuemax="survey._pertanyaan.length">
+                    <div class="progress-bar bg-success"
+                         :style="{width: (Object.keys(answers).length / survey._pertanyaan.length * 100) + '%'}">
                         {{Object.keys(answers).length}}/{{survey._pertanyaan.length}}
-                    </b-progress-bar>
-                </b-progress>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="d-flex align-items-center pt-3" v-if="survey._pertanyaan.length == Object.keys(answers).length && !survey.telah_mengisi">
             <div id="prev"> </div>
-            <div class="ml-auto mr-sm-5"> <button class="btn btn-success" @click="confirmSimpan">Simpan</button> </div>
+            <div class="ms-auto me-3"> <button class="btn btn-success" @click="confirmSimpan">Simpan</button> </div>
         </div>
 
-        <div class="row"><div class="col-12">&nbsp;</div></div>
+        <div class="row mb-3"></div>
     </div>
 
-    <div class="container mb-2 text-center" v-else>
-        <h1><i class="fa fa-smile-o" aria-hidden="true"></i></h1><br>
+    <div class="card mb-3 p-4 text-center" v-else>
+        <h1><i class="bi bi-emoji-smile" aria-hidden="true"></i></h1><br>
         <span>Belum ada data survey</span>
     </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal fade" id="surveyConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Submit hasil survey</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="text-center">Apakah anda sudah mengisi survey dengan sejujurnya?</h6>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Belum yakin</button>
+                    <button type="button" class="btn btn-primary" @click="simpan">Ya</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="surveySuccessModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-bottom-0 p-2">
+                    <h5 class="modal-title">Survey telah berhasil dikirim</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Terimakasih telah meluangkan waktu anda untuk mengisi survey ini.
+                </div>
+                <div class="modal-footer border-top-0 p-2">
+                    <button type="button" class="btn btn-sm btn-success" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-    
+
 </template>
 
 <script>
@@ -92,12 +136,11 @@ module.exports = {
                     this.survey._pertanyaan = Array.from(res.data.pertanyaan);
                     if (this.survey.telah_mengisi) {
                         _.forEach(this.survey._pertanyaan, (pertanyaan) => {
-                            this.$set(this.answers, `${pertanyaan.survey_id}_${pertanyaan.id}`, 
+                            this.$set(this.answers, `${pertanyaan.survey_id}_${pertanyaan.id}`,
                                 pertanyaan.opsi[0].jawaban_id);
                         })
                     }
                     this.survey.pertanyaan = _.chunk(this.survey.pertanyaan, this.chunkSize)
-                    // this.timeLeft = new Date(this.survey.date_end).getTime();
                 } else {
                     eventBus.$emit('openNotif', res.data);
                 }
@@ -107,27 +150,14 @@ module.exports = {
             })
         },
         confirmSimpan() {
-            const el = this.$createElement;
-            const message = el('div', {domProps: {class: 'row'}}, [
-                el('h6',{class: 'text-center'},
-                    'Apakah anda sudah mengisi survey dengan sejujurnya ?')
-            ]);
-            this.$bvModal.msgBoxConfirm(message, {
-                title: 'Submit hasil survey',
-                centered: true,
-                size: 'md',
-                okVariant: 'primary',
-                okTitle: 'Ya',
-                cancelTitle: 'Belum yakin'
-            })
-                .then(ok => {
-                    if (ok) {
-                        this.simpan();
-                    }
-                })
-                .catch(e => console.log(e));
+            var modal = new bootstrap.Modal(document.getElementById('surveyConfirmModal'));
+            modal.show();
         },
         simpan() {
+            // Close confirm modal
+            var confirmModal = bootstrap.Modal.getInstance(document.getElementById('surveyConfirmModal'));
+            if (confirmModal) confirmModal.hide();
+
             const payload = {
                 cmd: 'simpan',
                 answers: []
@@ -159,7 +189,8 @@ module.exports = {
             axios.post(this.postUrl, payload)
                 .then(res => {
                     if (res.data.class === 'success') {
-                        this.showMsgBoxTwo();
+                        var successModal = new bootstrap.Modal(document.getElementById('surveySuccessModal'));
+                        successModal.show();
                         this.disableSurvey()
                     } else {
                         eventBus.$emit(res.data);
@@ -174,24 +205,6 @@ module.exports = {
                     eventBus.$emit('openNotif', payload);
                     console.log(e)
                 })
-        },
-        showMsgBoxTwo() {
-            this.boxTwo = ''
-            this.$bvModal.msgBoxOk('Terimakasih telah meluangkan waktu anda untuk mengisi survey ini.', {
-            title: 'Survey telah berhasil dikirim',
-            size: 'sm',
-            buttonSize: 'sm',
-            okVariant: 'success',
-            headerClass: 'p-2 border-bottom-0',
-            footerClass: 'p-2 border-top-0',
-            centered: true
-            })
-            .then(ok => {
-                // this.disableSurvey()
-            })
-            .catch(err => {
-                
-            })
         },
         disableSurvey() {
             this.survey.telah_mengisi = true;
@@ -227,9 +240,6 @@ module.exports = {
     created() {
         this.getData();
     },
-    mounted() {
-        
-    },
     destroyed(){
         clearInterval(this.interval);
     },
@@ -258,26 +268,6 @@ module.exports = {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box
-}
-
-body {
-    background-color: #333
-}
-
-.container {
-    background-color: #fff;
-    color: #555;
-    border-radius: 5px;
-    padding: 20px;
-    font-family: 'Montserrat', sans-serif;
-}
-
 .options {
     position: relative;
     padding-left: 40px
@@ -324,8 +314,7 @@ body {
 }
 
 .options input[type="radio"]:checked~.checkmark {
-    /* background: #21bf73; */
-    background: #5c90d2;
+    background: var(--bs-primary, #5c90d2);
     transition: 300ms ease-in-out 0s
 }
 
@@ -333,58 +322,8 @@ body {
     transform: translate(-50%, -50%) scale(1)
 }
 
-.btn-primary {
-    background-color: #555;
-    color: #ddd;
-    border: 1px solid #ddd
-}
-
-.btn-primary:hover {
-    background-color: #21bf73;
-    border: 1px solid #21bf73
-}
-
-.btn-success {
-    padding: 5px 25px;
-    background-color: #21bf73
-}
-
-@media(max-width:576px) {
-    .question {
-        width: 100%;
-        word-spacing: 2px
-    }
-}
-
-hr {
-    /* border-top: 2px solid #555 !important; */
-    border-radius: 3px;
-}
-
-.progress {
-    height: 1rem;
-    line-height: 0;
-    font-size: .75rem;
-    background-color: #e9ecef;
-    border-radius: .25rem !important;
-}
-
 .bb-1 {
     border: 0;
     border-bottom: 1px solid rgba(0,0,0,.1);
-}
-
-.alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-}
-
-.alert {
-    position: relative;
-    padding: .75rem 1.25rem;
-    margin-bottom: 1rem;
-    border: 1px solid transparent;
-    border-radius: .25rem;
 }
 </style>

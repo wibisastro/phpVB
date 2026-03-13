@@ -1,30 +1,58 @@
-{% extends "@gov2survey/layout.html" %}
+{% extends "cubeLayout.html" %}
 
 {% block head %}
-    {{ parent() }}
-    {% include '@gov2survey/b4Head.html' %}
+	{{ parent() }}
+	{% include('cubeHead.html') %}
 {% endblock %}
 
-{% block header %}{% endblock %}
+{% block header %}
+	{% include('cubeHeader.html') %}
+{% endblock %}
 
 {% block pagetitle %}
-    {% include('bs4PageTitle.html') %}
+	{% include('cubePageTitle.html') %}
 {% endblock %}
 
 {% block notification %}
-    {% include('bs4Notification.html') %}
+	{% include('cubeNotification.html') %}
+{% endblock %}
+
+{% block sidebar %}
+    {% for item in sidebars %}
+       {% include[item,'cubeMissingFile.html'] %}
+	{% endfor %}
 {% endblock %}
 
 {% block content %}
     {% for item in contents %}
-        {% include[item,'bs4MissingFile.html'] %}
-    {% endfor %}
+       {% include[item,'cubeMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block footer %}
+	{% include('cubeFooter.html') %}
 {% endblock %}
 
 {% block js %}
-    {{ parent() }}
-    {% include('bs4JS.html') %}
+	{{ parent() }}
+	{% include('vueJS.html') %}
 {% endblock %}
 
 {% block externalJS %}
+	{% include('externalJS.html') %}
+
+{% if '/survey_view' in _SERVER['REQUEST_URI'] %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.3.1/highcharts.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.3.1/modules/exporting.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.3.1/modules/offline-exporting.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.3.1/modules/export-data.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.3.1/modules/accessibility.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.3.1/modules/no-data-to-display.min.js"></script>
+{% endif %}
+
+{% if '/survey' in _SERVER['REQUEST_URI'] %}
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/id.min.js"></script>
+{% endif %}
 {% endblock %}
