@@ -55,9 +55,17 @@ phpVB mengenali lingkungan kerja secara otomatis — tanpa konfigurasi manual:
 | Prefix `dev.` pada domain | **Pengembangan** | Default convention jika `APP_STAGE` tidak diset |
 | Selain di atas | **Produksi** | Diakses oleh pengguna akhir |
 
+**Ilustrasi:** jika domain produksi adalah `sidalih.kemendagri.go.id`, maka:
+
+| Lingkungan | Domain | Deteksi |
+|-----------|--------|---------|
+| Lokal | `localhost` | Otomatis |
+| Pengembangan | `dev.sidalih.kemendagri.go.id` | Convention prefix `dev.` |
+| Produksi | `sidalih.kemendagri.go.id` | Selain di atas = produksi |
+
 Setiap lingkungan bisa memiliki sumber data dan tingkat keamanan yang berbeda, namun kode aplikasinya tetap sama. Ini menghilangkan risiko "di komputer saya jalan, di server tidak."
 
-Untuk instansi yang memerlukan keamanan lebih, disarankan menggunakan variabel server `APP_STAGE` agar alamat server pengembangan tidak mudah ditebak dari luar.
+Untuk instansi yang memerlukan keamanan lebih, disarankan menggunakan variabel server `APP_STAGE` agar alamat server pengembangan bebas menggunakan domain apapun tanpa harus mengikuti pola `dev.` yang mudah ditebak dari luar.
 
 ---
 
