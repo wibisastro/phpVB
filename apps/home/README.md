@@ -46,15 +46,18 @@ Analoginya seperti gedung kantor pemerintahan: struktur bangunan (dinding, korid
 
 ### 4. Multi-Staging Otomatis
 
-phpVB mengenali lingkungan kerja secara otomatis dari alamat domain — tanpa konfigurasi manual:
+phpVB mengenali lingkungan kerja secara otomatis — tanpa konfigurasi manual:
 
-| Domain | Lingkungan | Fungsi |
-|--------|-----------|--------|
-| `localhost` | **Lokal** | Pengembangan di komputer developer |
-| `dev.nama-aplikasi.go.id` | **Pengembangan** | Pengujian oleh tim sebelum rilis |
-| `nama-aplikasi.go.id` | **Produksi** | Diakses oleh pengguna akhir |
+| Cara Deteksi | Lingkungan | Keterangan |
+|-------------|-----------|------------|
+| Domain `localhost` | **Lokal** | Otomatis, untuk pengembangan di komputer developer |
+| Variabel server `APP_STAGE` | **Sesuai nilai** | Eksplisit, untuk keamanan tambahan — domain tidak perlu mengikuti pola tertentu |
+| Prefix `dev.` pada domain | **Pengembangan** | Default convention jika `APP_STAGE` tidak diset |
+| Selain di atas | **Produksi** | Diakses oleh pengguna akhir |
 
 Setiap lingkungan bisa memiliki sumber data dan tingkat keamanan yang berbeda, namun kode aplikasinya tetap sama. Ini menghilangkan risiko "di komputer saya jalan, di server tidak."
+
+Untuk instansi yang memerlukan keamanan lebih, disarankan menggunakan variabel server `APP_STAGE` agar alamat server pengembangan tidak mudah ditebak dari luar.
 
 ---
 
