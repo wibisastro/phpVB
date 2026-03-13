@@ -117,15 +117,9 @@ apps/{module}/
 
 ### 1. Convention over Configuration
 
-phpVB meminimalkan konfigurasi manual. Stage (local/dev/prod) ditentukan **otomatis** dari nama domain:
+phpVB meminimalkan konfigurasi manual. Penamaan file, struktur folder, dan alur data mengikuti konvensi yang konsisten — framework otomatis menemukan dan menghubungkan semuanya.
 
-```
-1. localhost           → stage "local"
-2. Scan config.*.xml   → stage dari nama file yang memuat domain
-3. Fallback            → stage "dev"
-```
-
-Cara kerja: taruh domain di file config yang sesuai stage-nya.
+**Stage detection otomatis** — taruh domain di file config yang sesuai stage-nya:
 
 ```xml
 <!-- config.dev.xml → semua domain di sini = stage dev -->
@@ -140,7 +134,37 @@ Cara kerja: taruh domain di file config yang sesuai stage-nya.
 </domain>
 ```
 
-Mau tambah stage baru (misal `staging`)? Cukup buat file `config.staging.xml` — tanpa ubah code. phpVB scan otomatis semua `config.*.xml`.
+Mau tambah stage baru (misal `staging`)? Cukup buat file `config.staging.xml` — tanpa ubah code.
+
+**Penamaan konsisten** — satu nama dipakai di semua layer:
+
+```
+apps/gov2wilayah/                        # Nama app = nama folder
+├── gov2wilayah.php                      # Controller = nama folder
+├── model/wilayah.php                    # Model class = nama file
+├── view/wilayah.html                    # Template = nama model
+├── vue/cube-wilayah.vue                 # Vue component = nama file → <cube-wilayah>
+└── xml/
+    ├── route.xml                        # Route otomatis di-scan
+    ├── dbTables.xml                     # Tabel di-map ke $this->tbl->*
+    ├── dsnSource.dev.xml                # DB config = dsnSource.{STAGE}.xml
+    └── pageroles.xml                    # Hak akses, fallback ke global
+```
+
+**Auto-discovery** — framework scan dan registrasi otomatis:
+
+| Apa | Konvensi | Contoh |
+|-----|----------|--------|
+| Stage | `config.{stage}.xml` | `config.prod.xml` → stage `prod` |
+| Database | `dsnSource.{stage}.xml` | `dsnSource.dev.xml` untuk stage `dev` |
+| Model | File `.php` di `model/` | `model/wilayah.php` → class `wilayah` |
+| Vue component | File `.vue` di `vue/` | `cube-wilayah.vue` → tag `<cube-wilayah>` |
+| Template | `view/{model}.html` | `view/wilayah.html` untuk model `wilayah` |
+| Command → method | Parameter `cmd` | `?cmd=browse` → panggil method `browse()` |
+| Asset routing | `/{app}/js/{file}` | `/gov2wilayah/js/custom.js` → `apps/gov2wilayah/js/custom.js` |
+| Hak akses | `pageroles.xml` per app | Ada → pakai, tidak ada → fallback global |
+
+Developer cukup ikuti struktur folder dan penamaan file — phpVB yang menghubungkan semuanya tanpa konfigurasi tambahan.
 
 ### 2. Multi-Domain: Single Source
 
