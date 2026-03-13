@@ -7,7 +7,7 @@ Homestead.yaml
 composer.lock
 /logs/*
 /public/.htaccess
-/core/scripts/sql/*
+/core/scripts/sql/*.bak
 **/dsn*.xml
 
 # IDE and Editor

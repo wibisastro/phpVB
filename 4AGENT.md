@@ -334,6 +334,147 @@ Fix: samakan signature method child dengan parent persis.
 
 ---
 
+## Upgrade ke Versi Baru phpVB
+
+### Kapan Upgrade (Bukan Update Biasa)
+
+Upgrade dilakukan ketika versi phpVB baru di-release dan perlu mengganti seluruh framework. Berbeda dengan **update** (git pull), upgrade berarti mengambil source code baru secara keseluruhan — misalnya dari git clone atau download release.
+
+### ⚠ PERINGATAN: File yang TIDAK BOLEH Ditimpa
+
+Jika langsung `git clone` ke folder yang sama, file-file berikut akan **hilang** karena di-gitignore (tidak ada di repo):
+
+| File | Lokasi | Isi |
+|------|--------|-----|
+| `config.{STAGE}.xml` | `core/config/` | Domain mapping, konfigurasi stage |
+| `dsnSource.{STAGE}.xml` | `apps/*/xml/` | Credentials database (per-app) |
+| `.htaccess` | `public/` | Rewrite rules Apache |
+| `apps/{appPihakKetiga}/` | `apps/` | Aplikasi pihak ketiga (repo sendiri) |
+
+### Prosedur Upgrade
+
+```
+1. Backup file credential & config
+2. Clone/download versi baru ke folder terpisah
+3. Salin kembali file credential & config
+4. composer install/update
+5. Verifikasi
+```
+
+### Langkah 1: Backup File Credential & Config
+
+Sebelum upgrade, **backup semua file yang di-gitignore**:
+
+```bash
+cd /path/to/phpVB
+
+# Buat folder backup
+BACKUP_DIR="/tmp/phpVB_backup_$(date +%Y%m%d%H%M%S)"
+mkdir -p "$BACKUP_DIR"
+
+# Backup config stage
+cp core/config/config.*.xml "$BACKUP_DIR/" 2>/dev/null
+
+# Backup semua dsnSource
+for dsn in $(find apps -name "dsnSource.*.xml"); do
+    mkdir -p "$BACKUP_DIR/$(dirname $dsn)"
+    cp "$dsn" "$BACKUP_DIR/$dsn"
+done
+
+# Backup .htaccess
+cp public/.htaccess "$BACKUP_DIR/" 2>/dev/null
+
+# Catat daftar app pihak ketiga (yang punya .git sendiri)
+ls -d apps/*/.git 2>/dev/null | sed 's|apps/||;s|/.git||' > "$BACKUP_DIR/app_list.txt"
+
+echo "Backup selesai di: $BACKUP_DIR"
+```
+
+### Langkah 2: Clone/Download Versi Baru
+
+```bash
+# Opsi A: Clone ke folder baru, lalu ganti
+git clone <REPO_URL> /path/to/phpVB_new
+
+# Opsi B: Jika upgrade di tempat (folder sama)
+# Hapus file framework saja, JANGAN hapus apps/ dan file config
+cd /path/to/phpVB
+# Hapus hanya folder framework (bukan apps, bukan config)
+rm -rf core/ vendor/ composer.json composer.lock
+git clone <REPO_URL> /tmp/phpVB_new
+# Copy file framework dari clone baru
+cp -r /tmp/phpVB_new/core /tmp/phpVB_new/composer.* /tmp/phpVB_new/public/index.php .
+```
+
+### Langkah 3: Kembalikan File Credential & Config
+
+```bash
+# Restore config stage
+cp "$BACKUP_DIR"/config.*.xml core/config/
+
+# Restore semua dsnSource
+for dsn in $(find "$BACKUP_DIR/apps" -name "dsnSource.*.xml" 2>/dev/null); do
+    TARGET="${dsn#$BACKUP_DIR/}"
+    cp "$dsn" "$TARGET"
+done
+
+# Restore .htaccess
+cp "$BACKUP_DIR/.htaccess" public/.htaccess 2>/dev/null
+```
+
+### Langkah 4: composer install
+
+```bash
+cd /path/to/phpVB
+composer install
+```
+
+Jika `composer.json` berubah dari versi sebelumnya, kemungkinan ada dependency baru.
+
+### Langkah 5: Verifikasi
+
+```bash
+# Cek config ada
+ls core/config/config.*.xml
+
+# Cek dsnSource masih ada
+for app in gov2login gov2wilayah gov2instansi gov2option; do
+    FILE="apps/$app/xml/dsnSource.dev.xml"
+    [ -f "$FILE" ] && echo "OK  $FILE" || echo "MISSING  $FILE"
+done
+
+# Cek .htaccess
+[ -f "public/.htaccess" ] && echo "OK  .htaccess" || echo "MISSING  .htaccess"
+
+# Cek app pihak ketiga masih ada
+cat "$BACKUP_DIR/app_list.txt" 2>/dev/null
+```
+
+Akses `http://DOMAIN/home/` — pastikan tidak ada error.
+
+### Checklist Upgrade
+
+- [ ] Backup `config.{STAGE}.xml` sebelum upgrade
+- [ ] Backup semua `dsnSource.{STAGE}.xml` sebelum upgrade
+- [ ] Backup `public/.htaccess` sebelum upgrade
+- [ ] App pihak ketiga di `apps/` tidak terhapus
+- [ ] File credential & config sudah dikembalikan setelah upgrade
+- [ ] `composer install` berhasil
+- [ ] Halaman bisa diakses tanpa error
+
+### CATATAN: Jangan Clone Langsung ke Folder Production
+
+**JANGAN** lakukan ini:
+```bash
+# SALAH — akan menghapus semua file gitignored!
+rm -rf /path/to/phpVB
+git clone <REPO_URL> /path/to/phpVB
+```
+
+Selalu backup dulu, atau clone ke folder terpisah lalu salin file framework saja.
+
+---
+
 # BAGIAN C: INSTALL APLIKASI PIHAK KETIGA
 
 **Prasyarat**: phpVB sudah ter-install dan berjalan (Bagian A selesai).
