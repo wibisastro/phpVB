@@ -44,7 +44,7 @@
       <!-- Breadcrumb path -->
       <div class="list-group list-group-flush flex-shrink-0">
         <template v-for="(path, idx) in pathData">
-          <a v-if="path.level <= maxLevel && path.level > 0" :key="'p-'+idx" href="#"
+          <a v-if="path.level <= maxLevel" :key="'p-'+idx" href="#"
              class="list-group-item list-group-item-action d-flex align-items-center py-2"
              :class="{ 'bg-success-subtle': config.wilayah_id == path.id }"
              @click.prevent="goBack(path.id)">
