@@ -146,6 +146,15 @@ module.exports = {
       var name = label.toUpperCase();
       return name === 'KELURAHAN' ? 'KEL/DESA' : name;
     },
+    detectPortalType() {
+      var self = this;
+      axios.get('/gov2wilayah/sidepanel/listWilayah/1/-1')
+        .then(function(resp) {
+          var data = resp.data;
+          self.hasMultipleRoots = Array.isArray(data) && data.length > 1;
+        })
+        .catch(function() {});
+    },
     loadConfig() {
       axios.get('/gov2wilayah/sidepanel/getWilayahConfig')
         .then(resp => {
@@ -184,13 +193,9 @@ module.exports = {
         .then(resp => {
           var data = resp.data;
           this.childList = Array.isArray(data) ? data : [];
-          if (this.pathData.length === 1) {
-            if (this.childList.length === 1) {
-              this.hasMultipleRoots = false;
-              this.pickChild(this.childList[0].id);
-              return;
-            }
-            this.hasMultipleRoots = this.childList.length > 1;
+          if (this.pathData.length === 1 && this.childList.length === 1) {
+            this.pickChild(this.childList[0].id);
+            return;
           }
           this.showList = true;
         })
@@ -314,6 +319,7 @@ module.exports = {
     }
   },
   created() {
+    this.detectPortalType();
     this.loadConfig();
     this.loadBreadcrumb(-1);
   },
