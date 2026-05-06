@@ -56,7 +56,7 @@
       </div>
 
       <!-- Search input -->
-      <div v-if="pathData.length > 0 && pathData[pathData.length-1].level < maxLevel"
+      <div v-if="pathData.length > 0 && pathData[pathData.length-1].level < maxLevel && childList.length > 0"
            class="border-top flex-shrink-0 px-3 pt-2 pb-1">
         <div class="input-group input-group-sm">
           <span class="input-group-text bg-primary text-white" style="font-size:0.7rem">{{ nextLevelName }}</span>
@@ -182,7 +182,7 @@ module.exports = {
       axios.get('/gov2wilayah/sidepanel/listWilayah/1/' + parentId)
         .then(resp => {
           var data = resp.data;
-          this.childList = Array.from(Object.keys(data), function(k) { return data[k]; });
+          this.childList = Array.isArray(data) ? data : [];
           this.showList = true;
         })
         .catch(e => this.handleError(e));
