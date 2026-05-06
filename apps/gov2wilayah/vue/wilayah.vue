@@ -148,7 +148,8 @@ module.exports = {
     },
     detectPortalType() {
       var self = this;
-      axios.get('/gov2wilayah/sidepanel/listWilayah/1/-1')
+      // id=0 (bukan -1): -1 baca session-remembered id → bisa return children dari posisi navigasi user, bukan root portal.
+      axios.get('/gov2wilayah/sidepanel/listWilayah/1/0')
         .then(function(resp) {
           var data = resp.data;
           self.hasMultipleRoots = Array.isArray(data) && data.length > 1;
