@@ -171,12 +171,13 @@ module.exports = {
     },
     loadChildren() {
       if (this.pathData.length === 0) return;
-      var lastLevel = this.pathData[this.pathData.length - 1].level;
-      if (lastLevel >= this.maxLevel) {
+      var last = this.pathData[this.pathData.length - 1];
+      if (last.level >= this.maxLevel) {
         this.childList = [];
         return;
       }
-      axios.get('/gov2wilayah/sidepanel/listWilayah/1/-1')
+      var parentId = last.level == 0 ? -1 : last.id;
+      axios.get('/gov2wilayah/sidepanel/listWilayah/1/' + parentId)
         .then(resp => {
           var data = resp.data;
           this.childList = Array.from(Object.keys(data), function(k) { return data[k]; });
