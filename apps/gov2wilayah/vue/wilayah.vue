@@ -33,68 +33,70 @@
       </div>
     </div>
 
-    <!-- Content area -->
-    <div class="flex-grow-1 overflow-auto" v-if="!config.locked && !errorMsg">
-
-      <!-- Loading -->
-      <div v-if="loading" class="py-4 text-center text-muted">
-        <div class="spinner-border spinner-border-sm text-primary me-1"></div>
-        <span class="small">Memuat data...</span>
-      </div>
-
-      <div v-else>
-        <!-- Breadcrumb path -->
-        <div class="list-group list-group-flush">
-          <template v-for="(path, idx) in pathData">
-            <a v-if="path.level <= maxLevel && path.level > 0" :key="'p-'+idx" href="#"
-               class="list-group-item list-group-item-action d-flex align-items-center py-2"
-               :class="{ 'bg-success-subtle': config.wilayah_id == path.id }"
-               @click.prevent="goBack(path.id)">
-              <span class="badge bg-body-secondary text-muted me-2" style="min-width:70px;font-size:0.7rem">{{ levelName(path.level_label, path.level) }}</span>
-              <span class="small" :class="{ 'fw-bold text-success': config.wilayah_id == path.id }">{{ path.caption || path.nama }}</span>
-              <i class="bi bi-arrow-counterclockwise ms-auto text-muted small"></i>
-            </a>
-          </template>
-        </div>
-
-        <!-- Next level searchable list -->
-        <div v-if="pathData.length > 0 && pathData[pathData.length-1].level < maxLevel" class="border-top">
-          <div class="px-3 pt-2 pb-1">
-            <div class="input-group input-group-sm">
-              <span class="input-group-text bg-primary text-white" style="font-size:0.7rem">{{ nextLevelName }}</span>
-              <input type="text" class="form-control" v-model="filter"
-                     :placeholder="'Ketik untuk filter...'"
-                     @focus="showList = true"
-                     style="font-size:0.8rem">
-              <span class="input-group-text" style="font-size:0.7rem">
-                <i class="bi bi-list-ul me-1"></i>{{ filteredChildList.length }}
-              </span>
-            </div>
-          </div>
-          <div v-if="showList" class="list-group list-group-flush overflow-auto" style="max-height:220px">
-            <div v-if="filteredChildList.length === 0" class="list-group-item text-muted small text-center py-3">
-              <i class="bi bi-search me-1"></i>Tidak ditemukan
-            </div>
-            <a v-for="item in filteredChildList" :key="item.id" href="#"
-               class="list-group-item list-group-item-action d-flex align-items-center py-2"
-               @click.prevent="pickChild(item.id)">
-              <i class="bi bi-geo text-muted me-2" style="font-size:0.75rem"></i>
-              <span class="small">{{ item.nama }}</span>
-              <span v-if="item.children > 0" class="badge bg-body-secondary text-muted ms-auto" style="font-size:0.65rem">{{ item.children }}</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Select button -->
-        <div v-if="pathData.length > 0 && lastPath" class="px-3 py-3">
-          <button class="btn btn-sm btn-primary w-100 rounded-3" @click="selectFromPath(lastPath)"
-                  :disabled="config.wilayah_id == lastPath.id">
-            <i class="bi bi-check-circle me-1"></i>
-            Pilih: {{ lastPath.caption || lastPath.nama }}
-          </button>
-        </div>
-      </div>
+    <!-- Loading -->
+    <div v-if="loading && !config.locked && !errorMsg" class="flex-grow-1 py-4 text-center text-muted">
+      <div class="spinner-border spinner-border-sm text-primary me-1"></div>
+      <span class="small">Memuat data...</span>
     </div>
+
+    <template v-else-if="!config.locked && !errorMsg">
+
+      <!-- Breadcrumb path -->
+      <div class="list-group list-group-flush flex-shrink-0">
+        <template v-for="(path, idx) in pathData">
+          <a v-if="path.level <= maxLevel && path.level > 0" :key="'p-'+idx" href="#"
+             class="list-group-item list-group-item-action d-flex align-items-center py-2"
+             :class="{ 'bg-success-subtle': config.wilayah_id == path.id }"
+             @click.prevent="goBack(path.id)">
+            <span class="badge bg-body-secondary text-muted me-2" style="min-width:70px;font-size:0.7rem">{{ levelName(path.level_label, path.level) }}</span>
+            <span class="small" :class="{ 'fw-bold text-success': config.wilayah_id == path.id }">{{ path.caption || path.nama }}</span>
+            <i class="bi bi-arrow-counterclockwise ms-auto text-muted small"></i>
+          </a>
+        </template>
+      </div>
+
+      <!-- Search input -->
+      <div v-if="pathData.length > 0 && pathData[pathData.length-1].level < maxLevel"
+           class="border-top flex-shrink-0 px-3 pt-2 pb-1">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-primary text-white" style="font-size:0.7rem">{{ nextLevelName }}</span>
+          <input type="text" class="form-control" v-model="filter"
+                 placeholder="Ketik untuk filter..."
+                 style="font-size:0.8rem">
+          <span class="input-group-text" style="font-size:0.7rem">
+            <i class="bi bi-list-ul me-1"></i>{{ filteredChildList.length }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Child list: fills remaining space, scrolls only if needed -->
+      <div v-if="showList && pathData.length > 0 && pathData[pathData.length-1].level < maxLevel"
+           class="list-group list-group-flush flex-grow-1 overflow-auto" style="min-height:0">
+        <div v-if="filteredChildList.length === 0" class="list-group-item text-muted small text-center py-3">
+          <i class="bi bi-search me-1"></i>Tidak ditemukan
+        </div>
+        <a v-for="item in filteredChildList" :key="item.id" href="#"
+           class="list-group-item list-group-item-action d-flex align-items-center py-2"
+           @click.prevent="pickChild(item.id)">
+          <i class="bi bi-geo text-muted me-2" style="font-size:0.75rem"></i>
+          <span class="small">{{ item.nama }}</span>
+          <span v-if="item.children > 0" class="badge bg-body-secondary text-muted ms-auto" style="font-size:0.65rem">{{ item.children }}</span>
+        </a>
+      </div>
+
+      <!-- Spacer when list hidden: push button to bottom -->
+      <div v-else class="flex-grow-1"></div>
+
+      <!-- Select button -->
+      <div v-if="pathData.length > 0 && lastPath" class="px-3 py-3 flex-shrink-0 border-top">
+        <button class="btn btn-sm btn-primary w-100 rounded-3" @click="selectFromPath(lastPath)"
+                :disabled="config.wilayah_id == lastPath.id">
+          <i class="bi bi-check-circle me-1"></i>
+          Pilih: {{ lastPath.caption || lastPath.nama }}
+        </button>
+      </div>
+
+    </template>
   </div>
 </template>
 
@@ -108,7 +110,7 @@ module.exports = {
       childList: [],
       selectedId: '',
       filter: '',
-      showList: false,
+      showList: true,
       loading: false,
       maxLevel: 4,
       errorMsg: ''
@@ -181,6 +183,7 @@ module.exports = {
         .then(resp => {
           var data = resp.data;
           this.childList = Array.from(Object.keys(data), function(k) { return data[k]; });
+          this.showList = true;
         })
         .catch(e => this.handleError(e));
     },
