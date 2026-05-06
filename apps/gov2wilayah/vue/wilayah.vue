@@ -44,7 +44,7 @@
       <!-- Breadcrumb path -->
       <div class="list-group list-group-flush flex-shrink-0">
         <template v-for="(path, idx) in pathData">
-          <a v-if="path.level <= maxLevel" :key="'p-'+idx" href="#"
+          <a v-if="path.level <= maxLevel && (path.level > 0 || hasMultipleRoots)" :key="'p-'+idx" href="#"
              class="list-group-item list-group-item-action d-flex align-items-center py-2"
              :class="{ 'bg-success-subtle': config.wilayah_id == path.id }"
              @click.prevent="goBack(path.id)">
@@ -111,6 +111,7 @@ module.exports = {
       selectedId: '',
       filter: '',
       showList: true,
+      hasMultipleRoots: false,
       loading: false,
       maxLevel: 4,
       errorMsg: ''
@@ -183,6 +184,14 @@ module.exports = {
         .then(resp => {
           var data = resp.data;
           this.childList = Array.isArray(data) ? data : [];
+          if (this.pathData.length === 1) {
+            if (this.childList.length === 1) {
+              this.hasMultipleRoots = false;
+              this.pickChild(this.childList[0].id);
+              return;
+            }
+            this.hasMultipleRoots = this.childList.length > 1;
+          }
           this.showList = true;
         })
         .catch(e => this.handleError(e));
