@@ -17,7 +17,7 @@ class index extends \Gov2lib\api {
 
     function index() {
         global $self,$doc;
-        $self->gov2nav->setDefaultNavCustom();
+        $self->gov2nav->setCustomNav();
         $doc->body("pageTitle",'Survey');
         $doc->body("subTitle",'Kuesioner');
         $self->content();
@@ -25,7 +25,7 @@ class index extends \Gov2lib\api {
 
     function version() {
         global $self,$doc;
-        $self->gov2nav->setDefaultNavCustom();
+        $self->gov2nav->setCustomNav();
         $doc->body("pageTitle",'phpVB Skeleton');
         $doc->body("subTitle",'Versioning');
         $doc->body("appName",'Gov2.0 SSO');

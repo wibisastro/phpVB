@@ -13,7 +13,7 @@ class index extends \Gov2lib\api {
 
     function index () {
         global $self,$doc, $pageID;
-        $self->gov2nav->setDefaultNavCustom();
+        $self->gov2nav->setCustomNav();
         $self->loadTable();
         $doc->body("pageTitle",'Gov2pipe');
 

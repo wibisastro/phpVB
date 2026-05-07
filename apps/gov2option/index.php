@@ -14,7 +14,7 @@ class index extends \Gov2lib\api {
     
     function index() {
         global $self,$doc,$config;
-        $self->gov2nav->setDefaultNavCustom();
+        $self->gov2nav->setCustomNav();
         $self->gov2notification->content();
         $doc->body("pageTitle",'Sidalih');
         $doc->body("subTitle",'SISTEM INFORMASI DAFTAR PEMILIH');
@@ -34,7 +34,7 @@ class index extends \Gov2lib\api {
 
     function sidalih3(){
         global $self, $doc;
-        $self->gov2nav->setDefaultNavCustom();
+        $self->gov2nav->setCustomNav();
         $self->gov2notification->content();
         $doc->body("pageTitle",'Sidalih');
         $doc->body("subTitle",'SISTEM INFORMASI DAFTAR PEMILIH');
@@ -43,7 +43,7 @@ class index extends \Gov2lib\api {
     
     function version() {
         global $self,$doc;
-        $self->gov2nav->setDefaultNavCustom();
+        $self->gov2nav->setCustomNav();
         $self->gov2notification->content();
         $doc->body("pageTitle",'Sidalih');
         $doc->body("subTitle",'Versioning');

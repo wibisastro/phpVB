@@ -1,9 +1,5 @@
 <div class="p-4">
-  {% if readmeHtml %}
-    <div class="readme-content">
-      {{ readmeHtml|raw }}
-    </div>
-  {% else %}
-    <p class="text-muted">Tidak ada README.md</p>
-  {% endif %}
+  <div class="readme-content">
+    {{ readMD|raw }}
+  </div>
 </div>

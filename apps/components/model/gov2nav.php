@@ -23,7 +23,7 @@ class gov2nav extends \Gov2lib\document {
         $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
 	}
 
-    function setDefaultNavCustom ($_menuFile="") {
+    function setCustomNav ($_menuFile="") {
         global $pageID,$config,$self;
         $this->sidebar('gov2navMenuCustom.html');
         $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');

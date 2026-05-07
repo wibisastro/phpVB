@@ -238,10 +238,70 @@ class document extends customException
 
     /**
      * Set a body template variable.
+     *
+     * Two convenience conventions kick in when called from a controller:
+     *
+     * - body('readMD'[, 'name']): resolves <caller_dir>/md/<name>.md and
+     *   renders to HTML. Without 'name', defaults to the caller's class
+     *   short-name. Missing files render the framework default at
+     *   core/lib/md_missing.md (with {path} substituted), with a
+     *   hardcoded HTML notice as final fallback.
+     *
+     * - body('pageTitle'): without a value, defaults to ucfirst() of the
+     *   caller's class short-name.
      */
-    public function body(string $var, mixed $val): void
+    public function body(string $var, mixed $val = ''): void
     {
+        if ($var === 'readMD' || ($var === 'pageTitle' && $val === '')) {
+            $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] ?? null;
+            $val = $var === 'readMD'
+                ? $this->resolveMD((string) $val, $caller)
+                : $this->resolvePageTitle($caller);
+        }
         $this->body[$var] = $val;
+    }
+
+    private function resolveMD(string $name, ?array $caller): string
+    {
+        if (!$caller || empty($caller['file']) || empty($caller['class'])) {
+            return $this->mdMissing($name !== '' ? "md/{$name}.md" : 'md/?.md');
+        }
+
+        if ($name === '') {
+            $parts = explode('\\', $caller['class']);
+            $name = end($parts);
+        }
+
+        $path = dirname($caller['file']) . "/md/{$name}.md";
+        if (file_exists($path)) {
+            return markdown::renderFile($path);
+        }
+
+        return $this->mdMissing("md/{$name}.md");
+    }
+
+    private function resolvePageTitle(?array $caller): string
+    {
+        if (!$caller || empty($caller['class'])) {
+            return '';
+        }
+        $parts = explode('\\', $caller['class']);
+        return ucfirst((string) end($parts));
+    }
+
+    private function mdMissing(string $missingPath): string
+    {
+        $defaultFile = __DIR__ . '/md_missing.md';
+        if (file_exists($defaultFile)) {
+            return str_replace(
+                '{path}',
+                htmlspecialchars($missingPath, ENT_QUOTES),
+                markdown::renderFile($defaultFile)
+            );
+        }
+        return '<div class="notification is-warning"><p>File markdown <code>'
+            . htmlspecialchars($missingPath, ENT_QUOTES)
+            . '</code> tidak ditemukan. Buat file tersebut untuk mengisi konten halaman ini.</p></div>';
     }
 
     /**

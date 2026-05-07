@@ -13,7 +13,7 @@ class survey_view extends \Gov2lib\api {
     function index ()
     {
         global $self,$doc;
-        $self->gov2nav->setDefaultNavCustom();
+        $self->gov2nav->setCustomNav();
         $doc->body("pageTitle",'Hasil Survey');
         $self->loadTable();
         $self->content();

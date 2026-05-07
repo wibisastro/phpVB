@@ -13,7 +13,7 @@ class pipedin extends \Gov2lib\api {
 
     function index () {
         global $self,$doc;
-        $self->gov2nav->setDefaultNavCustom();
+        $self->gov2nav->setCustomNav();
         $endpoint_option = $self->opt->get(['nama' => 'krisna_home']);
         $krisna_home_endpoint = $endpoint_option['value'];
         $_authorized=$self->openPipe($krisna_home_endpoint);
@@ -24,7 +24,7 @@ class pipedin extends \Gov2lib\api {
     
     function logout () {
         global $self,$doc;
-        $self->gov2nav->setDefaultNavCustom();
+        $self->gov2nav->setCustomNav();
         $endpoint_option = $self->opt->get(['nama' => 'krisna_logout']);
         $krisna_logout_endpoint = $endpoint_option['value'];
         $_authorized=$self->openPipe($krisna_logout_endpoint);

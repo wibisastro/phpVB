@@ -8,14 +8,8 @@ class index {
         global $self,$doc;
         $self->take("components","gov2nav", "setDefaultNav");
         $doc->body("pageTitle",'Home Page');
-
-        $readmePath = __DIR__ . '/README.md';
-        if (file_exists($readmePath)) {
-            $doc->body("readmeHtml", \Gov2lib\markdown::renderFile($readmePath));
-            $self->content();
-        } else {
-            $doc->baseBody = "error404.html";
-        }
+        $doc->body("readMD");
+        $self->content();
     }
 }
 /*

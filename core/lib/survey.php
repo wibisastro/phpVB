@@ -24,7 +24,7 @@ class survey
     public function index(): void
     {
         global $self, $doc, $vars, $cmdID;
-        $self->gov2nav->setDefaultNavCustom();
+        $self->gov2nav->setCustomNav();
         $role = isset($vars['action']) ? $vars['action'] : 'Setup';
         $doc->body("pageTitle", strtoupper($vars['app']) . " " . ucwords($role));
 
