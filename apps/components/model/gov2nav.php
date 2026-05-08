@@ -16,29 +16,29 @@ class gov2nav extends \Gov2lib\document {
 	}
 
 	function setDefaultNav ($_menuFile="") {
-        global $pageID,$config,$self;
+        global $pageID,$config,$self,$doc;
         // Accumulate menu data (boleh dipanggil berkali-kali untuk multi-app)
         $this->menus=$this->menubar($pageID,$_menuFile);
-        // Register sidebar template hanya 1x meskipun method dipanggil berkali-kali
-        if (!($this->_sidebarRegistered ?? false)) {
+        // Register sidebar template hanya 1x — cek langsung di $doc karena
+        // take() bikin instance baru tiap call, jadi instance flag tidak persist.
+        $sidebarTpl = '@components/gov2navMenu.html';
+        if (!in_array($sidebarTpl, (array)($doc->sidebar ?? []), true)) {
             $this->sidebar('gov2navMenu.html');
-            $this->_sidebarRegistered = true;
         }
         // Register breadcrumb template hanya 1x
-        if (!($this->_breadcrumbRegistered ?? false)) {
+        $breadcrumbTpl = '@components/gov2navBreadcrumb.html';
+        if (!in_array($breadcrumbTpl, (array)($doc->content ?? []), true)) {
             $this->content('gov2navBreadcrumb.html');
-            $this->_breadcrumbRegistered = true;
         }
         $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
 	}
 
     function setCustomNav ($_menuFile="") {
-        global $pageID,$config,$self;
-        // setCustomNav: Vue fetch async, tidak ada akumulasi data di sini.
-        // Template hanya perlu register 1x.
-        if (!($this->_sidebarRegistered ?? false)) {
+        global $pageID,$config,$self,$doc;
+        // Cek di $doc langsung agar tahan terhadap multi-instance via take()
+        $sidebarTpl = '@components/gov2navMenuCustom.html';
+        if (!in_array($sidebarTpl, (array)($doc->sidebar ?? []), true)) {
             $this->sidebar('gov2navMenuCustom.html');
-            $this->_sidebarRegistered = true;
         }
         $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
     }
