@@ -19,15 +19,13 @@ class gov2nav extends \Gov2lib\document {
         global $pageID,$config,$self,$doc;
         // Accumulate menu data (boleh dipanggil berkali-kali untuk multi-app)
         $this->menus=$this->menubar($pageID,$_menuFile);
-        // Register sidebar template hanya 1x — cek langsung di $doc karena
-        // take() bikin instance baru tiap call, jadi instance flag tidak persist.
-        $sidebarTpl = '@components/gov2navMenu.html';
-        if (!in_array($sidebarTpl, (array)($doc->sidebar ?? []), true)) {
+        // Register sidebar template hanya 1x — pakai substring match agar
+        // tahan terhadap variasi prefix module (@components/ vs raw filename)
+        if (!$this->_alreadyRegistered($doc->sidebar ?? [], 'gov2navMenu.html')) {
             $this->sidebar('gov2navMenu.html');
         }
         // Register breadcrumb template hanya 1x
-        $breadcrumbTpl = '@components/gov2navBreadcrumb.html';
-        if (!in_array($breadcrumbTpl, (array)($doc->content ?? []), true)) {
+        if (!$this->_alreadyRegistered($doc->content ?? [], 'gov2navBreadcrumb.html')) {
             $this->content('gov2navBreadcrumb.html');
         }
         $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
@@ -36,11 +34,21 @@ class gov2nav extends \Gov2lib\document {
     function setCustomNav ($_menuFile="") {
         global $pageID,$config,$self,$doc;
         // Cek di $doc langsung agar tahan terhadap multi-instance via take()
-        $sidebarTpl = '@components/gov2navMenuCustom.html';
-        if (!in_array($sidebarTpl, (array)($doc->sidebar ?? []), true)) {
+        if (!$this->_alreadyRegistered($doc->sidebar ?? [], 'gov2navMenuCustom.html')) {
             $this->sidebar('gov2navMenuCustom.html');
         }
         $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
+    }
+
+    private function _alreadyRegistered($haystack, $needle) {
+        // Substring match agar tahan variasi format penyimpanan
+        // (mis. '@components/gov2navMenu.html' atau raw 'gov2navMenu.html')
+        foreach ((array)$haystack as $entry) {
+            if (is_string($entry) && str_contains($entry, $needle)) {
+                return true;
+            }
+        }
+        return false;
     }
 	
     function menubar ($pageID,$_menuFile="",$xml=true, $data = array(), $caption = '', $icon = '') {
