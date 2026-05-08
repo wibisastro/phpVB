@@ -68,17 +68,26 @@
             Tidak ada data
           </li>
           <template v-for="item in treeItems">
-            <!-- Eselon 1 header (clickable to expand/collapse) -->
+            <!-- Eselon 1 header: chevron = expand, area nama = pilih -->
             <li :key="'h-' + item.id"
-                class="list-group-item border-0 px-3 py-2 list-group-item-action"
-                style="cursor:pointer"
-                @click="toggleExpand(item)">
-              <div class="d-flex align-items-center">
-                <i class="bi me-2" :class="item.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"
-                   style="font-size:0.75rem; width:12px"></i>
-                <div class="flex-grow-1 small fw-semibold">
+                class="list-group-item border-0 p-0"
+                :class="{ 'bg-primary-subtle': config.unit_id == item.id }">
+              <div class="d-flex align-items-stretch">
+                <button type="button"
+                        class="btn btn-sm border-0 rounded-0 px-2 py-2 expand-toggle"
+                        :title="item.expanded ? 'Tutup sub instansi' : 'Buka sub instansi'"
+                        @click.stop="toggleExpand(item)">
+                  <i class="bi" :class="item.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"
+                     style="font-size:0.75rem"></i>
+                </button>
+                <a href="#"
+                   class="flex-grow-1 px-2 py-2 small fw-semibold text-decoration-none select-area"
+                   :class="config.unit_id == item.id ? 'fw-bold text-primary' : 'text-body'"
+                   title="Pilih instansi ini"
+                   @click.prevent="selectUnit(item)">
                   <span>{{ item.kode }}</span> - {{ item.nama }}
-                </div>
+                  <i class="bi bi-check2 select-hint ms-1 text-primary"></i>
+                </a>
               </div>
             </li>
             <!-- Eselon 2 children (shown when expanded) -->
@@ -336,5 +345,31 @@ module.exports = {
 <style scoped>
 .list-group-item-action:hover {
   background-color: #f0f0f0;
+}
+.expand-toggle {
+  background-color: transparent;
+  color: #6c757d;
+  border-right: 1px solid transparent;
+  transition: background-color 0.12s, border-color 0.12s;
+}
+.expand-toggle:hover {
+  background-color: #e9ecef;
+  border-right-color: #dee2e6;
+  color: #212529;
+}
+.select-area {
+  cursor: pointer;
+  transition: background-color 0.12s;
+}
+.select-area:hover {
+  background-color: #f0f0f0;
+}
+.select-hint {
+  opacity: 0;
+  font-size: 0.75rem;
+  transition: opacity 0.12s;
+}
+.select-area:hover .select-hint {
+  opacity: 1;
 }
 </style>

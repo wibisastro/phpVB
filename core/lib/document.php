@@ -243,8 +243,7 @@ class document extends customException
      *
      * - body('readMD'[, 'name']): resolves <caller_dir>/md/<name>.md and
      *   renders to HTML. Without 'name', defaults to the caller's class
-     *   short-name. The 'name' must not contain dots — dots are reserved
-     *   as separator for the tenant prefix (see below).
+     *   short-name.
      *
      *   Multi-tenant tenant slug resolution (in order):
      *   1. $config->domain->attr['tenant']  — explicit XML override
@@ -253,9 +252,12 @@ class document extends customException
      *      bkpm.gov2.web.id → "bkpm"
      *   3. Empty → no tenant lookup, use generic only
      *
-     *   With a tenant slug, looks for md/{tenant}.{name}.md first,
-     *   then falls back to md/{name}.md. Slug is sanitized to
-     *   ^[a-z0-9_-]+$ (case-insensitive); other patterns disable tenant lookup.
+     *   With a tenant slug, file lookup chain (first match wins):
+     *   1. md/{tenant}/{name}.md   — tenant subfolder
+     *   2. md/{name}.md            — generic fallback
+     *
+     *   Slug is sanitized to ^[a-z0-9_-]+$ (case-insensitive); other patterns
+     *   disable tenant lookup.
      *
      *   Missing files render the framework default at core/lib/md_missing.md
      *   (with {path} substituted), with a hardcoded HTML notice as final fallback.
@@ -288,15 +290,17 @@ class document extends customException
         $baseDir = dirname($caller['file']) . '/md';
         $tenant = $this->resolveTenant();
 
-        if ($tenant !== '' && file_exists("{$baseDir}/{$tenant}.{$name}.md")) {
-            return markdown::renderFile("{$baseDir}/{$tenant}.{$name}.md");
+        if ($tenant !== '' && file_exists("{$baseDir}/{$tenant}/{$name}.md")) {
+            return markdown::renderFile("{$baseDir}/{$tenant}/{$name}.md");
         }
 
         if (file_exists("{$baseDir}/{$name}.md")) {
             return markdown::renderFile("{$baseDir}/{$name}.md");
         }
 
-        $missingPath = $tenant !== '' ? "md/{$tenant}.{$name}.md atau md/{$name}.md" : "md/{$name}.md";
+        $missingPath = $tenant !== ''
+            ? "md/{$tenant}/{$name}.md atau md/{$name}.md"
+            : "md/{$name}.md";
         return $this->mdMissing($missingPath);
     }
 

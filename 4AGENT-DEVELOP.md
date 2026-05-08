@@ -78,13 +78,16 @@ Untuk app yang dipakai banyak tenant (multi-domain), konten markdown bisa di-ove
 **Struktur folder `md/`:**
 
 ```
-apps/home/
-├── index.php
-├── model/index.php
-└── md/
-    ├── index.md                    ← Generic (fallback untuk semua tenant)
-    ├── bkpm.index.md               ← Override khusus tenant bkpm
-    └── kemenko.index.md            ← Override khusus tenant kemenko
+apps/home/md/
+├── index.md                ← Generic (fallback semua tenant)
+├── tentang.md
+├── bkpm/                   ← Namespace tenant bkpm
+│   ├── index.md
+│   ├── tentang.md
+│   └── kontak.md
+└── kemenko/
+    ├── index.md
+    └── tentang.md
 ```
 
 **Pemanggilan dari controller — tidak berubah:**
@@ -94,13 +97,12 @@ $doc->body('readMD');             // resolve md/{className}.md (caller's class n
 $doc->body('readMD', 'tentang');  // resolve md/tentang.md
 ```
 
-**Resolution chain:**
-1. Cari `md/{tenant}.{name}.md` (jika tenant slug tersedia dari attr atau subdomain)
-2. Fallback ke `md/{name}.md` (generic)
-3. Fallback ke `core/lib/md_missing.md` (template error)
+**Resolution chain (first match wins):**
+1. `md/{tenant}/{name}.md` — tenant subfolder (kalau tenant slug tersedia)
+2. `md/{name}.md` — generic fallback
+3. `core/lib/md_missing.md` — template error
 
 **Aturan:**
-- Nilai `name` **tidak boleh mengandung titik** — titik di-reserve sebagai separator tenant prefix
 - Tenant slug di-sanitasi ke `^[a-z0-9_-]+$`; selain itu di-skip
 - Auto-derive subdomain cocok untuk skenario `{tenant}.domain-utama.tld` — kalau struktur domain berbeda, pakai atribut `tenant="..."` eksplisit
 
