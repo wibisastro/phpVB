@@ -48,6 +48,62 @@ apps/gov2inventory/
     └── kategori.sql
 ```
 
+### Konten Markdown Per-Tenant (Multi-Tenant)
+
+Untuk app yang dipakai banyak tenant (multi-domain), konten markdown bisa di-override per-tenant via naming convention `{tenant}.{name}.md`.
+
+**Resolusi tenant slug (urutan prioritas):**
+
+1. **Atribut XML eksplisit** `tenant="..."` di `config.{stage}.xml`
+2. **Auto-derive dari subdomain** — label pertama dari `SERVER_NAME`
+3. Kosong → tidak ada lookup tenant-specific, langsung pakai generic
+
+```xml
+<domain>
+    <!-- Eksplisit (override otomatis): -->
+    <portal.bkpm.go.id tenant="bkpm">home</portal.bkpm.go.id>
+
+    <!-- Auto-derive: tenant = "bkpm" (label pertama) -->
+    <bkpm.gov2.web.id>home</bkpm.gov2.web.id>
+
+    <!-- localhost / IP / single-label hostname → tenant kosong -->
+    <localhost>home</localhost>
+</domain>
+```
+
+> **Catatan:** value entry `<domain>` (`home` di contoh atas) tetap menjadi `$pageID` default. Atribut `tenant` adalah **field terpisah** khusus untuk override konten per-tenant.
+>
+> Slug di-sanitasi ke `^[a-z0-9_-]+$` — kalau hasil derive tidak match (misal IP address `192`), tenant lookup di-skip.
+
+**Struktur folder `md/`:**
+
+```
+apps/home/
+├── index.php
+├── model/index.php
+└── md/
+    ├── index.md                    ← Generic (fallback untuk semua tenant)
+    ├── bkpm.index.md               ← Override khusus tenant bkpm
+    └── kemenko.index.md            ← Override khusus tenant kemenko
+```
+
+**Pemanggilan dari controller — tidak berubah:**
+
+```php
+$doc->body('readMD');             // resolve md/{className}.md (caller's class name)
+$doc->body('readMD', 'tentang');  // resolve md/tentang.md
+```
+
+**Resolution chain:**
+1. Cari `md/{tenant}.{name}.md` (jika tenant slug tersedia dari attr atau subdomain)
+2. Fallback ke `md/{name}.md` (generic)
+3. Fallback ke `core/lib/md_missing.md` (template error)
+
+**Aturan:**
+- Nilai `name` **tidak boleh mengandung titik** — titik di-reserve sebagai separator tenant prefix
+- Tenant slug di-sanitasi ke `^[a-z0-9_-]+$`; selain itu di-skip
+- Auto-derive subdomain cocok untuk skenario `{tenant}.domain-utama.tld` — kalau struktur domain berbeda, pakai atribut `tenant="..."` eksplisit
+
 ---
 
 ## 2. Struktur Minimal (PoC)

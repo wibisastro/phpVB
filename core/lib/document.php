@@ -243,9 +243,22 @@ class document extends customException
      *
      * - body('readMD'[, 'name']): resolves <caller_dir>/md/<name>.md and
      *   renders to HTML. Without 'name', defaults to the caller's class
-     *   short-name. Missing files render the framework default at
-     *   core/lib/md_missing.md (with {path} substituted), with a
-     *   hardcoded HTML notice as final fallback.
+     *   short-name. The 'name' must not contain dots — dots are reserved
+     *   as separator for the tenant prefix (see below).
+     *
+     *   Multi-tenant tenant slug resolution (in order):
+     *   1. $config->domain->attr['tenant']  — explicit XML override
+     *      <bkpm.gov2.web.id tenant="bkpm">home</bkpm.gov2.web.id>
+     *   2. First subdomain label of SERVER_NAME (auto)
+     *      bkpm.gov2.web.id → "bkpm"
+     *   3. Empty → no tenant lookup, use generic only
+     *
+     *   With a tenant slug, looks for md/{tenant}.{name}.md first,
+     *   then falls back to md/{name}.md. Slug is sanitized to
+     *   ^[a-z0-9_-]+$ (case-insensitive); other patterns disable tenant lookup.
+     *
+     *   Missing files render the framework default at core/lib/md_missing.md
+     *   (with {path} substituted), with a hardcoded HTML notice as final fallback.
      *
      * - body('pageTitle'): without a value, defaults to ucfirst() of the
      *   caller's class short-name.
@@ -272,12 +285,41 @@ class document extends customException
             $name = end($parts);
         }
 
-        $path = dirname($caller['file']) . "/md/{$name}.md";
-        if (file_exists($path)) {
-            return markdown::renderFile($path);
+        $baseDir = dirname($caller['file']) . '/md';
+        $tenant = $this->resolveTenant();
+
+        if ($tenant !== '' && file_exists("{$baseDir}/{$tenant}.{$name}.md")) {
+            return markdown::renderFile("{$baseDir}/{$tenant}.{$name}.md");
         }
 
-        return $this->mdMissing("md/{$name}.md");
+        if (file_exists("{$baseDir}/{$name}.md")) {
+            return markdown::renderFile("{$baseDir}/{$name}.md");
+        }
+
+        $missingPath = $tenant !== '' ? "md/{$tenant}.{$name}.md atau md/{$name}.md" : "md/{$name}.md";
+        return $this->mdMissing($missingPath);
+    }
+
+    /**
+     * Resolve tenant slug for multi-tenant md lookup.
+     *
+     * Priority: $config->domain->attr['tenant'] → first subdomain label
+     * of SERVER_NAME → empty. Result is sanitized to ^[a-z0-9_-]+$.
+     */
+    private function resolveTenant(): string
+    {
+        global $config;
+
+        $tenant = trim((string) ($config->domain->attr['tenant'] ?? ''));
+
+        if ($tenant === '') {
+            $serverName = $_SERVER['SERVER_NAME'] ?? '';
+            if ($serverName !== '' && str_contains($serverName, '.')) {
+                $tenant = strtolower(strtok($serverName, '.'));
+            }
+        }
+
+        return preg_match('/^[a-z0-9_-]+$/i', $tenant) ? $tenant : '';
     }
 
     private function resolvePageTitle(?array $caller): string
