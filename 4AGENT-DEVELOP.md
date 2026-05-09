@@ -190,6 +190,39 @@ Tambahan jika butuh **database**:
 - `[/{id}]` = parameter opsional (square brackets)
 - Method di controller dipanggil otomatis berdasarkan `{cmd}`
 
+#### App sebagai default landing page (di-route dari `/`)
+
+Kalau app ini di-set sebagai default di `<domain>` config:
+
+```xml
+<domain>
+    <portal.example.id>gov2example</portal.example.id>   <!-- gov2example = default -->
+</domain>
+```
+
+**Mekanisme default framework** (di [`core/init/route.php`](core/init/route.php)): saat user akses root `/`, dispatcher coba match `/` dulu. Kalau tidak ada route yang match, framework **fallback retry** ke `/{pageID}` (route standar app). Jadi app **tidak wajib register `<uri>/</uri>`** — selama route `<uri>/{pageID}</uri>` ada (yang memang konvensi standar), root URL akan jalan.
+
+**Tapi sebaiknya tetap atur sendiri** route untuk `/` dengan handler eksplisit:
+
+```xml
+<route>
+    <method>GET</method>
+    <uri>/</uri>
+    <handler>gov2example\model\index</handler>
+</route>
+```
+
+Alasan:
+- **Kontrol eksplisit** atas root behavior (misal landing page beda dari `/{pageID}`, redirect khusus, custom class)
+- **Tidak bergantung** pada fallback framework yang bisa berubah implementasinya
+- **Self-documenting** — siapa baca route.xml langsung tahu `/` di-handle, tidak perlu trace ke framework
+- **Predictable** — eksplisit selalu menang; fallback hanya kick in saat dispatcher NOT_FOUND
+
+Aturan precedence:
+1. Route eksplisit di route.xml app dicoba duluan
+2. Kalau tidak match → framework retry dengan `/{pageID}`
+3. Kalau masih tidak match → 404
+
 ### menu.xml
 
 ```xml

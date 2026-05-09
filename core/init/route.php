@@ -78,6 +78,10 @@ try {
                 if (is_array($req)) { $_POST=array_merge($_POST,$req); }
             } else {
                 $pageID=trim($config->domain->{$_SERVER["SERVER_NAME"]});
+                // Track that pageID was auto-resolved from config (not from URL).
+                // Used below as a fallback: if user registered no route for `/`,
+                // dispatcher will retry with `/{pageID}` (the standard app route).
+                $pageIDFromConfig = true;
             }
     } elseif ($pageID=="login") {
         header("location: /".trim($config->domain->{$_SERVER["SERVER_NAME"]})."/$pageID");
@@ -109,6 +113,23 @@ try {
                     }
                 });
                 $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
+
+                // Fallback: if pageID was auto-resolved from <domain> config
+                // (user accessed bare `/` or `/index.php`) and no route matched,
+                // retry with `/{pageID}`. This way apps don't need to register
+                // `<uri>/</uri>` explicitly — the standard `/{pageID}` route
+                // is used instead. Apps that DO register `/` keep precedence.
+                if ($routeInfo[0] === FastRoute\Dispatcher::NOT_FOUND
+                    && !empty($pageIDFromConfig)
+                    && $pageID !== '') {
+                    $fallbackUri = rtrim((string)($config->webroot ?? ''), '/') . '/' . $pageID;
+                    $retryInfo = $dispatcher->dispatch($httpMethod, $fallbackUri);
+                    if ($retryInfo[0] === FastRoute\Dispatcher::FOUND) {
+                        $uri = $fallbackUri;
+                        $routeInfo = $retryInfo;
+                    }
+                }
+
                 switch ($routeInfo[0]) {
                     case FastRoute\Dispatcher::NOT_FOUND:
                         throw new Exception("RouteNotFound:".$uri);

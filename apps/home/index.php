@@ -19,6 +19,14 @@ class index {
         $doc->body("readMD",'phpvb');
         $self->content();
     }
+
+    function sandbox () {
+        global $self,$doc;
+        $self->take("components","gov2nav", "setDefaultNav");
+        $doc->body("pageTitle",'Sandbox Gov3.id');
+        $doc->body("readMD",'sandbox');
+        $self->content();
+    }
 }
 /*
 $doc->body("pageTitle",'Government 2.0 StarterKit');
