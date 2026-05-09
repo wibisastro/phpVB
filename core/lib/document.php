@@ -278,7 +278,7 @@ class document extends customException
 
     private function resolveMD(string $name, ?array $caller): string
     {
-        if (!$caller || empty($caller['file']) || empty($caller['class'])) {
+        if (!$caller || empty($caller['class'])) {
             return $this->mdMissing($name !== '' ? "md/{$name}.md" : 'md/?.md');
         }
 
@@ -287,7 +287,18 @@ class document extends customException
             $name = end($parts);
         }
 
-        $baseDir = dirname($caller['file']) . '/md';
+        // Resolve controller file via Reflection on $caller['class'].
+        // Note: $caller['file'] from debug_backtrace is the *callsite* of body(),
+        // which sits in the dispatcher (core/init/index.php) — not the controller.
+        try {
+            $controllerFile = (new \ReflectionClass($caller['class']))->getFileName();
+        } catch (\ReflectionException) {
+            $controllerFile = false;
+        }
+        if ($controllerFile === false) {
+            return $this->mdMissing($name !== '' ? "md/{$name}.md" : 'md/?.md');
+        }
+        $baseDir = dirname($controllerFile) . '/md';
         $tenant = $this->resolveTenant();
 
         if ($tenant !== '' && file_exists("{$baseDir}/{$tenant}/{$name}.md")) {
