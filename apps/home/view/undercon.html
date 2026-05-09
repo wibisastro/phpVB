@@ -1,0 +1,13 @@
+<div class="p-4">
+  <div class="readme-content">
+    {{ readMD|raw }}
+    {% if ref %}
+    <div class="alert alert-info mt-4 small">
+      <strong>Cabang yang belum dirancang:</strong> <code>{{ ref }}</code>
+    </div>
+    {% endif %}
+    <div class="mt-4">
+      <a href="/" class="btn btn-secondary">Kembali ke Beranda</a>
+    </div>
+  </div>
+</div>

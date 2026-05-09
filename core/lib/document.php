@@ -326,6 +326,43 @@ class document extends customException
         return preg_match('/^[a-z0-9_-]+$/i', $tenant) ? $tenant : '';
     }
 
+    /**
+     * Format the sidebar brand text. Priority:
+     *   1. $config->domain->attr['brand']  — per-domain XML attribute
+     *   2. $config->brand                  — global XML element
+     *   3. tenant slug uppercased          — auto-derived
+     *   4. "phpVB"                         — final fallback
+     *
+     * All sources are truncated to 10 chars (with ellipsis if longer).
+     * Custom brand (priority 1-2) keeps user casing; auto-tenant is uppercased.
+     */
+    private function formatBrand(): string
+    {
+        global $config;
+
+        $brand = trim((string) ($config->domain->attr['brand'] ?? ''));
+        if ($brand === '') {
+            $brand = trim((string) ($config->brand ?? ''));
+        }
+
+        if ($brand !== '') {
+            return $this->truncateBrand($brand);
+        }
+
+        $tenant = $this->resolveTenant();
+        if ($tenant === '') {
+            return 'phpVB';
+        }
+
+        return $this->truncateBrand(strtoupper($tenant));
+    }
+
+    private function truncateBrand(string $text): string
+    {
+        $max = 10;
+        return strlen($text) <= $max ? $text : substr($text, 0, $max - 1) . '…';
+    }
+
     private function resolvePageTitle(?array $caller): string
     {
         if (!$caller || empty($caller['class'])) {
@@ -509,6 +546,7 @@ class document extends customException
 
         $this->body('sidebars', $this->sidebar);
         $this->body('sidebarsRight', $this->sidebarRight);
+        $this->body('brandText', $this->formatBrand());
 
         // Load top-bar options from database
         if (isset($self) && isset($self->opt) && $pageID) {

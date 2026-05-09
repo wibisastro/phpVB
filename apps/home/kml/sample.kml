@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Sample — Ibu Kota Provinsi Indonesia (sebagian)</name>
+    <description>Beberapa titik ibu kota provinsi sebagai sampel KML viewer.</description>
+
+    <Style id="kotaStyle">
+      <IconStyle>
+        <color>ff0099ff</color>
+        <scale>1.1</scale>
+      </IconStyle>
+    </Style>
+
+    <Placemark>
+      <name>Jakarta</name>
+      <description>Ibu kota DKI Jakarta dan Indonesia</description>
+      <styleUrl>#kotaStyle</styleUrl>
+      <Point><coordinates>106.8456,-6.2088,0</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>Bandung</name>
+      <description>Ibu kota Jawa Barat</description>
+      <styleUrl>#kotaStyle</styleUrl>
+      <Point><coordinates>107.6191,-6.9175,0</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>Surabaya</name>
+      <description>Ibu kota Jawa Timur</description>
+      <styleUrl>#kotaStyle</styleUrl>
+      <Point><coordinates>112.7521,-7.2575,0</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>Makassar</name>
+      <description>Ibu kota Sulawesi Selatan</description>
+      <styleUrl>#kotaStyle</styleUrl>
+      <Point><coordinates>119.4327,-5.1477,0</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>Medan</name>
+      <description>Ibu kota Sumatera Utara</description>
+      <styleUrl>#kotaStyle</styleUrl>
+      <Point><coordinates>98.6722,3.5952,0</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>Denpasar</name>
+      <description>Ibu kota Bali</description>
+      <styleUrl>#kotaStyle</styleUrl>
+      <Point><coordinates>115.2126,-8.6705,0</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>Jayapura</name>
+      <description>Ibu kota Papua</description>
+      <styleUrl>#kotaStyle</styleUrl>
+      <Point><coordinates>140.7181,-2.5337,0</coordinates></Point>
+    </Placemark>
+
+  </Document>
+</kml>

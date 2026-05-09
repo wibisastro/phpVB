@@ -27,7 +27,32 @@
 	</route>
     <route>
 		<method>GET</method>
+		<uri>/home/undercon</uri>
+		<handler>home\model\undercon</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/home/viewer/{cmd}/{file}</uri>
+		<handler>home\model\viewer</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/home/viewer/{format}/{file}/{cmd}</uri>
+		<handler>home\model\viewer</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/home/viewer/{format}/{file}/{cmd}/{scroll}</uri>
+		<handler>home\model\viewer</handler>
+	</route>
+    <route>
+		<method>GET</method>
 		<uri>/home</uri>
+		<handler>home\model\index</handler>
+	</route>
+    <route>
+		<method>GET</method>
+		<uri>/home/index/phpvb</uri>
 		<handler>home\model\index</handler>
 	</route>
 

@@ -1,0 +1,22 @@
+<div class="p-4">
+  <h4 class="mb-3"><i class="fas fa-database me-2"></i>{{ filename }}.sql</h4>
+  <pre class="rounded p-3" style="background:#f8f9fa;max-height:80vh;overflow:auto"><code class="language-sql" id="sql-content">{{ content }}</code></pre>
+</div>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sql-formatter@13.0.0/dist/sql-formatter.min.js"></script>
+
+<script>
+(function(){
+  const el = document.getElementById('sql-content');
+  try {
+    const formatted = sqlFormatter.format(el.textContent, { language: 'mysql', tabWidth: 2 });
+    el.textContent = formatted;
+  } catch(e) {
+    /* keep raw */
+  }
+  if (window.Prism) Prism.highlightElement(el);
+})();
+</script>

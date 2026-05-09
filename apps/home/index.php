@@ -11,6 +11,14 @@ class index {
         $doc->body("readMD");
         $self->content();
     }
+
+    function phpvb () {
+        global $self,$doc;
+        $self->take("components","gov2nav", "setDefaultNav");
+        $doc->body("pageTitle",'phpVB');
+        $doc->body("readMD",'phpvb');
+        $self->content();
+    }
 }
 /*
 $doc->body("pageTitle",'Government 2.0 StarterKit');

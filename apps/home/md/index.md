@@ -1,134 +1,105 @@
-# phpVB
+# Gov3.id
 
-**Platform aplikasi digital pemerintahan yang dirancang untuk kondisi nyata di lapangan.**
+**Sandbox Tata Kelola Pemerintahan Digital Indonesia**
 
----
-
-## Mengapa phpVB?
-
-Digitalisasi pemerintahan menghadapi tantangan yang berbeda dari sektor swasta. Infrastruktur tidak selalu tersedia merata, kapasitas teknis tim bervariasi, dan kebutuhan bisa berubah seiring pergantian kepemimpinan. phpVB dibangun untuk menjawab tantangan-tantangan ini.
+*Riset eGov Lab UI bersama Cyber Gov Labs*
 
 ---
 
-## Prinsip Desain
+## Apa itu Gov3.id?
 
-### 1. Konvensi di Atas Konfigurasi
+Gov3.id adalah **sandbox tata kelola pemerintahan digital** yang terbuka bagi seluruh instansi pemerintah di Indonesia — dari kementerian, pemerintah provinsi, kabupaten/kota, hingga unit kerja teknis. Berbeda dari sandbox konvensional yang hanya menguji aplikasi dalam lingkungan terisolasi, Gov3.id menguji **keseluruhan ekosistem tata kelola**: regulasi, struktur organisasi, model interoperabilitas, dan pola penganggaran.
 
-Setiap aplikasi baru mengikuti pola yang sama — struktur folder, penamaan file, alur data — semuanya sudah ditentukan oleh framework. Developer tidak perlu membuat keputusan arsitektur dari nol setiap kali membangun fitur baru.
-
-**Dampaknya:** onboarding developer baru lebih cepat, kualitas antar modul konsisten, dan risiko kesalahan arsitektur berkurang.
-
-### 2. Siap di Berbagai Kondisi Infrastruktur
-
-phpVB dirancang agar bisa berjalan dalam tiga tingkat kesiapan infrastruktur:
-
-| Tingkat | Kondisi | Penyimpanan Data | Cocok Untuk |
-|---------|---------|-------------------|-------------|
-| **Mandiri** | Tanpa database server | File teks (XML & JSON) | Prototipe, demo, daerah dengan keterbatasan server |
-| **Database Lokal** | Database di server sendiri | MySQL/MariaDB | Instansi yang sudah punya data center atau server lokal |
-| **Database Cloud** | Database cloud via API | PostgreSQL | Instansi yang ingin skalabilitas dan kolaborasi antar-wilayah |
-
-Satu basis kode yang sama bisa berjalan di ketiga kondisi. Ketika infrastruktur ditingkatkan, aplikasi tidak perlu ditulis ulang — cukup ubah sumber datanya.
-
-### 3. Pemisahan Tanggung Jawab yang Jelas
-
-phpVB memisahkan **kerangka** dan **isi** secara tegas:
-
-- **Kerangka** (layout, navigasi, keamanan, hak akses) diproses di server — konsisten dan terkontrol
-- **Isi** (data, formulir, interaksi pengguna) diproses di browser — responsif dan interaktif
-
-Analoginya seperti gedung kantor pemerintahan: struktur bangunan (dinding, koridor, pintu keamanan) sudah fixed dan dikelola oleh pengelola gedung, sementara isi ruangan (meja, kursi, peralatan kerja) diatur fleksibel oleh masing-masing unit yang menempati.
-
-**Dampaknya:**
-- Tim desain tampilan dan tim pengembang data bisa bekerja paralel tanpa saling menunggu
-- Perubahan tampilan tidak mempengaruhi logika data, dan sebaliknya
-- Keamanan terjaga di level server — tidak bergantung pada browser pengguna
-
-### 4. Multi-Domain: Satu Sumber, Banyak Layanan
-
-Satu instalasi phpVB bisa melayani **banyak domain sekaligus**, masing-masing dengan halaman utama dan database yang berbeda.
-
-**Contoh:** satu server menjalankan phpVB, melayani tiga kabupaten/kota:
-
-| Domain | Halaman Utama | Database |
-|--------|--------------|----------|
-| `bandung.kota2.web.id` | Subsidi BBM | `gov2_bandung` |
-| `sumenep.kab.web.id` | SDI (Satu Data Indonesia) | `gov2_sumenep` |
-| `jabar.prov.web.id` | Home | `gov2_jabar` |
-
-Setiap domain otomatis diarahkan ke halaman dan database yang tepat — kode aplikasinya tetap sama untuk semua domain.
-
-**Keuntungan dibanding instalasi terpisah per daerah:**
-- Update framework **sekali**, semua domain ikut
-- Perbaikan bug **satu deploy**, selesai
-- Tidak perlu mengelola puluhan instalasi terpisah
-
-Cukup daftarkan domain di file konfigurasi, phpVB yang mengatur sisanya.
-
-### 5. Multi-Staging Otomatis
-
-phpVB mengenali lingkungan kerja secara otomatis berdasarkan **konvensi**:
-
-| Cara Deteksi | Lingkungan | Keterangan |
-|-------------|-----------|------------|
-| Domain `localhost` | **Lokal** | Otomatis, untuk pengembangan di komputer developer |
-| Domain terdaftar di `config.dev.xml` | **Pengembangan** | Domain dev didaftarkan di file config dev |
-| Domain terdaftar di `config.prod.xml` | **Produksi** | Domain prod didaftarkan di file config prod |
-| Domain belum terdaftar | **Pengembangan** | Fallback aman untuk domain baru |
-
-**Prinsipnya sederhana:** taruh domain di file konfigurasi yang sesuai lingkungannya. Domain pengembangan masuk `config.dev.xml`, domain produksi masuk `config.prod.xml`. phpVB mendeteksi lingkungan dari file mana yang memuat domain tersebut — tanpa konfigurasi tambahan.
-
-Setiap lingkungan bisa memiliki sumber data dan tingkat keamanan yang berbeda, namun kode aplikasinya tetap sama. Ini menghilangkan risiko "di komputer saya jalan, di server tidak."
-
-Mau tambah lingkungan baru (misalnya `staging`)? Cukup buat file `config.staging.xml` — tanpa mengubah kode.
+Platform ini berjalan **paralel** dengan infrastruktur `*.go.id` existing — bukan menggantikannya. Setiap instansi tetap menjalankan sistem resminya, sementara Gov3.id menyediakan ruang eksperimen untuk membuktikan ada cara yang lebih baik.
 
 ---
 
-## Modul Bawaan
+## Pergeseran Paradigma: Dari Domain Aplikasi ke Domain Instansi
 
-phpVB menyediakan modul-modul dasar yang dibutuhkan hampir semua aplikasi pemerintahan:
+Selama dua dekade pembangunan e-government, Indonesia menjalankan model "satu kebutuhan — satu aplikasi — satu domain". Hasilnya: ratusan silo digital, biaya integrasi yang berlipat, dan pemeliharaan yang mahal.
 
-| Modul | Fungsi |
-|-------|--------|
-| **Login & Akun** | Otentikasi pengguna, pendaftaran, profil, SSO |
-| **Wilayah** | Hierarki wilayah administratif (provinsi, kabupaten, kecamatan, kelurahan) |
-| **Instansi** | Struktur organisasi dan unit kerja |
-| **Pengaturan** | Konfigurasi aplikasi per-modul |
+Gov3.id mengusulkan pergeseran fundamental:
 
-Modul-modul ini sudah siap pakai dan bisa diperluas sesuai kebutuhan spesifik instansi.
+| Aspek | Gov 2.0 (Sekarang) | Gov 3.0 (Sandbox) |
+|---|---|---|
+| Unit arsitektur | Aplikasi | **Instansi** |
+| Integrasi | API point-to-point | **Federated by default** (MCP) |
+| Pembangunan | Proyek per kebutuhan | **Konfigurasi on-demand** |
+| Peran ASN | Operator + developer | **Domain expert + AI orchestrator** |
 
----
-
-## Keunggulan untuk Instansi Pemerintah
-
-**Tidak terkunci vendor** — phpVB adalah framework open-source, bukan layanan berlangganan. Instansi memiliki kendali penuh atas kode dan data.
-
-**Investasi bertahap** — Mulai dari mode mandiri (tanpa database), lalu tingkatkan ke database lokal atau cloud seiring kesiapan anggaran dan SDM.
-
-**Standar terbuka** — Dibangun di atas teknologi standar industri (PHP, MySQL, PostgreSQL, Vue.js) yang diajarkan di universitas dan tersedia tenaga kerjanya secara luas di Indonesia.
-
-**Keamanan terintegrasi** — Sistem hak akses, otentikasi, dan SSO sudah tertanam dalam framework — bukan tambahan di kemudian hari.
+Dengan AI sebagai orchestrator, layanan publik tidak lagi *dibangun*, melainkan *dideskripsikan*. Yang menjadi unit utama bukan lagi aplikasi — melainkan instansi pemerintah itu sendiri.
 
 ---
 
-## Dokumentasi Teknis
+## Open Onboarding — Terbuka untuk Seluruh Indonesia
 
-Untuk tim pengembang, dokumentasi teknis lengkap tersedia di [phpVB Wiki](https://github.com/wibisastro/phpVB/wiki).
+Setiap instansi pemerintah dapat bergabung **tanpa proses seleksi** — semudah mendaftar layanan cloud. Tidak ada *barrier to entry* selain kesediaan untuk bereksperimen.
+
+Setiap instansi yang onboard mendapatkan subdomain di bawah `gov3.id` dengan kapabilitas standar yang otomatis tersedia:
+
+| Subdomain | Fungsi |
+|---|---|
+| `[instansi].gov3.id` | Portal utama instansi |
+| `mcp.[instansi].gov3.id` | Endpoint AI interoperability (MCP) |
+| `dav.[instansi].gov3.id` | Federated document storage |
+| `auth.[instansi].gov3.id` | Identity & authentication |
+| `sql.[instansi].gov3.id` | Structured data endpoint |
+| `msg.[instansi].gov3.id` | Messaging antar-instansi |
+
+Tidak diperlukan pengembangan terpisah untuk masing-masing fungsi.
 
 ---
 
-## Lisensi
+## Komponen Platform
 
-phpVB dirilis di bawah **MIT License** — lisensi open-source yang paling permisif dan banyak digunakan di dunia.
+Gov3.id dibangun di atas komponen open-source teruji, dinamai dengan fauna Indonesia:
 
-Artinya:
-- **Bebas digunakan** untuk proyek apapun, termasuk proyek pemerintahan
-- **Bebas dimodifikasi** sesuai kebutuhan instansi tanpa harus meminta izin
-- **Bebas didistribusikan** ke pihak lain, termasuk vendor dan mitra kerja
-- **Aplikasi yang dibangun di atas phpVB boleh menggunakan lisensi berbeda** — misalnya GPL untuk aplikasi pemerintahan yang dibangun dengan APBN, sesuai ketentuan yang berlaku
+| Komponen | Nama | Fungsi |
+|---|---|---|
+| Discovery | **Gurita** | Service discovery antar-instansi (MCP Registry) |
+| Storage | **Kambing** | Federated document storage (WebDAV) |
+| Auth | **Walet** | Single identity federation (OAuth2/SAML) |
+| Audit | **Gajah** | Immutable audit trail |
+| Messaging | **Merpati** | Komunikasi antar-instansi |
+| Knowledge | **Lebah** | Basis pengetahuan institusional |
+| Geospatial | **Penyu** | Layanan data geospasial (PostGIS) |
+| Billing | **Semut** | Usage metering & PNBP |
+| AI Node | **Per-instansi LLM** | Orkestrasi AI per instansi |
 
-Satu-satunya syarat: mencantumkan notice hak cipta asli phpVB di dalam kode sumber.
+---
+
+## Lifecycle: Open Entry, Gradual Graduation
+
+Gov3.id menggunakan model adopsi bertahap — bukan *all-or-nothing*:
+
+1. **Onboarding** — instansi bergabung tanpa seleksi
+2. **Eksperimen** — bebas menguji proses bisnis dan model organisasi baru
+3. **Shadow Integration** — output sandbox menjadi *input referensi* bagi proses resmi
+4. **Adopsi Parsial** — komponen yang terbukti efektif diadopsi secara resmi
+5. **Adopsi Penyelenggara** — model atau standar di-graduate ke tata kelola formal
+
+Sandbox tetap hidup sebagai ruang inovasi permanen — yang di-graduate adalah **hasilnya**, bukan sandbox-nya.
+
+---
+
+## Momentum: SAKIP AI
+
+Titik masuk pertama Gov3.id adalah kolaborasi dengan **KemenPAN-RB** dalam implementasi **SAKIP AI** — sistem analisis dokumen kinerja berbasis AI. Instansi terpilih KemenPAN-RB mengakses SAKIP AI melalui platform Gov3.id, sekaligus membuka pintu bagi instansi lain untuk onboarding secara mandiri.
+
+---
+
+## Riset
+
+Gov3.id adalah **riset eGov Lab Universitas Indonesia bersama Cyber Gov Labs** untuk menguji apakah Indonesia siap bertransisi dari Government 2.0 (layanan online terfragmentasi) ke Government 3.0 (*orchestrated intelligence*).
+
+Platform ini menjalankan teknologi **phpVB** sebagai kerangka aplikasi — menyediakan multi-domain, multi-staging, dan pemisahan kerangka-isi yang dibutuhkan untuk melayani ratusan instansi dari satu basis kode.
+
+> Dokumen konsep lengkap: *Gov3.id — Sandbox Tata Kelola Pemerintahan Digital v1.2 (April 2026)*
+
+---
 
 ## Kontak
+
+eGov Lab Universitas Indonesia · Cyber Gov Labs
 
 Wibisono Sastrodiwiryo — wibi@alumni.ui.ac.id

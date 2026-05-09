@@ -46,4 +46,10 @@
         <level>prov</level>
         <level>kab</level>
     </dataroles>
+    <viewer>
+        <maxFileSize>
+            <csv>5242880</csv>
+            <default>1048576</default>
+        </maxFileSize>
+    </viewer>
 </gov2config>

@@ -31,4 +31,10 @@
         <mti08.vlsm.org>gov2session</mti08.vlsm.org>
         <api.krisna.systems>apikrisna</api.krisna.systems>
     </domain>
+    <viewer>
+        <maxFileSize>
+            <csv>5242880</csv>
+            <default>1048576</default>
+        </maxFileSize>
+    </viewer>
 </gov2config>

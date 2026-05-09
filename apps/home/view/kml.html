@@ -1,0 +1,29 @@
+<div class="p-4">
+  <h4 class="mb-3"><i class="fas fa-map-marked-alt me-2"></i>{{ filename }}.kml</h4>
+  <div id="kml-map" style="height:600px;border:1px solid #ddd;border-radius:.25rem;"></div>
+  <script type="text/plain" id="kml-data">{{ content|raw }}</script>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
+
+<script>
+(function(){
+  const map = L.map('kml-map').setView([-2.5, 118], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  const kmlText = document.getElementById('kml-data').textContent;
+  try {
+    const layer = omnivore.kml.parse(kmlText).addTo(map);
+    layer.on('ready', function(){
+      try { map.fitBounds(layer.getBounds()); } catch(e) {}
+    });
+  } catch(e) {
+    L.marker([-2.5, 118]).bindPopup('KML tidak dapat dimuat: ' + e.message).addTo(map).openPopup();
+  }
+})();
+</script>
