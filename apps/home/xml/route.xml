@@ -52,7 +52,7 @@
 	</route>
     <route>
 		<method>GET</method>
-		<uri>/home/index/phpvb</uri>
+		<uri>/home/index/{cmd}</uri>
 		<handler>home\model\index</handler>
 	</route>
 
