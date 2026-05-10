@@ -3,20 +3,21 @@
 class gov2nav extends \Gov2lib\document {
 
 	function __construct () {
-        global $pageID,$self,$config;
-		$this->templateDir=__DIR__."/../view";        
+        global $pageID,$self,$config,$cmdID;
+		$this->templateDir=__DIR__."/../view";
         $path=explode("\\",__CLASS__);
         $this->className=$path[sizeof($path)-1];
         $className=$self->className;
         if (!$className) {$className=$this->className;}
-        $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/$className", '/');
+        $base=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/$className", '/');
+        $GLOBALS['vueData']['pathurl']=$cmdID ? $base.'?cmdID='.urlencode($cmdID) : $base;
 	}
 
 	function dependencies () {
 	}
 
 	function setDefaultNav ($_menuFile="") {
-        global $pageID,$config,$self,$doc;
+        global $pageID,$config,$self,$doc,$cmdID;
         // Accumulate menu data (boleh dipanggil berkali-kali untuk multi-app)
         $this->menus=$this->menubar($pageID,$_menuFile);
         // Register sidebar template hanya 1x — pakai substring match agar
@@ -28,16 +29,24 @@ class gov2nav extends \Gov2lib\document {
         if (!$this->_alreadyRegistered($doc->content ?? [], 'gov2navBreadcrumb.html')) {
             $this->content('gov2navBreadcrumb.html');
         }
-        $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
+        // Set pathurl HANYA jika menu yang baru di-load berisi URL halaman aktif.
+        // Mencegah last-call-wins masalah saat controller call setDefaultNav
+        // berkali-kali dengan menu file berbeda (mis. SAKIPAI: ingest + aisakip).
+        $lastMenu = end($this->menus);
+        if ($this->_menuContainsActiveUrl($lastMenu, $pageID, $self->className, $cmdID)) {
+            $base = rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
+            $GLOBALS['vueData']['pathurl'] = $cmdID ? $base.'?cmdID='.urlencode($cmdID) : $base;
+        }
 	}
 
     function setCustomNav ($_menuFile="") {
-        global $pageID,$config,$self,$doc;
+        global $pageID,$config,$self,$doc,$cmdID;
         // Cek di $doc langsung agar tahan terhadap multi-instance via take()
         if (!$this->_alreadyRegistered($doc->sidebar ?? [], 'gov2navMenuCustom.html')) {
             $this->sidebar('gov2navMenuCustom.html');
         }
-        $GLOBALS['vueData']['pathurl']=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
+        $base = rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
+        $GLOBALS['vueData']['pathurl'] = $cmdID ? $base.'?cmdID='.urlencode($cmdID) : $base;
     }
 
     private function _alreadyRegistered($haystack, $needle) {
@@ -46,6 +55,27 @@ class gov2nav extends \Gov2lib\document {
         foreach ((array)$haystack as $entry) {
             if (is_string($entry) && str_contains($entry, $needle)) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    // Recursive walk: cek apakah node menu (atau descendant-nya) berisi URL
+    // halaman aktif. Match level-2 (/pageID/className), level-3
+    // (/pageID/className/cmdID), atau homepage (/pageID saat className=index).
+    private function _menuContainsActiveUrl($node, $pageID, $className, $cmdID="") {
+        if (!is_array($node)) return false;
+        $url = $node['url'] ?? null;
+        if ($url !== null) {
+            if ($url === "/$pageID/$className") return true;
+            if ($cmdID && $url === "/$pageID/$className/$cmdID") return true;
+            if ($className === 'index' && $url === "/$pageID") return true;
+        }
+        if (isset($node['menu']) && is_array($node['menu'])) {
+            foreach ($node['menu'] as $child) {
+                if (is_array($child) && $this->_menuContainsActiveUrl($child, $pageID, $className, $cmdID)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -148,23 +178,30 @@ class gov2nav extends \Gov2lib\document {
         }   
     }
     
-    function breadcrumb ($_data,$_pageID,$_className="") {
+    function breadcrumb ($_data,$_pageID,$_className="",$_cmdID="") {
         static $_c;
         global $config;
         $_c+=0;
         if (is_array($_data)) {
             foreach ($_data as $_child) {
-                if ($_child["url"] == "/".$_pageID."/".$_className || ($_className == "index" && $_child["url"] == "/".$_pageID)) {
+                $url = $_child["url"] ?? null;
+                // Saat cmdID di-set, match HANYA level-3 leaf agar walker turun
+                // ke submenu (jadi level-2 ancestor di-add via bubble, bukan
+                // direct match yang akan stop di level-2).
+                $isLeaf = $_cmdID
+                    ? ($url === "/$_pageID/$_className/$_cmdID")
+                    : ($url === "/$_pageID/$_className" || ($_className === "index" && $url === "/$_pageID"));
+                if ($isLeaf) {
                     $_c++;
                     $this->breadcrumb[$_c]["caption"]=$_child["caption"];
-                    $this->breadcrumb[$_c]["url"]=$config->webroot.$_child["url"];
-                } elseif ($_child["menu"]) {
+                    $this->breadcrumb[$_c]["url"]=$config->webroot.$url;
+                } elseif (!empty($_child["menu"])) {
                     $_b=$_c;
-                    $this->breadcrumb($_child["menu"],$_pageID,$_className);
+                    $this->breadcrumb($_child["menu"],$_pageID,$_className,$_cmdID);
                     if ($_c>$_b) {
                         $_c++;
                         $this->breadcrumb[$_c]["caption"]=$_child["caption"];
-                        $this->breadcrumb[$_c]["url"]=$config->webroot.$_child["url"];
+                        $this->breadcrumb[$_c]["url"]=$config->webroot.$url;
                         $_c=0;
                         break;
                     }

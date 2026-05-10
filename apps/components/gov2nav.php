@@ -15,8 +15,15 @@ class gov2nav {
     function breadcrumb ($vars) {
         global $self,$config,$doc;
         if ($vars['xml']) {$xml=$vars['xml'].".xml";}
+        $cmdID = $_GET['cmdID'] ?? '';
         $self->menus=$self->menubar($vars['pageID'],$xml);
-        $self->breadcrumb($self->menus,$vars['pageID'],$vars['className']);
+        // Coba match level-3 dulu kalau cmdID di-set; fallback ke level-2 bila tidak ketemu.
+        if ($cmdID) {
+            $self->breadcrumb($self->menus,$vars['pageID'],$vars['className'],$cmdID);
+        }
+        if (empty($self->breadcrumb)) {
+            $self->breadcrumb($self->menus,$vars['pageID'],$vars['className']);
+        }
         if (!$doc->error) {
             $self->breadcrumb = $self->breadcrumb ?? [];
             krsort($self->breadcrumb);
