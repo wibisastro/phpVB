@@ -67,7 +67,35 @@
 	        <caption>CRUD</caption>
 			<url>/home/crud</url>
 		</menu>
-		<menu>	       
+		<menu>
+			<caption>Static File Viewer</caption>
+			<url>/home/viewer</url>
+			<menu>
+				<caption>CSV</caption>
+				<url>/home/viewer/csv/sample</url>
+			</menu>
+			<menu>
+				<caption>JSON</caption>
+				<url>/home/viewer/json/crud</url>
+			</menu>
+			<menu>
+				<caption>XML</caption>
+				<url>/home/viewer/xml/route</url>
+			</menu>
+			<menu>
+				<caption>SQL</caption>
+				<url>/home/viewer/sql/sql</url>
+			</menu>
+			<menu>
+				<caption>KML</caption>
+				<url>/home/viewer/kml/sample</url>
+			</menu>
+			<menu>
+				<caption>Markdown</caption>
+				<url>/home/viewer/md/phpvb</url>
+			</menu>
+		</menu>
+		<menu>
 		</menu>
 	</menu>
 </mainmenu>
