@@ -1,19 +1,3 @@
-<style>
-  .sub-treeview-menu {
-    list-style: none;
-    padding-left: 1.25rem;
-    margin: 0.25rem 0;
-  }
-  .sub-treeview-menu > li { padding: 0.15rem 0; }
-  .sub-treeview-menu > li > a {
-    font-size: 0.85em;
-    text-decoration: none;
-    color: inherit;
-    opacity: 0.85;
-  }
-  .sub-treeview-menu > li > a:hover { opacity: 1; }
-  .sub-treeview-menu > li.current-page > a.active-sub { font-weight: 600; opacity: 1; }
-</style>
 <ul class="sidebar-menu">
   {% for mainmenu in menus %}
     {% for menu in mainmenu.menu %}
@@ -42,7 +26,7 @@
           <li{% if item_active %} class="current-page"{% endif %}>
             <a href="{{ webroot }}{{ item.url }}"{% if item_active %} class="active-sub"{% endif %}>{{ item.caption }}</a>
             {% if item.menu is iterable and item.menu|length > 0 %}
-            <ul class="sub-treeview-menu">
+            <ul class="treeview-menu" style="display:block;">
               {% for sub in item.menu %}
               {% set sub_active = sub.url == '/' ~ pageID ~ '/' ~ className ~ '/' ~ cmdID %}
               <li{% if sub_active %} class="current-page"{% endif %}>
