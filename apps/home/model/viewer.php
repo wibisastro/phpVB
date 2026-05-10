@@ -69,7 +69,7 @@ class viewer extends \Gov2lib\document {
 
         foreach ($lines as $line) {
             if ($line === '') continue;
-            $cells = str_getcsv($line);
+            $cells = str_getcsv($line, ',', '"', '\\');
             if (empty($headers)) {
                 $headers = array_values(array_map('trim', $cells));
                 continue;
