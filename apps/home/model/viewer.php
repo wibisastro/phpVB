@@ -44,7 +44,7 @@ class viewer extends \Gov2lib\document {
         $self->gov2pagination->content();
     }
 
-    function render (string $format, array $vars): void {
+    function renderRaw (string $format, array $vars): void {
         global $self, $doc;
 
         $info = $self->resolveFile($format, $vars['file'] ?? '');

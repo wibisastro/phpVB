@@ -7,11 +7,11 @@ class viewer {
     }
 
     function csv ($vars)  { global $self; $self->renderCsv($vars); }
-    function json ($vars) { global $self; $self->render('json', $vars); }
-    function xml ($vars)  { global $self; $self->render('xml', $vars); }
-    function sql ($vars)  { global $self; $self->render('sql', $vars); }
-    function kml ($vars)  { global $self; $self->render('kml', $vars); }
-    function md ($vars)   { global $self; $self->render('md', $vars); }
+    function json ($vars) { global $self; $self->renderRaw('json', $vars); }
+    function xml ($vars)  { global $self; $self->renderRaw('xml', $vars); }
+    function sql ($vars)  { global $self; $self->renderRaw('sql', $vars); }
+    function kml ($vars)  { global $self; $self->renderRaw('kml', $vars); }
+    function md ($vars)   { global $self; $self->renderRaw('md', $vars); }
 
     function table ($vars) {
         global $self, $doc;
