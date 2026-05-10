@@ -183,34 +183,34 @@ class gov2nav extends \Gov2lib\document {
         }   
     }
     
-    function breadcrumb ($_data,$_pageID,$_className="",$_cmdID="") {
-        static $_c;
+    // Depth-first walker: build breadcrumb path dengan deepest-match-wins.
+    // - Selalu recurse ke children (bahkan setelah parent match) — supaya leaf
+    //   yang lebih spesifik bisa replace parent (kasus parent+child URL sama).
+    // - Path order: root → leaf (no krsort needed di endpoint).
+    // - Skip item tanpa caption dari ancestors (mis. wrapper dari menubar).
+    function breadcrumb ($_data,$_pageID,$_className="",$_cmdID="",$_ancestors=[]) {
         global $config;
-        $_c+=0;
-        if (is_array($_data)) {
-            foreach ($_data as $_child) {
-                $url = $_child["url"] ?? null;
-                // Saat cmdID di-set, match HANYA level-3 leaf agar walker turun
-                // ke submenu (jadi level-2 ancestor di-add via bubble, bukan
-                // direct match yang akan stop di level-2).
-                $isLeaf = $_cmdID
-                    ? ($url === "/$_pageID/$_className/$_cmdID")
-                    : ($url === "/$_pageID/$_className" || ($_className === "index" && $url === "/$_pageID"));
-                if ($isLeaf) {
-                    $_c++;
-                    $this->breadcrumb[$_c]["caption"]=$_child["caption"];
-                    $this->breadcrumb[$_c]["url"]=$config->webroot.$url;
-                } elseif (!empty($_child["menu"])) {
-                    $_b=$_c;
-                    $this->breadcrumb($_child["menu"],$_pageID,$_className,$_cmdID);
-                    if ($_c>$_b) {
-                        $_c++;
-                        $this->breadcrumb[$_c]["caption"]=$_child["caption"];
-                        $this->breadcrumb[$_c]["url"]=$config->webroot.$url;
-                        $_c=0;
-                        break;
-                    }
-                }
+        if (!is_array($_data)) return;
+        foreach ($_data as $_child) {
+            if (!is_array($_child)) continue;
+            $url = $_child["url"] ?? null;
+            $caption = $_child["caption"] ?? null;
+            $newAncestors = ($caption !== null)
+                ? array_merge($_ancestors, [["caption"=>$caption, "url"=>$config->webroot.($url ?? "")]])
+                : $_ancestors;
+
+            $isMatch = false;
+            if ($url !== null) {
+                if ($_cmdID && $url === "/$_pageID/$_className/$_cmdID") $isMatch = true;
+                elseif (!$_cmdID && $url === "/$_pageID/$_className") $isMatch = true;
+                elseif (!$_cmdID && $_className === "index" && $url === "/$_pageID") $isMatch = true;
+            }
+            if ($isMatch) {
+                $this->breadcrumb = $newAncestors;
+            }
+
+            if (!empty($_child["menu"])) {
+                $this->breadcrumb($_child["menu"],$_pageID,$_className,$_cmdID,$newAncestors);
             }
         }
     }
