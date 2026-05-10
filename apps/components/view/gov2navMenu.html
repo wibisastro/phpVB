@@ -23,10 +23,21 @@
         <ul class="treeview-menu">
           {% for item in menu.menu %}
           {% set item_active = item.url == '/' ~ pageID ~ '/' ~ className or (className == 'index' and item.url == '/' ~ pageID) %}
-          <li{% if item_active %} class="current-page"{% endif %}>
-            <a href="{{ webroot }}{{ item.url }}"{% if item_active %} class="active-sub"{% endif %}>{{ item.caption }}</a>
-            {% if item.menu is iterable and item.menu|length > 0 %}
-            <ul class="treeview-menu" style="display:block;">
+          {% set has_active_sub = false %}
+          {% if item.menu is iterable %}
+            {% for sub in item.menu %}
+              {% if sub.url == '/' ~ pageID ~ '/' ~ className ~ '/' ~ cmdID %}
+                {% set has_active_sub = true %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+          {% if item.menu is iterable and item.menu|length > 0 %}
+          <li class="treeview{% if item_active or has_active_sub %} active{% endif %}">
+            <a href="{{ webroot }}{{ item.url }}"{% if item_active %} class="active-sub"{% endif %}>
+              {{ item.caption }}
+              <i class="bi bi-caret-right-fill"></i>
+            </a>
+            <ul class="treeview-menu">
               {% for sub in item.menu %}
               {% set sub_active = sub.url == '/' ~ pageID ~ '/' ~ className ~ '/' ~ cmdID %}
               <li{% if sub_active %} class="current-page"{% endif %}>
@@ -34,8 +45,12 @@
               </li>
               {% endfor %}
             </ul>
-            {% endif %}
           </li>
+          {% else %}
+          <li{% if item_active %} class="current-page"{% endif %}>
+            <a href="{{ webroot }}{{ item.url }}"{% if item_active %} class="active-sub"{% endif %}>{{ item.caption }}</a>
+          </li>
+          {% endif %}
           {% endfor %}
         </ul>
       </li>
