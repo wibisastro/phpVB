@@ -65,9 +65,14 @@ class gov2nav extends \Gov2lib\document {
         return false;
     }
 
-    // Recursive walk: cek apakah node menu (atau descendant-nya) berisi URL
-    // halaman aktif. Match level-2 (/pageID/className), level-3
-    // (/pageID/className/cmdID), atau homepage (/pageID saat className=index).
+    // Recursive walk: cek apakah node menu (atau descendant-nya) "milik" app yang
+    // sedang aktif. Pattern match (urutan dari spesifik ke umum):
+    //   - /pageID/className/cmdID  (level-3 leaf exact)
+    //   - /pageID/className        (level-2 exact)
+    //   - /pageID                  (homepage saat className=index)
+    //   - /pageID/...              (prefix — menu berisi entry untuk app ini,
+    //                               cukup untuk anggap "owner" menu app index page
+    //                               yang tidak ada URL exact-match-nya, mis. /aisakip)
     private function _menuContainsActiveUrl($node, $pageID, $className, $cmdID="") {
         if (!is_array($node)) return false;
         $url = $node['url'] ?? null;
@@ -75,6 +80,7 @@ class gov2nav extends \Gov2lib\document {
             if ($url === "/$pageID/$className") return true;
             if ($cmdID && $url === "/$pageID/$className/$cmdID") return true;
             if ($className === 'index' && $url === "/$pageID") return true;
+            if (str_starts_with($url, "/$pageID/")) return true;
         }
         if (isset($node['menu']) && is_array($node['menu'])) {
             foreach ($node['menu'] as $child) {
