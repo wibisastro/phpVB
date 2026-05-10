@@ -54,8 +54,11 @@ $.sidebarMenu = function (menu) {
       // Save which submenu was opened
       localStorage.setItem('openSubmenu', $this.find('.menu-text').text().trim() || $this.text().trim());
     }
-    //if this isn't a link, prevent the page from being redirected
-    if (checkElement.is(".treeview-menu")) {
+    // Hanya cegah navigate untuk parent toggle tanpa href asli (#! placeholder).
+    // Item dengan href asli (mis. Penyambungan → /ingest/sambung) tetap navigate
+    // sekaligus toggle submenu — submenu auto-buka via .active class server-rendered.
+    var href = $this.attr('href') || '';
+    if (checkElement.is(".treeview-menu") && (href === '' || href === '#' || href === '#!')) {
       e.preventDefault();
     }
   });
