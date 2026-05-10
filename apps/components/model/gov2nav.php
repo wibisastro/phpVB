@@ -9,8 +9,13 @@ class gov2nav extends \Gov2lib\document {
         $this->className=$path[sizeof($path)-1];
         $className=$self->className;
         if (!$className) {$className=$this->className;}
-        $base=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/$className", '/');
-        $GLOBALS['vueData']['pathurl']=$cmdID ? $base.'?cmdID='.urlencode($cmdID) : $base;
+        // Hanya set default pathurl bila belum di-set. Mencegah multi-take()
+        // (mis. SAKIPAI yang call setDefaultNav 3x dengan menu berbeda) meng-overwrite
+        // pathurl yang benar dari setDefaultNav guard sebelumnya.
+        if (!isset($GLOBALS['vueData']['pathurl'])) {
+            $base=rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/$className", '/');
+            $GLOBALS['vueData']['pathurl']=$cmdID ? $base.'?cmdID='.urlencode($cmdID) : $base;
+        }
 	}
 
 	function dependencies () {
