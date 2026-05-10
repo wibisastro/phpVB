@@ -119,7 +119,14 @@ try {
         )
     );
 
-    $loader->addPath((string) $self->templateDir,$pageID);
+    // Defensive: skip kalau templateDir tidak ada — Twig FilesystemLoader::addPath
+    // throws kalau dir missing, dan exception itu di-catch di bawah → set $doc->error
+    // → dispatcher kasih 401 (responseAuth). Ini terjadi misal di handler
+    // Gov2lib\vue saat app yang request tidak punya direktori vue/ override
+    // (mis. /ingest/vue/X.vue padahal apps/ingest/vue tidak exist).
+    if (is_string($self->templateDir) && $self->templateDir !== '' && is_dir($self->templateDir)) {
+        $loader->addPath((string) $self->templateDir, $pageID);
+    }
     /**No required for twig version 2.16 or later */
     // $escaper = new Twig_Extension_Escaper('html');
     // $twig->addExtension($escaper);
