@@ -70,4 +70,14 @@
 		<uri>/components/gov2pagination/{cmd}</uri>
 		<handler>components\model\gov2pagination</handler>
 	</route>
+	<route>
+		<method>GET</method>
+		<uri>/components/basichat</uri>
+		<handler>components\model\basichat</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/components/basichat/{cmd}</uri>
+		<handler>components\model\basichat</handler>
+	</route>
 </list>

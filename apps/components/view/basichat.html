@@ -1,0 +1,133 @@
+<div class="row g-3">
+
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title mb-2">
+          <i class="bi bi-chat-dots me-2 text-primary"></i>cube-chat-rag — Component Demo
+        </h5>
+        <p class="text-muted small mb-3">
+          Sidepanel chat-RAG reusable untuk aplikasi gov2/gov3. Component bersifat
+          agnostik terhadap backend — di demo ini di-wire ke endpoint dummy yang return
+          mock response (tidak hit LLM beneran).
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-primary" onclick="window.cubeChat.open()">
+            <i class="bi bi-chat-dots me-2"></i>Buka Chat Panel
+          </button>
+          <button class="btn btn-outline-primary"
+                  onclick="window.cubeChat.open('Apa itu cube-chat-rag?', {source: 'demo-prefill'})">
+            <i class="bi bi-arrow-right-circle me-2"></i>Buka dengan Query Pre-filled
+          </button>
+          <button class="btn btn-outline-secondary"
+                  onclick="window.cubeChat.clear()">
+            <i class="bi bi-trash me-2"></i>Hapus History
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header py-2 small fw-semibold">Config aktif di demo ini</div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <tbody class="small">
+            <tr>
+              <td class="text-nowrap"><code>endpoint</code></td>
+              <td><code>/components/basichat/dummy</code></td>
+            </tr>
+            <tr>
+              <td><code>greeting</code></td>
+              <td>Halo! Saya asisten demo…</td>
+            </tr>
+            <tr>
+              <td><code>placeholder</code></td>
+              <td>Tanya tentang component ini…</td>
+            </tr>
+            <tr>
+              <td><code>persist-key</code></td>
+              <td><code>demo:basichat</code> — refresh tetep aman</td>
+            </tr>
+            <tr>
+              <td><code>suggested-queries</code></td>
+              <td>3 pre-filled buttons</td>
+            </tr>
+            <tr>
+              <td><code>context</code></td>
+              <td><code>{source: "demo-page"}</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header py-2 small fw-semibold">Backend contract</div>
+      <div class="card-body small">
+        <p class="mb-2 text-muted">Endpoint POST yang component panggil:</p>
+<pre class="mb-2" style="font-size:0.75rem"><code>POST /components/basichat/dummy
+Content-Type: application/json
+
+{
+  "query": "string",
+  "context": { ... }
+}</code></pre>
+        <p class="mb-2 text-muted">Response:</p>
+<pre class="mb-0" style="font-size:0.75rem"><code>{
+  "answer": "markdown string",
+  "chunks": [{ file, heading_path,
+               content_preview, score, ... }],
+  "metadata": { model, duration_ms, ... }
+}</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header py-2 small fw-semibold">Integrasi ke aplikasi consumer (real LLM)</div>
+      <div class="card-body small">
+        <ol class="mb-2">
+          <li>Implement endpoint server-side yang return contract di atas. Bisa proxy ke <code>n8n</code>, langsung call API Claude/OpenAI, atau orchestrate retrieval + LLM sendiri.</li>
+          <li>Di controller consumer, set props via Twig vars:
+<pre class="mb-1 mt-2" style="font-size:0.72rem"><code>$doc->body("chatRagEndpoint",   "/your/proxy/path");
+$doc->body("chatRagGreeting",   "Selamat datang...");
+$doc->body("chatRagPersistKey", json_encode("app:slug"));
+$doc->body("chatRagSuggestedQueries", json_encode([...]));
+$doc->body("chatRagContext",    json_encode([
+  "instansi_slug" => $slug
+]));</code></pre>
+          </li>
+          <li>Untuk trigger button di view consumer:
+<pre class="mb-1 mt-2" style="font-size:0.72rem"><code>&lt;button onclick="window.cubeChat.open()"&gt;Buka Chat&lt;/button&gt;
+
+// Atau dengan query pre-filled:
+window.cubeChat.open('query', {kriteria_id: 'PUSAT_1.a.2'})</code></pre>
+          </li>
+          <li>Untuk API key (mis. Anthropic, OpenAI): jangan expose ke client. Pasang same-origin proxy server-side, baca key dari config XML / env. Pattern: <code>core/config/credentials.{stage}.xml</code> atau environment variable (lihat memory <code>phpvb_config_framework_only</code>).</li>
+          <li>Contoh consumer real: Lebah <a href="https://redmine.cybergl.co.id/issues/4929" target="_blank">#4929</a> (SAKIP) + <a href="https://redmine.cybergl.co.id/issues/4956" target="_blank">#4956</a> (n8n workflow di gurita.gov3.id).</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header py-2 small fw-semibold">Files terkait</div>
+      <div class="card-body small">
+        <ul class="mb-0">
+          <li><code>apps/components/vue/cube-chat-rag.vue</code> — SFC source</li>
+          <li><code>apps/components/basichat.php</code> — demo controller (file ini)</li>
+          <li><code>apps/components/view/basichat.html</code> — demo view</li>
+          <li><code>core/template/cube/cubeLayout.html</code> — slot <code>#sidePanel-chat</code> + props binding via Twig vars</li>
+          <li><code>core/template/cube/cubeHead.html</code> — load marked.js + DOMPurify CDN</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>

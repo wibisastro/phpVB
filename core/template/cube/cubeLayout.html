@@ -88,7 +88,14 @@
           <cube-menu-settings></cube-menu-settings>
         </div>
         <div id="sidePanel-chat" class="h-100" style="display:none">
-          <cube-chat-rag></cube-chat-rag>
+          <cube-chat-rag
+            endpoint="{{ chatRagEndpoint|default('') }}"
+            placeholder="{{ chatRagPlaceholder|default('Tanya tentang dokumen…') }}"
+            greeting="{{ chatRagGreeting|default('') }}"
+            :persist-key='{{ chatRagPersistKey|default('null')|raw }}'
+            :suggested-queries='{{ chatRagSuggestedQueries|default('[]')|raw }}'
+            :context='{{ chatRagContext|default('{}')|raw }}'
+          ></cube-chat-rag>
         </div>
       </div>
     </div>

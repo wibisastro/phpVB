@@ -32,6 +32,10 @@
 			<url>/components/gov2pagination</url>
 		</menu>
 		<menu>
+	        <caption>Basic Chat</caption>
+			<url>/components/basichat</url>
+		</menu>
+		<menu>
 	        <caption>SSO</caption>
 			<url>#</url>
 		</menu>
