@@ -36,7 +36,11 @@
           <tbody class="small">
             <tr>
               <td class="text-nowrap"><code>endpoint</code></td>
-              <td><code>/components/gov2chat/dummy</code></td>
+              <td><code>/components/gov2chat</code></td>
+            </tr>
+            <tr>
+              <td class="text-nowrap"><code>cmd</code></td>
+              <td><code>dummy</code> — sesuai konvensi phpvb, di-kirim di body</td>
             </tr>
             <tr>
               <td><code>greeting</code></td>
@@ -69,10 +73,11 @@
       <div class="card-header py-2 small fw-semibold">Backend contract</div>
       <div class="card-body small">
         <p class="mb-2 text-muted">Endpoint POST yang component panggil:</p>
-<pre class="mb-2" style="font-size:0.75rem"><code>POST /components/gov2chat/dummy
+<pre class="mb-2" style="font-size:0.75rem"><code>POST /components/gov2chat
 Content-Type: application/json
 
 {
+  "cmd": "dummy",
   "query": "string",
   "context": { ... }
 }</code></pre>

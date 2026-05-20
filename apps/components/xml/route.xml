@@ -77,7 +77,7 @@
 	</route>
 	<route>
 		<method>POST</method>
-		<uri>/components/gov2chat/{cmd}</uri>
+		<uri>/components/gov2chat</uri>
 		<handler>components\model\gov2chat</handler>
 	</route>
 </list>

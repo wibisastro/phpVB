@@ -113,6 +113,7 @@ module.exports = {
   name: 'cube-chat-rag',
   props: {
     endpoint: { type: String, default: '' },
+    cmd: { type: String, default: 'query' },
     placeholder: { type: String, default: 'Tanya tentang dokumen…' },
     greeting: { type: String, default: '' },
     persistKey: { type: String, default: null },
@@ -173,6 +174,7 @@ module.exports = {
       this.errorMsg = '';
       var self = this;
       axios.post(this.endpoint, {
+        cmd: this.cmd,
         query: query,
         context: this.mergedContext
       }).then(function(resp) {

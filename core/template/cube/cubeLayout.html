@@ -90,6 +90,7 @@
         <div id="sidePanel-chat" class="h-100" style="display:none">
           <cube-chat-rag
             endpoint="{{ chatRagEndpoint|default('') }}"
+            cmd="{{ chatRagCmd|default('query') }}"
             placeholder="{{ chatRagPlaceholder|default('Tanya tentang dokumen…') }}"
             greeting="{{ chatRagGreeting|default('') }}"
             :persist-key='{{ chatRagPersistKey|default('null')|raw }}'

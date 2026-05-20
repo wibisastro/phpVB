@@ -9,7 +9,8 @@ class gov2chat {
         // Configure global <cube-chat-rag> (rendered di cubeLayout sidepanel)
         // Twig vars di-binding ke props component — null/[]/{} sebagai default
         // saat halaman lain tidak set.
-        $doc->body("chatRagEndpoint", "/components/gov2chat/dummy");
+        $doc->body("chatRagEndpoint", "/components/gov2chat");
+        $doc->body("chatRagCmd", "dummy");
         $doc->body("chatRagPlaceholder", "Tanya tentang component ini…");
         $doc->body("chatRagGreeting", "Halo! Saya asisten demo. Backend ini dummy — tidak hit LLM, cuma return mock response.");
         $doc->body("chatRagPersistKey", json_encode("demo:gov2chat"));
@@ -25,15 +26,10 @@ class gov2chat {
         $self->content();
     }
 
-    function dummy ($vars = "") {
+    function dummy ($vars = []) {
         global $self;
-        // POST JSON body: {query, context}
-        $raw = file_get_contents('php://input');
-        $body = json_decode($raw, true);
-        if (!is_array($body)) { $body = $_POST; }
-
-        $query = $body['query'] ?? '';
-        $context = $body['context'] ?? [];
+        $query = $vars['query'] ?? '';
+        $context = $vars['context'] ?? [];
 
         // Simulate ~200ms LLM latency
         usleep(200000);
