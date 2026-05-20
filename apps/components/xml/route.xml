@@ -72,12 +72,12 @@
 	</route>
 	<route>
 		<method>GET</method>
-		<uri>/components/basichat</uri>
-		<handler>components\model\basichat</handler>
+		<uri>/components/gov2chat</uri>
+		<handler>components\model\gov2chat</handler>
 	</route>
 	<route>
 		<method>POST</method>
-		<uri>/components/basichat/{cmd}</uri>
-		<handler>components\model\basichat</handler>
+		<uri>/components/gov2chat/{cmd}</uri>
+		<handler>components\model\gov2chat</handler>
 	</route>
 </list>

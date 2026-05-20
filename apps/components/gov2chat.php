@@ -1,6 +1,6 @@
 <?php namespace App\components;
 
-class basichat {
+class gov2chat {
     function __construct () {
         global $self, $doc;
         $self->take("components", "gov2nav", "setDefaultNav");
@@ -9,10 +9,10 @@ class basichat {
         // Configure global <cube-chat-rag> (rendered di cubeLayout sidepanel)
         // Twig vars di-binding ke props component — null/[]/{} sebagai default
         // saat halaman lain tidak set.
-        $doc->body("chatRagEndpoint", "/components/basichat/dummy");
+        $doc->body("chatRagEndpoint", "/components/gov2chat/dummy");
         $doc->body("chatRagPlaceholder", "Tanya tentang component ini…");
         $doc->body("chatRagGreeting", "Halo! Saya asisten demo. Backend ini dummy — tidak hit LLM, cuma return mock response.");
-        $doc->body("chatRagPersistKey", json_encode("demo:basichat"));
+        $doc->body("chatRagPersistKey", json_encode("demo:gov2chat"));
         $doc->body("chatRagSuggestedQueries", json_encode([
             "Apa itu cube-chat-rag?",
             "Bagaimana integrasi ke aplikasi consumer?",
@@ -43,7 +43,7 @@ class basichat {
             'metadata' => [
                 'model' => 'dummy-echo-v1',
                 'duration_ms' => 200,
-                'note' => 'Backend dummy — tidak ada LLM call. Lihat apps/components/basichat.php untuk implementasi.',
+                'note' => 'Backend dummy — tidak ada LLM call. Lihat apps/components/gov2chat.php untuk implementasi.',
             ],
         ];
     }

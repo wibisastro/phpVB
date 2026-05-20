@@ -1,6 +1,6 @@
 <?php namespace App\components\model;
 
-class basichat extends \Gov2lib\document {
+class gov2chat extends \Gov2lib\document {
 	function __construct () {
 		$this->templateDir=__DIR__."/../view";
         $path=explode("\\",__CLASS__);

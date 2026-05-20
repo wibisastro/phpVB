@@ -36,7 +36,7 @@
           <tbody class="small">
             <tr>
               <td class="text-nowrap"><code>endpoint</code></td>
-              <td><code>/components/basichat/dummy</code></td>
+              <td><code>/components/gov2chat/dummy</code></td>
             </tr>
             <tr>
               <td><code>greeting</code></td>
@@ -48,7 +48,7 @@
             </tr>
             <tr>
               <td><code>persist-key</code></td>
-              <td><code>demo:basichat</code> — refresh tetep aman</td>
+              <td><code>demo:gov2chat</code> — refresh tetep aman</td>
             </tr>
             <tr>
               <td><code>suggested-queries</code></td>
@@ -69,7 +69,7 @@
       <div class="card-header py-2 small fw-semibold">Backend contract</div>
       <div class="card-body small">
         <p class="mb-2 text-muted">Endpoint POST yang component panggil:</p>
-<pre class="mb-2" style="font-size:0.75rem"><code>POST /components/basichat/dummy
+<pre class="mb-2" style="font-size:0.75rem"><code>POST /components/gov2chat/dummy
 Content-Type: application/json
 
 {
@@ -121,8 +121,8 @@ window.cubeChat.open('query', {kriteria_id: 'PUSAT_1.a.2'})</code></pre>
       <div class="card-body small">
         <ul class="mb-0">
           <li><code>apps/components/vue/cube-chat-rag.vue</code> — SFC source</li>
-          <li><code>apps/components/basichat.php</code> — demo controller (file ini)</li>
-          <li><code>apps/components/view/basichat.html</code> — demo view</li>
+          <li><code>apps/components/gov2chat.php</code> — demo controller (file ini)</li>
+          <li><code>apps/components/view/gov2chat.html</code> — demo view</li>
           <li><code>core/template/cube/cubeLayout.html</code> — slot <code>#sidePanel-chat</code> + props binding via Twig vars</li>
           <li><code>core/template/cube/cubeHead.html</code> — load marked.js + DOMPurify CDN</li>
         </ul>
