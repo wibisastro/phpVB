@@ -87,6 +87,9 @@
         <div id="sidePanel-pengaturan" style="display:none">
           <cube-menu-settings></cube-menu-settings>
         </div>
+        <div id="sidePanel-chat" class="h-100" style="display:none">
+          <cube-chat-rag></cube-chat-rag>
+        </div>
       </div>
     </div>
     <!-- Side Panel Offcanvas ends -->
@@ -136,6 +139,7 @@
         'cube-menu-settings': httpVueLoader('{{ webroot }}/gov2option/vue/cube-menu-settings.vue'),
         'cube-instansi': httpVueLoader('{{ webroot }}/gov2option/vue/cube-instansi.vue'),
         'wilayah': httpVueLoader('{{ webroot }}/gov2wilayah/vue/wilayah.vue'),
+        'cube-chat-rag': httpVueLoader('{{ webroot }}/components/vue/cube-chat-rag.vue'),
         'gov2navbreadcrumb': httpVueLoader('{{ webroot }}/components/vue/gov2navbreadcrumb.vue'),
         'gov2notification': httpVueLoader('{{ webroot }}/components/vue/gov2notification.vue'),
         {% for component in components %}
@@ -158,10 +162,11 @@
     var titles = {
       wilayah: '<i class="bi bi-geo-alt me-2"></i>Wilayah',
       instansi: '<i class="bi bi-building me-2"></i>Instansi',
-      pengaturan: '<i class="bi bi-gear me-2"></i>Pengaturan'
+      pengaturan: '<i class="bi bi-gear me-2"></i>Pengaturan',
+      chat: '<i class="bi bi-chat-dots me-2"></i>Chat Dokumen'
     };
     // Toggle panels via DOM
-    var views = ['wilayah', 'instansi', 'pengaturan'];
+    var views = ['wilayah', 'instansi', 'pengaturan', 'chat'];
     views.forEach(function(v) {
       var el = document.getElementById('sidePanel-' + v);
       if (el) { el.style.display = (v === view) ? '' : 'none'; }
