@@ -51,11 +51,14 @@ $mailgun = new Mailgun($config->mailgun->apikey);
 // exit;
 try {
 	if ($_POST) {
-	    $cmd = $_POST['cmd'];
+	    // POST: cmd dari body (form/JSON), fallback ke URL segment ($cmdID)
+	    // untuk REST-style endpoint seperti POST /components/gov2chat/dummy
+	    // dengan JSON body tanpa key cmd.
+	    $cmd = $_POST['cmd'] ?? ($cmdID ?: 'index');
 		$payload=$_POST;
 	} else {
-	    $cmd = !$vars["cmd"] ? "index" : $vars["cmd"];
-		$payload=$vars;
+	    $cmd = !($vars["cmd"] ?? '') ? "index" : $vars["cmd"];
+		$payload=$vars ?? [];
 	}
     //echo "c :".$controller;
     if (isset($controller) && class_exists($controller)) {
