@@ -1,0 +1,188 @@
+<!-- Dashboard Kelengkapan (app home) — CSS + AJAX wiring. Lebah #5210. -->
+<!-- Di-include via core's externalJS.html iteration (push dari controller pakai $self->externalJS('dashboardAssets.html')). -->
+<!-- Lokasi: di luar #app sehingga Vue 2 tidak strip <style>/<script>-nya. -->
+<!-- Section Pipeline Ingest (SAKIP) tidak dibawa ke home — fungsi/CSS ingest* di-skip total. -->
+<style>
+  /* ===== Cards umum (Wilayah, Instansi, Member) ===== */
+  .kel-dash .stat-card { border:1px solid var(--bs-gray-200); border-radius:.75rem; background:#fff; height:100%; transition:box-shadow .15s; }
+  .kel-dash .stat-card:hover { box-shadow:0 4px 16px rgba(91,79,185,.08); }
+  .kel-dash .stat-card .head { display:flex; align-items:center; gap:.6rem; padding:.85rem 1rem; border-bottom:1px solid var(--bs-gray-100); }
+  .kel-dash .stat-card .head i { font-size:1.25rem; color:var(--bs-primary); }
+  .kel-dash .stat-card .head .title { font-weight:600; font-size:.92rem; color:var(--bs-gray-800); }
+  .kel-dash .stat-card .big { font-size:2.1rem; font-weight:700; color:var(--bs-gray-800); line-height:1; }
+  .kel-dash .stat-card .big small { font-size:.85rem; font-weight:500; color:var(--bs-gray-500); }
+  .kel-dash .stat-card .body { padding:1rem; }
+  .kel-dash .stat-card .breakdown { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.4rem .75rem; margin-top:.85rem; }
+  .kel-dash .stat-card .breakdown.cols-3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .kel-dash .stat-card .bd-item { display:flex; flex-direction:column; padding:.4rem .55rem; background:var(--bs-light); border-radius:.4rem; }
+  .kel-dash .stat-card .bd-item .bd-label { font-size:.7rem; color:var(--bs-gray-500); text-transform:uppercase; letter-spacing:.03em; }
+  .kel-dash .stat-card .bd-item .bd-val { font-size:1rem; font-weight:600; color:var(--bs-gray-800); }
+
+  .kel-dash .section-label { font-size:.78rem; font-weight:600; color:var(--bs-gray-500); text-transform:uppercase; letter-spacing:.05em; margin:1.5rem 0 .75rem; display:flex; align-items:center; gap:.5rem; }
+  .kel-dash .section-label::before { content:""; width:3px; height:1rem; background:var(--bs-primary); border-radius:2px; }
+  .kel-dash .meta { font-size:.78rem; color:var(--bs-gray-500); }
+  .kel-dash .meta code { background:var(--bs-light); padding:1px 6px; border-radius:3px; color:var(--bs-primary); }
+  .kel-dash .skeleton { color:var(--bs-gray-400); }
+
+  /* ===== Single progress row (rollup member) ===== */
+  .kel-dash .pb-list { margin-top: .85rem; }
+  .kel-dash .pb-row {
+    display: grid;
+    grid-template-columns: 86px 1fr 96px;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: .35rem;
+    font-size: .78rem;
+  }
+  .kel-dash .pb-row .pb-label { color: var(--bs-gray-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kel-dash .pb-row .progress { height: 8px; background: var(--bs-gray-100); border-radius: 4px; }
+  .kel-dash .pb-row .pb-value { text-align: right; font-weight: 600; color: var(--bs-gray-800); font-variant-numeric: tabular-nums; font-size: .75rem; }
+  .kel-dash .pb-row .pb-value .pb-pct { color: var(--bs-gray-500); font-weight: 500; margin-left: .25rem; }
+
+  /* ===== Stacked 3-state bar (rollup wilayah/instansi) ===== */
+  .kel-dash .pb-stacked { margin-top: .85rem; }
+  .kel-dash .pb-stacked .progress { height: 22px; background: var(--bs-gray-100); border-radius: 6px; font-size: .72rem; font-weight: 600; overflow: hidden; }
+  .kel-dash .pb-stacked .progress-bar { transition: width .3s ease; }
+  .kel-dash .pb-legend { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: .5rem; font-size: .75rem; color: var(--bs-gray-700); }
+  .kel-dash .pb-legend .pb-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: .25rem; vertical-align: middle; }
+  .kel-dash .pb-legend .pb-dot.bg-secondary { background: var(--bs-gray-400) !important; }
+</style>
+
+<script>
+(function () {
+  if (!document.querySelector('.kel-dash')) return;
+
+  var url = '/home/dashboard/json';
+  var fmt = new Intl.NumberFormat('id-ID');
+  function num(n) { return (n === null || n === undefined) ? '—' : fmt.format(n); }
+  function pct(v, t) { if (!t || t <= 0) return 0; return (Number(v||0) / Number(t)) * 100; }
+  function pctFmt(v, t) { return pct(v, t).toFixed(0) + '%'; }
+
+  // ============ Helpers umum ============
+
+  function bdItem(label, val) {
+    return '<div class="bd-item"><span class="bd-label">' + label + '</span><span class="bd-val">' + num(val) + '</span></div>';
+  }
+
+  function pbRow(label, value, total, colorClass) {
+    var w = pct(value, total).toFixed(1);
+    return '<div class="pb-row">' +
+      '<div class="pb-label">' + label + '</div>' +
+      '<div class="progress"><div class="progress-bar ' + (colorClass || 'bg-primary') + '" style="width:' + w + '%"></div></div>' +
+      '<div class="pb-value">' + num(value) + '<span class="pb-pct">(' + pctFmt(value, total) + ')</span></div>' +
+    '</div>';
+  }
+
+  function pbStacked(items, total) {
+    var bars = items.map(function(it) {
+      var w = pct(it.value, total).toFixed(1);
+      var inner = (Number(w) >= 8) ? num(it.value) : '';
+      return '<div class="progress-bar ' + it.color + '" style="width:' + w + '%" title="' + it.label + ': ' + num(it.value) + ' (' + pctFmt(it.value, total) + ')">' + inner + '</div>';
+    }).join('');
+    var legend = items.map(function(it) {
+      return '<span><span class="pb-dot ' + it.color + '"></span>' + it.label + ' ' + num(it.value) + ' (' + pctFmt(it.value, total) + ')</span>';
+    }).join('');
+    return '<div class="pb-stacked"><div class="progress">' + bars + '</div><div class="pb-legend">' + legend + '</div></div>';
+  }
+
+  function card(icon, title, bigNum, bigSuffix, bodyHtml) {
+    return '<div class="stat-card">' +
+      '<div class="head"><i class="bi ' + icon + '"></i><span class="title">' + title + '</span></div>' +
+      '<div class="body">' +
+        '<div class="big">' + num(bigNum) + '<small> ' + bigSuffix + '</small></div>' +
+        (bodyHtml || '') +
+      '</div>' +
+    '</div>';
+  }
+
+  // ============ Info Diri (Wilayah, Instansi, Member) ============
+
+  function selfCards(d) {
+    var wb = d.self_wilayah_breakdown || {};
+    var wbHtml = '<div class="breakdown ' + (Object.keys(wb).length >= 3 ? 'cols-3' : '') + '">' +
+      Object.keys(wb).map(function(k){ return bdItem(k, wb[k]); }).join('') + '</div>';
+
+    var ib = d.self_instansi_breakdown || {};
+    var ibHtml = '<div class="breakdown">' +
+      Object.keys(ib).map(function(k){ return bdItem(k, ib[k]); }).join('') + '</div>';
+
+    var mHtml = '<div class="breakdown">' +
+      bdItem('Webmaster', d.self_member_webmaster) +
+      bdItem('Admin',     d.self_member_admin) +
+      bdItem('Member',    d.self_member_member) +
+      bdItem('Guest',     d.self_member_guest) + '</div>';
+
+    var wilSuffix = d.scope_level === 'pusat' ? 'provinsi' : (d.scope_level === 'prov' ? 'kab/kota' : 'kecamatan');
+    var instSuffix = d.scope_level === 'pusat' ? 'K/L' : 'OPD';
+
+    return '' +
+      '<div class="col-xl-4 col-md-6">' + card('bi-geo-alt-fill', 'Wilayah',  d.self_wilayah_total,  wilSuffix,  wbHtml) + '</div>' +
+      '<div class="col-xl-4 col-md-6">' + card('bi-building-fill','Instansi', d.self_instansi_total, instSuffix, ibHtml) + '</div>' +
+      '<div class="col-xl-4 col-md-6">' + card('bi-people-fill',  'Member',   d.self_member_total,   'user',     mHtml)  + '</div>';
+  }
+
+  // ============ Agregat rollup (Wilayah, Instansi, Member anak) ============
+
+  function rollupCards(d) {
+    var childLabel = d.scope_level === 'prov' ? 'kabko' : 'prov';
+    var T = Number(d.rollup_child_total || 0);
+
+    var wHtml = pbStacked([
+      { label: 'Kosong',  value: d.rollup_wilayah_kosong,  color: 'bg-secondary' },
+      { label: 'Parsial', value: d.rollup_wilayah_parsial, color: 'bg-warning'   },
+      { label: 'Lengkap', value: d.rollup_wilayah_lengkap, color: 'bg-success'   }
+    ], T);
+
+    var iHtml = pbStacked([
+      { label: 'Kosong',  value: d.rollup_instansi_kosong,  color: 'bg-secondary' },
+      { label: 'Parsial', value: d.rollup_instansi_parsial, color: 'bg-warning'   },
+      { label: 'Lengkap', value: d.rollup_instansi_lengkap, color: 'bg-success'   }
+    ], T);
+
+    var mHtml = '<div class="pb-list">' +
+      pbRow('Webmaster', d.rollup_member_webmaster_ada, T, 'bg-info') +
+      pbRow('Admin',     d.rollup_member_admin_ada,     T, 'bg-info') +
+      pbRow('Member',    d.rollup_member_member_ada,    T, 'bg-info') + '</div>';
+
+    return '' +
+      '<div class="col-xl-4 col-md-6">' + card('bi-geo',      childLabel + ' dgn Wilayah',  d.rollup_wilayah_lengkap,  '/ ' + num(T) + ' lengkap', wHtml) + '</div>' +
+      '<div class="col-xl-4 col-md-6">' + card('bi-building', childLabel + ' dgn Instansi', d.rollup_instansi_lengkap, '/ ' + num(T) + ' lengkap', iHtml) + '</div>' +
+      '<div class="col-xl-4 col-md-6">' + card('bi-people',   childLabel + ' dgn Member',   d.rollup_member_member_ada,'/ ' + num(T),              mHtml) + '</div>';
+  }
+
+  // ============ Render ============
+
+  function render(d) {
+    if (!d || d.error) {
+      document.getElementById('kel-scope-label').textContent = (d && d.error) ? ('error: ' + d.error) : 'data tidak tersedia';
+      document.getElementById('kel-self').innerHTML = '<div class="col-12 text-danger">Tabel <code>dashboard_ingest</code> kosong atau tidak ada di DB portal ini.</div>';
+      return;
+    }
+    document.getElementById('kel-scope-label').textContent = d.scope_slug + ' (' + d.scope_level + ')';
+    document.getElementById('kel-refreshed-at').textContent = 'Refresh: ' + (d.self_refreshed_at || '—');
+
+    var hasRollup = (d.scope_level === 'pusat' || d.scope_level === 'prov') && d.rollup_child_total !== null && d.rollup_child_total !== undefined;
+
+    document.getElementById('kel-self').innerHTML = selfCards(d);
+
+    document.getElementById('kel-rollup-section').style.display = hasRollup ? '' : 'none';
+    if (hasRollup) {
+      document.getElementById('kel-child-label').textContent =
+        num(d.rollup_child_total) + ' ' + (d.scope_level === 'pusat' ? 'provinsi' : 'kab/kota');
+      document.getElementById('kel-rollup').innerHTML = rollupCards(d);
+    }
+  }
+
+  function load() {
+    document.getElementById('kel-self').innerHTML = '<div class="col-12 skeleton">Memuat data…</div>';
+    axios.get(url)
+      .then(function(r){ render(r.data); })
+      .catch(function(e){ render({ error: (e && e.message) || 'network error' }); });
+  }
+
+  var btn = document.getElementById('kel-refresh-btn');
+  if (btn) btn.addEventListener('click', load);
+
+  load();
+})();
+</script>

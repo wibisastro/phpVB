@@ -1,0 +1,30 @@
+<div class="kel-dash px-3 pt-2">
+
+  <div class="d-flex flex-wrap align-items-center justify-content-between mb-2 gap-2">
+    <h5 class="mb-0">Kelengkapan Portal — <span class="text-primary" id="kel-scope-label">memuat…</span></h5>
+    <div class="meta">
+      <span id="kel-refreshed-at">Refresh: —</span>
+      <button class="btn btn-sm btn-outline-primary ms-2" id="kel-refresh-btn" title="Muat ulang">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="section-label">Info Diri</div>
+  <div class="row g-3" id="kel-self">
+    <div class="col-12 skeleton">Memuat data…</div>
+  </div>
+
+  <div id="kel-rollup-section" style="display:none">
+    <div class="section-label">Agregat — <span id="kel-child-label">—</span> di Bawahnya</div>
+    <div class="row g-3" id="kel-rollup"></div>
+  </div>
+
+  <hr class="my-4">
+  <div class="section-label">Rencana Pembangunan Dashboard</div>
+  <div class="meta mb-2">Catatan rancangan di bawah ini berasal dari <code>md/dashboard.md</code> — disimpan sebagai pengingat fitur yang masih akan dibangun.</div>
+  <div class="readme-content">
+    {{ readMD|raw }}
+  </div>
+
+</div>

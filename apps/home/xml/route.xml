@@ -58,8 +58,19 @@
 
 	<route>
 		<method>GET</method>
+		<uri>/home/dashboard</uri>
+		<handler>home\model\dashboard</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/home/dashboard/{cmd}</uri>
+		<handler>home\model\dashboard</handler>
+	</route>
+
+	<route>
+		<method>GET</method>
 		<uri>/home/crud</uri>
-		<handler>home\model\crud</handler>	
+		<handler>home\model\crud</handler>
 	</route>
 	<route>
 		<method>GET</method>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dashboardmenu>
+	<menu>
+		<caption>Dashboard</caption>
+		<url>/home/dashboard</url>
+	</menu>
+</dashboardmenu>

@@ -7,6 +7,7 @@ class index {
     function index () {
         global $self,$doc;
         $self->take("components","gov2nav", "setDefaultNav");
+        $self->take("components","gov2nav", "setDefaultNav", "dashboard.xml");
         $doc->body("pageTitle",'Home Page');
         $doc->body("readMD");
         $self->content();
@@ -15,6 +16,7 @@ class index {
     function phpvb () {
         global $self,$doc;
         $self->take("components","gov2nav", "setDefaultNav");
+        $self->take("components","gov2nav", "setDefaultNav", "dashboard.xml");
         $doc->body("pageTitle",'phpVB');
         $doc->body("readMD",'phpvb');
         $self->content();
@@ -23,6 +25,7 @@ class index {
     function sandbox () {
         global $self,$doc;
         $self->take("components","gov2nav", "setDefaultNav");
+        $self->take("components","gov2nav", "setDefaultNav", "dashboard.xml");
         $doc->body("pageTitle",'Sandbox Gov3.id');
         $doc->body("readMD",'sandbox');
         $self->content();
