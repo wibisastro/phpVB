@@ -37,13 +37,13 @@ class viewer {
     function count ($vars) {
         global $self, $doc;
         if (($vars['format'] ?? '') !== 'csv') {
-            return $doc->responseGet((object)['totalRecord' => 0]);
+            return $doc->responseGet(['totalRecord' => 0]);
         }
 
         $info = $self->resolveFile('csv', $vars['file'] ?? '');
-        if (!$info) return $doc->responseGet((object)['totalRecord' => 0]);
+        if (!$info) return $doc->responseGet(['totalRecord' => 0]);
 
         $parsed = $self->parseCsv($info['content']);
-        return $doc->responseGet((object)['totalRecord' => count($parsed['rows'])]);
+        return $doc->responseGet(['totalRecord' => count($parsed['rows'])]);
     }
 }

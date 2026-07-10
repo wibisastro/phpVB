@@ -29,16 +29,22 @@ class dsnSource extends document
 
     /**
      * Load table configuration from XML.
+     *
+     * dbTables.xml is optional (tier statis): an app that never touches the
+     * database does not need one. When the file is absent, $this->tbl becomes
+     * a deferred-error stub — the original TableConfigFileNotExist error only
+     * fires if a table name is actually accessed.
      */
     private function loadTableConfig(string $pageID): void
     {
         $tablesPath = __DIR__ . "/../../apps/{$pageID}/xml/dbTables.xml";
 
-        try {
-            if (!file_exists($tablesPath)) {
-                throw new \Exception("TableConfigFileNotExist:{$tablesPath}");
-            }
+        if (!file_exists($tablesPath)) {
+            $this->tbl = $this->missingTableConfig($tablesPath);
+            return;
+        }
 
+        try {
             $list = simplexml_load_file($tablesPath);
 
             if (!is_object($list)) {
@@ -75,6 +81,27 @@ class dsnSource extends document
         } catch (\Exception $e) {
             $this->exceptionHandler($e->getMessage());
         }
+    }
+
+    /**
+     * Deferred-error stub for a missing dbTables.xml.
+     */
+    private function missingTableConfig(string $path): \stdClass
+    {
+        return new class($this, $path) extends \stdClass {
+            public function __construct(
+                private dsnSource $owner,
+                private string $path,
+            ) {
+            }
+
+            public function __get(string $name): mixed
+            {
+                $this->owner->exceptionHandler("TableConfigFileNotExist:{$this->path}");
+
+                return null;
+            }
+        };
     }
 
     /**

@@ -59,8 +59,17 @@ class gov2option
             $res = DB::queryFirstRow($q, $where_clause);
         } catch (MeekroDBException $e) {
             if ($e->getCode() == 0) {
-                $connector = new DBConnector($this->dsn);
-                $res = $connector->db->queryFirstRow($q, $where_clause);
+                $xmlRows = $this->xmlRows((string) ($where['app'] ?? $GLOBALS['pageID'] ?? ''));
+
+                if ($xmlRows !== null) {
+                    $match = self::matchRows($xmlRows, $where, $whereType)[0] ?? null;
+                    $res = $match ? array_intersect_key($match, array_flip($select)) : null;
+                } elseif (self::hasDsnConfig()) {
+                    $connector = new DBConnector($this->dsn);
+                    $res = $connector->db->queryFirstRow($q, $where_clause);
+                }
+                // Tier statis (tanpa dsnSource.{stage}.xml dan tanpa options.xml):
+                // tidak ada datasource yang dideklarasikan — kembalikan null tanpa error
             } else {
                 $doc->exceptionHandler($e->getMessage());
             }
@@ -145,16 +154,150 @@ class gov2option
             $res = DB::query($q, $app, $status);
         } catch (MeekroDBException $e) {
             if ($e->getCode() == 0) {
-                $connector = new DBConnector($this->dsn);
-                if (isset($connector->db)) {
-                    $res = $connector->db->query($q, $app, $status);
+                $xmlRows = $this->xmlRows($app);
+
+                if ($xmlRows !== null) {
+                    $select = ['id', 'app', 'type', 'privilege', 'nama', 'keterangan', 'status', 'value'];
+                    $res = array_map(
+                        fn (array $row): array => array_intersect_key($row, array_flip($select)),
+                        self::matchRows($xmlRows, ['app' => $app, 'level' => 1, 'status' => $status])
+                    );
+                } elseif (self::hasDsnConfig()) {
+                    $connector = new DBConnector($this->dsn);
+                    if (isset($connector->db)) {
+                        $res = $connector->db->query($q, $app, $status);
+                    }
                 }
+                // Tier statis: tanpa DSN & tanpa options.xml → options kosong, tanpa error
             }
         } catch (Exception $e) {
             // Silently fail - options are non-critical for page rendering
         }
 
         return $res ?: [];
+    }
+
+    /**
+     * Whether the current app declares a database connection at all
+     * (apps/{pageID}/xml/dsnSource.{stage}.xml). Absent file = tier statis:
+     * the DBConnector retry path is skipped so no-DB apps render without error.
+     */
+    private static function hasDsnConfig(): bool
+    {
+        global $pageID;
+
+        $stage = defined('STAGE') ? STAGE : 'dev';
+
+        return file_exists(__DIR__ . "/../../apps/{$pageID}/xml/dsnSource.{$stage}.xml");
+    }
+
+    /**
+     * Load options rows from apps/{app}/xml/options.xml (fallback tier statis
+     * — dipakai saat database tidak tersedia; DB tetap menang bila terkonfigurasi).
+     *
+     * Format file mengikuti wiki 12-Options "XML-based Setup (Tanpa Database)":
+     * <options><cluster name="..."><item name="..." value="..."/></cluster></options>
+     *
+     * @return array<int, array<string, mixed>>|null Null when the file does not exist
+     */
+    private function xmlRows(string $app): ?array
+    {
+        if ($app === '' || preg_match('/[^a-zA-Z0-9_-]/', $app)) {
+            return null;
+        }
+
+        $file = __DIR__ . "/../../apps/{$app}/xml/options.xml";
+
+        if (!file_exists($file)) {
+            return null;
+        }
+
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_file($file);
+        libxml_clear_errors();
+
+        return is_object($xml) ? self::flattenOptionsXml($xml, $app) : null;
+    }
+
+    /**
+     * Flatten cluster/item XML into rows shaped like the options table.
+     * Ids are synthetic (document order, 1-based); cluster = level 1,
+     * item = level 2 with parent_id pointing at its cluster.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function flattenOptionsXml(\SimpleXMLElement $xml, string $app): array
+    {
+        $rows = [];
+        $id = 0;
+
+        foreach ($xml->cluster as $cluster) {
+            $a = $cluster->attributes();
+            $clusterId = ++$id;
+            $clusterPrivilege = (string) ($a->privilege ?? 'admin');
+
+            $rows[] = [
+                'id' => $clusterId,
+                'parent_id' => 0,
+                'app' => $app,
+                'nama' => (string) ($a->name ?? ''),
+                'type' => (string) ($a->type ?? 'option'),
+                'privilege' => $clusterPrivilege,
+                'status' => (string) ($a->status ?? 'on'),
+                'value' => (string) ($a->value ?? ''),
+                'level' => 1,
+                'level_label' => 'cluster',
+                'keterangan' => (string) ($a->keterangan ?? ''),
+            ];
+
+            foreach ($cluster->item as $item) {
+                $b = $item->attributes();
+
+                $rows[] = [
+                    'id' => ++$id,
+                    'parent_id' => $clusterId,
+                    'app' => $app,
+                    'nama' => (string) ($b->name ?? ''),
+                    'type' => (string) ($b->type ?? 'text'),
+                    'privilege' => (string) ($b->privilege ?? $clusterPrivilege),
+                    'status' => (string) ($b->status ?? 'on'),
+                    'value' => (string) ($b->value ?? ''),
+                    'level' => 2,
+                    'level_label' => 'option',
+                    'keterangan' => (string) ($b->keterangan ?? ''),
+                ];
+            }
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Filter rows with the same semantics as the SQL WHERE built in get():
+     * loose string equality per key, combined with AND (default) or OR.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    public static function matchRows(array $rows, array $where, string $whereType = 'and'): array
+    {
+        if (empty($where)) {
+            return $rows;
+        }
+
+        $useOr = strtolower($whereType) === 'or';
+
+        return array_values(array_filter($rows, function (array $row) use ($where, $useOr): bool {
+            $hits = 0;
+
+            foreach ($where as $key => $val) {
+                if (array_key_exists($key, $row) && (string) $row[$key] === (string) $val) {
+                    $hits++;
+                }
+            }
+
+            return $useOr ? $hits > 0 : $hits === count($where);
+        }));
     }
 
     /**

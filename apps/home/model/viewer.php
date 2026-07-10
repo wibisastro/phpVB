@@ -4,6 +4,7 @@ class viewer extends \Gov2lib\document {
     public const ALLOWED = ['csv','json','xml','sql','kml','md'];
     public int $scrollInterval = 300;
     public int $itemPerPage = 50;
+    private ?\Gov2lib\fileSource $files = null;
 
     function __construct () {
         $this->templateDir=__DIR__."/../view";
@@ -62,58 +63,20 @@ class viewer extends \Gov2lib\document {
     }
 
     function parseCsv (string $content): array {
-        $headers = [];
-        $rows = [];
-        $idx = 0;
-        $lines = preg_split('/\r\n|\r|\n/', $content);
-
-        foreach ($lines as $line) {
-            if ($line === '') continue;
-            $cells = str_getcsv($line, ',', '"', '\\');
-            if (empty($headers)) {
-                $headers = array_values(array_map('trim', $cells));
-                continue;
-            }
-            $row = ['id' => ++$idx];
-            foreach ($headers as $j => $h) {
-                $row[$h] = $cells[$j] ?? '';
-            }
-            $rows[] = $row;
-        }
-
-        if (!in_array('id', $headers, true)) {
-            array_unshift($headers, 'id');
-        }
-
-        return ['headers' => $headers, 'rows' => $rows];
+        return \Gov2lib\fileSource::parseCsv($content);
     }
 
     function resolveFile (string $format, string $name): ?array {
-        global $config;
-
         if (!in_array($format, self::ALLOWED, true)) return null;
-        if ($name === '' || preg_match('/[^a-zA-Z0-9_-]/', $name)) return null;
 
-        $base = __DIR__ . "/../{$format}";
-        $real = realpath("{$base}/{$name}.{$format}");
-        $baseReal = realpath($base);
+        $files = $this->files ??= new \Gov2lib\fileSource(__DIR__ . "/..");
+        $info = $files->resolve($format, $name);
 
-        if (!$real || !$baseReal || !str_starts_with($real, $baseReal)) return null;
-
-        $maxSize = (int) (
-            $config->viewer->maxFileSize->{$format}
-            ?? $config->viewer->maxFileSize->default
-            ?? 1048576
-        );
-        if (filesize($real) > $maxSize) {
+        if (!$info && $files->lastError === 'toolarge') {
             header("Location: /home/error?ref=viewer-{$format}-toolarge");
             exit;
         }
 
-        return [
-            'path' => $real,
-            'name' => $name,
-            'content' => file_get_contents($real),
-        ];
+        return $info;
     }
 }

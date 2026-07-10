@@ -323,18 +323,7 @@ class document extends customException
      */
     private function resolveTenant(): string
     {
-        global $config;
-
-        $tenant = trim((string) ($config->domain->attr['tenant'] ?? ''));
-
-        if ($tenant === '') {
-            $serverName = $_SERVER['SERVER_NAME'] ?? '';
-            if ($serverName !== '' && str_contains($serverName, '.')) {
-                $tenant = strtolower(strtok($serverName, '.'));
-            }
-        }
-
-        return preg_match('/^[a-z0-9_-]+$/i', $tenant) ? $tenant : '';
+        return fileSource::tenant();
     }
 
     /**
