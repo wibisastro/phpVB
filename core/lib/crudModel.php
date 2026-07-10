@@ -46,7 +46,7 @@ class crudModel extends dsnSource
                 $query .= " AND {$target2}_id=%i";
             }
 
-            return \DB::query($query, $sourceId, $this->ses->val[$target2 . '_id'] ?? 0);
+            return $this->db()->query($query, $sourceId, $this->ses->val[$target2 . '_id'] ?? 0);
         } catch (\MeekroDBException $e) {
             $this->exceptionHandler("doBrowseTags:{$e->getMessage()}");
             return null;
@@ -68,7 +68,7 @@ class crudModel extends dsnSource
             if ($target2) {
                 $query = "SELECT * FROM " . $this->tbl->table
                     . " WHERE {$source}_id=%i AND {$target}_id=%i AND {$target2}_id=%i";
-                $tagged = \DB::queryFirstRow(
+                $tagged = $this->db()->queryFirstRow(
                     $query,
                     $data['source_id'],
                     $data['target_id'],
@@ -77,7 +77,7 @@ class crudModel extends dsnSource
             } else {
                 $query = "SELECT * FROM " . $this->tbl->table
                     . " WHERE {$source}_id=%i AND {$target}_id=%i";
-                $tagged = \DB::queryFirstRow($query, $data['source_id'], $data['target_id']);
+                $tagged = $this->db()->queryFirstRow($query, $data['source_id'], $data['target_id']);
             }
 
             if (!empty($tagged['id'])) {
@@ -85,8 +85,8 @@ class crudModel extends dsnSource
             }
 
             // Get source and target data
-            $sourceData = \DB::queryFirstRow("SELECT * FROM " . $this->tbl->source . " WHERE id=%i", $data['source_id']);
-            $targetData = \DB::queryFirstRow("SELECT * FROM " . $this->tbl->target . " WHERE id=%i", $data['target_id']);
+            $sourceData = $this->db()->queryFirstRow("SELECT * FROM " . $this->tbl->source . " WHERE id=%i", $data['source_id']);
+            $targetData = $this->db()->queryFirstRow("SELECT * FROM " . $this->tbl->target . " WHERE id=%i", $data['target_id']);
 
             $insert = [
                 "{$source}_id" => (int) $data['source_id'],
@@ -99,14 +99,14 @@ class crudModel extends dsnSource
 
             // Handle target2 data
             if ($target2) {
-                $target2Data = \DB::queryFirstRow(
+                $target2Data = $this->db()->queryFirstRow(
                     "SELECT * FROM " . $this->tbl->{$target2} . " WHERE id=%i",
                     $this->ses->val[$target2 . '_id'] ?? 0
                 );
             }
 
             // Check columns and add optional fields
-            $columns = \DB::columnList($this->tbl->table);
+            $columns = $this->db()->columnList($this->tbl->table);
 
             if (in_array("{$target}_level", $columns)) {
                 $insert["{$target}_level"] = $targetData['level_label'] ?? '';
@@ -129,8 +129,7 @@ class crudModel extends dsnSource
                 $insert = $this->resolveWilayahHierarchy($insert, (int) $data['source_id']);
             }
 
-            \DB::insert($this->tbl->table, $insert);
-            return \DB::insertId();
+            return $this->db()->insert($this->tbl->table, $insert);
         } catch (\MeekroDBException $e) {
             $this->exceptionHandler("doTagging:{$e->getMessage()}");
             return null;
@@ -145,7 +144,7 @@ class crudModel extends dsnSource
      */
     private function resolveWilayahHierarchy(array $insert, int $sourceId): array
     {
-        $wilayah = \DB::queryFirstRow(
+        $wilayah = $this->db()->queryFirstRow(
             "SELECT * FROM " . $this->tbl->wilayah . " WHERE id=%i",
             $sourceId
         );
@@ -178,7 +177,7 @@ class crudModel extends dsnSource
 
         if ($hierarchyQuery) {
             try {
-                $resolved = \DB::queryFirstRow($hierarchyQuery, $wilayah['id']);
+                $resolved = $this->db()->queryFirstRow($hierarchyQuery, $wilayah['id']);
                 $insert['provinsi_id'] = (int) ($resolved['prov_id'] ?? 0);
                 $insert['kabupaten_id'] = (int) ($resolved['kab_id'] ?? 0);
                 $insert['kecamatan_id'] = (int) ($resolved['kec_id'] ?? 0);
@@ -200,7 +199,7 @@ class crudModel extends dsnSource
 
         try {
             $query = "SELECT * FROM " . $this->tbl->table . " WHERE id=%i";
-            $results = \DB::query($query, $id);
+            $results = $this->db()->query($query, $id);
 
             if (!is_array($results)) {
                 return;
@@ -235,7 +234,7 @@ class crudModel extends dsnSource
     {
         unset($data['cmd']);
         $fields = $data;
-        $columns = \DB::columnList($this->tbl->table);
+        $columns = $this->db()->columnList($this->tbl->table);
 
         if (in_array('parent_id', $columns)) {
             $recursive = [
@@ -250,7 +249,7 @@ class crudModel extends dsnSource
         }
 
         try {
-            \DB::update($this->tbl->table, $fields, "id=%i", (int) ($data['id'] ?? 0));
+            $this->db()->update($this->tbl->table, $fields, "id=%i", (int) ($data['id'] ?? 0));
 
             if (!empty($data['id']) && in_array('parent_id', $columns)) {
                 $this->updateChildren((int) $data['id']);
@@ -267,7 +266,7 @@ class crudModel extends dsnSource
     {
         try {
             $data = $this->doRead($id);
-            \DB::delete($this->tbl->table, "id=%i", $id);
+            $this->db()->delete($this->tbl->table, "id=%i", $id);
 
             if (!empty($data['parent_id'])) {
                 $this->updateChildren((int) $data['parent_id']);
@@ -286,7 +285,7 @@ class crudModel extends dsnSource
         $fields = ['children' => $children['totalRecord'] ?? 0];
 
         try {
-            \DB::update($this->tbl->table, $fields, "id=%i", $id);
+            $this->db()->update($this->tbl->table, $fields, "id=%i", $id);
         } catch (\MeekroDBException $e) {
             $this->exceptionHandler($e->getMessage());
         }
@@ -305,7 +304,7 @@ class crudModel extends dsnSource
         $fields = $data;
 
         try {
-            $columns = array_keys(\DB::columnList($this->tbl->table));
+            $columns = array_keys($this->db()->columnList($this->tbl->table));
 
             if (in_array('parent_id', $columns)) {
                 $levelLabel = $this->gov2formfield->getLevel(
@@ -346,8 +345,7 @@ class crudModel extends dsnSource
                 $fields = array_merge($fields, $flat);
             }
 
-            \DB::insert($this->tbl->table, $fields);
-            $id = \DB::insertId();
+            $id = $this->db()->insert($this->tbl->table, $fields);
 
             if (!empty($data['parent_id']) && in_array('parent_id', $columns)) {
                 $this->updateChildren((int) $data['parent_id']);
@@ -375,7 +373,7 @@ class crudModel extends dsnSource
         $query = "SELECT * FROM " . $this->tbl->table . " WHERE id=%i";
 
         try {
-            return \DB::queryFirstRow($query, $id);
+            return $this->db()->queryFirstRow($query, $id);
         } catch (\MeekroDBException $e) {
             $doc->exceptionHandler($e->getMessage());
             return null;
@@ -392,7 +390,7 @@ class crudModel extends dsnSource
         $where = $parentId ? 'WHERE parent_id=%i' : '';
         $query = "SELECT count(id) as totalRecord FROM " . $this->tbl->table . " {$where}";
 
-        return \DB::queryFirstRow($query, $parentId);
+        return $this->db()->queryFirstRow($query, $parentId);
     }
 
     /**
@@ -409,7 +407,7 @@ class crudModel extends dsnSource
 
             $query = "SELECT * FROM " . $this->tbl->table . " {$where} LIMIT {$scrolled}";
 
-            return \DB::query($query, $parentId);
+            return $this->db()->query($query, $parentId);
         } catch (\Exception $e) {
             $this->exceptionHandler($e->getMessage());
             return null;

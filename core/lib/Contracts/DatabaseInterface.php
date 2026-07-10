@@ -126,4 +126,15 @@ interface DatabaseInterface
      * @return int The number of affected rows.
      */
     public function affectedRows(): int;
+
+    /**
+     * List columns of a table with backend metadata.
+     *
+     * Bentuk return mengikuti MeekroDB columnList(): array asosiatif
+     * nama kolom => metadata. Dipakai crudModel untuk deteksi kolom
+     * hierarkis (parent_id dll).
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public function columnList(string $table): array;
 }

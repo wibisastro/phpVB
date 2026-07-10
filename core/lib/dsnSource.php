@@ -16,6 +16,11 @@ class dsnSource extends document
     public int $scrollInterval = 1000;
     public ?array $api = null;
 
+    /** Driver datasource dari <driver> di entri DSN XML (keputusan T0 #6085). */
+    protected string $driver = 'meekro';
+    private ?Contracts\DatabaseInterface $dbAdapter = null;
+    private ?Contracts\CrudRepositoryInterface $crudRepo = null;
+
     public function __construct()
     {
         global $pageID;
@@ -187,6 +192,7 @@ class dsnSource extends document
         foreach ($list->dsn as $dsn) {
             if ($dsnName === trim((string) $dsn->name)) {
                 $this->dsnName = $dsnName;
+                $this->driver = trim((string) $dsn->driver) ?: 'meekro';
 
                 $result = [
                     'user' => trim((string) $dsn->user),
@@ -209,6 +215,31 @@ class dsnSource extends document
         }
 
         return null;
+    }
+
+    /**
+     * Database adapter sesuai driver DSN (fase T2 #6085).
+     *
+     * Kode baru dianjurkan lewat sini (atau repo()) alih-alih facade
+     * statis \DB:: — memberi seam untuk adapter non-MySQL di fase T3.
+     */
+    public function db(): Contracts\DatabaseInterface
+    {
+        return $this->dbAdapter ??= match ($this->driver) {
+            'meekro' => new Database\MeekroAdapter(),
+            'supabase' => throw new \Exception(
+                'DriverNotImplemented: driver supabase menyusul di fase T3 (#6085)'
+            ),
+            default => throw new \Exception("UnknownDriver:{$this->driver}"),
+        };
+    }
+
+    /**
+     * Repository CRUD row-level di atas db() — kontrak wajib lintas-tier.
+     */
+    public function repo(): Contracts\CrudRepositoryInterface
+    {
+        return $this->crudRepo ??= new Database\MeekroCrudRepository($this->db());
     }
 
     /**
