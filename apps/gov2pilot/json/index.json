@@ -1,0 +1,30 @@
+[{
+    "name": "cmd",
+    "value": "",
+    "label": "Submit"
+},{
+    "name": "id",
+    "value": "",
+    "label": "ID",
+    "placeholder": "Nomor ID",
+    "disabled": "true"
+},{
+    "name": "nama",
+    "value": "",
+    "label": "Nama Tugas",
+    "placeholder": "Masukan nama tugas",
+    "error_message": "Nama tugas wajib diisi",
+    "required": "true"
+},{
+    "name": "status",
+    "value": "baru",
+    "label": "Status",
+    "required": "true",
+    "error_message": "Status harus dipilih",
+    "type": "select",
+    "options": {
+        "baru":"Baru",
+        "proses":"Proses",
+        "selesai":"Selesai"
+    }
+}]

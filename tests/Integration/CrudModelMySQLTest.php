@@ -55,10 +55,8 @@ class CrudModelMySQLTest extends TestCase
               <dsn>
                 <name>gajah</name>
                 <driver>supabase</driver>
-                <user>anon</user>
-                <pass>key</pass>
-                <host>gajah.gov3.id</host>
-                <db>rest</db>
+                <url>https://gajah.gov3.id</url>
+                <key>test-anon-key</key>
               </dsn>
             </list>
             XML);
@@ -161,7 +159,7 @@ class CrudModelMySQLTest extends TestCase
         $this->assertInstanceOf(\Gov2lib\Database\MeekroCrudRepository::class, $model->repo());
     }
 
-    public function testDriverSupabaseTerbacaDanBelumDiimplementasi(): void
+    public function testDriverSupabaseMenghasilkanAdapterDanRepositorySupabase(): void
     {
         $model = $this->model('member_t2');
         $list = simplexml_load_file(self::$dsnFile);
@@ -169,16 +167,13 @@ class CrudModelMySQLTest extends TestCase
         $model->credentialDB($list, 'gajah');
 
         $this->assertEquals('supabase', $model->driverName());
+        $this->assertInstanceOf(\Gov2lib\Database\SupabaseAdapter::class, $model->db());
+        $this->assertInstanceOf(\Gov2lib\Database\SupabaseCrudRepository::class, $model->repo());
 
-        try {
-            $model->db();
-            $this->fail('db() seharusnya melempar DriverNotImplemented');
-        } catch (\Exception $e) {
-            $this->assertStringContainsString('DriverNotImplemented', $e->getMessage());
-        } finally {
-            // Pulihkan statics MeekroDB ke master untuk test berikutnya
-            $model->credentialDB($list, 'master');
-        }
+        // Ganti DSN kembali ke meekro → cache adapter ikut ganti
+        $model->credentialDB($list, 'master');
+        $this->assertInstanceOf(\Gov2lib\Database\MeekroAdapter::class, $model->db());
+        $this->assertInstanceOf(\Gov2lib\Database\MeekroCrudRepository::class, $model->repo());
     }
 
     public function testCrudRoundtripFlat(): void

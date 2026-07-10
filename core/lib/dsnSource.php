@@ -18,6 +18,9 @@ class dsnSource extends document
 
     /** Driver datasource dari <driver> di entri DSN XML (keputusan T0 #6085). */
     protected string $driver = 'meekro';
+
+    /** @var array{url: string, key: string, schema: string}|null kredensial driver supabase (fase T3) */
+    protected ?array $supabase = null;
     private ?Contracts\DatabaseInterface $dbAdapter = null;
     private ?Contracts\CrudRepositoryInterface $crudRepo = null;
 
@@ -163,6 +166,12 @@ class dsnSource extends document
                 throw new \Exception("DSNEntryNotFound: Entry '{$dsnName}' tidak ditemukan di apps/{$pageID}/xml/dsnSource." . STAGE . ".xml — periksa isi file dan pastikan tag <name>{$dsnName}</name> ada");
             }
 
+            // Driver supabase: koneksi HTTP lazy di SupabaseAdapter — tidak
+            // ada link mysqli yang perlu dibuka (fase T3 #6085)
+            if ($this->driver === 'supabase') {
+                return null;
+            }
+
             $linkId = mysqli_connect(
                 $dsn['host'],
                 $dsn['user'],
@@ -185,7 +194,12 @@ class dsnSource extends document
     /**
      * Extract database credentials from an XML DSN list.
      *
-     * @return array{user: string, pass: string, host: string, port: string, db: string}|null
+     * Entri driver=meekro (default) mengembalikan kredensial MySQL dan
+     * men-set statics MeekroDB. Entri driver=supabase memakai tag
+     * <url> + <key> (+ <schema> opsional) dan mengembalikan kredensial
+     * REST tanpa menyentuh MeekroDB.
+     *
+     * @return array{user: string, pass: string, host: string, port: string, db: string}|array{url: string, key: string, schema: string}|null
      */
     public function credentialDB(\SimpleXMLElement $list, string $dsnName): ?array
     {
@@ -193,6 +207,18 @@ class dsnSource extends document
             if ($dsnName === trim((string) $dsn->name)) {
                 $this->dsnName = $dsnName;
                 $this->driver = trim((string) $dsn->driver) ?: 'meekro';
+
+                // Ganti DSN = ganti adapter; buang cache lazy db()/repo()
+                $this->dbAdapter = null;
+                $this->crudRepo = null;
+
+                if ($this->driver === 'supabase') {
+                    return $this->supabase = [
+                        'url' => trim((string) $dsn->url),
+                        'key' => trim((string) $dsn->key),
+                        'schema' => trim((string) $dsn->schema) ?: 'public',
+                    ];
+                }
 
                 $result = [
                     'user' => trim((string) $dsn->user),
@@ -227,8 +253,10 @@ class dsnSource extends document
     {
         return $this->dbAdapter ??= match ($this->driver) {
             'meekro' => new Database\MeekroAdapter(),
-            'supabase' => throw new \Exception(
-                'DriverNotImplemented: driver supabase menyusul di fase T3 (#6085)'
+            'supabase' => new Database\SupabaseAdapter(
+                $this->supabase ?? throw new \Exception(
+                    'SupabaseCredentialMissing: connectDB() belum memuat entri DSN driver supabase'
+                )
             ),
             default => throw new \Exception("UnknownDriver:{$this->driver}"),
         };
@@ -239,7 +267,11 @@ class dsnSource extends document
      */
     public function repo(): Contracts\CrudRepositoryInterface
     {
-        return $this->crudRepo ??= new Database\MeekroCrudRepository($this->db());
+        $db = $this->db();
+
+        return $this->crudRepo ??= $db instanceof Database\SupabaseAdapter
+            ? new Database\SupabaseCrudRepository($db)
+            : new Database\MeekroCrudRepository($db);
     }
 
     /**
