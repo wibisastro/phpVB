@@ -28,3 +28,6 @@ composer.lock
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# PHPUnit cache
+.phpunit.cache/
