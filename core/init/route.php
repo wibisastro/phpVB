@@ -7,7 +7,11 @@
 *	Copyleft	: eGov Lab UI
 *********************************************************************/
 try {
-    $requestWith=explode(",", $_SERVER['HTTP_ACCEPT'] ?? '');
+    //--------layer modern Fase 2.5 (#6105): request dibungkus Gov2lib\Http\Request.
+    //        Superglobals TIDAK dihapus — masih dipakai jalur legacy di bawah.
+    $httpRequest = Gov2lib\Http\Request::createFromGlobals(trim((string)$config->webroot) ?: '/');
+
+    $requestWith=explode(",", (string) $httpRequest->header('Accept', ''));
 
     if ($requestWith[0]=="application/json") {
         $request="ajax";
@@ -15,15 +19,23 @@ try {
         $request="page";
     }
 
-    if (strstr($_SERVER['HTTP_USER_AGENT'] ?? '','curl')) {
+    if (strstr((string) $httpRequest->header('User-Agent', ''),'curl')) {
         $requester="webservice";
     } else {
         $requester="browser";
     }
 
-    $httpMethod = $_SERVER['REQUEST_METHOD'];
+    $httpMethod = $httpRequest->method;
 
-    $uri = $_SERVER['REQUEST_URI'];
+    $uri = $httpRequest->uri;
+
+    //--------safety net exception tak tertangkap: styled page/JSON sesuai Accept,
+    //        menggantikan fatal mentah PHP. Jalur $doc->exceptionHandler() legacy
+    //        (string "Kode:Pesan") tetap jalan lebih dulu via try/catch existing.
+    //        Error handler PHP (warning/notice) sengaja TIDAK didaftarkan —
+    //        parity: kode legacy bergantung pada toleransi warning.
+    $gov2ExceptionHandler = new Gov2lib\Http\ExceptionHandler($request === 'ajax', STAGE);
+    set_exception_handler([$gov2ExceptionHandler, 'handle']);
 
     if (substr($uri, 0, 4) == "http") {
         $param=explode("/",$uri);
@@ -106,50 +118,52 @@ try {
             if (is_array($list)) {
                 if (is_array($list['route'][0])) {$list=$list['route'];}
                 $merged_list=array_merge($default_list["route"],$list);
-                $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-                    global $merged_list, $config;
-                    foreach ($merged_list as $route) {
-                        $r->addRoute($route['method'], $config->webroot.$route['uri'], $route['handler']);
-                    }
-                });
-                $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
+                //--------layer modern Fase 2.5 (#6105): dispatch via Gov2lib\Http\Router
+                //        yang membungkus FastRoute. Route didaftarkan TANPA prefix
+                //        webroot — Router yang strip webroot dari URI masuk
+                //        (ekuivalen dgn pola lama: register webroot+uri, dispatch
+                //        URI mentah). Handler yang cocok tetap jalur legacy di bawah.
+                $gov2Router = new Gov2lib\Http\Router(trim((string)$config->webroot) ?: '/');
+                foreach ($merged_list as $route) {
+                    $gov2Router->addRoute($route['method'], $route['uri'], $route['handler']);
+                }
+                $routeResult = $gov2Router->dispatch($httpMethod, $uri);
 
                 // Fallback: if pageID was auto-resolved from <domain> config
                 // (user accessed bare `/` or `/index.php`) and no route matched,
                 // retry with `/{pageID}`. This way apps don't need to register
                 // `<uri>/</uri>` explicitly — the standard `/{pageID}` route
                 // is used instead. Apps that DO register `/` keep precedence.
-                if ($routeInfo[0] === FastRoute\Dispatcher::NOT_FOUND
+                if ($routeResult->status === Gov2lib\Contracts\RouteStatus::NOT_FOUND
                     && !empty($pageIDFromConfig)
                     && $pageID !== '') {
                     $fallbackUri = rtrim((string)($config->webroot ?? ''), '/') . '/' . $pageID;
-                    $retryInfo = $dispatcher->dispatch($httpMethod, $fallbackUri);
-                    if ($retryInfo[0] === FastRoute\Dispatcher::FOUND) {
+                    $retryResult = $gov2Router->dispatch($httpMethod, $fallbackUri);
+                    if ($retryResult->status === Gov2lib\Contracts\RouteStatus::FOUND) {
                         $uri = $fallbackUri;
-                        $routeInfo = $retryInfo;
+                        $routeResult = $retryResult;
                     }
                 }
 
-                switch ($routeInfo[0]) {
-                    case FastRoute\Dispatcher::NOT_FOUND:
+                switch ($routeResult->status) {
+                    case Gov2lib\Contracts\RouteStatus::NOT_FOUND:
                         throw new Exception("RouteNotFound:".$uri);
                     break;
-                    case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-                        $allowedMethods = $routeInfo[1];
+                    case Gov2lib\Contracts\RouteStatus::METHOD_NOT_ALLOWED:
                         throw new Exception('MethodNotAllowed:'.$httpMethod);
                     break;
-                    case FastRoute\Dispatcher::FOUND:
+                    case Gov2lib\Contracts\RouteStatus::FOUND:
                         if ($httpMethod == "POST" && !$_POST) {
                             $_POST = json_decode(trim(file_get_contents('php://input')), true);
                         } elseif ($httpMethod == "GET") {
-                            $vars = $routeInfo[2];
+                            $vars = $routeResult->vars;
                             if (!isset($vars["cmd"])) {
                                 if (($_GET['cmd'] ?? '')=='logout') {$vars["cmd"]="logout";}
                                 else {$vars["cmd"]="";}
                             }
                         }
-                        if (substr($routeInfo[1],0,7)=="Gov2lib") {
-                            $handler = $routeInfo[1];
+                        if (substr($routeResult->handler,0,7)=="Gov2lib") {
+                            $handler = $routeResult->handler;
                             $handler=str_replace("/","\\",$handler);
                             list($_lib, $_handler)=explode("\\",$handler);
                             switch ($_handler) {
@@ -181,7 +195,7 @@ try {
                             $className = $scriptID;
 
                         } else {
-                            list($p,$d,$className)=explode("\\",$routeInfo[1]);
+                            list($p,$d,$className)=explode("\\",$routeResult->handler);
                             $handler = "App\\".$pageID."\model\\".$className;
                             $controller = "App\\".$pageID."\\".$className;
                         }

@@ -284,6 +284,8 @@ class ExceptionHandler
      */
     private function outputJsonResponse(array $response): void
     {
+        $code = $response['error']['code'] ?? 500;
+        http_response_code(is_int($code) && $code >= 100 && $code < 600 ? $code : 500);
         header('Content-Type: application/json', true);
         echo json_encode($response, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     }
