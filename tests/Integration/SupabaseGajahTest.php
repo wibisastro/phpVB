@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Integration test: SupabaseAdapter di atas gajah (Supabase self-hosted) nyata.
- * Fase T3 #6085 — pilot tabel public.phpvb_pilot_todo dengan RLS:
+ * Fase T3 #6085 — pilot tabel public.phpvb_gajah_todo dengan RLS:
  * anon read-only, service_role penuh (migration 20260710173603).
  *
  * Butuh env (otomatis SKIP bila tidak ada — tidak pernah dikomit):
@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class SupabaseGajahTest extends TestCase
 {
-    private const TABLE = 'phpvb_pilot_todo';
+    private const TABLE = 'phpvb_gajah_todo';
 
     private static string $url = '';
     private static string $anonKey = '';

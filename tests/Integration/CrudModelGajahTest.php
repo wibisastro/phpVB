@@ -14,7 +14,7 @@ use Gov2lib\Exceptions\UnsupportedDriverOperationException;
  * membuktikan keputusan T4 #6085 "ganti driver saja": model tanpa override
  * apa pun berperilaku identik di meekro (SQL) dan supabase (PostgREST).
  *
- * Tabel: phpvb_pilot_todo (flat) + phpvb_pilot_wilayah (hierarkis,
+ * Tabel: phpvb_gajah_todo (flat) + phpvb_gajah_wilayah (hierarkis,
  * migration 20260711022755) — dua-duanya RLS anon read-only.
  *
  * Butuh env (otomatis SKIP bila tidak ada — tidak pernah dikomit):
@@ -65,7 +65,7 @@ class CrudModelGajahTest extends CrudModelParityBase
         }
 
         try {
-            self::service()->restCount('phpvb_pilot_wilayah');
+            self::service()->restCount('phpvb_gajah_wilayah');
         } catch (SupabaseException $e) {
             self::markTestSkipped('gajah tidak terjangkau / tabel parity belum ada: ' . $e->getMessage());
         }
@@ -119,12 +119,12 @@ class CrudModelGajahTest extends CrudModelParityBase
 
     protected function flatTable(): string
     {
-        return 'phpvb_pilot_todo';
+        return 'phpvb_gajah_todo';
     }
 
     protected function hierTable(): string
     {
-        return 'phpvb_pilot_wilayah';
+        return 'phpvb_gajah_wilayah';
     }
 
     protected function model(string $table): object

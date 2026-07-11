@@ -4,7 +4,7 @@
  * Contoh app tier 3 #6085 (dulu gov2pilot) — CRUD via SupabaseAdapter (gajah).
  *
  * Halaman CRUD standar (pola apps/home/crud.php); bedanya seluruh data
- * hidup di tabel public.phpvb_pilot_todo di gajah dan diakses lewat
+ * hidup di tabel public.phpvb_gajah_todo di gajah dan diakses lewat
  * PostgREST, tanpa koneksi database langsung. Model tidak meng-override
  * apa pun — driver dipilih murni dari tag <driver> di DSN XML (T4).
  */
