@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+	<route>
+		<method>GET</method>
+		<uri>/gov2gajah</uri>
+		<handler>gov2gajah\model\index</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2gajah/{cmd}[/{id}]</uri>
+		<handler>gov2gajah\model\index</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/gov2gajah/{cmd}/{scroll}/[{id}]</uri>
+		<handler>gov2gajah\model\index</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/gov2gajah</uri>
+		<handler>gov2gajah\model\index</handler>
+	</route>
+</list>

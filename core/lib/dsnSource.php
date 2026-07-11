@@ -30,9 +30,18 @@ class dsnSource extends document
 
         parent::__construct();
 
-        require_once __DIR__ . '/../../vendor/sergeytsalkov/meekrodb/db.class.php';
-
         $this->loadTableConfig($pageID);
+    }
+
+    /**
+     * Muat library MeekroDB (bukan autoload composer) — lazy, hanya dari
+     * jalur yang benar-benar memakai driver meekro (fase T4 #6085): tier 1
+     * (statis) dan tier 3 (supabase) tidak lagi menyeret db.class.php,
+     * sehingga bisa jalan di PHP tanpa ekstensi mysqli.
+     */
+    public static function requireMeekroDB(): void
+    {
+        require_once __DIR__ . '/../../vendor/sergeytsalkov/meekrodb/db.class.php';
     }
 
     /**
@@ -229,6 +238,7 @@ class dsnSource extends document
                 ];
 
                 // Configure MeekroDB static connection
+                self::requireMeekroDB();
                 \DB::$user = $result['user'];
                 \DB::$password = $result['pass'];
                 \DB::$dbName = $result['db'];

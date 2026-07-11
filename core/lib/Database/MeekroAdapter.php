@@ -17,6 +17,11 @@ use Gov2lib\Contracts\DatabaseInterface;
  */
 class MeekroAdapter implements DatabaseInterface
 {
+    public function __construct()
+    {
+        \Gov2lib\dsnSource::requireMeekroDB();
+    }
+
     public function query(string $sql, mixed ...$params): array
     {
         $result = \DB::query($sql, ...$params);

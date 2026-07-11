@@ -1,12 +1,12 @@
-<?php namespace App\gov2pilot;
+<?php namespace App\gov2gajah;
 
 /**
- * Controller pilot fase T3 #6085 — CRUD via SupabaseAdapter (gajah).
+ * Contoh app tier 3 #6085 (dulu gov2pilot) — CRUD via SupabaseAdapter (gajah).
  *
  * Halaman CRUD standar (pola apps/home/crud.php); bedanya seluruh data
  * hidup di tabel public.phpvb_pilot_todo di gajah dan diakses lewat
- * PostgREST, tanpa koneksi database langsung. Lihat model/index.php
- * untuk pemetaan repository-level.
+ * PostgREST, tanpa koneksi database langsung. Model tidak meng-override
+ * apa pun — driver dipilih murni dari tag <driver> di DSN XML (T4).
  */
 class index extends \Gov2lib\api {
 
@@ -21,7 +21,7 @@ class index extends \Gov2lib\api {
     function index() {
         global $self,$doc;
         $self->take("components","gov2nav", "setDefaultNav");
-        $doc->body("pageTitle",'Pilot Supabase — T3');
+        $doc->body("pageTitle",'Contoh Tier 3 — Supabase (gajah)');
         $doc->body("subTitle",'Daftar Tugas (data di gajah via PostgREST)');
         $self->loadTable();
         $self->gov2notification->content();

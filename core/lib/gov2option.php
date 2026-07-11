@@ -16,6 +16,9 @@ use Gov2lib\DBConnector;
 class gov2option
 {
     public mixed $dsn = null;
+
+    /** @var string|null cache hasil dsnDriver() per instance */
+    private ?string $driver = null;
     /**
      * Initialize options handler with database connection
      */
@@ -44,6 +47,18 @@ class gov2option
     public function get(array $where = [], string $whereType = 'and', array $select = ['id', 'parent_id', 'nama', 'value']): ?array
     {
         global $doc;
+
+        // Tier 1 (statis) & tier 3 (supabase): options hanya dari
+        // apps/{app}/xml/options.xml — jalur SQL/DBConnector tidak disentuh
+        // sama sekali, tanpa file = null silent (T4 #6085)
+        if ($this->dsnDriver() !== 'meekro') {
+            $xmlRows = $this->xmlRows((string) ($where['app'] ?? $GLOBALS['pageID'] ?? ''));
+            $match = $xmlRows === null ? null : (self::matchRows($xmlRows, $where, $whereType)[0] ?? null);
+
+            return $match ? array_intersect_key($match, array_flip($select)) : null;
+        }
+
+        dsnSource::requireMeekroDB();
         $select_field = join(',', $select);
         $where_clause = new WhereClause($whereType);
 
@@ -91,6 +106,7 @@ class gov2option
     public function connector_get(array $where = [], string $whereType = 'and', array $select = ['id', 'parent_id', 'nama', 'value']): ?array
     {
         global $doc, $config;
+        dsnSource::requireMeekroDB();
         $select_field = join(',', $select);
         $connector = new DBConnector($config->domain->attr['dsn']);
         $where_clause = new WhereClause($whereType);
@@ -126,6 +142,7 @@ class gov2option
         $result = null;
 
         try {
+            dsnSource::requireMeekroDB();
             DB::insert('options', $data);
             $result = $this->get(['id' => DB::insertId()], 'and',
                 ['id', 'parent_id', 'app', 'type', 'nama', 'value', 'status', 'level', 'level_label', 'created_by']);
@@ -147,6 +164,24 @@ class gov2option
     {
         global $doc;
         $res = [];
+
+        // Tier 1 & 3: XML-only, selaras get() (T4 #6085)
+        if ($this->dsnDriver() !== 'meekro') {
+            $xmlRows = $this->xmlRows($app);
+
+            if ($xmlRows === null) {
+                return [];
+            }
+
+            $select = ['id', 'app', 'type', 'privilege', 'nama', 'keterangan', 'status', 'value'];
+
+            return array_map(
+                fn (array $row): array => array_intersect_key($row, array_flip($select)),
+                self::matchRows($xmlRows, ['app' => $app, 'level' => 1, 'status' => $status])
+            );
+        }
+
+        dsnSource::requireMeekroDB();
 
         $q = "SELECT id, app, type, privilege, nama, keterangan, status, value FROM options WHERE app=%s AND level=1 AND status=%s ORDER BY id ASC";
 
@@ -189,6 +224,59 @@ class gov2option
         $stage = defined('STAGE') ? STAGE : 'dev';
 
         return file_exists(__DIR__ . "/../../apps/{$pageID}/xml/dsnSource.{$stage}.xml");
+    }
+
+    /**
+     * Driver DSN app aktif: 'static' (tanpa file DSN), 'meekro', atau
+     * 'supabase' — penentu jalur options per tier (T4 #6085). Entri dicari
+     * berdasarkan nama DSN instance ($this->dsn); bila tidak ketemu, pakai
+     * driver entri pertama. Mengikuti <share> seperti dsnSource::connectDB.
+     */
+    private function dsnDriver(): string
+    {
+        global $pageID;
+
+        if ($this->driver !== null) {
+            return $this->driver;
+        }
+
+        $stage = defined('STAGE') ? STAGE : 'dev';
+        $file = __DIR__ . "/../../apps/{$pageID}/xml/dsnSource.{$stage}.xml";
+
+        if (!file_exists($file)) {
+            return $this->driver = 'static';
+        }
+
+        libxml_use_internal_errors(true);
+        $list = simplexml_load_file($file);
+
+        if (is_object($list) && !empty($list->share)) {
+            $sharedFile = __DIR__ . "/../../apps/{$list->share}/xml/dsnSource.{$stage}.xml";
+
+            if (file_exists($sharedFile)) {
+                $shared = simplexml_load_file($sharedFile);
+                $list = is_object($shared) ? $shared : $list;
+            }
+        }
+
+        libxml_clear_errors();
+
+        if (!is_object($list)) {
+            return $this->driver = 'meekro';
+        }
+
+        $first = null;
+
+        foreach ($list->dsn as $dsn) {
+            $entryDriver = trim((string) $dsn->driver) ?: 'meekro';
+            $first ??= $entryDriver;
+
+            if (trim((string) $dsn->name) === trim((string) $this->dsn)) {
+                return $this->driver = $entryDriver;
+            }
+        }
+
+        return $this->driver = $first ?? 'meekro';
     }
 
     /**
@@ -359,6 +447,7 @@ class gov2option
         $_response = null;
 
         try {
+            dsnSource::requireMeekroDB();
             $_query = "SELECT * FROM member WHERE account_id=%i";
             $_response = \DB::queryFirstRow($_query, $accountId);
         } catch (\MeekroDBException $DBException) {

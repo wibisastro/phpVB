@@ -46,6 +46,9 @@ class gov2session extends dsnSource
         }
 
         if ($_COOKIE['Gov2Session'] ?? false) {
+            // Session store selalu MySQL master (tidak ikut tier per-app) —
+            // muat MeekroDB begitu ada sesi login (T4 #6085)
+            self::requireMeekroDB();
             $this->sesRead($_COOKIE['Gov2Session']);
             global $doc;
             if (isset($doc) && !empty($this->val)) {

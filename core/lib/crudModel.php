@@ -19,6 +19,32 @@ class crudModel extends dsnSource
     }
 
     /**
+     * Driver-branch (fase T4 #6085): true bila DSN aktif memakai driver
+     * non-SQL (supabase) sehingga method CRUD harus lewat repo() (REST).
+     * Jalur meekro tetap menjalankan SQL existing byte-identik — ganti
+     * tier cukup dengan mengubah <driver> di DSN XML, tanpa override model.
+     */
+    protected function usesRepo(): bool
+    {
+        return $this->repo() instanceof Database\SupabaseCrudRepository;
+    }
+
+    /**
+     * Guard operasi join-heavy yang deliberately meekro-only (keputusan
+     * T4: defer — belum ada pemetaan JOIN/alias kolom ke PostgREST).
+     */
+    private function assertSqlDriver(string $operation): void
+    {
+        if ($this->usesRepo()) {
+            throw new Exceptions\UnsupportedDriverOperationException(
+                "UnsupportedDriverOperation: {$operation} butuh JOIN/alias kolom SQL"
+                    . ' yang belum terpetakan ke PostgREST — sediakan RPC/view di'
+                    . ' Supabase bila operasi ini diperlukan di driver supabase'
+            );
+        }
+    }
+
+    /**
      * Browse tags linked to a source entity.
      *
      * @return array<int, array<string, mixed>>|null
@@ -30,6 +56,8 @@ class crudModel extends dsnSource
         string $target2 = '',
         string $caption = ''
     ): ?array {
+        $this->assertSqlDriver('doBrowseTags');
+
         try {
             $query = "SELECT *,
                 {$target}_{$caption} AS target_{$caption},
@@ -63,6 +91,8 @@ class crudModel extends dsnSource
         string $target2,
         string $caption
     ): ?int {
+        $this->assertSqlDriver('doTagging');
+
         try {
             // Check if already tagged
             if ($target2) {
@@ -144,6 +174,8 @@ class crudModel extends dsnSource
      */
     private function resolveWilayahHierarchy(array $insert, int $sourceId): array
     {
+        $this->assertSqlDriver('resolveWilayahHierarchy');
+
         $wilayah = $this->db()->queryFirstRow(
             "SELECT * FROM " . $this->tbl->wilayah . " WHERE id=%i",
             $sourceId
@@ -196,6 +228,36 @@ class crudModel extends dsnSource
     public function setBreadcrumb(int $id = 0, string $caption = '', string $code = ''): void
     {
         static $counter = 0;
+
+        if ($this->usesRepo()) {
+            try {
+                $row = $this->repo()->read((string) $this->tbl->table, $id);
+
+                if ($row === null) {
+                    return;
+                }
+
+                $counter++;
+                $this->breadcrumb[$counter] = [
+                    'caption' => $caption ? ($row[$caption] ?? '') : ($row['nama'] ?? ''),
+                    'id' => $row['id'],
+                    'level' => $row['level'] ?? '',
+                    'level_label' => $row['level_label'] ?? '',
+                ];
+
+                if ($code) {
+                    $this->breadcrumb[$counter]['code'] = $row[$code] ?? '';
+                }
+
+                if (!empty($row['parent_id']) && $row['parent_id'] > 0) {
+                    $this->setBreadcrumb((int) $row['parent_id'], $caption, $code);
+                }
+            } catch (Exceptions\SupabaseException $e) {
+                $this->exceptionHandler($e->getMessage());
+            }
+
+            return;
+        }
 
         try {
             $query = "SELECT * FROM " . $this->tbl->table . " WHERE id=%i";
@@ -264,6 +326,21 @@ class crudModel extends dsnSource
      */
     public function doDel(int $id = 0): void
     {
+        if ($this->usesRepo()) {
+            try {
+                $data = $this->doRead($id);
+                $this->repo()->delete((string) $this->tbl->table, $id);
+
+                if (!empty($data['parent_id'])) {
+                    $this->updateChildren((int) $data['parent_id']);
+                }
+            } catch (Exceptions\SupabaseException $e) {
+                $this->exceptionHandler($e->getMessage());
+            }
+
+            return;
+        }
+
         try {
             $data = $this->doRead($id);
             $this->db()->delete($this->tbl->table, "id=%i", $id);
@@ -283,6 +360,16 @@ class crudModel extends dsnSource
     {
         $children = $this->doCountChildren($id);
         $fields = ['children' => $children['totalRecord'] ?? 0];
+
+        if ($this->usesRepo()) {
+            try {
+                $this->repo()->update((string) $this->tbl->table, $fields, $id);
+            } catch (Exceptions\SupabaseException $e) {
+                $this->exceptionHandler($e->getMessage());
+            }
+
+            return;
+        }
 
         try {
             $this->db()->update($this->tbl->table, $fields, "id=%i", $id);
@@ -370,6 +457,15 @@ class crudModel extends dsnSource
     {
         global $doc;
 
+        if ($this->usesRepo()) {
+            try {
+                return $this->repo()->read((string) $this->tbl->table, $id);
+            } catch (Exceptions\SupabaseException $e) {
+                $doc->exceptionHandler($e->getMessage());
+                return null;
+            }
+        }
+
         $query = "SELECT * FROM " . $this->tbl->table . " WHERE id=%i";
 
         try {
@@ -387,6 +483,12 @@ class crudModel extends dsnSource
      */
     public function doCountChildren(int|string $parentId = 0): ?array
     {
+        if ($this->usesRepo()) {
+            $filter = $parentId ? ['parent_id' => (int) $parentId] : [];
+
+            return ['totalRecord' => $this->repo()->count((string) $this->tbl->table, $filter)];
+        }
+
         $where = $parentId ? 'WHERE parent_id=%i' : '';
         $query = "SELECT count(id) as totalRecord FROM " . $this->tbl->table . " {$where}";
 
@@ -400,6 +502,22 @@ class crudModel extends dsnSource
      */
     public function doBrowse(int|string $scroll = 0, int|string $parentId = 0, string $parentIdName = ''): ?array
     {
+        if ($this->usesRepo()) {
+            try {
+                // Terjemahan scroll() "offset,interval" → limit/offset PostgREST;
+                // order eksplisit by id = padanan praktis urutan PK MySQL
+                $interval = $this->scrollInterval ?: 1000;
+                $offset = max(0, (int) $scroll - 1) * $interval;
+                $parentCol = $parentIdName ? "{$parentIdName}_id" : 'parent_id';
+                $filter = $parentId ? [$parentCol => (int) $parentId] : [];
+
+                return $this->repo()->browse((string) $this->tbl->table, $filter, $interval, $offset, 'id');
+            } catch (Exceptions\SupabaseException $e) {
+                $this->exceptionHandler($e->getMessage());
+                return null;
+            }
+        }
+
         try {
             $scrolled = $this->scroll((int) $scroll);
             $parentCol = $parentIdName ? "{$parentIdName}_id" : 'parent_id';

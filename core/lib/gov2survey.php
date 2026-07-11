@@ -74,6 +74,7 @@ class gov2survey
     final public function get(array $where = [], string $whereType = 'and', array $select = ['*']): ?array
     {
         global $doc;
+        dsnSource::requireMeekroDB();
         $select_field = join(',', $select);
         $where_clause = new WhereClause($whereType);
         $connector = new DBConnector($this->dsn);

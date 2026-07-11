@@ -18,6 +18,8 @@ class DBConnector
 
     public function __construct(string $dsn = 'master')
     {
+        dsnSource::requireMeekroDB();
+
         $this->dsn = trim($dsn);
         $this->initializeDsn();
         $this->initializeDb();
