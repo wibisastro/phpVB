@@ -69,21 +69,25 @@ class Router implements RouterInterface
 
     /**
      * Register a single route with the router
-     * 
-     * @param string $method HTTP method (GET, POST, etc.)
+     *
+     * @param string|array $method HTTP method (GET, POST, etc.) or a list of
+     *                             methods — route XML boleh punya beberapa
+     *                             <method> per route (paritas FastRoute lama)
      * @param string $uri URI pattern with optional {param} placeholders
      * @param string $handler Handler class path
      * @throws InvalidArgumentException If method or uri is empty
      */
-    public function addRoute(string $method, string $uri, string $handler): void
+    public function addRoute(string|array $method, string $uri, string $handler): void
     {
         if (empty($method) || empty($uri)) {
             throw new InvalidArgumentException('Method and URI cannot be empty');
         }
 
-        $method = strtoupper($method);
-        $routeKey = "{$method}:{$uri}";
-        $this->routes[$routeKey] = $handler;
+        foreach ((array) $method as $m) {
+            $m = strtoupper((string) $m);
+            $routeKey = "{$m}:{$uri}";
+            $this->routes[$routeKey] = $handler;
+        }
 
         // Reset dispatcher cache when routes change
         $this->dispatcher = null;

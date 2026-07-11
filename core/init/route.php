@@ -125,6 +125,11 @@ try {
                 //        URI mentah). Handler yang cocok tetap jalur legacy di bawah.
                 $gov2Router = new Gov2lib\Http\Router(trim((string)$config->webroot) ?: '/');
                 foreach ($merged_list as $route) {
+                    // Entri tak lengkap = dead route di pola lama (tak pernah
+                    // match) — dilewati, jangan sampai mematahkan seluruh app
+                    if (empty($route['method']) || empty($route['uri']) || !isset($route['handler'])) {
+                        continue;
+                    }
                     $gov2Router->addRoute($route['method'], $route['uri'], $route['handler']);
                 }
                 $routeResult = $gov2Router->dispatch($httpMethod, $uri);

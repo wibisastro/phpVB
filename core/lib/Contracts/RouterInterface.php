@@ -24,7 +24,7 @@ interface RouterInterface
      * @param string $handler The handler or controller reference (e.g., 'UserController@show').
      * @return void
      */
-    public function addRoute(string $method, string $uri, string $handler): void;
+    public function addRoute(string|array $method, string $uri, string $handler): void;
 
     /**
      * Dispatch a request to the appropriate route handler.
