@@ -31,3 +31,4 @@ Thumbs.db
 
 # PHPUnit cache
 .phpunit.cache/
+tests/golden/fixtures/
