@@ -218,8 +218,9 @@ class ExceptionHandler
             $parts = explode(':', $message, 2);
             $code = trim($parts[0]);
 
-            // Verify code is numeric
-            if (is_numeric($code)) {
+            // Verify code is a whole number — floats like "404.5" are not
+            // valid HTTP codes and fall through to the non-legacy path
+            if (ctype_digit($code)) {
                 return [
                     'code' => (int)$code,
                     'message' => trim($parts[1] ?? ''),

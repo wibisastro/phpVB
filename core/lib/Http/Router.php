@@ -98,6 +98,7 @@ class Router implements RouterInterface
      */
     public function dispatch(string $method, string $uri): RouteResult
     {
+        $uri = $this->normalizeUri($uri);
         $uri = $this->stripWebroot($uri);
         $method = strtoupper($method);
 
@@ -267,8 +268,33 @@ class Router implements RouterInterface
     }
 
     /**
+     * Normalize a raw request URI before matching
+     *
+     * FastRoute matches the path component only, so the query string is
+     * dropped; duplicate and trailing slashes are collapsed so URIs like
+     * "///api/users//" still match "/api/users" (root "/" is preserved).
+     *
+     * @param string $uri The raw request URI
+     * @return string The normalized URI
+     */
+    private function normalizeUri(string $uri): string
+    {
+        if (false !== $pos = strpos($uri, '?')) {
+            $uri = substr($uri, 0, $pos);
+        }
+
+        $uri = preg_replace('#/{2,}#', '/', $uri);
+
+        if ($uri !== '/') {
+            $uri = rtrim($uri, '/');
+        }
+
+        return $uri === '' ? '/' : $uri;
+    }
+
+    /**
      * Strip webroot prefix from URI
-     * 
+     *
      * @param string $uri The request URI
      * @return string The cleaned URI
      */
@@ -404,6 +430,7 @@ class Router implements RouterInterface
      */
     public function resolvePageId(string $uri): string
     {
+        $uri = $this->normalizeUri($uri);
         $uri = $this->stripWebroot($uri);
         $this->resolveIds($uri);
         return $this->getPageId();
