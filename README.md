@@ -2,7 +2,7 @@
 
 Framework PHP untuk pengembangan aplikasi pemerintahan (government e-services) dengan arsitektur **Component-Based MVC**, konfigurasi XML-driven, dan frontend Vue.js interaktif.
 
-> **Versi saat ini:** v5.0.2 (Perbaikan Arsitektur)
+> **Versi saat ini:** v2.0.2 (Perbaikan Arsitektur)
 > Lihat [Release Notes](../../wiki/13-Release-Notes) untuk detail perubahan per versi.
 
 ---
@@ -283,13 +283,13 @@ phpVB sedang dalam proses refactoring besar menuju arsitektur modern. Rencana di
 
 | Rilis | Versi | Fase | Fokus | Status |
 |-------|-------|------|-------|--------|
-| **1 — Deploy Klasik** | **v5.0.1** | **1 — Foundation** | PHP 8.4, tooling, testing, modern syntax | **Selesai** |
-| | **v5.0.2** | **2 — Arsitektur** | DI container, interfaces, routing bersih | **Selesai** |
-| 2 — Deploy Baru | v5.1.1 | 3 — Frontend | Vue 3, Vite, Bootstrap 5, TypeScript | Planned |
-| | v5.1.2 | 4 — Supabase | API abstraction layer, PostgreSQL migration | Planned |
-| 3 — Incremental | v5.2.1 | 5 — Template | Design system, dark mode, SCSS | Planned |
-| | v5.2.2 | 6 — PWA | Service worker, offline support, installable | Planned |
-| | v5.2.3 | 7 — Finalisasi | Migration system, CI/CD, cleanup | Planned |
+| **1 — Deploy Klasik** | **v2.0.1** | **1 — Foundation** | PHP 8.4, tooling, testing, modern syntax | **Selesai** |
+| | **v2.0.2** | **2 — Arsitektur** | DI container, interfaces, routing bersih | **Selesai** |
+| 2 — Deploy Baru | v3.0.1 | 3 — Frontend | Vue 3, Vite, Bootstrap 5, TypeScript | Planned |
+| | v3.0.2 | 4 — Supabase | API abstraction layer, PostgreSQL migration | Planned |
+| 3 — Incremental | v4.0.1 | 5 — Template | Design system, dark mode, SCSS | Planned |
+| | v4.0.2 | 6 — PWA | Service worker, offline support, installable | Planned |
+| | v4.0.3 | 7 — Finalisasi | Migration system, CI/CD, cleanup | Planned |
 
 Estimasi total: 18 minggu untuk 1 developer full-time.
 
