@@ -11,7 +11,6 @@ class member {
         $self->fields = $self->gov2formfield->getFields(__DIR__."/json/member.json");
         $self->ses->authenticate($vars['role']);
         $self->scrollInterval = 100;
-        $doc->baseBody = '@gov2login/b4body.html';
     }
     
     function index ($vars) {

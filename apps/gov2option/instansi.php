@@ -11,7 +11,6 @@ class instansi extends \Gov2lib\api
         parent::__construct();
         $self->scrollInterval = 100;
         $self->fields = $self->gov2formfield->getFields(__DIR__ . '/json/instansi.json');
-        $doc->baseBody = '@gov2option/b4body.html';
     }
 
     public function index(): void

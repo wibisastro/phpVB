@@ -5,7 +5,6 @@ class privilege {
         global $self, $doc;
         $self->takeAll("components");
         $self->ses->authenticate('admin');
-        $doc->baseBody = '@gov2login/b4body.html';
     }
     
     function index () {

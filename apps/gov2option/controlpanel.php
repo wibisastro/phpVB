@@ -9,7 +9,6 @@ class controlpanel extends api {
         $self->takeAll("components");
         $self->ses->authenticate('admin');
         $self->fields = $self->gov2formfield->getFields(__DIR__."/json/option.json");
-        $doc->baseBody = '@gov2option/b4body.html';
     }
 
     function index ($vars) {

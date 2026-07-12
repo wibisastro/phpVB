@@ -104,7 +104,6 @@ try {
     }
 
     $templates=array(__DIR__.'/../template/cube',
-                     __DIR__.'/../template/bootstrap',
                      __DIR__.'/../template/general');
 
     $vueData['isNavToggle'] = false;
