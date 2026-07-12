@@ -18,7 +18,7 @@ module.exports = {
         },
         position: {
           type: String,
-          default: 'float-left'
+          default: 'float-start'
         }
     },
     data: function () {

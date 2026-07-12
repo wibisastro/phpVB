@@ -1,6 +1,6 @@
 <template>
 <nav aria-label="Page Navigation" :data-test="`pagination${'-' + instance}`">
-    <ul class="pagination float-right">
+    <ul class="pagination float-end">
         <li class="page-item"
             :class="{'disabled': firstPageOn}"
             v-if="pages > 1">

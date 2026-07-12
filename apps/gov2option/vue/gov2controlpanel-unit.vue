@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-card-header class="pointer" :class="{'pl-5': parseInt(unit.level) == 3}" role="tab" @click="toggleCollapse(unit)">
+    <b-card-header class="pointer" :class="{'ps-5': parseInt(unit.level) == 3}" role="tab" @click="toggleCollapse(unit)">
       {{unit.kode}} - {{ unit.nama }}
       <b-spinner variant="info" small v-if="loading"></b-spinner>
       <span class="subtitle" v-if="unit.keterangan">[{{ unit.keterangan }}]</span>

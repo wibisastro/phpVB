@@ -1,5 +1,5 @@
 <template>
-    <div class="float-left form-inline" v-if="options > 1 && isActive">
+    <div class="float-start form-inline" v-if="options > 1 && isActive">
         Scrolls&nbsp;
         <b-form-select
                 v-model="scroll"

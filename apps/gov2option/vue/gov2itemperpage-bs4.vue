@@ -1,6 +1,6 @@
 <template>
     <nav aria-label="Item per Page">
-        <div class="float-left form-inline">
+        <div class="float-start form-inline">
             Per Page: &nbsp;
             <b-form-select
                     v-model="selected"
