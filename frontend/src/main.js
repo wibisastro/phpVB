@@ -1,4 +1,4 @@
-// Entry bundle inti phpVB — Fase 3b #6118 (v3.0.1).
+// Entry bundle inti phpVB — Fase 3b #6118 (v5.1.1, eks v3.0.1).
 //
 // Dua jalur frontend:
 // 1. Jalur CORE (file ini): Vue 3 + mitt bridge + komponen inti + wrapper
@@ -110,7 +110,7 @@ function createPageApp(options = {}) {
 }
 
 window.phpvb = {
-  version: '3.0.1',
+  version: '5.1.1',
   Vue,
   eventBus,
   loadVue,
