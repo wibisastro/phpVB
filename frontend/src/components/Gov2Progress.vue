@@ -8,7 +8,8 @@
 </template>
 
 <script>
-module.exports = {
+// Port Vue 3 dari apps/components/vue/_gov2progress.vue (#6118 3b).
+export default {
     name: 'gov2progress',
     props: {
         hi: Number,
@@ -21,14 +22,14 @@ module.exports = {
     },
     methods: {
         setPercent: function() {
-            this.percent=((this.lo/this.hi) * 100).toFixed(2);
+            this.percent = ((this.lo / this.hi) * 100).toFixed(2);
         },
         setColor: function () {
             var color;
-            if (this.percent<50) {color="bg-danger";}
-            else if (this.percent>=50 && this.percent<80) {color="bg-warning";}
-            else if (this.percent>=80 && this.lo<this.hi) {color="bg-success";}
-            else if (this.lo==this.hi) {color="bg-info";}
+            if (this.percent < 50) { color = "bg-danger"; }
+            else if (this.percent >= 50 && this.percent < 80) { color = "bg-warning"; }
+            else if (this.percent >= 80 && this.lo < this.hi) { color = "bg-success"; }
+            else if (this.lo == this.hi) { color = "bg-info"; }
             return color;
         }
     },

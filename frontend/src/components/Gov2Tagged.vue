@@ -11,7 +11,10 @@
 </template>
 
 <script>
-module.exports = {
+// Port Vue 3 dari apps/components/vue/_gov2tagged.vue (#6118 3b).
+import eventBus from '../eventBus.js'
+
+export default {
     name: 'gov2tagged',
     props: {
         tagCaption: String,
@@ -20,26 +23,26 @@ module.exports = {
     },
     computed: {
         caption: function () {
-            return 'target_'+this.tagCaption;
+            return 'target_' + this.tagCaption;
         }
     },
     methods: {
         setDesc: function(data) {
-            var result="(id:" + data['target_id'] + ") " + data[this.caption];
+            var result = "(id:" + data['target_id'] + ") " + data[this.caption];
             return result;
         },
         setLabel: function(data) {
             if (data) {
-                var result=data.split(' ');
+                var result = data.split(' ');
                 if (result.length > 1) {
-                    return result[0]+"...";
+                    return result[0] + "...";
                 } else {
                     return result[0];
                 }
             }
         },
-        unSetTag: function(data,source_id) {
-            eventBus.$emit('unSetTag'+source_id,data);
+        unSetTag: function(data, source_id) {
+            eventBus.$emit('unSetTag' + source_id, data);
         },
     }
 }

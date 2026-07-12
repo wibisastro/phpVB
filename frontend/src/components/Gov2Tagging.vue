@@ -16,7 +16,10 @@
 </template>
 
 <script>
-module.exports = {
+// Port Vue 3 dari apps/components/vue/_gov2tagging.vue (#6118 3b).
+import eventBus from '../eventBus.js'
+
+export default {
     name: 'gov2tagging',
     props: {
         getUrl: String,
@@ -37,71 +40,60 @@ module.exports = {
         }
     },
     methods: {
-        /*
-        selectedTag: function (data) {
-            for (let row in this.taggedData) {
-                if (this.taggedData[row]['target_id']==data) {
-                    return true;
-                } else {
-                    return false;
-                }   
-            }
-        },
-        */
         onTagLimit: function () {
             if (this.tagLimit) {
                 if (this.gridData.length <= this.tagLimit) {
                     return true;
                 } else {
-                    return false;   
+                    return false;
                 }
             } else {
                 return true;
             }
         },
         formSuccess: function (data) {
-            eventBus.$emit('refreshData'+this.instance);
-            eventBus.$emit('refreshTags'+this.instance);
-            eventBus.$emit('openNotif',data);
-            if (data['callback']) {this[data['callback']]();}
+            eventBus.$emit('refreshData' + this.instance);
+            eventBus.$emit('refreshTags' + this.instance);
+            eventBus.$emit('openNotif', data);
+            if (data['callback']) { this[data['callback']](); }
         },
         formFail: function (data) {
-            eventBus.$emit('openNotif',data);
-            if (data['callback']) {this[data['callback']]();}
+            eventBus.$emit('openNotif', data);
+            if (data['callback']) { this[data['callback']](); }
         },
-        setTag: function (cmd,source_id,target_id,id="") {
-            this.isActive=false;
-            this.form['cmd']=cmd;
-            this.form['source_id']=source_id
+        setTag: function (cmd, source_id, target_id, id = "") {
+            this.isActive = false;
+            this.form['cmd'] = cmd;
+            this.form['source_id'] = source_id
             if (cmd == "setTag") {
-                this.form['target_id']=target_id;                
+                this.form['target_id'] = target_id;
             } else {
-                this.form['id']=id;    
+                this.form['id'] = id;
             }
-            this.form.submit('post',this.postUrl)
+            this.form.submit('post', this.postUrl)
                 .then(data => this.formSuccess(data))
                 .catch(error => this.formFail(error));
         },
         getData: function () {
             if (this.isActive == false) {
-                this.isActive=true;
-                url=this.getUrl+'/table/1/-1';
+                this.isActive = true;
+                let url = this.getUrl + '/table/1/-1';
                 axios.get(url)
                     .then(response => this.loadData(response.data))
-                    .catch(error =>  eventBus.$emit('openNotif',error.response.data));
+                    .catch(error => eventBus.$emit('openNotif', error.response.data));
             } else {
-                this.isActive=false;
+                this.isActive = false;
             }
         },
         unSetTag: function(data) {
-            this.setTag('unSetTag',this.source_id,0,data);
+            this.setTag('unSetTag', this.source_id, 0, data);
         },
         loadData: function(data) {
-            this.gridData=Array.from(Object.keys(data), k=>data[k]);
+            this.gridData = Array.from(Object.keys(data), k => data[k]);
         },
     },
     created: function() {
-        eventBus.$on('unSetTag'+this.source_id, this.unSetTag);
+        eventBus.$on('unSetTag' + this.source_id, this.unSetTag);
     }
 }
 </script>
