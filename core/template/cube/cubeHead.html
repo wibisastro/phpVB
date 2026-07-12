@@ -35,8 +35,8 @@
 <!-- Overlay Scrollbar CSS -->
 <link rel="stylesheet" href="{{ webroot }}/cube/js/overlay-scroll/OverlayScrollbars.min.css" />
 
-<!-- BootstrapVue CSS (for Vue components compatibility) -->
-<link type="text/css" rel="stylesheet" href="{{ webroot }}/css/bootstrap-vue.min.css" />
+<!-- phpVB core bundle CSS (Vue 3 komponen inti) -->
+<link type="text/css" rel="stylesheet" href="{{ webroot }}/dist/style.css?v=3.0.1" />
 
 <!-- App-specific CSS -->
 {# <link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/custom.css"/> #}
@@ -68,10 +68,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="//cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css">
 
-<!-- Vue and friends -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js"></script>
-<script src="{{ webroot }}/js/bootstrap-vue.min.js"></script>
-<script src="{{ webroot }}/js/httpVueLoader.js"></script>
+<!-- phpVB core bundle: Vue 3 + mitt eventBus + vue3-sfc-loader + komponen inti -->
+<script src="{{ webroot }}/dist/main.js?v=3.0.1"></script>
 <script src="{{ webroot }}/js/axios.min.js"></script>
 <script>
 (function(){
@@ -85,14 +83,8 @@
         }
         return config;
     });
-    var originalHttpRequest = httpVueLoader.httpRequest;
-    httpVueLoader.httpRequest = function(url) {
-        if (url.charAt(0) === '/') { url = baseURL + url; }
-        return originalHttpRequest(url);
-    };
 })();
 </script>
-<script src="{{ webroot }}/js/vue-scrollto.js"></script>
 <script src="{{ webroot }}/js/gov2form.js"></script>
 <script src="{{ webroot }}/js/iframeResizer.min.js"></script>
 
@@ -109,10 +101,6 @@
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.11/dist/purify.min.js"></script>
 
-<!-- Sortable & Vue.Draggable -->
-<script src="//cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
-
 <!-- jQuery (for Cube sidebar) -->
 <script src="{{ webroot }}/cube/js/jquery.min.js"></script>
 <script src="{{ webroot }}/cube/js/bootstrap.bundle.min.js"></script>
@@ -120,7 +108,3 @@
 <!-- Overlay Scrollbar JS -->
 <script src="{{ webroot }}/cube/js/overlay-scroll/jquery.overlayScrollbars.min.js"></script>
 <script src="{{ webroot }}/cube/js/overlay-scroll/custom-scrollbar.js"></script>
-
-<script type="text/javascript">
-	const eventBus = new Vue();
-</script>

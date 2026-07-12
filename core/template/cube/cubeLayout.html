@@ -111,36 +111,13 @@
   }
 </script>
 
-{% block customVueLoader %}
-<script>
-    httpVueLoader.httpRequest = function(url) {
-        const apppath = window.location.pathname.split("/");
-        const originAppPath = window.location.href+'/../../../'+apppath[1];
-        const componentPath = url.split('/');
-        const originComponent = originAppPath + `/vue/${componentPath[componentPath.length-1]}`;
-        return axios.get(originComponent)
-                .then(function(res) {
-                    var data = String(res.data || '').trim();
-                    var isVueSfc = data.startsWith('<template') || data.startsWith('<script') || data.startsWith('<style');
-                    if (isVueSfc) {
-                        return res.data;
-                    } else {
-                        return axios.get(url)
-                                .then(function (res) { return res.data; })
-                                .catch(function (err) { return Promise.reject(err.status); })
-                    }
-                })
-                .catch(function(err) {
-                    return axios.get(url)
-                            .then(function (res) { return res.data; })
-                            .catch(function (err) { return Promise.reject(err.status); })
-                });
-    }
-</script>
-{% endblock %}
+{# Fallback path per-portal (dulu override httpVueLoader.httpRequest di sini)
+   sudah perilaku default vue3-sfc-loader adaptor di dist/main.js — block
+   dipertahankan kosong untuk kompat template turunan yang meng-override. #}
+{% block customVueLoader %}{% endblock %}
 
 <script>
-  window.__vueApp = new Vue({
+  window.__vueApp = phpvb.createPageApp({
     {% block js %}
         el: '#app',
         components: {
@@ -149,7 +126,6 @@
         'wilayah': httpVueLoader('{{ webroot }}/gov2wilayah/vue/wilayah.vue'),
         'cube-chat-rag': httpVueLoader('{{ webroot }}/components/vue/cube-chat-rag.vue'),
         'gov2navbreadcrumb': httpVueLoader('{{ webroot }}/components/vue/gov2navbreadcrumb.vue'),
-        'gov2notification': httpVueLoader('{{ webroot }}/components/vue/gov2notification.vue'),
         {% for component in components %}
             {% for item in component %}
            '{{ item.tag }}': httpVueLoader('{{ webroot }}/{{ item.pageID }}/vue/{{ item.component }}'),

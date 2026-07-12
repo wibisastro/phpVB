@@ -67,7 +67,7 @@
                         <th v-if="!readonly || isRowHistory"></th>
                         <th v-if="childComponent">
                         <span v-if="childComponent['type'] == 'checkbox'">
-                            {{ childComponent['instance'] | capitalize}}
+                            {{ capitalize(childComponent['instance']) }}
                         </span>
                         </th>
                         <th v-if="isSetactive"> Aksi </th>
@@ -163,7 +163,7 @@
                             <b-dropdown
                                 right variant="primary" size="sm"
                                 :data-test="`button-action-${entry.id}`">
-                                <template slot="button-content">
+                                <template #button-content>
                                     <i class="fa fa-cog"></i>
                                 </template>
                                 <b-dropdown-item href="#" @click="edit(entry['id'])" :disabled="!permission.canEdit"><i class="fa fa-edit" ></i> Ubah</b-dropdown-item>
@@ -176,7 +176,7 @@
                         </td>
                         <td v-if="isRowHistory && readonly" style="text-align:center">
                             <b-dropdown right variant="primary" size="sm">
-                                <template slot="button-content">
+                                <template #button-content>
                                     <i class="fa fa-cog"></i>
                                 </template>
                                 <b-dropdown-item href="#" @click="getRowHistory(entry['id'])"><i class="fa fa-calendar"></i> History</b-dropdown-item>
@@ -247,7 +247,7 @@
                             <th rowspan="2" v-if="!readonly || isRowHistory"></th>
                             <th rowspan="2" v-if="childComponent">
                                 <span v-if="childComponent['type'] == 'checkbox'">
-                                    {{ childComponent['instance'] | capitalize}}
+                                    {{ capitalize(childComponent['instance']) }}
                                 </span>
                             </th>
                             <th v-if="isSetactive"> Aksi </th>
@@ -541,19 +541,6 @@
                 return data
             }
         },
-        filters: {
-            capitalize: function (str) {
-                let res = str;
-                if (str) {
-                    try {
-                        res = str.charAt(0).toUpperCase() + str.slice(1)
-                    } catch (e) {
-                        res = str
-                    }
-                }
-                return res;
-            }
-        },
         mounted() {
             // this.$nextTick(function() {
             //     window.addEventListener('resize', this.setTableWidth);
@@ -571,6 +558,17 @@
             });
         },
         methods: {
+            capitalize: function (str) {
+                let res = str;
+                if (str) {
+                    try {
+                        res = str.charAt(0).toUpperCase() + str.slice(1)
+                    } catch (e) {
+                        res = str
+                    }
+                }
+                return res;
+            },
             isCheckbox: function (data) {
                 if (this.headers) {
                     return true;

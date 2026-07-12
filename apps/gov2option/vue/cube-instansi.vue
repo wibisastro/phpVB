@@ -172,14 +172,14 @@ module.exports = {
       }
     },
     loadChildren(item) {
-      this.$set(item, 'childrenLoading', true);
+      item.childrenLoading = true;
       axios.get('/gov2option/index/getUnitKerjaList/' + item.id)
         .then(resp => {
-          this.$set(item, 'childrenData', resp.data || []);
-          this.$set(item, 'childrenLoading', false);
+          item.childrenData = resp.data || [];
+          item.childrenLoading = false;
         })
         .catch(e => {
-          this.$set(item, 'childrenLoading', false);
+          item.childrenLoading = false;
           this.handleError(e);
         });
     },
@@ -238,8 +238,8 @@ module.exports = {
         for (var i = 0; i < this.treeItems.length; i++) {
           if (this.treeItems[i].id == parentId) {
             var parent = this.treeItems[i];
-            this.treeItems.forEach(function(x) { self.$set(x, 'expanded', false); });
-            this.$set(parent, 'expanded', true);
+            this.treeItems.forEach(function(x) { x.expanded = false; });
+            parent.expanded = true;
             if (!parent.childrenData || parent.childrenData.length === 0) {
               this.loadChildren(parent);
             }
@@ -259,8 +259,8 @@ module.exports = {
         if (item.childrenData && item.childrenData.length > 0) {
           for (var j = 0; j < item.childrenData.length; j++) {
             if (item.childrenData[j].id == unitId) {
-              this.treeItems.forEach(function(x) { self.$set(x, 'expanded', false); });
-              this.$set(item, 'expanded', true);
+              this.treeItems.forEach(function(x) { x.expanded = false; });
+              item.expanded = true;
               return;
             }
           }
@@ -270,23 +270,23 @@ module.exports = {
       var found = false;
       this.treeItems.forEach(function(item) {
         if (!item.childrenData || item.childrenData.length === 0) {
-          self.$set(item, 'childrenLoading', true);
+          item.childrenLoading = true;
           axios.get('/gov2option/index/getUnitKerjaList/' + item.id)
             .then(function(resp) {
               var children = resp.data || [];
-              self.$set(item, 'childrenData', children);
-              self.$set(item, 'childrenLoading', false);
+              item.childrenData = children;
+              item.childrenLoading = false;
               if (found) return;
               for (var k = 0; k < children.length; k++) {
                 if (children[k].id == unitId) {
                   found = true;
-                  self.treeItems.forEach(function(x) { self.$set(x, 'expanded', false); });
-                  self.$set(item, 'expanded', true);
+                  self.treeItems.forEach(function(x) { x.expanded = false; });
+                  item.expanded = true;
                   return;
                 }
               }
             })
-            .catch(function() { self.$set(item, 'childrenLoading', false); });
+            .catch(function() { item.childrenLoading = false; });
         }
       });
     },

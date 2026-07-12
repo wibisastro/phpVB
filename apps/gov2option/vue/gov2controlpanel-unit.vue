@@ -49,7 +49,7 @@ module.exports = {
         this.getApps(unit);
       }
       this.collapsed[unit.id] = !this.collapsed[unit.id];
-      this.$root.$emit('bv::toggle::collapse', `collapse-${unit.id}`)
+      eventBus.$emit('bv::toggle::collapse', `collapse-${unit.id}`)
     },
     getApps: function (cluster) {
       this.loading = true;
@@ -74,18 +74,6 @@ module.exports = {
   },
   mounted() {
 
-  },
-  filters: {
-    capitalize: function (value) {
-      if (!value) return ''
-      value = value.toString()
-      return value.charAt(0).toUpperCase() + value.slice(1)
-    },
-    uppercase: function (value) {
-      if (!value) return ''
-      value = value.toString()
-      return value.toUpperCase()
-    }
   }
 }
 </script>

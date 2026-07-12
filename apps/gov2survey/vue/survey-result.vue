@@ -60,8 +60,8 @@ module.exports = {
             })
          }
 
-         this.$set(this, 'title', data.survey);
-         this.$set(this, 'categories', categories);
+         this.title = data.survey;
+         this.categories = categories;
          this.series = series;
          this.loading = false;
       }
