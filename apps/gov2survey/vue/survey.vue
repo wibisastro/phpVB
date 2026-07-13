@@ -240,7 +240,7 @@ module.exports = {
     created() {
         this.getData();
     },
-    destroyed(){
+    unmounted(){
         clearInterval(this.interval);
     },
     data() {

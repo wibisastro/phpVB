@@ -9,6 +9,12 @@ import eventBus from './eventBus.js'
 
 const styleCache = new Set()
 
+// Compiler template Vue 3 men-transform asset URL relatif (mis.
+// <img src="../../images/working.gif">) menjadi import — httpVueLoader lama
+// tidak (compile in-browser Vue 2 membiarkan src apa adanya). Import asset
+// dikembalikan sebagai URL string, jangan di-fetch/compile sebagai SFC.
+const ASSET_RE = /\.(gif|png|jpe?g|svg|webp|ico|bmp|avif)(\?.*)?$/i
+
 // Fallback path per-portal — perilaku yang sama dengan override
 // httpVueLoader.httpRequest lama di cubeLayout (block customVueLoader):
 // coba <app-halaman-sekarang>/vue/<file> dulu, baru URL asli.
@@ -54,6 +60,7 @@ async function fetchSfc(url) {
 export const sfcOptions = {
   moduleCache: { vue: Vue },
   async getFile(url) {
+    if (ASSET_RE.test(url)) return { getContentData: () => '', type: '.asset' }
     const code = await fetchSfc(url)
     return { getContentData: () => code, type: '.vue' }
   },
@@ -64,7 +71,10 @@ export const sfcOptions = {
     style.textContent = textContent
     document.head.appendChild(style)
   },
-  handleModule: undefined,
+  async handleModule(type, getContentData, path) {
+    if (type === '.asset') return { default: String(path) }
+    return undefined
+  },
   log(type, ...args) {
     if (type === 'error') console.error('[phpvb sfc-loader]', ...args)
   },
