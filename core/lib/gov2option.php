@@ -372,6 +372,10 @@ class gov2option
     public function pinnedRows(string $app): ?array
     {
         if (!array_key_exists($app, $this->pinnedCache)) {
+            // Revalidasi cache thd kambing (TTL + etag, stale-while-revalidate)
+            // — no-op instan bila env kambing tidak dikonfigurasi (slice C)
+            pinnedStore::syncFromEnv((string) $this->dsn, $app);
+
             $this->pinnedCache[$app] =
                 self::pinnedRowsFromFile(self::pinnedPath((string) $this->dsn, $app), $app);
         }

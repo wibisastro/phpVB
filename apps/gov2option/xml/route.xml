@@ -24,6 +24,22 @@
 
     <route>
         <method>GET</method>
+        <uri>/gov2option/connection/{privilege}</uri>
+        <handler>gov2option\model\connection</handler>
+    </route>
+    <route>
+        <method>GET</method>
+        <uri>/gov2option/connection/{privilege}/{cmd}[/{id}]</uri>
+        <handler>gov2option\model\connection</handler>
+    </route>
+    <route>
+        <method>POST</method>
+        <uri>/gov2option/connection/{privilege}</uri>
+        <handler>gov2option\model\connection</handler>
+    </route>
+
+    <route>
+        <method>GET</method>
         <uri>/gov2option/option/{privilege}</uri>
         <handler>gov2option\model\option</handler>
     </route>

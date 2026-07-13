@@ -2,4 +2,5 @@
 <list>
     <table name="options">options</table>
     <table name="instansi">instansi</table>
+    <table name="connections">gov2_connections</table>
 </list>
