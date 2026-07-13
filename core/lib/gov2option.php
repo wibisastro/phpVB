@@ -267,6 +267,34 @@ class gov2option
     }
 
     /**
+     * Nilai satu entry options (item level 2) by nama — API cross-calling
+     * (#6134 keputusan 7). Scope: $app eksplisit > $GLOBALS['pageID']; entry
+     * tidak ditemukan di scope → fallback otomatis ke home. Shadowing
+     * lokal-menang: entry yang ADA di scope lokal menang meski value null.
+     * get() lama tetap untuk filter bebas bergaya WHERE (BC).
+     */
+    public function val(string $entry, ?string $app = null): ?string
+    {
+        $scope = $app ?? (string) ($GLOBALS['pageID'] ?? '');
+
+        foreach (array_unique([$scope, 'home']) as $candidate) {
+            if ($candidate === '') {
+                continue;
+            }
+
+            $row = $this->get(['app' => $candidate, 'nama' => $entry, 'level' => 2], 'and', ['value']);
+
+            if ($row !== null) {
+                $value = $row['value'] ?? null;
+
+                return $value === null ? null : (string) $value;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Whether the current app declares a database connection at all
      * (apps/{pageID}/xml/dsnSource.{stage}.xml). Absent file = tier statis:
      * the DBConnector retry path is skipped so no-DB apps render without error.
