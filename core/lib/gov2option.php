@@ -15,10 +15,22 @@ use Gov2lib\DBConnector;
  */
 class gov2option
 {
+    /**
+     * Nama tabel options — satu-satunya sumber; berubah ke 'gov2_options'
+     * saat jendela migrasi rename prefix (#6134, plan §4.2).
+     */
+    public const TABLE = 'options';
+
+    /** Versi envelope pinned JSON yang didukung resolver (#6134 note-3) */
+    public const PINNED_VERSION = '1.0';
+
     public mixed $dsn = null;
 
     /** @var string|null cache hasil dsnDriver() per instance */
     private ?string $driver = null;
+
+    /** @var array<string, array<int, array<string, mixed>>|null> cache pinnedRows() per app */
+    private array $pinnedCache = [];
     /**
      * Initialize options handler with database connection
      */
@@ -48,6 +60,36 @@ class gov2option
     {
         global $doc;
 
+        // Preseden tertinggi rantai 4 sumber (#6134): pinned JSON per-portal.
+        // Short-circuit per-sumber per-MVC — pinned ada = sumber terpilih,
+        // entry miss tidak jatuh ke tier bawah.
+        //
+        // KECUALI $where tanpa key 'app' (pencarian lintas-app legacy — jalur
+        // SQL lama SELECT tanpa filter app): resolusi ikut konvensi
+        // cross-calling #6134 — scope saat ini menang, miss → fallback pinned
+        // home, masih miss → tier bawah tetap dicari (BC call site krisna_* dkk).
+        $appScoped = array_key_exists('app', $where);
+        $app = (string) ($where['app'] ?? $GLOBALS['pageID'] ?? '');
+        $pinned = $this->pinnedRows($app);
+
+        if ($pinned !== null) {
+            $match = self::matchRows($pinned, $where, $whereType)[0] ?? null;
+
+            if ($match || $appScoped) {
+                return $match ? array_intersect_key($match, array_flip($select)) : null;
+            }
+        }
+
+        if (!$appScoped && $app !== 'home') {
+            $pinnedHome = $this->pinnedRows('home');
+            $match = $pinnedHome === null ? null
+                : (self::matchRows($pinnedHome, $where, $whereType)[0] ?? null);
+
+            if ($match) {
+                return array_intersect_key($match, array_flip($select));
+            }
+        }
+
         // Tier 1 (statis) & tier 3 (supabase): options hanya dari
         // apps/{app}/xml/options.xml — jalur SQL/DBConnector tidak disentuh
         // sama sekali, tanpa file = null silent (T4 #6085)
@@ -67,7 +109,7 @@ class gov2option
             $where_clause->add($kwarg, $val);
         }
 
-        $q = "SELECT {$select_field} FROM options WHERE %l";
+        $q = "SELECT {$select_field} FROM " . self::TABLE . " WHERE %l";
         $res = null;
 
         try {
@@ -116,7 +158,7 @@ class gov2option
             $where_clause->add($kwarg, $val);
         }
 
-        $q = "SELECT {$select_field} FROM options WHERE %l";
+        $q = "SELECT {$select_field} FROM " . self::TABLE . " WHERE %l";
         $res = null;
 
         try {
@@ -143,7 +185,7 @@ class gov2option
 
         try {
             dsnSource::requireMeekroDB();
-            DB::insert('options', $data);
+            DB::insert(self::TABLE, $data);
             $result = $this->get(['id' => DB::insertId()], 'and',
                 ['id', 'parent_id', 'app', 'type', 'nama', 'value', 'status', 'level', 'level_label', 'created_by']);
         } catch (MeekroDBException $e) {
@@ -165,6 +207,18 @@ class gov2option
         global $doc;
         $res = [];
 
+        // Preseden tertinggi rantai 4 sumber (#6134): pinned JSON, selaras get()
+        $pinned = $this->pinnedRows($app);
+
+        if ($pinned !== null) {
+            $select = ['id', 'app', 'type', 'privilege', 'nama', 'keterangan', 'status', 'value'];
+
+            return array_map(
+                fn (array $row): array => array_intersect_key($row, array_flip($select)),
+                self::matchRows($pinned, ['app' => $app, 'level' => 1, 'status' => $status])
+            );
+        }
+
         // Tier 1 & 3: XML-only, selaras get() (T4 #6085)
         if ($this->dsnDriver() !== 'meekro') {
             $xmlRows = $this->xmlRows($app);
@@ -183,7 +237,7 @@ class gov2option
 
         dsnSource::requireMeekroDB();
 
-        $q = "SELECT id, app, type, privilege, nama, keterangan, status, value FROM options WHERE app=%s AND level=1 AND status=%s ORDER BY id ASC";
+        $q = "SELECT id, app, type, privilege, nama, keterangan, status, value FROM " . self::TABLE . " WHERE app=%s AND level=1 AND status=%s ORDER BY id ASC";
 
         try {
             $res = DB::query($q, $app, $status);
@@ -280,6 +334,114 @@ class gov2option
     }
 
     /**
+     * Baca pinned JSON (preseden tertinggi rantai 4 sumber, #6134) dari cache
+     * lokal disposable per-portal. Hasil di-memo per app per instance — get()
+     * dipanggil berulang dalam satu request (getActiveYear, autoregistrasi MVC).
+     *
+     * @return array<int, array<string, mixed>>|null Null saat tidak ada pinned
+     *         atau file invalid (fall-through ke tier berikutnya)
+     */
+    public function pinnedRows(string $app): ?array
+    {
+        if (!array_key_exists($app, $this->pinnedCache)) {
+            $this->pinnedCache[$app] =
+                self::pinnedRowsFromFile(self::pinnedPath((string) $this->dsn, $app), $app);
+        }
+
+        return $this->pinnedCache[$app];
+    }
+
+    /**
+     * Path cache lokal pinned JSON: {GOV2_VAR_DIR | sys_get_temp_dir()+"/gov2var"}
+     * /options/{dsn}/{app}.json — dsn = kunci portal (konvensi SERVER_NAME).
+     * File disposable: boleh dihapus kapan pun, regenerasi dari kambing (slice C).
+     *
+     * @return string|null Null bila dsn/app mengandung karakter di luar charset
+     *         aman path — dsn berasal dari cookie, app dari URL (anti traversal)
+     */
+    public static function pinnedPath(string $dsn, string $app): ?string
+    {
+        foreach ([$dsn, $app] as $segment) {
+            if ($segment === '' || preg_match('/[^a-zA-Z0-9_.-]/', $segment) || str_contains($segment, '..')) {
+                return null;
+            }
+        }
+
+        $base = getenv('GOV2_VAR_DIR') ?: sys_get_temp_dir() . '/gov2var';
+
+        return "{$base}/options/{$dsn}/{$app}.json";
+    }
+
+    /**
+     * Baca + validasi satu file pinned JSON (envelope #6134 note-3):
+     * { "gov2options": "1.0", "meta": { "app": ... }, "rows": [...] }.
+     *
+     * File bisa disentuh admin lewat UI kambing → validasi wajib saat baca:
+     * envelope/rows invalid → warning + null (fall-through), bukan fatal.
+     * File tidak ada = kondisi normal (portal tanpa pinned), tanpa warning.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    public static function pinnedRowsFromFile(?string $file, string $app): ?array
+    {
+        if ($file === null) {
+            return null;
+        }
+
+        // Satu kali baca tanpa is_file (hindari double-stat + TOCTOU): file
+        // disposable boleh lenyap kapan pun — gagal baca = setara tidak ada,
+        // bukan warning "invalid" yang menyesatkan
+        $raw = @file_get_contents($file);
+
+        if ($raw === false) {
+            return null;
+        }
+
+        $data = json_decode($raw, true);
+
+        if (
+            !is_array($data)
+            || ($data['gov2options'] ?? null) !== self::PINNED_VERSION
+            || ($data['meta']['app'] ?? null) !== $app
+            || !is_array($data['rows'] ?? null)
+        ) {
+            error_log("gov2option: pinned JSON invalid (envelope), fall-through: {$file}");
+
+            return null;
+        }
+
+        // Row wajib membawa SEMUA kolom options (nilai null boleh — mirror
+        // jaminan kolom jalur SQL): matchRows menuntut key ada utk filter
+        // app/status/level, dan konsumen (MVC intval($row['value']), select
+        // getAll) deref tanpa guard. Kunci hilang → file invalid, fall-through.
+        $required = array_flip(['id', 'parent_id', 'app', 'nama', 'type',
+            'privilege', 'status', 'value', 'level', 'level_label', 'keterangan']);
+
+        foreach ($data['rows'] as $row) {
+            if (!is_array($row) || array_diff_key($required, $row)) {
+                error_log("gov2option: pinned JSON invalid (rows), fall-through: {$file}");
+
+                return null;
+            }
+        }
+
+        return array_values($data['rows']);
+    }
+
+    /**
+     * Apakah tier efektif saat ini = SQL (driver meekro tanpa pinned aktif)?
+     * Satu-satunya kondisi autoregistrasi MVC boleh INSERT (#6134): saat pinned
+     * aktif, DB tidak sedang terbaca — menulis ke sana = INSERT berulang tiap
+     * request tanpa pernah kelihatan hasilnya.
+     */
+    public function sqlTierEffective(?string $app = null): bool
+    {
+        $app ??= (string) ($GLOBALS['pageID'] ?? '');
+
+        return $this->dsnDriver() === 'meekro' && $this->pinnedRows($app) === null;
+    }
+
+    /**
      * Load options rows from apps/{app}/xml/options.xml (fallback tier statis
      * — dipakai saat database tidak tersedia; DB tetap menang bila terkonfigurasi).
      *
@@ -363,6 +525,9 @@ class gov2option
     /**
      * Filter rows with the same semantics as the SQL WHERE built in get():
      * loose string equality per key, combined with AND (default) or OR.
+     * Case-insensitive seperti collation *_ci MySQL yang digantikannya —
+     * snapshot pinned membawa data DB apa adanya (status 'ON'/'On' nyata,
+     * lih. UPPER(status) di apps/gov2option/model/index.php).
      *
      * @param array<int, array<string, mixed>> $rows
      * @return array<int, array<string, mixed>>
@@ -379,7 +544,7 @@ class gov2option
             $hits = 0;
 
             foreach ($where as $key => $val) {
-                if (array_key_exists($key, $row) && (string) $row[$key] === (string) $val) {
+                if (array_key_exists($key, $row) && strcasecmp((string) $row[$key], (string) $val) === 0) {
                     $hits++;
                 }
             }
@@ -510,6 +675,12 @@ class MVC
     private function create(): ?array
     {
         global $self, $doc, $pageID;
+
+        // Autoregistrasi hanya saat tier efektif = SQL (#6134): pinned aktif
+        // atau driver non-meekro → no-op, jangan INSERT ke DB yang tak terbaca
+        if (!$self->opt->sqlTierEffective()) {
+            return null;
+        }
 
         $parent_data = [
             'app' => $pageID,
