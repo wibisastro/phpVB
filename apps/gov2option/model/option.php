@@ -108,12 +108,16 @@ class option extends \Gov2lib\crudHandler {
     function getRecords (array $vars, string $parentName = ''): mixed {
         global $doc,$self;
         $_id=$this->setRememberId($vars['id']);
-        $data=$this->doBrowse($vars['scroll'],$_id,$parentName);
+        // Flavor dari segmen privilege URL fetch (get-url tablepack):
+        // "service" = setup services, selainnya = setup options — daftar
+        // akar (parent 0) difilter per type; anak mengikuti parent-nya
+        $type = ($vars['privilege'] ?? '') === 'service' ? 'service' : 'option';
+        $data=$this->doBrowse($vars['scroll'],$_id,$parentName,$type);
         if (sizeof($data)==0) {$data=array("data"=>"empty","level"=>"1");}
         return $doc->responseGet($data);
     }
 
-    function doBrowse (string|int $scroll = 0, string|int $parent_id = 0, string $parent_id_name = ''): ?array {
+    function doBrowse (string|int $scroll = 0, string|int $parent_id = 0, string $parent_id_name = '', string $type = ''): ?array {
         global $uri, $scriptID;
         $WHERE = "WHERE app='{$scriptID}' ";
         try {
@@ -121,6 +125,10 @@ class option extends \Gov2lib\crudHandler {
             if ($parent_id_name) {$_parent=$parent_id_name."_id";}
             else {$_parent="parent_id";}
             if (isset($parent_id)) {$WHERE.="AND $_parent=%i";}
+            if ($type !== '' && !intval($parent_id)) {
+                // Literal aman: whitelist dua nilai, bukan input bebas
+                $WHERE .= "AND level=1 AND type='" . ($type === 'service' ? 'service' : 'option') . "' ";
+            }
             $query="SELECT * FROM ".$this->tbl->table." $WHERE LIMIT $scrolled";
             // echo \DB::$dbName;
             // echo \DB::$host;

@@ -14,7 +14,10 @@ class option {
     
     function index ($vars) {
         global $self, $doc, $scriptID;
-        if ($vars["privilege"] == "setup") {
+        if ($vars["privilege"] == "setup" || $vars["privilege"] == "setup_services") {
+            // optType memarametrikan option.html (get-url tablepack +
+            // breadcrumb) → daftar akar difilter per type di model
+            $doc->body('optType', $vars["privilege"] === 'setup_services' ? 'service' : 'option');
             $self->loadTable($self->scrollInterval);
             $self->content();
         } elseif ($vars["privilege"] == "view" || $vars["privilege"] == "view_services") {

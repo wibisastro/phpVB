@@ -30,6 +30,10 @@ class options
         $role = isset($vars['role']) ? $vars['role'] : 'Options';
         $doc->body("pageTitle", ucwords($vars['app']) . " " . ucwords($role));
 
+        // Flavor setup dibawa ke iframe dalam via segmen privilege
+        // (setup vs setup_services) — daftar cluster difilter per type
+        $doc->body('setupPath', $scriptID === 'services' ? 'setup_services' : 'setup');
+
         match ($cmdID) {
             'setup' => $self->content("option_setup.html"),
             'view' => [

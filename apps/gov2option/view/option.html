@@ -11,7 +11,7 @@
   <div class="col-lg-12">
     <div class="main-box">
       <gov2breadcrumb
-              path-url="option/breadcrumb"
+              path-url="{{ optType|default('option') }}/breadcrumb"
               :is-active="true"
               :is-horizontal="true">
       </gov2breadcrumb>
@@ -21,9 +21,13 @@
 
 <div class="row">
   <div class="col-lg-12">
+    {# get-url membawa flavor lewat segmen privilege URL fetch:
+       "service/table/..." vs "option/table/..." — model memfilter type
+       daftar akar dari sana. post-url tetap "option" (add/del/update
+       tidak flavor-sensitive; type ditentukan isi form) #}
     <tablepack
             :is-active="true"
-            get-url="option"
+            get-url="{{ optType|default('option') }}"
             post-url="option"
             :columns="['nama', 'type', 'privilege', 'keterangan', 'status']"
             :dyn-col-name="{col1:'nama',col2:'level_label'}"
