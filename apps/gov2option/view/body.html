@@ -1,0 +1,21 @@
+{% extends "@gov2option/layout.html" %}
+
+{% block head %}
+	{{ parent() }}
+	{% include('cubeHead.html') %}
+{% endblock %}
+
+{% block content %}
+    {% for item in contents %}
+       {% include[item,'cubeMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block js %}
+	{{ parent() }}
+	{% include('vueJS.html') %}
+{% endblock %}
+
+{% block externalJS %}
+	{% include('externalJS.html') %}
+{% endblock %}
