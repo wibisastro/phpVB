@@ -31,6 +31,15 @@ class gov2option
 
     /** @var array<string, array<int, array<string, mixed>>|null> cache pinnedRows() per app */
     private array $pinnedCache = [];
+
+    /** @var array{url:string, key:string, schema:string}|null kredensial gajah dari entri DSN driver supabase */
+    private ?array $restConfig = null;
+
+    /** @var array<string, array<int, array<string, mixed>>|null> cache restRows() per app */
+    private array $restCache = [];
+
+    /** @var \GuzzleHttp\ClientInterface|null injectable utk test (Guzzle MockHandler) */
+    public ?\GuzzleHttp\ClientInterface $restClient = null;
     /**
      * Initialize options handler with database connection
      */
@@ -76,7 +85,7 @@ class gov2option
             $match = self::matchRows($pinned, $where, $whereType)[0] ?? null;
 
             if ($match || $appScoped) {
-                return $match ? array_intersect_key($match, array_flip($select)) : null;
+                return self::project($match, $select);
             }
         }
 
@@ -86,18 +95,18 @@ class gov2option
                 : (self::matchRows($pinnedHome, $where, $whereType)[0] ?? null);
 
             if ($match) {
-                return array_intersect_key($match, array_flip($select));
+                return self::project($match, $select);
             }
         }
 
-        // Tier 1 (statis) & tier 3 (supabase): options hanya dari
-        // apps/{app}/xml/options.xml — jalur SQL/DBConnector tidak disentuh
-        // sama sekali, tanpa file = null silent (T4 #6085)
+        // Tier 1 (statis) & tier 3 (supabase): REST gajah > factory XML —
+        // jalur SQL/DBConnector tidak disentuh sama sekali (T4 #6085,
+        // slot REST #6134 slice D)
         if ($this->dsnDriver() !== 'meekro') {
-            $xmlRows = $this->xmlRows((string) ($where['app'] ?? $GLOBALS['pageID'] ?? ''));
-            $match = $xmlRows === null ? null : (self::matchRows($xmlRows, $where, $whereType)[0] ?? null);
+            $rows = $this->sourceRows($app);
+            $match = $rows === null ? null : (self::matchRows($rows, $where, $whereType)[0] ?? null);
 
-            return $match ? array_intersect_key($match, array_flip($select)) : null;
+            return self::project($match, $select);
         }
 
         dsnSource::requireMeekroDB();
@@ -116,11 +125,11 @@ class gov2option
             $res = DB::queryFirstRow($q, $where_clause);
         } catch (MeekroDBException $e) {
             if ($e->getCode() == 0) {
-                $xmlRows = $this->xmlRows((string) ($where['app'] ?? $GLOBALS['pageID'] ?? ''));
+                $xmlRows = $this->xmlRows($app);
 
                 if ($xmlRows !== null) {
                     $match = self::matchRows($xmlRows, $where, $whereType)[0] ?? null;
-                    $res = $match ? array_intersect_key($match, array_flip($select)) : null;
+                    $res = self::project($match, $select);
                 } elseif (self::hasDsnConfig()) {
                     $connector = new DBConnector($this->dsn);
                     $res = $connector->db->queryFirstRow($q, $where_clause);
@@ -206,32 +215,16 @@ class gov2option
     {
         global $doc;
         $res = [];
+        $select = ['id', 'app', 'type', 'privilege', 'nama', 'keterangan', 'status', 'value'];
 
-        // Preseden tertinggi rantai 4 sumber (#6134): pinned JSON, selaras get()
-        $pinned = $this->pinnedRows($app);
+        // Rantai 4 sumber (#6134): pinned > (non-meekro: REST gajah/XML);
+        // null = tier efektif SQL — lanjut jalur DB di bawah
+        $rows = $this->resolveRows($app);
 
-        if ($pinned !== null) {
-            $select = ['id', 'app', 'type', 'privilege', 'nama', 'keterangan', 'status', 'value'];
-
-            return array_map(
-                fn (array $row): array => array_intersect_key($row, array_flip($select)),
-                self::matchRows($pinned, ['app' => $app, 'level' => 1, 'status' => $status])
-            );
-        }
-
-        // Tier 1 & 3: XML-only, selaras get() (T4 #6085)
-        if ($this->dsnDriver() !== 'meekro') {
-            $xmlRows = $this->xmlRows($app);
-
-            if ($xmlRows === null) {
-                return [];
-            }
-
-            $select = ['id', 'app', 'type', 'privilege', 'nama', 'keterangan', 'status', 'value'];
-
-            return array_map(
-                fn (array $row): array => array_intersect_key($row, array_flip($select)),
-                self::matchRows($xmlRows, ['app' => $app, 'level' => 1, 'status' => $status])
+        if ($rows !== null) {
+            return self::projectRows(
+                self::matchRows($rows, ['app' => $app, 'level' => 1, 'status' => $status]),
+                $select
             );
         }
 
@@ -246,10 +239,9 @@ class gov2option
                 $xmlRows = $this->xmlRows($app);
 
                 if ($xmlRows !== null) {
-                    $select = ['id', 'app', 'type', 'privilege', 'nama', 'keterangan', 'status', 'value'];
-                    $res = array_map(
-                        fn (array $row): array => array_intersect_key($row, array_flip($select)),
-                        self::matchRows($xmlRows, ['app' => $app, 'level' => 1, 'status' => $status])
+                    $res = self::projectRows(
+                        self::matchRows($xmlRows, ['app' => $app, 'level' => 1, 'status' => $status]),
+                        $select
                     );
                 } elseif (self::hasDsnConfig()) {
                     $connector = new DBConnector($this->dsn);
@@ -348,17 +340,104 @@ class gov2option
         }
 
         $first = null;
+        $firstConfig = null;
 
         foreach ($list->dsn as $dsn) {
             $entryDriver = trim((string) $dsn->driver) ?: 'meekro';
-            $first ??= $entryDriver;
+
+            // Entri supabase membawa kredensial REST gajah (slot REST #6134)
+            $entryConfig = $entryDriver !== 'supabase' ? null : [
+                'url' => trim((string) $dsn->url),
+                'key' => trim((string) $dsn->key),
+                'schema' => trim((string) $dsn->schema) ?: 'public',
+            ];
+
+            if ($first === null) {
+                $first = $entryDriver;
+                $firstConfig = $entryConfig;
+            }
 
             if (trim((string) $dsn->name) === trim((string) $this->dsn)) {
+                $this->restConfig = $entryConfig;
+
                 return $this->driver = $entryDriver;
             }
         }
 
+        $this->restConfig = $firstConfig;
+
         return $this->driver = $first ?? 'meekro';
+    }
+
+    /**
+     * Rows options dari REST gajah (PostgREST via SupabaseAdapter) — slot
+     * REST rantai 4 sumber (#6134, ditunda dari slice A). Gagal jaringan/
+     * konfigurasi ATAU nol rows utk app → null + fall-through factory XML
+     * (jaminan boot ter-konfigurasi: gajah tanpa entri app ≠ app tanpa
+     * config). Memo per app per instance — get() dipanggil berulang per
+     * request (getActiveYear, autoregistrasi MVC).
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    private function restRows(string $app): ?array
+    {
+        if (array_key_exists($app, $this->restCache)) {
+            return $this->restCache[$app];
+        }
+
+        $this->dsnDriver(); // pastikan restConfig terbaca dari entri DSN
+
+        if ($this->restConfig === null || $this->restConfig['url'] === '' || $this->restConfig['key'] === '') {
+            return $this->restCache[$app] = null;
+        }
+
+        try {
+            $adapter = new Database\SupabaseAdapter($this->restConfig, $this->restClient);
+            $rows = $adapter->restSelect(self::TABLE, ['app' => $app], 0, 0, 'id');
+        } catch (\Throwable $e) {
+            error_log("gov2option: REST gajah gagal utk app {$app}, fall-through XML: {$e->getMessage()}");
+
+            return $this->restCache[$app] = null;
+        }
+
+        return $this->restCache[$app] = ($rows ?: null);
+    }
+
+    /**
+     * Rows sumber non-SQL sesuai driver aktif (pinned sudah dicek pemanggil):
+     * supabase = REST gajah > factory XML; statis = factory XML saja.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    private function sourceRows(string $app): ?array
+    {
+        if ($this->dsnDriver() === 'supabase') {
+            return $this->restRows($app) ?? $this->xmlRows($app);
+        }
+
+        return $this->xmlRows($app);
+    }
+
+    /**
+     * Rantai resolusi utuh satu app utk sumber array (#6134): pinned >
+     * (non-meekro: REST/XML). Null = tier efektif SQL — pemanggil lanjut
+     * jalur DB. Ekstraksi bersama get()/getAll() (utang review slice A #4).
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    private function resolveRows(string $app): ?array
+    {
+        $pinned = $this->pinnedRows($app);
+
+        if ($pinned !== null) {
+            return $pinned;
+        }
+
+        if ($this->dsnDriver() !== 'meekro') {
+            return $this->sourceRows($app) ?? [];
+        }
+
+        return null;
     }
 
     /**
@@ -393,10 +472,14 @@ class gov2option
      */
     public static function pinnedPath(string $dsn, string $app): ?string
     {
-        foreach ([$dsn, $app] as $segment) {
-            if ($segment === '' || preg_match('/[^a-zA-Z0-9_.-]/', $segment) || str_contains($segment, '..')) {
-                return null;
-            }
+        // dsn (konvensi SERVER_NAME) boleh titik; app mengikuti charset
+        // xmlRows — tanpa titik (satu aturan utk semua sumber per-app)
+        if ($dsn === '' || preg_match('/[^a-zA-Z0-9_.-]/', $dsn) || str_contains($dsn, '..')) {
+            return null;
+        }
+
+        if ($app === '' || preg_match('/[^a-zA-Z0-9_-]/', $app)) {
+            return null;
         }
 
         $base = getenv('GOV2_VAR_DIR') ?: sys_get_temp_dir() . '/gov2var';
@@ -583,6 +666,31 @@ class gov2option
 
             return $useOr ? $hits > 0 : $hits === count($where);
         }));
+    }
+
+    /**
+     * Proyeksi kolom $select satu row — padanan select-list SQL untuk
+     * sumber array (pinned/REST/XML). Null row → null (miss).
+     */
+    private static function project(?array $row, array $select): ?array
+    {
+        return $row ? array_intersect_key($row, array_flip($select)) : null;
+    }
+
+    /**
+     * Proyeksi kolom $select banyak rows — array_flip sekali, bukan per-row.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private static function projectRows(array $rows, array $select): array
+    {
+        $flip = array_flip($select);
+
+        return array_map(
+            fn (array $row): array => array_intersect_key($row, $flip),
+            $rows
+        );
     }
 
     /**

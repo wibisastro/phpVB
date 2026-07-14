@@ -1,6 +1,8 @@
 <?php namespace App\gov2option\model;
 
 use Gov2lib\gov2crypto;
+use Gov2lib\mcpClient;
+use Gov2lib\optionsImportAdapter;
 use Gov2lib\pinnedStore;
 
 /**
@@ -147,6 +149,189 @@ class connection extends \Gov2lib\crudHandler
         }
 
         return $sealed === null ? null : gov2crypto::decrypt((string) $sealed);
+    }
+
+    /**
+     * Refresh inventori tools satu koneksi gurita: initialize + tools/list →
+     * simpan JSON ke kolom `tools` (#6134 slice D). Kegagalan MCP dilaporkan
+     * sebagai errors, bukan exception — server gurita = pihak eksternal.
+     *
+     * @return array{tools?:int, errors?:array<string,string>}
+     */
+    function discoverTools(int $id, ?mcpClient $client = null): array
+    {
+        $row = $this->connectionRow($id);
+
+        if ($row === null) {
+            return ['errors' => ['id' => 'Koneksi tidak ditemukan']];
+        }
+
+        $list = ($client ?? $this->mcpFor($row))->toolsList();
+
+        if ($list['error'] !== null) {
+            return ['errors' => ['mcp' => "tools/list gagal: {$list['error']}"]];
+        }
+
+        $meta = json_decode((string) ($row['meta'] ?? ''), true) ?: [];
+        $meta['tools_discovered_at'] = date('c');
+
+        try {
+            \DB::update($this->tbl->table, [
+                'tools' => json_encode($list['tools'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                'meta' => json_encode($meta, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            ], 'id=%i', $id);
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler($e->getMessage());
+
+            return ['errors' => ['db' => 'Simpan inventori tools gagal']];
+        }
+
+        return ['tools' => count($list['tools'])];
+    }
+
+    /**
+     * Import gurita → options: tools/call → payload kanonik → adapter →
+     * rows options app tujuan (#6134 slice D). Semantik replace-by-cluster:
+     * cluster existing dengan nama sama di app tujuan diganti utuh, supaya
+     * re-import idempoten ("copy configuration", bukan append).
+     *
+     * @return array{app?:string, rows?:int, errors?:array<string,string>}
+     */
+    function importFromTool(
+        int $connectionId,
+        string $tool,
+        array $arguments,
+        string $app = '',
+        ?int $actorId = null,
+        ?mcpClient $client = null
+    ): array {
+        $row = $this->connectionRow($connectionId);
+
+        if ($row === null) {
+            return ['errors' => ['id' => 'Koneksi tidak ditemukan']];
+        }
+
+        if ($row['jenis'] !== 'gurita' || $row['status'] !== 'on') {
+            return ['errors' => ['id' => 'Koneksi bukan gurita aktif']];
+        }
+
+        if ($tool === '') {
+            return ['errors' => ['tool' => 'Nama tool wajib diisi']];
+        }
+
+        $call = ($client ?? $this->mcpFor($row))->toolsCall($tool, $arguments);
+
+        if ($call['error'] !== null) {
+            return ['errors' => ['mcp' => "tools/call gagal: {$call['error']}"]];
+        }
+
+        $payload = mcpClient::extractPayload($call['result']);
+
+        if ($payload === null) {
+            return ['errors' => ['payload' => 'Hasil tool tidak membawa payload JSON']];
+        }
+
+        $adapter = new optionsImportAdapter();
+        $issues = $adapter->validate($payload);
+
+        if ($issues) {
+            return ['errors' => ['payload' => join('; ', array_slice($issues, 0, 5))]];
+        }
+
+        $app = $app !== '' ? $app : (string) ($payload['target']['app'] ?? 'home');
+
+        if (preg_match('/[^a-zA-Z0-9_-]/', $app)) {
+            return ['errors' => ['app' => 'Nama app tujuan tidak valid']];
+        }
+
+        $rows = $adapter->toRows($payload, [
+            'app' => $app,
+            'connection_id' => $connectionId,
+        ]);
+
+        return $this->persistImportedRows($rows, $app, $actorId);
+    }
+
+    /**
+     * Tulis rows import ke tabel options dalam satu transaksi: hapus cluster
+     * senama (beserta anak-anaknya), lalu INSERT dengan remap id sintetis →
+     * id nyata untuk parent_id.
+     *
+     * @param array<int, array<string, mixed>> $rows hasil optionsImportAdapter::toRows
+     * @return array{app?:string, rows?:int, errors?:array<string,string>}
+     */
+    private function persistImportedRows(array $rows, string $app, ?int $actorId): array
+    {
+        try {
+            \DB::startTransaction();
+
+            $clusterNames = array_column(
+                array_filter($rows, fn (array $r): bool => (int) $r['level'] === 1),
+                'nama'
+            );
+            $existing = \DB::queryFirstColumn(
+                "SELECT id FROM {$this->tbl->options} WHERE app=%s AND level=1 AND nama IN %ls",
+                $app,
+                $clusterNames
+            );
+
+            if ($existing) {
+                \DB::query(
+                    "DELETE FROM {$this->tbl->options} WHERE id IN %li OR parent_id IN %li",
+                    $existing,
+                    $existing
+                );
+            }
+
+            $idMap = [0 => 0];
+
+            foreach ($rows as $row) {
+                $syntheticId = (int) $row['id'];
+                unset($row['id']);
+                $row['parent_id'] = $idMap[(int) $row['parent_id']] ?? 0;
+                $row['metadata'] = json_encode($row['metadata'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                $row['created_by'] = $actorId;
+
+                \DB::insert($this->tbl->options, $row);
+                $idMap[$syntheticId] = (int) \DB::insertId();
+            }
+
+            \DB::commit();
+        } catch (\MeekroDBException $e) {
+            try {
+                \DB::rollback();
+            } catch (\MeekroDBException) {
+                // koneksi sudah putus — tidak ada yang bisa di-rollback
+            }
+
+            $this->exceptionHandler($e->getMessage());
+
+            return ['errors' => ['db' => 'Tulis rows import gagal (periksa kolom metadata — lihat options_table.sql)']];
+        }
+
+        return ['app' => $app, 'rows' => count($rows)];
+    }
+
+    /** Baris koneksi mentah by id — pemakaian internal (credential ikut terbaca) */
+    private function connectionRow(int $id): ?array
+    {
+        try {
+            return \DB::queryFirstRow("SELECT * FROM {$this->tbl->table} WHERE id=%i", $id);
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler($e->getMessage());
+        }
+
+        return null;
+    }
+
+    /** Client MCP dari row koneksi — credential didekripsi in-memory saja */
+    private function mcpFor(array $row): mcpClient
+    {
+        $credential = empty($row['credential'])
+            ? null
+            : gov2crypto::decrypt((string) $row['credential']);
+
+        return new mcpClient((string) $row['url'], (string) ($row['auth_type'] ?? 'none'), $credential);
     }
 
     /**

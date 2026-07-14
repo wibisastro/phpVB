@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `options` (
   `keterangan`  VARCHAR(255) DEFAULT NULL,
   `status`      VARCHAR(8) NOT NULL DEFAULT 'on',
   `value`       VARCHAR(255) DEFAULT NULL,
+  `metadata`    JSON DEFAULT NULL,
   `created_by`  VARCHAR(64) DEFAULT NULL,
   `created_at`  DATETIME DEFAULT CURRENT_TIMESTAMP,
   `modify_by`   VARCHAR(64) DEFAULT NULL,
@@ -26,3 +27,6 @@ CREATE TABLE IF NOT EXISTS `options` (
 --   MODIFY `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
 --   MODIFY `modify_at`  DATETIME DEFAULT NULL,
 --   MODIFY `modify_by`  VARCHAR(64) DEFAULT NULL;
+
+-- Kolom provenance import (#6134 slice D, plan §4.2) — jalankan di tabel existing:
+-- ALTER TABLE `options` ADD COLUMN `metadata` JSON DEFAULT NULL AFTER `value`;

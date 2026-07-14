@@ -42,7 +42,8 @@ class connection
         $self->ses->authenticate('webmaster');
         csrf::guard();
 
-        $result = $self->saveConnection($payload['data'] ?? [], (int) ($self->ses->val['account_id'] ?? 0) ?: null);
+        $data = $payload['data'] ?? [];
+        $result = $self->saveConnection($data, (int) ($self->ses->val['account_id'] ?? 0) ?: null);
 
         if (isset($result['errors'])) {
             header('HTTP/1.1 422 Unprocessable Entity');
@@ -50,7 +51,69 @@ class connection
             return ['class' => 'is-warning', 'notification' => join('; ', $result['errors']), 'errors' => $result['errors']];
         }
 
-        return $doc->response('is-primary', '', $result['id']);
+        $response = $doc->response('is-primary', '', $result['id']);
+
+        // Registrasi gurita: langsung simpan inventori tools/list (#6134
+        // slice D). Gagal discover ≠ gagal save — koneksi tersimpan, admin
+        // bisa ulang via endpoint tools
+        if (($data['jenis'] ?? '') === 'gurita' && ($data['status'] ?? 'on') !== 'off') {
+            $discovered = $self->discoverTools($result['id']);
+            $response['tools'] = $discovered['tools'] ?? 0;
+
+            if (isset($discovered['errors'])) {
+                $response['notification'] .= ' — discover tools gagal: ' . join('; ', $discovered['errors']);
+            }
+        }
+
+        return $response;
+    }
+
+    /** POST refresh inventori tools/list satu koneksi gurita */
+    function tools($payload)
+    {
+        global $self, $doc;
+        $self->ses->authenticate('webmaster');
+        csrf::guard();
+
+        $result = $self->discoverTools((int) ($payload['data']['id'] ?? 0));
+
+        if (isset($result['errors'])) {
+            header('HTTP/1.1 422 Unprocessable Entity');
+
+            return ['class' => 'is-warning', 'notification' => join('; ', $result['errors'])];
+        }
+
+        return ['class' => 'is-primary', 'notification' => "{$result['tools']} tools tersimpan"] + $result;
+    }
+
+    /** POST import hasil tools/call gurita → rows options app tujuan */
+    function import($payload)
+    {
+        global $self, $doc;
+        $self->ses->authenticate('webmaster');
+        csrf::guard();
+
+        $data = $payload['data'] ?? [];
+        $arguments = $data['arguments'] ?? [];
+
+        $result = $self->importFromTool(
+            (int) ($data['id'] ?? 0),
+            trim((string) ($data['tool'] ?? '')),
+            is_array($arguments) ? $arguments : [],
+            trim((string) ($data['app'] ?? '')),
+            (int) ($self->ses->val['account_id'] ?? 0) ?: null
+        );
+
+        if (isset($result['errors'])) {
+            header('HTTP/1.1 422 Unprocessable Entity');
+
+            return ['class' => 'is-warning', 'notification' => join('; ', $result['errors'])];
+        }
+
+        return [
+            'class' => 'is-primary',
+            'notification' => "Import {$result['rows']} rows ke app '{$result['app']}'",
+        ] + $result;
     }
 
     /** POST hapus koneksi by id */
