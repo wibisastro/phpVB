@@ -2,20 +2,27 @@
 
 namespace Gov2lib;
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
 /**
  * Token CSRF stateless — #6134 slice C (keamanan keputusan 9).
  *
- * Sesi phpVB = JWT di cookie Gov2Session (tanpa server-side store), maka
- * token diturunkan HMAC dari cookie sesi + $publickey: tidak butuh storage,
- * terikat sesi (cookie berganti → token lama gugur). Klien mengambil token
- * dari respons GET (mis. cmd getList) dan mengirimkannya kembali via header
- * `X-Gov2-Csrf` atau field `_csrf` pada setiap POST mutation.
+ * Sesi phpVB = JWT di cookie Gov2Session (tanpa server-side store). Token
+ * diturunkan HMAC dari klaim identitas STABIL di dalam JWT (account_id) +
+ * $publickey — BUKAN dari string cookie utuh: sesSave() me-re-issue JWT
+ * setiap menyimpan state sesi (mis. setRememberId saat drill-down tabel),
+ * sehingga token berbasis cookie utuh akan basi di tengah umur halaman.
+ * Token gugur saat logout (cookie hilang) / ganti akun (account_id beda).
+ *
+ * Klien: token di-render sekali ke halaman (cubeHead memasangnya sebagai
+ * default header axios `X-Gov2-Csrf`) atau dikirim via field `_csrf`.
  *
  * @package Gov2lib
  */
 class csrf
 {
-    /** Token untuk sesi saat ini; '' bila belum login (tanpa cookie sesi) */
+    /** Token untuk sesi login saat ini; '' bila belum login / JWT invalid */
     public static function token(): string
     {
         global $publickey;
@@ -26,7 +33,19 @@ class csrf
             return '';
         }
 
-        return hash_hmac('sha256', 'gov2csrf.v1|' . $session, (string) $publickey);
+        try {
+            $claims = (array) JWT::decode($session, new Key((string) $publickey, 'HS256'));
+        } catch (\Throwable $e) {
+            return '';
+        }
+
+        $accountId = (string) ($claims['account_id'] ?? '');
+
+        if ($accountId === '') {
+            return '';
+        }
+
+        return hash_hmac('sha256', 'gov2csrf.v2|' . $accountId, (string) $publickey);
     }
 
     /** Cocokkan token kiriman klien dengan token sesi (constant-time) */
