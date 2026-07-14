@@ -126,8 +126,9 @@ class option extends \Gov2lib\crudHandler {
             else {$_parent="parent_id";}
             if (isset($parent_id)) {$WHERE.="AND $_parent=%i";}
             if ($type !== '' && !intval($parent_id)) {
-                // Literal aman: whitelist dua nilai, bukan input bebas
-                $WHERE .= "AND level=1 AND type='" . ($type === 'service' ? 'service' : 'option') . "' ";
+                // Literal aman: whitelist dua nilai, bukan input bebas.
+                // Spasi depan wajib — klausa sebelumnya berakhir "%i" tanpa spasi
+                $WHERE .= " AND level=1 AND type='" . ($type === 'service' ? 'service' : 'option') . "'";
             }
             $query="SELECT * FROM ".$this->tbl->table." $WHERE LIMIT $scrolled";
             // echo \DB::$dbName;
