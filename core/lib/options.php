@@ -26,7 +26,7 @@ class options
     public function index(): void
     {
         global $self, $doc, $vars, $cmdID, $scriptID;
-        $self->gov2nav->setCustomNav();
+        $self->gov2nav->setAutoNav();
         $role = isset($vars['role']) ? $vars['role'] : 'Options';
         $doc->body("pageTitle", ucwords($vars['app']) . " " . ucwords($role));
 

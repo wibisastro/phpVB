@@ -26,7 +26,7 @@ class role
         global $self, $doc, $cmdID, $vars;
 
         $self->ses->authenticate($vars['role']);
-        $self->gov2nav->setCustomNav();
+        $self->gov2nav->setAutoNav();
         $doc->body("pageTitle", 'Gov 2.0 SSO ' . ucfirst($cmdID) . ' Role');
         $self->content("role.html");
     }

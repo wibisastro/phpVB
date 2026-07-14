@@ -44,6 +44,31 @@ class gov2nav extends \Gov2lib\document {
         }
 	}
 
+    /**
+     * Mode nav otomatis untuk halaman core lintas-app (options/role/survey):
+     * custom bila app host menyediakan endpoint getMenus (dipakai
+     * menu-custom fetch /{pageID}/index/getMenus — gov2survey/gov2pipe),
+     * selain itu default XML app (dashboard.xml bila ada; tanpa file =
+     * menu core config). Sebelumnya halaman ini selalu setCustomNav →
+     * sidebar KOSONG di portal tanpa getMenus.
+     */
+    function setAutoNav () {
+        global $pageID;
+
+        if (class_exists("App\\{$pageID}\\index") && method_exists("App\\{$pageID}\\index", 'getMenus')) {
+            $this->setCustomNav();
+            return;
+        }
+
+        $menuFile = file_exists(__DIR__."/../../{$pageID}/xml/dashboard.xml") ? "dashboard.xml" : "";
+
+        if ($menuFile === "" && !file_exists(__DIR__."/../../../core/config/menu.".STAGE.".xml")) {
+            return; // tanpa sumber menu sama sekali — biarkan tanpa sidebar, jangan fatal
+        }
+
+        $this->setDefaultNav($menuFile);
+    }
+
     function setCustomNav ($_menuFile="") {
         global $pageID,$config,$self,$doc,$cmdID;
         // Cek di $doc langsung agar tahan terhadap multi-instance via take()
