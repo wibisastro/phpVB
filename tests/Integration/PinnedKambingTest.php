@@ -20,9 +20,9 @@ use PHPUnit\Framework\TestCase;
  */
 class PinnedKambingTest extends TestCase
 {
-    private const DSN = 'integrasi.uji.test';
     private const APP = 'zzpinnedintegrasi';
 
+    private string $dsn;
     private string $varDir;
 
     protected function setUp(): void
@@ -31,6 +31,8 @@ class PinnedKambingTest extends TestCase
             $this->markTestSkipped('GOV2_KAMBING_URL/USER tidak di-set — butuh akun kambing dev');
         }
 
+        // Nama folder dsn bisa dikontrol (mis. 'ayam' utk uji manual)
+        $this->dsn = getenv('GOV2_KAMBING_TEST_DSN') ?: 'integrasi.uji.test';
         $this->varDir = sys_get_temp_dir() . '/gov2opt-kambing-' . getmypid();
         putenv('GOV2_VAR_DIR=' . $this->varDir);
     }
@@ -41,6 +43,11 @@ class PinnedKambingTest extends TestCase
 
         if (isset($this->varDir) && is_dir($this->varDir)) {
             exec('rm -rf ' . escapeshellarg($this->varDir));
+        }
+
+        // Bersihkan folder uji di kambing (koleksi dsn saja, rekursif)
+        if (isset($this->dsn)) {
+            webdavClient::fromEnv()?->delete("portal-config/{$this->dsn}");
         }
     }
 
@@ -58,25 +65,25 @@ class PinnedKambingTest extends TestCase
         $store = new pinnedStore();
 
         // 1. Save → kambing + cache lokal
-        $result = $store->save(self::DSN, self::APP, $envelope);
+        $result = $store->save($this->dsn, self::APP, $envelope);
         $this->assertEquals('ok', $result['remote'], 'PUT ke kambing harus sukses');
         $this->assertEquals('ok', $result['cache']);
 
         // 2. File benar-benar ada di kambing (GET langsung)
         $dav = webdavClient::fromEnv();
-        $remote = $dav->get(pinnedStore::remotePath(self::DSN, self::APP));
+        $remote = $dav->get(pinnedStore::remotePath($this->dsn, self::APP));
         $this->assertEquals(200, $remote['status']);
         $this->assertStringContainsString('kambing-' . getmypid(), (string) $remote['body']);
 
         // 3. Resolver membaca cache lokal
-        $file = gov2option::pinnedPath(self::DSN, self::APP);
+        $file = gov2option::pinnedPath($this->dsn, self::APP);
         $parsed = gov2option::pinnedRowsFromFile($file, self::APP);
         $this->assertEquals('kambing-' . getmypid(), $parsed[1]['value']);
 
         // 4. Cache dihapus (disposable) → sync menarik ulang dari kambing
         unlink($file);
         @unlink($file . '.sync');
-        $store->sync(self::DSN, self::APP);
+        $store->sync($this->dsn, self::APP);
         $this->assertFileExists($file, 'sync harus meregenerasi cache dari kambing');
     }
 }

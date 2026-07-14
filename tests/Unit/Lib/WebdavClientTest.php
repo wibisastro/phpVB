@@ -117,6 +117,14 @@ class WebdavClientTest extends TestCase
         $this->assertEquals('1', $this->mock->getLastRequest()->getHeaderLine('Depth'));
     }
 
+    public function testDeleteSendsDeleteVerb(): void
+    {
+        $dav = $this->client(new Response(204));
+
+        $this->assertEquals(204, $dav->delete('portal-config/ayam'));
+        $this->assertEquals('DELETE', $this->mock->getLastRequest()->getMethod());
+    }
+
     public function testNetworkErrorYieldsStatusZeroNotException(): void
     {
         $dav = $this->client(new RequestException('timeout', new Request('GET', 'x')));

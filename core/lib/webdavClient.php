@@ -119,6 +119,12 @@ class webdavClient
         return $this->request('MKCOL', $path)['status'];
     }
 
+    /** DELETE file/koleksi (koleksi terhapus rekursif — semantik WebDAV) */
+    public function delete(string $path): int
+    {
+        return $this->request('DELETE', $path)['status'];
+    }
+
     /** Buat rantai koleksi induk (portal-config → {dsn} → options) */
     private function ensureCollections(string $dirPath): void
     {
