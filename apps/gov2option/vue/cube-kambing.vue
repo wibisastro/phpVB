@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="px-3 py-2 border-bottom bg-body-tertiary small text-muted">
-      <i class="bi bi-hdd-network me-1"></i>
+      <i class="bi bi-hdd-stack me-1"></i>
       Storage WebDAV (Nextcloud) — onboarding: endpoint WebDAV + app password akun instansi.
     </div>
 

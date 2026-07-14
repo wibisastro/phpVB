@@ -78,10 +78,12 @@
     var csrfToken = "{{ csrfToken|default('') }}";
     if (csrfToken) { axios.defaults.headers.common['X-Gov2-Csrf'] = csrfToken; }
     axios.interceptors.request.use(function(config) {
-        if (config.url && !config.url.match(/^https?:\/\//)) {
-            if (config.url.charAt(0) !== '/') {
-                config.url = '/' + config.url;
-            }
+        if (config.url && !config.url.match(/^https?:\/\//) && config.url.charAt(0) !== '/') {
+            // URL relatif diresolusi terhadap URL halaman (perilaku axios
+            // pra-3b tanpa baseURL) — BUKAN dipaksa root-absolute: halaman
+            // iframe /gov2option/{app}/setup memanggil "option/table/..."
+            // yang harus mendarat di bawah path halaman (route lama)
+            config.url = new URL(config.url, window.location.href).href;
         }
         return config;
     });

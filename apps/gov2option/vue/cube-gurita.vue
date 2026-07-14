@@ -3,7 +3,7 @@
     <!-- Header: label + discovery configurable via options global home (#6134) -->
     <div class="px-3 py-2 border-bottom bg-body-tertiary">
       <div class="small text-muted">
-        <i class="bi bi-diagram-3 me-1"></i>
+        <i class="bi bi-bezier2 me-1"></i>
         Konektor ekosistem gov3 — registry {{ label }}
       </div>
       <div v-if="discoveryUrl" class="small text-truncate">

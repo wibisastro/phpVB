@@ -8,10 +8,13 @@
                 <div class="main-box-body clearfix">
                     <form @submit.prevent="onSubmit" @keydown="form.errors.clear($event.target.name)">
 
+                        <!-- Vue 3: v-if + v-for satu elemen = v-if dievaluasi
+                             duluan (val belum ada) dan crash render — loop
+                             dipindah ke <template> pembungkus -->
+                        <template v-for="(val, key) in fields" :key="key">
                         <div class="form-group"
-                             :class="{'form-group-select2': val.type === 'select', 'has-error': form.errors.has(val.name)}"
-                             v-for="(val, key) in fields"
-                             v-if="val.name !== 'cmd'">
+                             v-if="val.name !== 'cmd'"
+                             :class="{'form-group-select2': val.type === 'select', 'has-error': form.errors.has(val.name)}">
 
                             <label :for="val.name" v-if="val.type != 'hidden'">
                                 {{val.label}}
@@ -92,6 +95,7 @@
                                   v-if="form.errors.has(val.name)">
                             </span>
                         </div>
+                        </template>
 
                         <div class="form-group">
                             <hr>

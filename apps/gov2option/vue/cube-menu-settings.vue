@@ -136,7 +136,7 @@
             <button class="accordion-button collapsed fw-semibold small py-3 px-3" type="button"
                     data-bs-toggle="collapse" data-bs-target="#collapseGurita"
                     aria-expanded="false" aria-controls="collapseGurita">
-              <i class="bi bi-diagram-3 me-2 text-primary"></i>Gurita
+              <i class="bi bi-bezier2 me-2 text-primary"></i>Gurita
             </button>
           </h2>
           <div id="collapseGurita" class="accordion-collapse collapse">
@@ -151,7 +151,7 @@
             <button class="accordion-button collapsed fw-semibold small py-3 px-3" type="button"
                     data-bs-toggle="collapse" data-bs-target="#collapseKambing"
                     aria-expanded="false" aria-controls="collapseKambing">
-              <i class="bi bi-hdd-network me-2 text-primary"></i>Kambing
+              <i class="bi bi-hdd-stack me-2 text-primary"></i>Kambing
             </button>
           </h2>
           <div id="collapseKambing" class="accordion-collapse collapse">
