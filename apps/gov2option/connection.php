@@ -32,6 +32,21 @@ class connection
             'connections' => $self->listConnections(),
             'jenis' => \App\gov2option\model\connection::JENIS,
             'csrf' => csrf::token(),
+            // Dogfooding keputusan 4: panel membaca konfigurasinya dari
+            // options global home (factory apps/home/xml/options.xml) —
+            // branding tidak hardcoded, phpVB publik
+            'label' => $self->opt->val('gurita_label', 'home') ?: 'Gurita',
+            'discovery_url' => $self->opt->val('gurita_discovery_url', 'home'),
+        ]);
+    }
+
+    /** GET inventori tools satu koneksi (cache kolom tools hasil discover) */
+    function inventory($vars)
+    {
+        global $self, $doc;
+
+        return $doc->responseGet([
+            'tools' => $self->toolInventory((int) ($vars['id'] ?? 0)),
         ]);
     }
 

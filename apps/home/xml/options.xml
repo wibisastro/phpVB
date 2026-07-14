@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Factory options global (MVC home) — preseden TERAKHIR rantai 4 sumber
+     (#6134): nilai di sini jaminan boot; portal menimpanya lewat DB/pinned.
+
+     Cluster Gurita: konfigurasi panel konektor gov3 (#6134 keputusan 4).
+     phpVB publik — branding tidak boleh hardcoded di kode: pemakai di luar
+     ekosistem gov3 cukup mengarahkan discovery_url + label ke miliknya.
+     Entry diprefix gurita_ karena namespace nama di home bersifat global
+     (val() mencari per-nama level 2, bukan per-cluster). -->
+<options>
+  <cluster name="Gurita" type="option" privilege="webmaster" keterangan="Konfigurasi panel konektor gov3 (menu Gurita)">
+    <item name="gurita_discovery_url" type="text" value="https://gurita.gov3.id" keterangan="Discovery channel registry gurita"/>
+    <item name="gurita_label" type="text" value="Gurita" keterangan="Label menu panel konektor"/>
+  </cluster>
+</options>

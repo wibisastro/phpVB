@@ -1,5 +1,9 @@
 <?php namespace App\gov2option;
 
+use Gov2lib\csrf;
+
+// CSRF di semua mutation (#6134 keputusan 9, dipasang slice E): token dikirim
+// otomatis oleh axios default header X-Gov2-Csrf (di-set cubeHead dari sesi)
 class option {
     function __construct () {
         global $self, $doc;
@@ -39,6 +43,7 @@ class option {
     }
 
     function add () {
+        csrf::guard();
         global $self, $doc, $scriptID;
         unset($_POST['id']);
         unset($_POST['cmd']);
@@ -63,6 +68,7 @@ class option {
     }
 
     function del () {
+        csrf::guard();
         global $self;
         $response=$self->postDel($_POST);
         return $response;
@@ -74,6 +80,7 @@ class option {
     }
 
     function update () {
+        csrf::guard();
         global $self;
         $currentUser = $self->ses->val['account_id'];
 
@@ -112,6 +119,7 @@ class option {
     }
 
     function service_del($vars) {
+        csrf::guard();
         global $self, $doc;
         $id = $vars['id'];
         $self->service_del($id);
@@ -124,6 +132,7 @@ class option {
     }
 
     function save($vars) {
+        csrf::guard();
         global $self, $doc;
         $response = [
             'class' => 'success',
@@ -139,6 +148,7 @@ class option {
     }
 
     function save1($vars) {
+        csrf::guard();
         global $self, $doc;
         $response = [
             'class' => 'success',

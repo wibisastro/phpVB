@@ -75,6 +75,8 @@
 (function(){
     var baseURL = "{{ protocol }}://{{ _SERVER.SERVER_NAME }}";
     axios.defaults.baseURL = baseURL;
+    var csrfToken = "{{ csrfToken|default('') }}";
+    if (csrfToken) { axios.defaults.headers.common['X-Gov2-Csrf'] = csrfToken; }
     axios.interceptors.request.use(function(config) {
         if (config.url && !config.url.match(/^https?:\/\//)) {
             if (config.url.charAt(0) !== '/') {

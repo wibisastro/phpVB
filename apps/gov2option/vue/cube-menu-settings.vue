@@ -14,16 +14,26 @@
         <div id="collapseOptions" class="accordion-collapse collapse">
           <div class="accordion-body p-0">
             <ul class="list-group list-group-flush" v-if="options.length > 0">
-              <li class="list-group-item border-0 px-4 py-2" v-for="item in options" :key="item.app">
+              <li class="list-group-item border-0 px-4 py-2 d-flex align-items-center" v-for="item in options" :key="item.app">
                 <a :href="`/${item.app}/options/view`"
-                   class="d-flex align-items-center text-decoration-none text-body">
+                   class="d-flex align-items-center text-decoration-none text-body flex-grow-1">
                   <i class="bi bi-gear me-2 text-muted"></i>
                   <span class="small">{{ item.app.toUpperCase() }}</span>
+                </a>
+                <!-- Pengganti obscurity /setup (#6134): webmaster dapat link
+                     eksplisit; route lama tetap hidup & tetap gated -->
+                <a v-if="userRole === 'webmaster'" :href="`/${item.app}/options/setup`"
+                   class="text-decoration-none text-muted ms-2" title="Setup definisi options">
+                  <i class="bi bi-wrench-adjustable small"></i>
                 </a>
               </li>
             </ul>
             <div v-else class="px-4 py-2 text-muted small">
               <i class="bi bi-info-circle me-1"></i>Belum ada options
+              <a v-if="userRole === 'webmaster' && pageID" :href="`/${pageID}/options/setup`"
+                 class="d-block mt-1 text-decoration-none">
+                <i class="bi bi-wrench-adjustable me-1"></i>Setup options {{ pageID.toUpperCase() }}
+              </a>
             </div>
           </div>
         </div>
@@ -41,11 +51,15 @@
         <div id="collapseServices" class="accordion-collapse collapse">
           <div class="accordion-body p-0">
             <ul class="list-group list-group-flush" v-if="services.length > 0">
-              <li class="list-group-item border-0 px-4 py-2" v-for="item in services" :key="item.app">
+              <li class="list-group-item border-0 px-4 py-2 d-flex align-items-center" v-for="item in services" :key="item.app">
                 <a :href="`/${item.app}/services/view`"
-                   class="d-flex align-items-center text-decoration-none text-body">
+                   class="d-flex align-items-center text-decoration-none text-body flex-grow-1">
                   <i class="bi bi-plug me-2 text-muted"></i>
                   <span class="small">{{ item.app.toUpperCase() }}</span>
+                </a>
+                <a v-if="userRole === 'webmaster'" :href="`/${item.app}/services/setup`"
+                   class="text-decoration-none text-muted ms-2" title="Setup definisi services">
+                  <i class="bi bi-wrench-adjustable small"></i>
                 </a>
               </li>
             </ul>

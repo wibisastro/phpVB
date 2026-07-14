@@ -87,6 +87,11 @@
         <div id="sidePanel-pengaturan" style="display:none">
           <cube-menu-settings></cube-menu-settings>
         </div>
+        {# Section Gov3 (#6134): panel konektor ekosistem — Gurita dulu,
+           Kambing/Lebah menyusul; satu registry gov2_connections utk semua #}
+        <div id="sidePanel-gurita" style="display:none">
+          <cube-gurita></cube-gurita>
+        </div>
         <div id="sidePanel-chat" class="h-100" style="display:none">
           <cube-chat-rag
             endpoint="{{ chatRagEndpoint|default('') }}"
@@ -122,6 +127,7 @@
         el: '#app',
         components: {
         'cube-menu-settings': httpVueLoader('{{ webroot }}/gov2option/vue/cube-menu-settings.vue'),
+        'cube-gurita': httpVueLoader('{{ webroot }}/gov2option/vue/cube-gurita.vue'),
         'cube-instansi': httpVueLoader('{{ webroot }}/gov2option/vue/cube-instansi.vue'),
         'wilayah': httpVueLoader('{{ webroot }}/gov2wilayah/vue/wilayah.vue'),
         'cube-chat-rag': httpVueLoader('{{ webroot }}/components/vue/cube-chat-rag.vue'),
@@ -147,10 +153,11 @@
       wilayah: '<i class="bi bi-geo-alt me-2"></i>Wilayah',
       instansi: '<i class="bi bi-building me-2"></i>Instansi',
       pengaturan: '<i class="bi bi-gear me-2"></i>Pengaturan',
+      gurita: '<i class="bi bi-diagram-3 me-2"></i>Gov3',
       chat: '<i class="bi bi-chat-dots me-2"></i>Chat Dokumen'
     };
     // Toggle panels via DOM
-    var views = ['wilayah', 'instansi', 'pengaturan', 'chat'];
+    var views = ['wilayah', 'instansi', 'pengaturan', 'gurita', 'chat'];
     views.forEach(function(v) {
       var el = document.getElementById('sidePanel-' + v);
       if (el) { el.style.display = (v === view) ? '' : 'none'; }

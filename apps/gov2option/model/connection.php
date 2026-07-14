@@ -312,6 +312,31 @@ class connection extends \Gov2lib\crudHandler
         return ['app' => $app, 'rows' => count($rows)];
     }
 
+    /**
+     * Inventori tools satu koneksi dari kolom cache `tools` (hasil
+     * discoverTools) — hanya field aman utk UI (name, description, schema).
+     *
+     * @return array<int, array{name:string, description:string, inputSchema:mixed}>
+     */
+    function toolInventory(int $id): array
+    {
+        $row = $this->connectionRow($id);
+        $tools = $row === null ? null : json_decode((string) ($row['tools'] ?? ''), true);
+
+        if (!is_array($tools)) {
+            return [];
+        }
+
+        return array_values(array_map(
+            fn (array $tool): array => [
+                'name' => (string) ($tool['name'] ?? ''),
+                'description' => (string) ($tool['description'] ?? ''),
+                'inputSchema' => $tool['inputSchema'] ?? null,
+            ],
+            array_filter($tools, 'is_array')
+        ));
+    }
+
     /** Baris koneksi mentah by id — pemakaian internal (credential ikut terbaca) */
     private function connectionRow(int $id): ?array
     {

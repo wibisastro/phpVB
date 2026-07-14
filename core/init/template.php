@@ -20,6 +20,9 @@ try {
     $doc->body('pageID',$pageID);
     $doc->component($pageID);
     $doc->body('SSONODE',$config->platform->ssonode);
+    // Token CSRF sesi (#6134 keputusan 9) — dipasang cubeHead sebagai default
+    // header axios supaya semua POST mutation membawanya tanpa per-komponen
+    $doc->body('csrfToken', Gov2lib\csrf::token());
 
     if (file_exists($self->templateDir."/body.html")) {
         $doc->baseBody="@$pageID/body.html";

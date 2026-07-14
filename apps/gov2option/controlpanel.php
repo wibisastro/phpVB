@@ -1,6 +1,7 @@
 <?php namespace App\gov2option;
 
 use Gov2lib\api;
+use Gov2lib\csrf;
 
 class controlpanel extends api {
     function __construct () {
@@ -51,6 +52,7 @@ class controlpanel extends api {
     }
 
     function save($vars) {
+        csrf::guard();
         global $self, $doc;
         $data = $vars['data'];
         $option_row = $self->opt->get(['nama' => 'unit_portal']);

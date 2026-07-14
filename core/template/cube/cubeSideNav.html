@@ -18,5 +18,14 @@
       <span class="menu-text">Pengaturan</span>
     </a>
   </li>
+  {% if _SESSION['userRole'] == 'webmaster' %}
+  {# Section Gov3 (#6134): panel konektor gurita — khusus webmaster #}
+  <li>
+    <a href="#" onclick="event.preventDefault(); openSidePanel('gurita')">
+      <i class="bi bi-diagram-3"></i>
+      <span class="menu-text">Gov3</span>
+    </a>
+  </li>
+  {% endif %}
   {% endif %}
 </ul>
