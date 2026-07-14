@@ -904,11 +904,16 @@
             },
             loadData: function(data) {
                 // console.log(data);
-                this.gridData=Array.from(Object.keys(data), k=>data[k]);
-
                 if (data['data'] === 'empty') {
+                    // Respons kosong {"data":"empty","level":"1"}: JANGAN
+                    // masuk gridData sbg string junk — paging() menulis
+                    // row['page'], dan di ESM strict mode (vue3-sfc-loader)
+                    // assignment ke string primitif = TypeError yang
+                    // meledakkan render seluruh tablepack (tabel+tombol hilang)
+                    this.gridData=[];
                     this.records=0;
                 } else {
+                    this.gridData=Array.from(Object.keys(data), k=>data[k]);
                     this.records=this.gridData.length;
                     if (this.tagUrl) {
                         this.getTaggedData();

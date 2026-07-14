@@ -474,10 +474,14 @@ export default {
         console.log(errors);
     },
     loadData: function(data) {
-        this.gridData = Array.from(Object.keys(data), k => data[k]);
         if (data['data'] == 'empty') {
+            // Respons kosong: jangan isi gridData dgn string junk — paging()
+            // menulis row['page'], di ESM strict mode assignment ke string
+            // primitif = TypeError yang meledakkan render seluruh tabel
+            this.gridData = [];
             this.records = 0;
         } else {
+            this.gridData = Array.from(Object.keys(data), k => data[k]);
             this.records = this.gridData.length;
             if (this.tagUrl) {
                 this.getTaggedData();
