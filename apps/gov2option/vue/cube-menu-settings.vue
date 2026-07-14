@@ -127,6 +127,56 @@
         </div>
       </div>
 
+      <!-- Konektor gov3 (#6134): tiap fauna accordion sendiri — onboarding
+           path & form field beda-beda (gurita: domain MCP; kambing: WebDAV +
+           app password; gajah: endpoint realtime/edge + apikey) -->
+      <template v-if="userRole === 'webmaster'">
+        <div class="accordion-item border-0">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed fw-semibold small py-3 px-3" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#collapseGurita"
+                    aria-expanded="false" aria-controls="collapseGurita">
+              <i class="bi bi-diagram-3 me-2 text-primary"></i>Gurita
+            </button>
+          </h2>
+          <div id="collapseGurita" class="accordion-collapse collapse">
+            <div class="accordion-body p-0">
+              <cube-gurita></cube-gurita>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item border-0">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed fw-semibold small py-3 px-3" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#collapseKambing"
+                    aria-expanded="false" aria-controls="collapseKambing">
+              <i class="bi bi-hdd-network me-2 text-primary"></i>Kambing
+            </button>
+          </h2>
+          <div id="collapseKambing" class="accordion-collapse collapse">
+            <div class="accordion-body p-0">
+              <cube-kambing></cube-kambing>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item border-0">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed fw-semibold small py-3 px-3" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#collapseGajah"
+                    aria-expanded="false" aria-controls="collapseGajah">
+              <i class="bi bi-database me-2 text-primary"></i>Gajah
+            </button>
+          </h2>
+          <div id="collapseGajah" class="accordion-collapse collapse">
+            <div class="accordion-body p-0">
+              <cube-gajah></cube-gajah>
+            </div>
+          </div>
+        </div>
+      </template>
+
     </div>
   </div>
 </template>

@@ -32,17 +32,12 @@
                  placeholder="Nama, mis. Gurita Kemdikbud" required maxlength="190">
           <input v-model.trim="form.url" type="url" class="form-control form-control-sm mb-2"
                  placeholder="https://gurita.instansi.go.id/mcp/..." required maxlength="255">
-          <div class="d-flex gap-2 mb-2">
-            <select v-model="form.jenis" class="form-select form-select-sm">
-              <option v-for="j in jenisList" :key="j" :value="j">{{ j }}</option>
-            </select>
-            <select v-model="form.auth_type" class="form-select form-select-sm">
-              <option value="none">tanpa auth</option>
-              <option value="bearer">bearer</option>
-              <option value="basic">basic</option>
-              <option value="apikey">apikey</option>
-            </select>
-          </div>
+          <select v-model="form.auth_type" class="form-select form-select-sm mb-2">
+            <option value="none">tanpa auth</option>
+            <option value="bearer">bearer</option>
+            <option value="basic">basic</option>
+            <option value="apikey">apikey</option>
+          </select>
           <input v-if="form.auth_type !== 'none'" v-model="form.credential" type="password"
                  class="form-control form-control-sm mb-2" autocomplete="new-password"
                  :placeholder="form.id ? 'Credential (kosongkan bila tetap)' : 'Credential'">
@@ -57,11 +52,11 @@
       <div v-if="loading" class="px-4 py-3 text-muted small">
         <span class="spinner-border spinner-border-sm me-2"></span>Memuat…
       </div>
-      <div v-else-if="connections.length === 0" class="px-4 py-3 text-muted small">
-        <i class="bi bi-info-circle me-1"></i>Belum ada koneksi terdaftar
+      <div v-else-if="guritaConnections.length === 0" class="px-4 py-3 text-muted small">
+        <i class="bi bi-info-circle me-1"></i>Belum ada gurita terdaftar
       </div>
 
-      <div v-for="c in connections" :key="c.id" class="border-bottom px-3 py-2">
+      <div v-for="c in guritaConnections" :key="c.id" class="border-bottom px-3 py-2">
         <div class="d-flex align-items-center">
           <div class="flex-grow-1 text-truncate">
             <span class="badge me-1" :class="c.status === 'on' ? 'bg-primary' : 'bg-secondary'">{{ c.jenis }}</span>
@@ -152,6 +147,12 @@ module.exports = {
       importForm: { tool: '', app: '' },
       pinApp: '',
       pageID: ''
+    }
+  },
+  computed: {
+    // Accordion ini khusus fauna gurita — kambing/gajah punya accordion sendiri
+    guritaConnections() {
+      return this.connections.filter(c => c.jenis === 'gurita');
     }
   },
   methods: {
@@ -264,12 +265,10 @@ module.exports = {
     this.loadData();
   },
   mounted() {
+    // Kini embed di accordion panel Pengaturan (mount hanya utk webmaster)
     var el = document.getElementById('sidePanelOffcanvas');
     if (el) {
-      el.addEventListener('show.bs.offcanvas', () => {
-        var panel = document.getElementById('sidePanel-gurita');
-        if (panel && panel.style.display !== 'none') { this.loadData(); }
-      });
+      el.addEventListener('show.bs.offcanvas', () => this.loadData());
     }
   }
 }

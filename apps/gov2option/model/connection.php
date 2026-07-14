@@ -13,8 +13,10 @@ use Gov2lib\pinnedStore;
  */
 class connection extends \Gov2lib\crudHandler
 {
-    /** Jenis komponen gov3 yang dikenal — VARCHAR di DB, whitelist di kode */
-    public const JENIS = ['gurita', 'kambing', 'lebah'];
+    /** Jenis komponen gov3 yang dikenal — VARCHAR di DB, whitelist di kode.
+     *  gajah = endpoint layanan supabase realtime/edge (onboarding per-fauna
+     *  di accordion Pengaturan, keputusan Wibi 14 Jul) */
+    public const JENIS = ['gurita', 'kambing', 'gajah', 'lebah'];
     public const AUTH_TYPES = ['none', 'bearer', 'basic', 'apikey'];
 
     function __construct()
