@@ -26,7 +26,7 @@
             </label>
           </div>
 
-          <label :for="`input-${c.id}`" v-if="c.type==='textbox' || c.type==='text'">{{c.nama | capitalize}}</label>
+          <label :for="`input-${c.id}`" v-if="c.type==='textbox' || c.type==='text'">{{capitalize(c.nama)}}</label>
           <b-form-textarea v-if="c.type==='textbox'"
                            :id="`exampleTextarea${c.id}`"
                            v-model="child[index].value"
@@ -77,7 +77,7 @@ module.exports = {
         this.getData();
       }
       this.collapsed[id] = !this.collapsed[id];
-      this.$root.$emit('bv::toggle::collapse', `collapse-${id}`)
+      eventBus.$emit('bv::toggle::collapse', `collapse-${id}`)
     },
     getData: function () {
       this.loading = true;
@@ -156,28 +156,10 @@ module.exports = {
           })
     },
     confirmDel : function () {
-      const el = this.$createElement;
-      const message = el('div', {domProps: {class: 'row'}}, [
-        el('p',{class: 'text-center'},
-            'Apakah anda yakin ingin menghapus service ini ? ')
-      ]);
-      this.$bvModal.msgBoxConfirm(message, {
-        title: 'Hapus Service',
-        centered: true,
-        size: 'sm',
-        okVariant: 'danger'
-      })
-          .then(ok => {
-            if (ok) {
-              this.del();
-            }
-          }).catch(e => console.log(e));
+      if (window.confirm('Apakah anda yakin ingin menghapus service ini ?')) {
+        this.del();
+      }
     },
-  },
-  mounted() {
-    this.getExpiration();
-  },
-  filters: {
     capitalize: function (value) {
       if (!value) return ''
       value = value.toString()
@@ -188,6 +170,9 @@ module.exports = {
       value = value.toString()
       return value.toUpperCase()
     }
+  },
+  mounted() {
+    this.getExpiration();
   }
 }
 </script>

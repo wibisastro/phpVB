@@ -4,18 +4,20 @@
 </div>
 </template>
 <script>
-module.exports = {
+// Port Vue 3 dari apps/components/vue/gov2search.vue (#6118 3b).
+import eventBus from '../eventBus.js'
+
+export default {
     name: 'gov2search',
     data: function () {
         return {
-            searchQuery:''
+            searchQuery: ''
         }
     },
     methods: {
         setQuery: function () {
-            eventBus.$emit('searchQuery',this.searchQuery);
+            eventBus.$emit('searchQuery', this.searchQuery);
         }
     }
 }
 </script>
-<style></style>

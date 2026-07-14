@@ -11,13 +11,15 @@
             <a class="page-link" @click="scrollPrev()"><i class="fa fa-ellipsis-h"></i></a>
         </li>
 
-        <li class="page-item" v-for="page in pages"
-            v-if="toggleVisibility(page + firstPage)"
-            :class="{'active': currentPage === page + firstPage - 1}">
-            <a class="page-link" @click="gotoPage(page + firstPage - 1)">
-                {{ page + firstPage - 1 }}
-            </a>
-        </li>
+        <template v-for="page in pages">
+            <li class="page-item"
+                v-if="toggleVisibility(page + firstPage)"
+                :class="{'active': currentPage === page + firstPage - 1}">
+                <a class="page-link" @click="gotoPage(page + firstPage - 1)">
+                    {{ page + firstPage - 1 }}
+                </a>
+            </li>
+        </template>
 
         <li class="page-item"
             v-if="pages > pageInterval && !((intervalWindow+1)*pageInterval>lastPage)">
@@ -34,7 +36,12 @@
 </template>
 
 <script>
-module.exports = {
+// Port Vue 3 dari apps/components/vue/gov2pagination.vue (#6118 3b).
+// Perubahan sadar: v-if yang memakai variabel v-for pada elemen yang sama
+// dipindah ke <template v-for> (presedensi v-if/v-for berubah di Vue 3).
+import eventBus from '../eventBus.js'
+
+export default {
     name: 'gov2pagination',
     props: {
         instance: {

@@ -11,16 +11,14 @@
 	<link rel="stylesheet" href="{{ webroot }}/cube/fonts/bootstrap-icons.min.css" />
 	<link rel="stylesheet" href="{{ webroot }}/cube/css/main.min.css" />
 
-	<!-- BootstrapVue CSS -->
-	<link type="text/css" rel="stylesheet" href="{{ webroot }}/css/bootstrap-vue.min.css" />
+	<!-- phpVB core bundle CSS (Vue 3 komponen inti) -->
+	<link type="text/css" rel="stylesheet" href="{{ webroot }}/dist/style.css?v=5.1.2" />
 
 	<!-- Google Fonts -->
 	<link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
 
-	<!-- Vue and friends -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js"></script>
-	<script src="{{ webroot }}/js/bootstrap-vue.min.js"></script>
-	<script src="{{ webroot }}/js/httpVueLoader.js"></script>
+	<!-- phpVB core bundle: Vue 3 + mitt eventBus + vue3-sfc-loader + komponen inti -->
+	<script src="{{ webroot }}/dist/main.js?v=5.1.2"></script>
 	<script src="{{ webroot }}/js/axios.min.js"></script>
 	<script>
 	(function(){
@@ -34,16 +32,7 @@
 	        }
 	        return config;
 	    });
-	    var originalHttpRequest = httpVueLoader.httpRequest;
-	    httpVueLoader.httpRequest = function(url) {
-	        if (url.charAt(0) === '/') { url = baseURL + url; }
-	        return originalHttpRequest(url);
-	    };
 	})();
-	</script>
-
-	<script type="text/javascript">
-		const eventBus = new Vue();
 	</script>
 </head>
 
@@ -56,34 +45,11 @@
 		</div>
 	</div>
 
-{% block customVueLoader %}
-<script>
-	httpVueLoader.httpRequest = function(url) {
-		const apppath = window.location.pathname.split("/");
-		const originAppPath = window.location.href+'/../../../'+apppath[1];
-		const componentPath = url.split('/');
-		const originComponent = originAppPath + `/vue/${componentPath[componentPath.length-1]}`;
-		return axios.get(originComponent)
-				.then(function(res) {
-					if (res.data !== "") {
-						return res.data;
-					} else {
-						return axios.get(url)
-								.then(function (res) { return res.data; })
-								.catch(function (err) { return Promise.reject(err.status); })
-					}
-				})
-				.catch(function(err) {
-					return axios.get(url)
-							.then(function (res) { return res.data; })
-							.catch(function (err) { return Promise.reject(err.status); })
-				});
-	}
-</script>
-{% endblock %}
+{# Fallback path per-portal sudah default di vue3-sfc-loader adaptor (dist/main.js). #}
+{% block customVueLoader %}{% endblock %}
 
 <script>
-  new Vue({
+  phpvb.createPageApp({
 	{% block js %}
 	    el: '#app',
 	    components: {

@@ -26,10 +26,14 @@
 </div>
 </template>
 <script>
-module.exports = {
+// Port Vue 3 dari apps/components/vue/gov2notification.vue (#6118 3b).
+import eventBus from '../eventBus.js'
+import Gov2Session from './Gov2Session.vue'
+
+export default {
     name: 'gov2notification',
     components: {
-        'gov2session': httpVueLoader('./_gov2session.vue'),
+        'gov2session': Gov2Session,
     },
     data: function() {
         return {
@@ -145,4 +149,3 @@ module.exports = {
     }
 }
 </script>
-<style></style>

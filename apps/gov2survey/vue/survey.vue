@@ -132,12 +132,12 @@ module.exports = {
             axios.get(this.getUrl)
             .then(res => {
                 if (res.hasOwnProperty('data') && res.data.hasOwnProperty('class') === false) {
-                    this.$set(this, 'survey', res.data);
+                    this.survey = res.data;
                     this.survey._pertanyaan = Array.from(res.data.pertanyaan);
                     if (this.survey.telah_mengisi) {
                         _.forEach(this.survey._pertanyaan, (pertanyaan) => {
-                            this.$set(this.answers, `${pertanyaan.survey_id}_${pertanyaan.id}`,
-                                pertanyaan.opsi[0].jawaban_id);
+                            this.answers[`${pertanyaan.survey_id}_${pertanyaan.id}`] =
+                                pertanyaan.opsi[0].jawaban_id;
                         })
                     }
                     this.survey.pertanyaan = _.chunk(this.survey.pertanyaan, this.chunkSize)
@@ -184,7 +184,7 @@ module.exports = {
                 payload.answers.push(answer);
             })
 
-            this.$set(this, 'payload', payload);
+            this.payload = payload;
 
             axios.post(this.postUrl, payload)
                 .then(res => {
@@ -212,7 +212,7 @@ module.exports = {
                 _.forEach(this.survey.pertanyaan, (chunk, chunk_index) => {
                     _.forEach(chunk, (pertanyaan, pert_index) => {
                         _.forEach(pertanyaan.opsi, (opsi, index) => {
-                            this.$set(this.survey.pertanyaan[chunk_index][pert_index].opsi[index], 'jawaban_id',  answer.opsi_id)
+                            this.survey.pertanyaan[chunk_index][pert_index].opsi[index].jawaban_id = answer.opsi_id
                         })
                     })
                 })
@@ -240,7 +240,7 @@ module.exports = {
     created() {
         this.getData();
     },
-    destroyed(){
+    unmounted(){
         clearInterval(this.interval);
     },
     data() {

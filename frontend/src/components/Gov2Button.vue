@@ -6,10 +6,12 @@
 </template>
 
 <script>
+// Port Vue 3 dari apps/components/vue/gov2button.vue (#6118 3b).
+import eventBus from '../eventBus.js'
 
-module.exports = {
+export default {
     name: 'gov2button',
-    props:  {
+    props: {
         buttonLabel: String,
         buttonSize: String
     },
@@ -21,10 +23,10 @@ module.exports = {
     methods: {
         toggleClick: function () {
             this.isPressed = !this.isPressed;
-            eventBus.$emit('toggleClick',this.isPressed);
+            eventBus.$emit('toggleClick', this.isPressed);
         },
         resetButton: function () {
-            this.isPressed=false;
+            this.isPressed = false;
         }
     },
     created: function () {

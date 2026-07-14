@@ -6,7 +6,8 @@
                 {{ mainmenu.label.toUpperCase() }}
             </li>
             <template v-for="menus in mainmenu">
-                <li v-for="(submenu, index) in menus" :class="[selected == idx+'-'+index ? open : '']" style="width:100%" v-if="submenu.caption">
+                <template v-for="(submenu, index) in menus">
+                <li v-if="submenu.caption" :class="[selected == idx+'-'+index ? open : '']" style="width:100%">
                     <a :href="submenu.url" class="dropdown-nocaret" @click="choose(idx,index)" style="cursor:pointer;">
                         <template v-if="submenu.tab">
                             <template v-for="i in parseInt(submenu.tab)" >
@@ -51,6 +52,7 @@
                         </template>
                     </ul>
                 </li>
+                </template>
             </template>
         </ul>
     </div>

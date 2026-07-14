@@ -53,34 +53,11 @@
       </div>
     </div>
 
-{% block customVueLoader %}
-<script>
-    httpVueLoader.httpRequest = function(url) {
-        const apppath = window.location.pathname.split("/");
-        const originAppPath = window.location.href+'/../../../'+apppath[1];
-        const componentPath = url.split('/');
-        const originComponent = originAppPath + `/vue/${componentPath[componentPath.length-1]}`;
-        return axios.get(originComponent)
-                .then(function(res) {
-                    if (res.data !== "") {
-                        return res.data;
-                    } else {
-                        return axios.get(url)
-                                .then(function (res) { return res.data; })
-                                .catch(function (err) { return Promise.reject(err.status); })
-                    }
-                })
-                .catch(function(err) {
-                    return axios.get(url)
-                            .then(function (res) { return res.data; })
-                            .catch(function (err) { return Promise.reject(err.status); })
-                });
-    }
-</script>
-{% endblock %}
+{# Fallback path per-portal sudah default di vue3-sfc-loader adaptor (dist/main.js). #}
+{% block customVueLoader %}{% endblock %}
 
 <script>
-  new Vue({
+  phpvb.createPageApp({
     {% block js %}
         el: '#app',
         components: {

@@ -197,13 +197,13 @@ module.exports = {
     markLastUserError() {
       var last = this.history[this.history.length - 1];
       if (last && last.role === 'user') {
-        this.$set(last, 'error', true);
+        last.error = true;
       }
     },
     retryLastMessage() {
       if (!this.canRetry) return;
       var last = this.history[this.history.length - 1];
-      this.$set(last, 'error', false);
+      last.error = false;
       this.dispatchQuery(last.content);
     },
     clearHistory() {
