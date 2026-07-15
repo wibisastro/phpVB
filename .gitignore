@@ -32,3 +32,8 @@ Thumbs.db
 # PHPUnit cache
 .phpunit.cache/
 tests/golden/fixtures/
+
+# App SSO "beo" co-located but non-tracked (deploy #6275, app #6161).
+# Real code lives in beo.git (apps/beo subfolder), symlinked in at deploy time.
+# Do NOT commit it into the framework repo.
+/apps/beo
