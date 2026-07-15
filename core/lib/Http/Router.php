@@ -313,14 +313,30 @@ class Router implements RouterInterface
 
     /**
      * Build FastRoute dispatcher from registered routes
-     * 
+     *
+     * Route STATIS didaftarkan lebih dulu, baru route variable (#6161/#6275):
+     * FastRoute v1.3 melempar BadRouteException bila route statis didaftar
+     * SETELAH route variable yang menaunginya (mis. default core "/{app}/signup"
+     * vs app SSO "/beo/signup") — padahal saat dispatch statis memang selalu
+     * menang. Partisi stabil ini menghilangkan fatal tsb tanpa mengubah
+     * semantik apa pun: dedup addRoute per METHOD:URI tetap "terakhir menang"
+     * (app menimpa default), urutan relatif antar route variable tak berubah.
+     *
      * @return Dispatcher The FastRoute dispatcher
      */
     private function buildDispatcher(): Dispatcher
     {
         return \FastRoute\simpleDispatcher(function (RouteCollector $r) {
+            $variable = [];
             foreach ($this->routes as $routeKey => $handler) {
                 [$method, $uri] = explode(':', $routeKey, 2);
+                if (strpbrk($uri, '{[') === false) {
+                    $r->addRoute($method, $uri, $handler);
+                } else {
+                    $variable[] = [$method, $uri, $handler];
+                }
+            }
+            foreach ($variable as [$method, $uri, $handler]) {
                 $r->addRoute($method, $uri, $handler);
             }
         });
