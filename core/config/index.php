@@ -64,6 +64,13 @@ try {
         throw new Exception('InvalidConfigFile:'.STAGE);
     }
 
+    // Override kunci JWT Gov2Session per-server via <publickey> di config.{stage}.xml.
+    // Default framework-wide dipakai 633 portal; server SSO beo WAJIB kunci sendiri
+    // (K8 #6161) supaya kebocoran salinan beo tak bisa menempa cookie portal lain.
+    if (!empty($config->publickey)) {
+        $publickey = trim((string)$config->publickey);
+    }
+
     // Set error reporting based on stage
     switch (STAGE) {
         case "local":

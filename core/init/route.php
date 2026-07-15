@@ -68,10 +68,26 @@ try {
     $scriptID=$uriParts[2] ?? '';
     $cmdID=$uriParts[3] ?? '';
 
+    // App SSO-node di server ini — beo (#6161) men-set <ssoapp>beo</ssoapp> di
+    // config.{stage}.xml; default gov2sso (paritas legacy). Path kontrak portal
+    // (/slogin.php dkk) di-redirect DENGAN query string utuh: resolver
+    // cmd=authorize&token= dipanggil portal via file_get_contents yang mengikuti
+    // 302 — tanpa QS token hilang dan login 633 portal putus. /slogout.php tidak
+    // redirect: pageID ditulis-ulang (paritas route legacy) agar cascade logout
+    // tetap 1 round-trip per portal.
+    $ssoApp = trim((string)($config->ssoapp ?? '')) ?: 'gov2sso';
+
     if ($pageID == 'ssignup' || $pageID == 'ssignup.php') {
-        header("location: /gov2sso/signup?".$_SERVER['QUERY_STRING']);
+        header("location: /{$ssoApp}/signup?".$_SERVER['QUERY_STRING']);
+        exit;
     } elseif ($pageID == 'slogin' || $pageID == 'slogin.php') {
-        header("location: /gov2sso/slogin/".($_GET['client'] ?? ''));
+        header("location: /{$ssoApp}/slogin?".$_SERVER['QUERY_STRING']);
+        exit;
+    } elseif ($pageID == 'sprofile' || $pageID == 'sprofile.php') {
+        header("location: /{$ssoApp}/sprofile?".$_SERVER['QUERY_STRING']);
+        exit;
+    } elseif ($pageID == 'slogout' || $pageID == 'slogout.php') {
+        $pageID = $ssoApp;
     } elseif (!$pageID ||
         $pageID=="install.php" ||
         $pageID=="index.php" ||

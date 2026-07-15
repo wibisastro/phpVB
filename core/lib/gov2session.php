@@ -35,7 +35,9 @@ class gov2session extends dsnSource
         $this->client = new \GuzzleHttp\Client();
         $this->timeout = time() + (24 * 60 * 60);
 
-        if (isset($_GET['view'])) {
+        // Dump debug ?view=session/cookie HANYA stage local/dev (#6161): di prod
+        // ini membocorkan isi sesi (account_id, daftar client SSO) ke siapa pun.
+        if (isset($_GET['view']) && defined('STAGE') && (STAGE == 'local' || STAGE == 'dev')) {
             echo match($_GET['view']) {
                 'cases' => json_encode($cases ?? []),
                 'cookie' => json_encode($_COOKIE),
