@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gov2config>
     <comm>ok</comm>
+    <ssoapp>gov2sso</ssoapp>
+    <publickey>a0a67fd0a33061f7664346d13585166b</publickey>
     <title>SSO Node Gov2</title>
     <webmaster>wibi@alumni.ui.ac.id</webmaster>
 	<secure>true</secure>
     <platform>
         <apikey>https://gov2.mti08.vlsm.org/api.php</apikey>
-        <ssonode>http://sso.gov2.web.id</ssonode>
-        <ssoconn>https://sso.gov2.web.id</ssoconn>
+        <ssonode>https://beo.gov3.id</ssonode>
+        <ssoconn>https://beo.gov3.id</ssoconn>
     </platform>
     <apikey>
         <public>81d03a754448e774d706f0754acd88ff</public>
@@ -30,6 +32,7 @@
     <domain>
         <mti08.vlsm.org>gov2session</mti08.vlsm.org>
         <api.krisna.systems>apikrisna</api.krisna.systems>
+        <beo.gov3.id>gov2sso</beo.gov3.id>
     </domain>
     <viewer>
         <maxFileSize>
