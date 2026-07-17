@@ -19,6 +19,7 @@ class index {
         $doc->body("pageTitle",'Gov 2.0 SSO Login');
         if ($self->ses->val['account_id'] ?? false) {
             $self->ses->authenticate('guest');
+            $doc->body('ssoProfileUrl', profile::ssoProfileUrl());
             $self->content("profile.html");
         } else {
             $self->ses->authenticate('public');
@@ -36,6 +37,7 @@ class index {
         global $self,$doc;
         $doc->body("pageTitle",'Gov 2.0 SSO Profile');
         $self->ses->authenticate('guest');
+        $doc->body('ssoProfileUrl', profile::ssoProfileUrl());
         $self->content("profile.html");
     }
     
