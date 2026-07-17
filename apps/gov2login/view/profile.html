@@ -38,7 +38,9 @@
         {# Kelola akun/password terjadi di SSO node (kredensial hanya ada di sana) —
            buka top-level/new-tab, JANGAN iframe: cookie beo jadi third-party di iframe
            (diblokir browser modern) dan halaman password rawan clickjacking. #}
-        <a href="{{ SSONODE }}/gov2sso/sprofile?client={{ _SERVER["SERVER_NAME"] }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+        {# &token= (ssokey = session_id beo yang dipegang portal) → beo adopsi sesi
+           langsung, user tidak perlu login ulang di SSO node. #}
+        <a href="{{ SSONODE }}/gov2sso/sprofile?client={{ _SERVER["SERVER_NAME"] }}&token={{ _SESSION['ssokey'] }}" class="btn btn-sm btn-outline-secondary" target="_blank">
           <i class="bi bi-key me-1"></i>Ganti Password
         </a>
         <a href="/{{ pageID }}/logout" class="btn btn-sm btn-outline-danger">
