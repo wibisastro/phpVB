@@ -64,6 +64,9 @@ class login
 
         $self->ses->authenticate('public');
         $doc->body("pageTitle", 'Gov 2.0 SSO Signup');
+        // Form signup beo (di-iframe) sudah berjudul sendiri — sembunyikan heading
+        // portal (paritas jalur signup via link di form login, gov2login index).
+        $doc->body('hideTitle', 1);
         $self->content("@gov2login/signup.html");
     }
 
