@@ -24,20 +24,6 @@
 {% block js %}
 	{{ parent() }}
 	{% include('vueJS.html') %}
-	{# Auto-resize iframe auth beo: dengarkan tinggi konten via postMessage (dari
-	   signingBody beo) → set tinggi iframe.beo-auth-frame. Hanya terima dari SSO node. #}
-	<script>
-	(function(){
-	  var SSONODE = "{{ SSONODE }}";
-	  window.addEventListener('message', function(e){
-	    if (!e.origin || SSONODE.indexOf(e.origin) !== 0) return;
-	    var d = e.data || {};
-	    if (d.type !== 'beo-frame-height' || !(d.height > 0)) return;
-	    var fs = document.querySelectorAll('iframe.beo-auth-frame');
-	    for (var i = 0; i < fs.length; i++) { fs[i].style.height = (d.height + 24) + 'px'; }
-	  });
-	})();
-	</script>
 {% endblock %}
 
 {% block externalJS %}
