@@ -20,9 +20,9 @@ class index {
         global $self,$doc;
         $doc->body("pageTitle",'Gov 2.0 SSO Login');
         if ($self->ses->val['account_id'] ?? false) {
-            $self->ses->authenticate('guest');
-            $doc->body('ssoProfileUrl', profile::ssoProfileUrl());
-            $self->content("profile.html");
+            // Halaman profil portal pensiun — profil beo ber-tab (adopsi sesi stoken).
+            header("Location: " . profile::ssoProfileUrl());
+            exit;
         } else {
             $self->ses->authenticate('public');
             $doc->body('hideTitle', 1);   // form login beo (iframe) sudah berjudul
@@ -38,11 +38,9 @@ class index {
     }
     
     function profile () {
-        global $self,$doc;
-        $doc->body("pageTitle",'Gov 2.0 SSO Profile');
-        $self->ses->authenticate('guest');
-        $doc->body('ssoProfileUrl', profile::ssoProfileUrl());
-        $self->content("profile.html");
+        // Halaman profil portal pensiun — profil beo ber-tab (adopsi sesi stoken).
+        header("Location: " . profile::ssoProfileUrl());
+        exit;
     }
     
     function forgot () {
