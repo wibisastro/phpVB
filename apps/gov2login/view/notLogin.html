@@ -1,3 +1,7 @@
-<div class="saas-frame">
-    <iframe src="{{ SSONODE }}/slogin.php?client={{ _SERVER["SERVER_NAME"] }}" width="100%" frameborder="0" referrerpolicy="unsafe-url"></iframe>
-</div>
+<!-- Iframe login beo. Tinggi awal 560px (fallback) + auto-resize via postMessage
+     dari beo (listener di body.html). JANGAN pakai .saas-frame: overflow:hidden +
+     aspect-ratio persegi meng-clip form di mobile (tak bisa scroll). -->
+<iframe class="beo-auth-frame"
+        src="{{ SSONODE }}/slogin.php?client={{ _SERVER["SERVER_NAME"] }}"
+        style="width:100%;height:560px;border:0;display:block"
+        referrerpolicy="unsafe-url"></iframe>

@@ -39,6 +39,9 @@ class login
 
         $self->ses->authenticate('public');
         $doc->body("pageTitle", 'Silakan Login');
+        // Form login beo (di-iframe) sudah punya logo + judul sendiri → sembunyikan
+        // heading portal "Silakan Login" biar form lebih dekat ke topbar.
+        $doc->body('hideTitle', 1);
         $_SESSION['ssonode'] = trim((string) ($config->platform->ssonode ?? ''));
         $self->content("@gov2login/notLogin.html");
     }
