@@ -205,6 +205,13 @@ class gov2session extends dsnSource
                 $doc->body("_SESSION['fullname']", 'Development');
                 $doc->body("_SESSION['account_id']']", '-1');
             }
+            // Re-push _SESSION template: val bisa berubah DI DALAM authenticate
+            // (memberRead/checkSuperuser mengisi userRole dst) SETELAH doc->body
+            // diisi konstruktor — tanpa ini menu ber-gate role baru tampil pada
+            // request berikutnya (cookie), bukan halaman ini.
+            if (!empty($this->val)) {
+                $doc->body['_SESSION'] = (array)$this->val;
+            }
         } catch (\Exception $e) {
             $doc->exceptionHandler($e->getMessage());
         }
