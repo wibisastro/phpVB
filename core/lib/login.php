@@ -79,9 +79,12 @@ class login
             exit;
         }
 
-        $self->ses->authenticate('guest');
-        $doc->body("pageTitle", 'Profil');
-        $self->content("@gov2login/profile.html");
+        // Profil portal = profil beo ber-tab (Profil + Ganti Password) TOP-LEVEL.
+        // Nav "Profile" (layout.html) menuju route ini; render profile.html di sini
+        // tak pernah mengisi ssoProfileUrl → tombol "Ganti Password" href kosong
+        // ("tetep di situ"). stoken AES-GCM → beo adopsi sesi tanpa login ulang.
+        header("Location: " . \App\gov2login\profile::ssoProfileUrl());
+        exit;
     }
 
     /**

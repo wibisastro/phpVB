@@ -8,10 +8,11 @@ class profile {
     }
 
     function index () {
-        global $self,$doc;
-        $doc->body("pageTitle",'Gov 2.0 Profile');
-        $doc->body('ssoProfileUrl', self::ssoProfileUrl());
-        $self->content('profile.html');
+        // Halaman profil portal pensiun — langsung ke profil beo ber-tab
+        // (Profil + Ganti Password) TOP-LEVEL, sesi diadopsi via stoken.
+        // Helper ssoProfileUrl tetap di sini (dipakai juga Gov2lib\login::profile).
+        header("Location: " . self::ssoProfileUrl());
+        exit;
     }
 
     /**
