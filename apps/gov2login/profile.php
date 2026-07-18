@@ -22,10 +22,13 @@ class profile {
      * fallback URL tanpa stoken (SSO node akan minta login).
      */
     static function ssoProfileUrl () {
-        global $config;
+        global $config, $self;
         $node = rtrim((string)$config->platform->ssonode, '/');
         $base = $node . '/gov2sso/sprofile?client=' . urlencode($_SERVER['SERVER_NAME']);
-        $ssokey = (string)($_SESSION['ssokey'] ?? '');
+        // ssokey ada di Gov2Session ($self->ses->val), BUKAN $_SESSION — gov2session
+        // pakai cookie JWT → ->val, tak menulis $_SESSION. (Fallback $_SESSION jaga2.)
+        // Tanpa ini stoken kosong → "Ganti Password" mendarat di login, bukan profil.
+        $ssokey = (string)(($self->ses->val['ssokey'] ?? null) ?: ($_SESSION['ssokey'] ?? ''));
         $pub = trim((string)($config->apikey->public ?? ''));
         $sec = trim((string)($config->apikey->secret ?? ''));
         if ($ssokey === '' || $pub === '' || $sec === '') { return $base; }

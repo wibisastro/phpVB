@@ -17,12 +17,15 @@ class login
      */
     public function __construct()
     {
-        global $self, $vars, $doc, $loader;
+        global $self, $vars, $doc, $loader, $config;
         $self->takeAll("components");
         $self->take($vars['app'], "index", "dependencies");
 
         $loader->addPath(__DIR__ . '/../../apps/gov2login/view', 'gov2login');
         $doc->baseBody = '@gov2login/body.html';
+        // brandName utk SEMUA method (login/signup/forgot dll) — bukan hanya index()
+        // (halaman login sempat tampil brand kosong krn di-set cuma di index()).
+        $doc->body('brandName', (trim((string)($config->title ?? '')) ?: ($_SERVER['SERVER_NAME'] ?? '')));
     }
 
     /**
