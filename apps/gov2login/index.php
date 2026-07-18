@@ -25,6 +25,7 @@ class index {
             $self->content("profile.html");
         } else {
             $self->ses->authenticate('public');
+            $doc->body('hideTitle', 1);   // form login beo (iframe) sudah berjudul
             $self->content("notLogin.html");
         }
     }
