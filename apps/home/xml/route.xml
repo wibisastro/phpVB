@@ -42,6 +42,11 @@
 	</route>
     <route>
 		<method>GET</method>
+		<uri>/home/galeri</uri>
+		<handler>home\model\galeri</handler>
+	</route>
+    <route>
+		<method>GET</method>
 		<uri>/home/viewer/{cmd}/{file}</uri>
 		<handler>home\model\viewer</handler>
 	</route>

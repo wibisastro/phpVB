@@ -33,6 +33,11 @@ Thumbs.db
 .phpunit.cache/
 tests/golden/fixtures/
 
+# Galeri Komponen Cube — ARTEFAK GENERATE (9MB: aset = salinan verbatim demo Cube,
+# HTML = generate). Bangun ulang: php .claude/skills/halaman-cube/scripts/build-galeri.php
+# <dir-design> public/galeri. Landing /home/galeri degrade anggun bila absen.
+/public/galeri/
+
 # App SSO "gov2sso" co-located but non-tracked (deploy #6317, rename #6275, app #6161).
 # Real code lives in beo.git (apps/gov2sso subfolder), symlinked in at deploy time.
 # Do NOT commit it into the framework repo.

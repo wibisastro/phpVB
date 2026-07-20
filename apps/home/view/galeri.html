@@ -1,0 +1,72 @@
+{# Landing panduan developer: index bergrup halaman galeri (index.json hasil
+   build-galeri.php). Tiap kartu tautan ke /galeri/{slug}.html (mini-site faithful
+   dgn badge ID per komponen). Themed cube — ikut tema aktif (cube/gelap). #}
+
+<div class="px-3">
+
+  {% if not galeriReady %}
+  <div class="alert bg-warning text-white" role="alert">
+    <strong>Galeri belum di-generate.</strong> Jalankan
+    <code>php .claude/skills/halaman-cube/scripts/build-galeri.php &lt;dir-design&gt; public/galeri</code>
+    lalu muat ulang.
+  </div>
+  {% else %}
+
+  {# ---- Kartu penjelas ---- #}
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <div>
+          <h5 class="mb-1">Galeri Komponen Cube <span class="badge bg-primary-subtle text-primary">{{ versi }}</span></h5>
+          <p class="m-0 text-secondary small">
+            {{ totalKomp }} komponen di {{ totalHal }} halaman. Buka satu halaman, temukan komponen yang cocok,
+            <strong>klik badge</strong> untuk menyalin ID (mis. <code>tables#4</code>), lalu sebut ID itu ke skill
+            <code>halaman-cube</code> — mis. <em>"buat halaman CRUD mvc aset pakai tabel tables#4"</em>.
+          </p>
+        </div>
+        <div class="ms-auto text-center">
+          <div class="display-6 fw-bold text-primary lh-1">{{ totalKomp }}</div>
+          <div class="small text-secondary">komponen ber-ID</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ---- Grup ---- #}
+  {% for name, pages in groups %}
+  <div class="d-flex align-items-center mb-2 mt-3">
+    <h6 class="fw-semibold text-secondary text-uppercase m-0" style="letter-spacing:.05em">{{ name }}</h6>
+    <span class="badge bg-secondary-subtle text-secondary ms-2">{{ pages|length }}</span>
+  </div>
+  <div class="row gx-3 gy-3">
+    {% for p in pages %}
+    <div class="col-xl-3 col-md-4 col-sm-6 col-12">
+      <a href="/galeri/{{ p.slug }}.html" class="card h-100 text-decoration-none" style="transition:box-shadow .15s"
+         onmouseover="this.style.boxShadow='0 4px 16px rgba(91,79,185,.15)'" onmouseout="this.style.boxShadow=''">
+        <div class="card-body d-flex flex-column">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="fw-semibold text-body">{{ p.slug }}</span>
+            <span class="badge bg-primary rounded-pill">{{ p.count }}</span>
+          </div>
+          <div class="mt-2 small text-secondary">
+            {% if p.whole %}
+              <i class="bi bi-window"></i> halaman penuh
+            {% else %}
+              <i class="bi bi-grid-3x3-gap"></i> {{ p.count }} komponen
+            {% endif %}
+          </div>
+          {% if p.deps %}
+          <div class="mt-2">
+            {% for d in p.deps %}<span class="badge bg-warning-subtle text-warning me-1">vendor: {{ d }}</span>{% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+
+  {% endif %}
+
+</div>
