@@ -41,12 +41,26 @@ class aset extends \Gov2lib\api {
 
     function count ($vars) {
         global $self;
-        return $self->getCount($vars['id']);
+        // gov2table memanggil /aset/count TANPA id (non-recursive) — jangan
+        // akses $vars['id'] mentah (TypeError int); getCount butuh int.
+        return $self->getCount((int)($vars['id'] ?? 0));
     }
 
     function table ($vars) {
         global $self, $doc;
-        $data = $self->getRecords($vars['scroll']);
+        // gov2table non-recursive memanggil /aset/table/{scroll} (2 segmen) →
+        // cocok rute {cmd}[/{id}] sehingga angka scroll MENDARAT DI 'id';
+        // varian 3 segmen /table/{scroll}/{parent} baru mengisi 'scroll'.
+        // Exemplar home/crud meneruskan $vars['scroll'] mentah (skalar/null) ke
+        // getRecords(array ...) = TypeError — jangan ditiru.
+        if (isset($vars['scroll'])) {
+            $scroll = (int)$vars['scroll'];
+            $parent = max(0, (int)($vars['id'] ?? 0)); // -1 sentinel gov2table → 0
+        } else {
+            $scroll = (int)($vars['id'] ?? 1);
+            $parent = 0;
+        }
+        $data = $self->getRecords(array('scroll' => $scroll, 'id' => $parent));
         if (sizeof($data) == 0) {
             $data = array("data" => "empty", "level" => "1");
         }
