@@ -2,7 +2,10 @@
 
 class viewer {
     function __construct () {
+        // R0 role-framework: keputusan Wibi 20 Jul — file-server /home/viewer
+        // ber-gate guest (naikkan belakangan bila perlu).
         global $self;
+        $self->ses->authenticate('guest');
         $self->takeAll("components");
     }
 

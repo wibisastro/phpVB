@@ -191,6 +191,13 @@ module.exports = {
               + '&parent_id=' + parentId;
       axios.get(url)
         .then(resp => {
+          // R0 role-framework: changePortal balas HTTP 200 dgn status
+          // 'denied'/'invalid' bila role tak berwenang / unit tak ada — jangan
+          // update konteks topbar kecuali server benar menulis sesi ('ok').
+          if (!resp.data || resp.data.status !== 'ok') {
+            console.log('changePortal ditolak:', resp.data && resp.data.status);
+            return;
+          }
           this.config.unit_nama = item.nama;
           this.config.unit_id = item.id;
           this.config.parent_id = parentId;

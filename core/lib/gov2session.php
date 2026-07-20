@@ -23,6 +23,24 @@ Version		: 0.1.0 28 Feb 2026, [claude] extract handleAuthorization() dari authen
 */
 class gov2session extends dsnSource
 {
+    /**
+     * Peta privilege halaman kanonik (default framework, R0 role-framework).
+     * Basis merge di handleAuthorization() — selalu ada meski config.{stage}.xml
+     * instance server tak mendefinisikan <pageroles>. Level mengikuti urutan
+     * enum role DB (member.sql): guest<member<admin<webmaster<owner<developer.
+     * 'closed' = privilege "menu ditutup" (butuh level owner=5), BUKAN role user.
+     * 'maintenance' sengaja bukan level (ditangani cabang khusus, tak pernah
+     * dibandingkan). R1 akan memindah sumber ini ke enum PagePrivilege.
+     */
+    private const DEFAULT_PAGE_ROLES = [
+        'guest' => 1,
+        'member' => 2,
+        'admin' => 3,
+        'webmaster' => 4,
+        'closed' => 5,
+        'developer' => 6,
+    ];
+
     public \GuzzleHttp\Client $client;
     public int $timeout = 0;
     public array $val = [];
@@ -223,9 +241,36 @@ class gov2session extends dsnSource
      */
     private function handleAuthorization(string $pageID, object $doc, object $config, string $_privilege): void
     {
-        $_userRole = $this->getRoleLevel('member', 'role');
+        // R0 role-framework: peta privilege halaman = MERGE tiga lapis
+        // (default framework → override config server → override per-app), bukan
+        // mengganti total. Rasional tiap lapis:
+        // - DEFAULT_PAGE_ROLES di KODE = sumber selalu-ada. config.{stage}.xml
+        //   adalah config INSTANCE per-server (633 portal); config.prod.xml di
+        //   repo pun TAK punya <pageroles>. Tanpa default kode, di stage prod
+        //   $config->pageroles = [] → SEMUA privilege jadi "unknown" → fail-closed
+        //   mengunci seluruh halaman ber-gate fleet. Default kode mencegah itu.
+        // - $config->pageroles = override sadar per-server (bila ada).
+        // - pageroles.xml per-app = override per-app (mis. gov2login member=3).
+        //   Dulu custom yang tak menyebut <closed>/<developer> membuat level itu
+        //   null→0 → authenticate('closed') di owner/webmaster lolos ke SEMUA user
+        //   login (bocor); merge mengembalikannya dari default.
         $_customPageroles = $this->readXML($pageID, "pageroles");
-        $_pageRole = $_customPageroles ? (array)$_customPageroles : (array)$config->pageroles;
+        $_pageRole = array_merge(
+            self::DEFAULT_PAGE_ROLES,
+            (array)$config->pageroles,
+            $_customPageroles ? (array)$_customPageroles : []
+        );
+
+        // Fail-closed: privilege yang tetap tak punya level setelah merge = tolak.
+        // Tanpa ini, level null→0 → semua lolos. 'maintenance' sengaja bukan level
+        // (ditangani cabang khusus di bawah), jadi dikecualikan. Contoh yang kini
+        // ditutup: authenticate('owner') — 'owner' adalah ROLE user, bukan
+        // privilege halaman, dan tak pernah terdefinisi di pageroles mana pun.
+        if (!isset($_pageRole[$_privilege]) && $_privilege != 'maintenance') {
+            throw new \Exception("UnknownPrivilege:Level akses '" . $_privilege . "' tidak terdefinisi, akses ditolak. Silakan hubungi Admin");
+        }
+
+        $_userRole = $this->getRoleLevel('member', 'role');
 
         $_role = $this->checkSuperuser();
         if ($_role) {
@@ -502,6 +547,11 @@ class gov2session extends dsnSource
 
             if (is_object($_data)) {
                 if ($_data->share ?? false) {
+                    // R0 role-framework: share rusak (app target sudah tak ada, mis.
+                    // rokuone/sdi) dulu fatal SuperUserShareFileNotExist dan mematikan
+                    // seluruh halaman ber-gate app itu. Kini log + abaikan file:
+                    // return null = seolah tak ada file custom (superuser → tidak ada
+                    // superuser; pageroles/dataroles → fallback config default).
                     $shared_file = __DIR__ . "/../../apps/{$_data->share}/xml/{$file}.xml";
                     if (file_exists($shared_file)) {
                         $shared_file_list = simplexml_load_file(
@@ -512,10 +562,12 @@ class gov2session extends dsnSource
                         if (is_object($shared_file_list)) {
                             $_data = $shared_file_list;
                         } else {
-                            throw new \Exception('InvalidSuperuserShareFile:' . $shared_file);
+                            error_log("gov2session::readXML: share '{$_data->share}' utk {$file}.xml tidak valid ({$shared_file}) — file diabaikan");
+                            return null;
                         }
                     } else {
-                        throw new \Exception('SuperUserShareFileNotExist:' . $shared_file);
+                        error_log("gov2session::readXML: share '{$_data->share}' utk {$file}.xml tidak ditemukan ({$shared_file}) — file diabaikan");
+                        return null;
                     }
                 }
             }

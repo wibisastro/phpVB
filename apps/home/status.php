@@ -2,6 +2,9 @@
 
 class status {
     function __construct () {
+        // R0 role-framework: keputusan Wibi 20 Jul — apps/home ber-gate guest.
+        global $self;
+        $self->ses->authenticate('guest');
     }
 
     function index () {

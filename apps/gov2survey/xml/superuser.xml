@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- R0 role-framework: dulu <share>rokuone</share> — app rokuone sudah tidak ada
+     sehingga checkSuperuser() fatal SuperUserShareFileNotExist di semua halaman
+     ber-gate gov2survey. Kini inline (pola gov2login): tanpa account_id = tidak
+     ada superuser. -->
 <superuser>
-    <share>rokuone</share>
+    <role name="webmaster">
+        <!-- <account_id></account_id> -->
+    </role>
 </superuser>

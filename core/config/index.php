@@ -20,12 +20,25 @@ try {
     $detectedStage = null;
     $serverName = $_SERVER["SERVER_NAME"] ?? '';
 
+    // R0 role-framework: STAGE 'local' mem-bypass SELURUH gate authenticate()
+    // (gov2session.php: cabang STAGE != 'local'). SERVER_NAME mengikuti header
+    // Host (Apache default UseCanonicalName Off), jadi tanpa proteksi ini siapa
+    // pun bisa kirim "Host: localhost" ke server publik → STAGE local → semua
+    // gate mati. Aturan: 'local' HANYA sah bila request dari mesin ini
+    // (REMOTE_ADDR loopback). CLI/phpunit tak punya REMOTE_ADDR → tetap boleh.
+    $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+    $isLoopback = ($remoteAddr === '' || $remoteAddr === '127.0.0.1' || $remoteAddr === '::1');
+
     // 1. localhost → local
-    if ($serverName === 'localhost') {
+    if ($serverName === 'localhost' && $isLoopback) {
         $detectedStage = 'local';
     }
 
-    // 2. XML multi-domain: scan config.*.xml, cari domain yang cocok
+    // 2. XML multi-domain: scan config.*.xml, cari domain yang cocok.
+    //    Stage 'local' dari langkah ini WAJIB loopback juga (config.local.xml
+    //    memuat <localhost> di blok domain — tanpa syarat ini, request remote
+    //    ber-Host localhost akan terpilih 'local' lagi di sini, membatalkan
+    //    proteksi langkah 1).
     if (!$detectedStage) {
         $configFiles = glob(__DIR__."/config.*.xml");
         foreach ($configFiles AS $configPath) {
@@ -33,6 +46,7 @@ try {
             preg_match('/config\.(.+)\.xml$/', basename($configPath), $matches);
             $stage = $matches[1] ?? null;
             if (!$stage) continue;
+            if ($stage === 'local' && !$isLoopback) continue;
 
             $testConfig = simplexml_load_file($configPath);
             if (is_object($testConfig)) {

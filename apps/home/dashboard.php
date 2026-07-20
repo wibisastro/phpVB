@@ -8,6 +8,13 @@
  */
 class dashboard {
 
+    function __construct () {
+        // R0 role-framework: keputusan Wibi 20 Jul — apps/home ber-gate guest
+        // (berlaku juga endpoint json() yang dipanggil axios dashboardAssets).
+        global $self;
+        $self->ses->authenticate('guest');
+    }
+
     function index () {
         global $self,$doc;
         $self->take("components","gov2nav", "setDefaultNav");

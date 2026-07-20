@@ -4,6 +4,10 @@ class crud extends \Gov2lib\api {
 
     function __construct() {
        global $self;
+       // R0 role-framework: apps/home ber-gate guest (keputusan Wibi 20 Jul).
+       // Konstruktor = gate untuk SEMUA cmd termasuk POST add/update/del &
+       // GET table/count — tanpa ini endpoint CRUD daftar_aset terbuka anon.
+       $self->ses->authenticate('guest');
 	   $self->takeAll("components");
        parent::__construct();
        $self->scrollInterval=300;

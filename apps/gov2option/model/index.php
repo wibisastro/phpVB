@@ -151,8 +151,11 @@ class index extends \Gov2lib\crudHandler {
         $result['parent_id'] = $self->ses->val['unit_parent_id'] ?? null;
         $result['portal'] = $self->ses->val['opd'] ?? '';
 
+        // R0 role-framework: predikat lock HARUS komplemen allow-list changePortal
+        // (admin/webmaster/owner/developer). Dulu hanya lock ''/'member' → role
+        // 'guest' dapat picker interaktif padahal tiap pilihan ditolak server.
         $role = $result['userRole'];
-        if ($role === '' || $role === 'member') {
+        if (!in_array($role, ['admin', 'webmaster', 'owner', 'developer'], true)) {
             $result['locked'] = true;
         }
 
@@ -164,22 +167,44 @@ class index extends \Gov2lib\crudHandler {
     {
         global $self, $doc;
         $unitId = (int)($vars['id'] ?? 0);
-        $portal = $_GET['portal'] ?? '';
-        $unitNama = $_GET['nama'] ?? '';
-        $parentId = (int)($_GET['parent_id'] ?? 0);
 
-        if ($unitId && $unitNama) {
-            $self->ses->val['opd_id'] = $unitId;
-            $self->ses->val['opd'] = $portal;
-            $self->ses->val['portal_nama'] = $unitNama;
-            $self->ses->val['unit_nama'] = $unitNama;
-            $self->ses->val['unit_id'] = $unitId;
-            $self->ses->val['unit_parent_id'] = $parentId;
-            $self->ses->val['change_portal'] = 1;
-            $self->ses->sesSave($self->ses->val);
+        // R0 role-framework: konteks instansi TIDAK ditulis dari query string.
+        // (1) Hanya role admin+ yang boleh ganti konteks (mirror lock
+        //     getUnitKerjaConfig; STAGE local bypass ikut konvensi authenticate).
+        // (2) Unit wajib ada di tabel instansi portal ini; nama/portal/parent_id
+        //     diambil dari row DB, parameter GET nama/portal diabaikan.
+        if (STAGE != 'local') {
+            $role = $self->ses->val['userRole'] ?? '';
+            if (!in_array($role, ['admin', 'webmaster', 'owner', 'developer'], true)) {
+                $this->exceptionHandler("Unauthorized:UserRole akun Anda tidak memiliki wewenang mengganti konteks instansi");
+                return $doc->responseGet(['status' => 'denied']);
+            }
         }
 
-        return $doc->responseGet(['status' => 'ok', 'unit_id' => $unitId, 'unit_nama' => $unitNama]);
+        $row = null;
+        if ($unitId) {
+            try {
+                $q = "SELECT id, parent_id, nama, portal FROM {$this->tbl->instansi} WHERE id=%i";
+                $row = \DB::queryFirstRow($q, $unitId);
+            } catch (\MeekroDBException $e) {
+                $this->exceptionHandler($e->getMessage());
+            }
+        }
+
+        if (!is_array($row)) {
+            return $doc->responseGet(['status' => 'invalid', 'unit_id' => $unitId, 'unit_nama' => '']);
+        }
+
+        $self->ses->val['opd_id'] = (int)$row['id'];
+        $self->ses->val['opd'] = (string)($row['portal'] ?? '');
+        $self->ses->val['portal_nama'] = (string)$row['nama'];
+        $self->ses->val['unit_nama'] = (string)$row['nama'];
+        $self->ses->val['unit_id'] = (int)$row['id'];
+        $self->ses->val['unit_parent_id'] = (int)($row['parent_id'] ?? 0);
+        $self->ses->val['change_portal'] = 1;
+        $self->ses->sesSave($self->ses->val);
+
+        return $doc->responseGet(['status' => 'ok', 'unit_id' => (int)$row['id'], 'unit_nama' => (string)$row['nama']]);
     }
 
     #---coded by claude
