@@ -1,0 +1,41 @@
+{# View CRUD "aset" — mesin gov2formfield + gov2table (JANGAN diganti markup demo),
+   didandani komponen cube: alert (alerts#1) + card pembungkus (tables#4). Kolom
+   plain (tanpa nama_kategori computed) supaya lewat repo Supabase, bukan SQL MySQL. #}
+
+<div class="px-3">
+
+  {# alerts#1 (info) — penanda demo #}
+  <div class="alert bg-info text-white alert-dismissible fade show" role="alert">
+    <strong>CRUD contoh (skill halaman-cube).</strong> Data di tabel scratch
+    <code>phpvb_demo_aset</code> (gajah) lewat driver Supabase — bukan MySQL.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  {# Form tambah/ubah (mesin) #}
+  <gov2formfield
+    :action="action"
+    :field-url="fieldurl"
+    :default-level="defaultLevel"></gov2formfield>
+
+  {# tables#4 — card pembungkus + mesin gov2table di dalamnya #}
+  <div class="card mb-3">
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <h5 class="card-title m-0">Daftar Aset</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-outer">
+        <div class="table-responsive">
+          <gov2table
+            :is-active="true"
+            :get-url="geturl"
+            :columns="['id','nama','spesifikasi','kategori','jumlah']"
+            :filter-key="searchQuery"
+            :readonly="false"
+            :item-per-page="itemPerPage">
+          </gov2table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

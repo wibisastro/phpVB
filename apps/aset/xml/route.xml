@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+	<route>
+		<method>GET</method>
+		<uri>/aset</uri>
+		<handler>aset\model\aset</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/aset/{cmd}[/{id}]</uri>
+		<handler>aset\model\aset</handler>
+	</route>
+	<route>
+		<method>GET</method>
+		<uri>/aset/{cmd}/{scroll}/[{id}]</uri>
+		<handler>aset\model\aset</handler>
+	</route>
+	<route>
+		<method>POST</method>
+		<uri>/aset</uri>
+		<handler>aset\model\aset</handler>
+	</route>
+</list>
