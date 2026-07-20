@@ -106,8 +106,18 @@ try {
 
     }
 
+    // Tema overlay (rencana/multi-template-bootstrap.md): <template>nama</template>
+    // di config menaruh core/template/{nama} DI DEPAN cube — tema cukup override
+    // file yang perlu (nama file cube* = nama kontrak), sisanya fallback
+    // cube → general. Tanpa config / nama tak valid / folder tak ada = cube.
     $templates=array(__DIR__.'/../template/cube',
                      __DIR__.'/../template/general');
+    $tema = trim((string)($config->template ?? ''));
+    if ($tema !== '' && $tema !== 'cube' && $tema !== 'general'
+        && preg_match('/^[a-z0-9_-]+$/', $tema)
+        && is_dir(__DIR__.'/../template/'.$tema)) {
+        array_unshift($templates, __DIR__.'/../template/'.$tema);
+    }
 
     $vueData['isNavToggle'] = false;
 
