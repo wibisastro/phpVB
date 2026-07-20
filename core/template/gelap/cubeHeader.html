@@ -1,0 +1,159 @@
+<!-- Toggle buttons starts -->
+<div class="d-flex">
+  <button type="button" class="toggle-sidebar">
+    <i class="bi bi-list lh-1"></i>
+  </button>
+  <button type="button" class="pin-sidebar">
+    <i class="bi bi-layout-sidebar lh-1"></i>
+  </button>
+</div>
+<!-- Toggle buttons ends -->
+
+<!-- Notification icon start -->
+{% if _SESSION['account_id'] %}
+<a href="#" class="position-relative d-flex align-items-center justify-content-center lh-1 text-muted" title="Notifikasi" style="padding:0.5rem; font-size:1.25rem; text-decoration:none">
+  <i class="bi bi-bell"></i>
+  <span class="position-absolute badge rounded-pill bg-danger" style="font-size:0.55rem; top:2px; right:2px">
+    3
+  </span>
+</a>
+{% endif %}
+<!-- Notification icon end -->
+
+<!-- App brand sm starts -->
+<div class="app-brand-sm d-lg-none d-flex">
+  <a href="https://{{ _SERVER['SERVER_NAME'] }}">
+    <img src="{{ webroot }}/gelap/images/logo-krisna2.png" class="logo" alt="phpVB" style="max-height: 32px;">
+  </a>
+</div>
+<!-- App brand sm ends -->
+
+<!-- Home button starts -->
+<a href="/" class="d-none d-lg-flex align-items-center justify-content-center lh-1" style="background:var(--bs-tertiary-bg); border:0; padding:0.5rem; font-size:1.25rem; color:var(--bs-primary-text-emphasis); text-decoration:none">
+  <i class="bi bi-house"></i>
+</a>
+<!-- Home button ends -->
+
+<!-- Breadcrumb starts -->
+<div class="d-none d-lg-flex align-items-center">
+  <gov2navbreadcrumb :path-url="pathurl"></gov2navbreadcrumb>
+</div>
+<!-- Breadcrumb ends -->
+
+<!-- App header actions starts -->
+<div class="header-actions">
+
+  <!-- Header action bar starts -->
+  <div class="header-actions-container rounded-4 d-flex align-items-center">
+
+  {% if _SESSION['account_id'] %}
+    <!-- Wilayah indicator start -->
+    <div class="dropdown">
+      <a href="#!" id="topbarWilayah"
+         class="dropdown-toggle d-flex align-items-center header-action-icon"
+         role="button" data-bs-toggle="dropdown" aria-expanded="false"
+         style="font-size:0.85rem; text-decoration:none; color:inherit">
+        <i class="bi bi-geo-alt{% if _SESSION['wilayah_nama'] %}-fill{% endif %}" style="font-size:1rem{% if _SESSION['wilayah_nama'] %}; color:#5b4fb9{% endif %}"></i>
+        {% if _SESSION['wilayah_nama'] %}
+          <span class="text-truncate d-none d-lg-inline ms-1 text-body" style="max-width:140px; font-size:0.8rem">{{ _SESSION['wilayah_nama'] }}</span>
+        {% else %}
+          <span class="d-none d-lg-inline ms-1 text-muted" style="font-size:0.8rem">Wilayah</span>
+        {% endif %}
+      </a>
+      <div class="dropdown-menu dropdown-menu-end shadow-lg" id="topbarWilayahMenu" style="min-width:220px; font-size:0.8rem">
+        {% if _SESSION['wilayah_nama'] %}
+          <div class="px-3 py-2 small">
+            <i class="bi bi-geo-alt-fill text-primary me-1"></i><strong>{{ _SESSION['wilayah_nama'] }}</strong>
+          </div>
+        {% else %}
+          <div class="px-3 py-2 text-muted small">Belum dipilih</div>
+        {% endif %}
+        <div class="dropdown-divider my-1"></div>
+        <a class="dropdown-item small" href="#" onclick="event.preventDefault(); openSidePanel('wilayah')">
+          <i class="bi bi-pencil-square me-2"></i>Pilih Wilayah
+        </a>
+      </div>
+    </div>
+    <!-- Wilayah indicator ends -->
+
+    <span class="vr mx-1 d-none d-lg-inline" style="opacity:0.15"></span>
+
+    <!-- Instansi indicator start -->
+    <a href="#" id="topbarUnitKerja"
+       class="d-flex align-items-center text-decoration-none header-action-icon"
+       style="white-space:nowrap; font-size:0.85rem"
+       data-bs-toggle="tooltip" data-bs-placement="bottom"
+       data-bs-title="{{ _SESSION['unit_nama'] ?: 'Pilih Instansi' }}"
+       onclick="event.preventDefault(); openSidePanel('instansi')">
+      <i class="bi bi-building{% if _SESSION['unit_nama'] %}-fill{% endif %}" style="font-size:1rem{% if _SESSION['unit_nama'] %}; color:#5b4fb9{% endif %}"></i>
+      {% if _SESSION['unit_nama'] %}
+        <span class="text-truncate d-none d-lg-inline ms-1 text-body" style="max-width:160px; font-size:0.8rem">{{ _SESSION['unit_nama'] }}</span>
+      {% else %}
+        <span class="d-none d-lg-inline ms-1 text-muted" style="font-size:0.8rem">Instansi</span>
+      {% endif %}
+    </a>
+    <!-- Instansi indicator ends -->
+
+  {% endif %}
+
+    <!-- User settings start -->
+    <div class="dropdown">
+    {% if _SESSION['account_id'] %}
+      <a id="userSettings" class="dropdown-toggle user-settings" href="#!" role="button"
+        data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="me-2 text-truncate d-lg-block d-none">
+          {{ _SESSION['fullname'] }}
+        </span>
+        <div class="header-actions-avatar fw-bold bg-primary-subtle text-primary">
+          {{ _SESSION['fullname']|first|upper }}
+        </div>
+      </a>
+      <div class="dropdown-menu dropdown-menu-end shadow-lg">
+        {# Role akun — tampilan saja (padanan role SDI: walidata dll menyusul saat refactor role) #}
+        <div class="dropdown-item-text d-flex align-items-center text-muted">
+          <i class="bi bi-person-badge fs-5 me-2"></i>{{ _SESSION['userRole'] }}
+        </div>
+        {# Profil dikelola SSO beo — link KELUAR portal, panah = penanda eksternal #}
+        <a class="dropdown-item d-flex align-items-center" href="/{{ pageID }}/profile">
+          <i class="bi bi-person-circle fs-5 me-2"></i>Profil@Beo
+          <i class="bi bi-box-arrow-up-right ms-auto small text-muted"></i>
+        </a>
+        <a class="dropdown-item d-flex align-items-center" href="#" onclick="event.preventDefault(); openSidePanel('pengaturan')">
+          <i class="bi bi-gear fs-5 me-2"></i>Pengaturan
+        </a>
+        <div class="mx-3 my-2 d-grid">
+          <a href="/{{ pageID }}/logout" class="btn btn-danger">Logout</a>
+        </div>
+      </div>
+    {% else %}
+      <a class="btn btn-sm btn-outline-primary me-2" href="/{{ pageID }}/signup">
+        <i class="bi bi-person-plus me-1"></i>Signup
+      </a>
+      <a class="btn btn-sm btn-primary" href="/{{ pageID }}/login?type=gov2">
+        <i class="bi bi-box-arrow-in-right me-1"></i>Login
+      </a>
+    {% endif %}
+    </div>
+    <!-- User settings end -->
+
+  </div>
+  <!-- Header action bar ends -->
+
+</div>
+<!-- App header actions ends -->
+
+<!-- Wilayah dropdown style -->
+<style>
+#topbarWilayahMenu::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 1rem;
+  width: 12px;
+  height: 12px;
+  background: var(--bs-dropdown-bg, var(--bs-body-bg));
+  border-top: 1px solid var(--bs-border-color-translucent);
+  border-left: 1px solid var(--bs-border-color-translucent);
+  transform: rotate(45deg);
+}
+</style>

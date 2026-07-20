@@ -1,0 +1,72 @@
+/* Tema gelap — skin koreksi dark mode di atas Cube v1.0.7 (main.min.css).
+   Dimuat SETELAH main.min.css oleh core/template/gelap/cubeHead.html; halaman
+   di-set html[data-bs-theme=dark] oleh cubeLayout tema ini.
+   Dua kelas masalah pada CSS vendor:
+   (1) blok [data-bs-theme=dark] bawaan salah nilai --bs-body-bg (tetap terang,
+       padahal kartu/permukaan BS ikut var ini);
+   (2) layer kustom Cube (.sidebar-wrapper, .header-actions-container, menu
+       sidebar, .pin-sidebar) hardcoded warna terang, tidak ikut color mode. */
+
+[data-bs-theme=dark] {
+  --bs-body-bg: #16171d;
+  --bs-body-bg-rgb: 22, 23, 29;
+}
+
+/* Permukaan kustom Cube yang hardcoded putih */
+[data-bs-theme=dark] .sidebar-wrapper,
+[data-bs-theme=dark] .header-actions-container {
+  background-color: #1d1e26;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.35);
+}
+
+/* Blob dekoratif di belakang sidebar (sidebar-bg.svg) diredupkan */
+[data-bs-theme=dark] .main-container:before {
+  opacity: 0.3;
+}
+
+/* Menu sidebar: teks/ikon/border warna terang → token dark */
+[data-bs-theme=dark] .sidebar-menu > li > a,
+[data-bs-theme=dark] .sidebar-menu .treeview-menu > li > a {
+  color: var(--bs-body-color);
+}
+[data-bs-theme=dark] .sidebar-menu > li:hover > a,
+[data-bs-theme=dark] .sidebar-menu > li.active > a {
+  color: var(--bs-emphasis-color);
+  background: rgba(255, 255, 255, 0.06);
+}
+[data-bs-theme=dark] .sidebar-menu > li > a > i {
+  border-color: var(--bs-border-color);
+}
+[data-bs-theme=dark] .sidebar-menu > li.active > a i {
+  border-color: #5b4fb9;
+  color: var(--bs-emphasis-color);
+}
+[data-bs-theme=dark] .sidebar-menu > li.treeview.active > a:after {
+  color: var(--bs-body-color);
+}
+[data-bs-theme=dark] .sidebar-menu .treeview-menu > li > a {
+  border-left-color: var(--bs-border-color);
+}
+[data-bs-theme=dark] .sidebar-menu .treeview-menu > li > a:hover,
+[data-bs-theme=dark] .sidebar-menu .treeview-menu > li > a.active-sub {
+  color: var(--bs-primary-text-emphasis);
+  border-left-color: var(--bs-primary-text-emphasis);
+}
+/* .current-page dibiarkan: bg #5b4fb9 + teks putih, kontras cukup di dark */
+
+/* Tombol pin sidebar (chip putih di header) */
+[data-bs-theme=dark] .pin-sidebar {
+  background: var(--bs-tertiary-bg);
+}
+[data-bs-theme=dark] .pin-sidebar i {
+  color: var(--bs-primary-text-emphasis);
+}
+
+[data-bs-theme=dark] .user-settings {
+  border-left-color: var(--bs-border-color);
+}
+
+/* Halaman maintenance: satu-satunya bg terang hardcoded lain yang dirender */
+[data-bs-theme=dark] .maintenance-container {
+  background-color: var(--bs-body-bg);
+}

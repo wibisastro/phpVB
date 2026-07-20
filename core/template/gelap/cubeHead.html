@@ -1,0 +1,114 @@
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+<title>{{ pageTitle }} - phpVB</title>
+
+<!-- Favicon -->
+{%
+	if pageID == 'dpdraft2'
+	or pageID == 'dpaktif2'
+	or pageID == 'dpsnapshot2'
+	or pageID == 'dppublik2'
+	or pageID == 'dppindah2'
+	or pageID == 'apisidalih'
+	or pageID == 'apitahapan'
+	or pageID == 'apitps'
+	or pageID == 'apiwilayah'
+	or pageID == 'apidparsip'
+	or pageID == 'apidpsnapshot'
+	or pageID == 'boardsidalih'
+	or pageID == 'boardtahapan'
+	or pageID == 'boardtps'
+	or pageID == 'boardwilayah'
+	or pageID == 'sidalih'
+%}
+	<link type="image/x-icon" href="{{ webroot }}/images/logo-sidalih.png" rel="shortcut icon" />
+{% else %}
+	<link type="image/x-icon" href="{{ webroot }}/images/logo-krisna.png" rel="shortcut icon" />
+{% endif %}
+
+<!-- Cube Theme CSS (includes Bootstrap) — aset tema gelap -->
+<link rel="stylesheet" href="{{ webroot }}/gelap/fonts/bootstrap-icons.min.css" />
+<link rel="stylesheet" href="{{ webroot }}/gelap/css/main.min.css" />
+<!-- Skin gelap: koreksi hardcode terang Cube utk data-bs-theme="dark" -->
+<link rel="stylesheet" href="{{ webroot }}/gelap/css/skin.css" />
+
+<!-- Overlay Scrollbar CSS -->
+<link rel="stylesheet" href="{{ webroot }}/gelap/js/overlay-scroll/OverlayScrollbars.min.css" />
+
+<!-- phpVB core bundle CSS (Vue 3 komponen inti) -->
+<link type="text/css" rel="stylesheet" href="{{ webroot }}/dist/style.css?v=5.1.2" />
+
+<!-- App-specific CSS -->
+{# <link rel="stylesheet" type="text/css" href="{{ webroot }}/{{ pageID }}/css/custom.css"/> #}
+
+<style>
+  .saas-frame iframe { width: 100%; min-height: 80vh; border: 0; }
+  body { font-family: 'Poppins', sans-serif; }
+  .page-title { font-family: 'Source Serif 4', serif; }
+
+  /* Markdown rendered tables */
+  .readme-content table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+  .readme-content th,
+  .readme-content td { border: 1px solid var(--bs-border-color, #dee2e6); padding: 0.625rem 0.75rem; vertical-align: top; }
+  .readme-content thead th { background-color: var(--bs-secondary-bg, #e9ecef); font-weight: 600; }
+  .readme-content tbody tr:hover { background-color: var(--bs-secondary-bg, #e9ecef); }
+</style>
+
+<!-- Handsontable -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css">
+
+<!-- Google Fonts -->
+<link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
+<link href="https://fonts.googleapis.com/css?family=Philosopher&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Berkshire+Swash&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome (legacy support) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="//cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css">
+
+<!-- phpVB core bundle: Vue 3 + mitt eventBus + vue3-sfc-loader + komponen inti -->
+<script src="{{ webroot }}/dist/main.js?v=5.1.2"></script>
+<script src="{{ webroot }}/js/axios.min.js"></script>
+<script>
+(function(){
+    var baseURL = "{{ protocol }}://{{ _SERVER.SERVER_NAME }}";
+    axios.defaults.baseURL = baseURL;
+    var csrfToken = "{{ csrfToken|default('') }}";
+    if (csrfToken) { axios.defaults.headers.common['X-Gov2-Csrf'] = csrfToken; }
+    axios.interceptors.request.use(function(config) {
+        if (config.url && !config.url.match(/^https?:\/\//) && config.url.charAt(0) !== '/') {
+            // URL relatif diresolusi terhadap URL halaman (perilaku axios
+            // pra-3b tanpa baseURL) — BUKAN dipaksa root-absolute: halaman
+            // iframe /gov2option/{app}/setup memanggil "option/table/..."
+            // yang harus mendarat di bawah path halaman (route lama)
+            config.url = new URL(config.url, window.location.href).href;
+        }
+        return config;
+    });
+})();
+</script>
+<script src="{{ webroot }}/js/gov2form.js"></script>
+<script src="{{ webroot }}/js/iframeResizer.min.js"></script>
+
+<!-- Handsontable JS -->
+<script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+
+<!-- Chart JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js"></script>
+<!-- Lodash -->
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+
+<!-- Markdown renderer + sanitizer (for cube-chat-rag and other markdown surfaces) -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.11/dist/purify.min.js"></script>
+
+<script src="{{ webroot }}/gelap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Overlay Scrollbar JS (vanilla, tanpa jQuery) -->
+<script src="{{ webroot }}/gelap/js/overlay-scroll/OverlayScrollbars.min.js"></script>
+<script src="{{ webroot }}/gelap/js/overlay-scroll/custom-scrollbar.js"></script>
