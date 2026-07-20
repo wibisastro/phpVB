@@ -1,0 +1,38 @@
+{# Halaman contoh chart — uji jalur VENDOR skill halaman-cube.
+   Komponen katalog (Cube v1.0.7): apex#6 (Area Graph) + apex#3 (Donut).
+   Markup container diambil dari source; init vanilla theme-aware di
+   grafikAssets.html (bukan glue jQuery demo custom/graphs/*.js). #}
+
+<div class="px-3">
+
+  <div class="row gx-4">
+
+    {# ---- apex#6 Area Graph ---- #}
+    <div class="col-xl-8 col-12">
+      <div class="card mb-3">
+        <div class="card-header">
+          <h5 class="card-title">Kunjungan SSO per Bulan</h5>
+        </div>
+        <div class="card-body">
+          <div class="graph-body">
+            <div id="areaGrafik"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ---- apex#3 Donut ---- #}
+    <div class="col-xl-4 col-12">
+      <div class="card mb-3">
+        <div class="card-header">
+          <h5 class="card-title">Distribusi Metode Login</h5>
+        </div>
+        <div class="card-body d-flex justify-content-center">
+          <div id="donutGrafik"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

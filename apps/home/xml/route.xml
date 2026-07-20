@@ -37,6 +37,11 @@
 	</route>
     <route>
 		<method>GET</method>
+		<uri>/home/grafik</uri>
+		<handler>home\model\grafik</handler>
+	</route>
+    <route>
+		<method>GET</method>
 		<uri>/home/viewer/{cmd}/{file}</uri>
 		<handler>home\model\viewer</handler>
 	</route>
