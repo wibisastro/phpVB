@@ -1,0 +1,115 @@
+{# Halaman contoh — uji perdana skill halaman-cube.
+   Komponen katalog (Cube v1.0.7): stat card invoice-list#1 · alert alerts#1 ·
+   tabel striped tables#4. Data statis, bukan monitoring nyata. #}
+
+{% set layanan = [
+  {'nama': 'beo',          'domain': 'beo.gov3.id',    'peran': 'SSO / autentikasi',       'status': 'live', 'catatan': 'GoTrue gajah; kontrak session_send 633 portal'},
+  {'nama': 'gajah',        'domain': 'gajah.gov3.id',  'peran': 'Supabase Auth (GoTrue)',  'status': 'live', 'catatan': 'Backend identitas + profiles/memberships'},
+  {'nama': 'lebah',        'domain': 'lebah.gov3.id',  'peran': 'Redmine + git host',      'status': 'live', 'catatan': 'Tiket proyek + remote git'},
+  {'nama': 'kambing',      'domain': 'kambing.gov3.id','peran': 'Nextcloud / vault',       'status': 'live', 'catatan': 'Berbagi berkas + vault kredensial'},
+  {'nama': 'pesut',        'domain': 'pesut.gov3.id',  'peran': 'LiteLLM gateway',         'status': 'dev',  'catatan': 'Menunggu sign-off UI'},
+  {'nama': 'fleet portal', 'domain': '(633 domain)',   'peran': 'Portal instansi gov2',    'status': 'dev',  'catatan': 'Transisi ssonode ke beo (rollout bertahap)'}
+] %}
+
+<div class="px-3">
+
+  {# ---- Stat cards — invoice-list#1 ---- #}
+  <div class="row gx-4">
+    <div class="col-xl-3 col-sm-6 col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h6 class="mb-3">Layanan Terdaftar</h6>
+          <h2 class="mb-2 d-flex align-items-center justify-content-between">
+            <i class="bi bi-hdd-stack fs-3 lh-1 bg-primary p-3 rounded-3 text-white"></i>
+            <span class="text-primary">{{ layanan|length }}</span>
+          </h2>
+          <p class="m-0 small">Ekosistem gov3</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h6 class="mb-3">Live</h6>
+          <h2 class="mb-2 d-flex align-items-center justify-content-between">
+            <i class="bi bi-check-circle fs-3 lh-1 bg-success p-3 rounded-3 text-white"></i>
+            <span class="text-success">4</span>
+          </h2>
+          <p class="m-0 small">Berjalan produksi</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h6 class="mb-3">Dalam Pengembangan</h6>
+          <h2 class="mb-2 d-flex align-items-center justify-content-between">
+            <i class="bi bi-tools fs-3 lh-1 bg-warning p-3 rounded-3 text-white"></i>
+            <span class="text-warning">2</span>
+          </h2>
+          <p class="m-0 small">Menuju rilis</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 col-12">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h6 class="mb-3">Insiden</h6>
+          <h2 class="mb-2 d-flex align-items-center justify-content-between">
+            <i class="bi bi-exclamation-triangle fs-3 lh-1 bg-danger p-3 rounded-3 text-white"></i>
+            <span class="text-danger">0</span>
+          </h2>
+          <p class="m-0 small">Tidak ada gangguan</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ---- Alert — alerts#1 (varian info) ---- #}
+  <div class="alert bg-info text-white alert-dismissible fade show" role="alert">
+    Halaman contoh <strong>uji perdana skill halaman-cube</strong> — data statis, bukan monitoring nyata.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  {# ---- Tabel — tables#4 (Table Striped) ---- #}
+  <div class="card mb-3">
+    <div class="card-header">
+      <h5 class="card-title">Layanan Ekosistem Gov3</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-outer">
+        <div class="table-responsive">
+          <table class="table table-striped truncate m-0">
+            <thead>
+              <tr>
+                <th>Layanan</th>
+                <th>Domain</th>
+                <th>Peran</th>
+                <th>Status</th>
+                <th>Catatan</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for l in layanan %}
+              <tr>
+                <td class="fw-semibold">{{ l.nama }}</td>
+                <td class="text-primary">{{ l.domain }}</td>
+                <td>{{ l.peran }}</td>
+                <td>
+                  {% if l.status == 'live' %}
+                  <span class="badge bg-success">LIVE</span>
+                  {% else %}
+                  <span class="badge bg-warning">DEV</span>
+                  {% endif %}
+                </td>
+                <td class="small">{{ l.catatan }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

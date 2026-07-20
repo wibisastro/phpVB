@@ -32,6 +32,11 @@
 	</route>
     <route>
 		<method>GET</method>
+		<uri>/home/status</uri>
+		<handler>home\model\status</handler>
+	</route>
+    <route>
+		<method>GET</method>
 		<uri>/home/viewer/{cmd}/{file}</uri>
 		<handler>home\model\viewer</handler>
 	</route>
