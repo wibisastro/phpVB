@@ -89,41 +89,29 @@ class member extends \Gov2lib\crudHandler {
     }
     */
     function roleBrowse ($superUser) {
-        global $self, $uri;
-        $role_level = ['guest' => 1, 'member' => 2, 'admin' => 3, 'webmaster' => 4];
-        $current_level = $role_level[$self->ses->val['userRole']];
-        try {
-            $_member = \DB::query("DESCRIBE member");
-            foreach ($_member as $_column) {
-                if ($_column['Field']=="role") {
-                    $_result=str_replace("enum(","",$_column['Type']);
-                    $_result=str_replace(")","",$_result);
-                    $_result=str_replace("'","",$_result);
-                    $_result=explode(",",$_result);
-                    break;
-                }
+        global $self;
+        // R1 role-framework: daftar role assignable dari enum UserRole
+        // (kanonik) — bukan DESCRIBE member + peta hardcode. Set assignable
+        // tetap dibatasi guest..webmaster seperti sebelumnya (owner/developer
+        // tak pernah bisa di-assign lewat UI ini). Key = level kanonik
+        // (identik dgn posisi enum DB lama: guest=1..webmaster=4).
+        // Perbaikan ikutan: user ber-role owner/developer dulu bikin peta
+        // hardcode meledak (key tak ada → daftar kosong/undefined); kini
+        // levelnya sah (5/6) dan melihat seluruh daftar assignable.
+        $_current = \Gov2lib\Enums\UserRole::fromName((string)($self->ses->val['userRole'] ?? ''))->level();
+        $_assignable = [
+            \Gov2lib\Enums\UserRole::GUEST,
+            \Gov2lib\Enums\UserRole::MEMBER,
+            \Gov2lib\Enums\UserRole::ADMIN,
+            \Gov2lib\Enums\UserRole::WEBMASTER,
+        ];
+        $_result = [];
+        foreach ($_assignable as $_role) {
+            $_allowed = $superUser ? ($_current >= $_role->level()) : ($_current > $_role->level());
+            if ($_allowed) {
+                $_result[$_role->level()] = $_role->value;
             }
-            $_buffer=array_flip($_result);
-            foreach ($_result as $_key => $_val) {
-//                if ($_key <= $_buffer[$self->ses->val['userRole']]) {
-                if($superUser){
-                    if (isset($role_level[$_val]) && ($current_level >= $role_level[$_val])) {
-                        $_reorder[$_key+1]=$_val;
-                    }
-                }else{
-                    if (isset($role_level[$_val]) && ($current_level > $role_level[$_val])) {
-                        $_reorder[$_key+1]=$_val;
-                    }
-                }
-//                else {
-//                    break;
-//                }
-            }
-
-            $_result=$_reorder;
-        } catch (\MeekroDBException $e) {
-			$this->exceptionHandler($e->getMessage().":".$uri);
-		}
+        }
         return $_result;
     }
     

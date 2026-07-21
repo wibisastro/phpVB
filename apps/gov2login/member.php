@@ -4,12 +4,19 @@ class member {
 
     public $page_role = 'webmaster';
 
-    function __construct () {  
+    function __construct () {
 		global $self,$vars, $doc;
 
         $self->takeAll("components");
         $self->fields = $self->gov2formfield->getFields(__DIR__."/json/member.json");
-        $self->ses->authenticate($vars['role']);
+        // {role} di URL menentukan privilege gate — 'public' di-clamp ke
+        // 'guest' (R1 role-framework): 'public' mem-bypass login sepenuhnya,
+        // padahal controller ini memuat cmd mutasi (del/update/setTag);
+        // tanpa clamp, POST /gov2login/user/public cmd=del bisa dieksekusi
+        // ANON. Halaman daftar "role public" memang tak pernah ada (bukan
+        // role DB). Gate per-cmd berbasis target = agenda R2.
+        $_gate = ($vars['role'] ?? '') === 'public' ? 'guest' : $vars['role'];
+        $self->ses->authenticate($_gate);
         $self->scrollInterval = 100;
     }
     
@@ -236,27 +243,22 @@ class member {
         return $self->getBrowseTags($id, 'unit', 'member', '', 'fullname');
     }
 
+    /**
+     * Gate tulis tagging unit (setTag/unsetTag): wewenang role LOKAL portal
+     * aktif, dibaca via enum UserRole (R1 role-framework) — bukan lagi angka
+     * pageroles.xml. Jalur lintas-DSN lama (get_user_unit ke portal unit
+     * target, sistem role per-unit) dihapus: mati sejak UI role-tagging
+     * dinonaktifkan; kebutuhan multi-instansi dilayani memberships (R4).
+     * Delta sadar: owner/developer kini lolos (dulu terblokir karena tak ada
+     * di peta XML gov2login → level 0); webmaster portal LAIN tak lagi diakui.
+     */
     function authorized ($unit_id)
     {
-        global $self, $doc, $pageID;
-
-        $_pageroles = $self->get_xml('pageroles');
+        global $self;
 
         $user = $self->get_user(['account_id' => $self->ses->val['account_id']]);
 
-        $user_role = intval($_pageroles->{$user['role']});
-        $page_role = intval($_pageroles->{$this->page_role});
-
-        $unitkerja = $self->get_unitkerja($unit_id);
-
-        if ($user_role < $page_role) {
-            $user_unit = $self->get_user_unit($self->ses->val['account_id'], $unitkerja['portal']);
-            $user_unit_role = intval($_pageroles->{$user_unit['role']});
-            if ($user_unit_role >= $page_role) {
-                return true;
-            }
-            return false;
-        }
-        return true;
+        return \Gov2lib\Enums\UserRole::fromName((string)($user['role'] ?? ''))->level()
+            >= \Gov2lib\Enums\UserRole::fromName($this->page_role)->level();
     }
 }

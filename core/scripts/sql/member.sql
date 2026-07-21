@@ -27,6 +27,15 @@ SET time_zone = "+00:00";
 --
 -- Table structure for table `member`
 --
+-- R1 role-framework (21 Jul 2026): enum role disamakan dgn taksonomi kanonik
+-- 6-nilai (apps/gov2login/sql/member.sql). Portal lama hasil dump 4-nilai
+-- migrasi manual:
+--   ALTER TABLE member MODIFY role
+--     enum('guest','member','admin','webmaster','owner','developer')
+--     NOT NULL DEFAULT 'guest';
+-- Sejak R1 gate TIDAK lagi membaca urutan enum DB (level dari enum UserRole),
+-- tapi kolom tetap harus bisa MENYIMPAN keenam nilai.
+--
 
 CREATE TABLE `member` (
   `id` mediumint(8) UNSIGNED NOT NULL,
@@ -34,7 +43,7 @@ CREATE TABLE `member` (
   `fullname` char(32) NOT NULL DEFAULT '',
   `email` char(64) NOT NULL DEFAULT '',
   `status` enum('pending','active','suspended') NOT NULL DEFAULT 'pending',
-  `role` enum('guest','member','admin','webmaster') NOT NULL DEFAULT 'guest',
+  `role` enum('guest','member','admin','webmaster','owner','developer') NOT NULL DEFAULT 'guest',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `lastlogin_at` datetime NOT NULL DEFAULT current_timestamp(),
   `counter` mediumint(8) UNSIGNED NOT NULL DEFAULT 0,

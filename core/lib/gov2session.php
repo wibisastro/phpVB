@@ -7,6 +7,8 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Gov2lib\Enums\UserRole;
+use Gov2lib\Enums\PagePrivilege;
 
 /*
 Author		: Wibisono Sastrodiwiryo
@@ -23,24 +25,6 @@ Version		: 0.1.0 28 Feb 2026, [claude] extract handleAuthorization() dari authen
 */
 class gov2session extends dsnSource
 {
-    /**
-     * Peta privilege halaman kanonik (default framework, R0 role-framework).
-     * Basis merge di handleAuthorization() — selalu ada meski config.{stage}.xml
-     * instance server tak mendefinisikan <pageroles>. Level mengikuti urutan
-     * enum role DB (member.sql): guest<member<admin<webmaster<owner<developer.
-     * 'closed' = privilege "menu ditutup" (butuh level owner=5), BUKAN role user.
-     * 'maintenance' sengaja bukan level (ditangani cabang khusus, tak pernah
-     * dibandingkan). R1 akan memindah sumber ini ke enum PagePrivilege.
-     */
-    private const DEFAULT_PAGE_ROLES = [
-        'guest' => 1,
-        'member' => 2,
-        'admin' => 3,
-        'webmaster' => 4,
-        'closed' => 5,
-        'developer' => 6,
-    ];
-
     public \GuzzleHttp\Client $client;
     public int $timeout = 0;
     public array $val = [];
@@ -126,6 +110,10 @@ class gov2session extends dsnSource
 
     /**
      * Get role level mapping from database table
+     *
+     * R1 role-framework: JANGAN dipakai untuk hierarki role user — sumber
+     * otoritatifnya enum UserRole. Sisa pemakaian sah tinggal metadata
+     * struktur non-role (privilegeRead: level_label tabel wilayah dsb).
      */
     public function getRoleLevel(string $table, string $levelName): array
     {
@@ -185,7 +173,7 @@ class gov2session extends dsnSource
                             match ($this->val['status']) {
                                 'pending' => throw new \Exception("Pending:Akun Anda belum aktif, silahkan aktivasi terlebih dahulu"),
                                 'suspended' => throw new \Exception("Suspended:Akun Anda terblokir, silakan hubungi Admin"),
-                                default => $this->handleAuthorization($pageID, $doc, $config, $_privilege),
+                                default => $this->handleAuthorization($pageID, $doc, $config, $_privilege, $_maintenance),
                             };
                         }
                     } else {
@@ -213,7 +201,7 @@ class gov2session extends dsnSource
                                 match ($this->val['status']) {
                                     'pending' => throw new \Exception("Pending:Akun Anda belum aktif, silahkan aktivasi terlebih dahulu"),
                                     'suspended' => throw new \Exception("Suspended:Akun Anda terblokir, silakan hubungi Admin"),
-                                    default => $this->handleAuthorization($pageID, $doc, $config, $_privilege),
+                                    default => $this->handleAuthorization($pageID, $doc, $config, $_privilege, $_maintenance),
                                 };
                             }
                         }
@@ -237,52 +225,83 @@ class gov2session extends dsnSource
 
     /**
      * Handle authorization checks for user roles
+     *
+     * R1 role-framework: SATU sumber hierarki. Level user dibaca dari enum
+     * UserRole (otoritatif) — bukan lagi DESCRIBE tabel member; peta privilege
+     * halaman berbasis PagePrivilege::defaultMap() dari enum yang sama — bukan
+     * lagi angka XML. XML tinggal override sadar (deprecated, ber-log).
      * #---coded by claude (extracted from authenticate(), logic original by wibi)
      */
-    private function handleAuthorization(string $pageID, object $doc, object $config, string $_privilege): void
+    private function handleAuthorization(string $pageID, object $doc, object $config, string $_privilege, string $_maintenance = ""): void
     {
-        // R0 role-framework: peta privilege halaman = MERGE tiga lapis
-        // (default framework → override config server → override per-app), bukan
-        // mengganti total. Rasional tiap lapis:
-        // - DEFAULT_PAGE_ROLES di KODE = sumber selalu-ada. config.{stage}.xml
-        //   adalah config INSTANCE per-server (633 portal); config.prod.xml di
-        //   repo pun TAK punya <pageroles>. Tanpa default kode, di stage prod
-        //   $config->pageroles = [] → SEMUA privilege jadi "unknown" → fail-closed
-        //   mengunci seluruh halaman ber-gate fleet. Default kode mencegah itu.
-        // - $config->pageroles = override sadar per-server (bila ada).
-        // - pageroles.xml per-app = override per-app (mis. gov2login member=3).
-        //   Dulu custom yang tak menyebut <closed>/<developer> membuat level itu
-        //   null→0 → authenticate('closed') di owner/webmaster lolos ke SEMUA user
-        //   login (bocor); merge mengembalikannya dari default.
+        // Peta privilege = MERGE tiga lapis DI ATAS peta kanonik enum:
+        //   PagePrivilege::defaultMap() → <pageroles> config server → pageroles.xml per-app
+        // - defaultMap() di KODE = sumber selalu-ada (config.{stage}.xml adalah
+        //   config INSTANCE per-server; config.prod.xml repo tak punya
+        //   <pageroles> — tanpa basis kode, fail-closed mengunci fleet).
+        // - Dua lapis XML = override sadar per-server / per-app (mis. gov2login
+        //   member=3). Deprecated sejak R1: tiap penyimpangan dari kanonik
+        //   di-log sebagai penanda migrasi, hasil EFEKTIF-nya dipertahankan.
         $_customPageroles = $this->readXML($pageID, "pageroles");
+        $_defaultMap = PagePrivilege::defaultMap();
         $_pageRole = array_merge(
-            self::DEFAULT_PAGE_ROLES,
+            $_defaultMap,
             (array)$config->pageroles,
             $_customPageroles ? (array)$_customPageroles : []
         );
 
-        // Fail-closed: privilege yang tetap tak punya level setelah merge = tolak.
-        // Tanpa ini, level null→0 → semua lolos. 'maintenance' sengaja bukan level
-        // (ditangani cabang khusus di bawah), jadi dikecualikan. Contoh yang kini
-        // ditutup: authenticate('owner') — 'owner' adalah ROLE user, bukan
-        // privilege halaman, dan tak pernah terdefinisi di pageroles mana pun.
-        if (!isset($_pageRole[$_privilege]) && $_privilege != 'maintenance') {
+        // Log peringatan (sekali per app per proses) bila lapisan XML MENGUBAH
+        // level kanonik atau menambah nama non-kanonik (mis. 'default').
+        static $_warnedApps = [];
+        if (!isset($_warnedApps[$pageID])) {
+            $_warnedApps[$pageID] = true;
+            $_diff = [];
+            foreach ($_pageRole as $_name => $_level) {
+                if (!isset($_defaultMap[$_name]) || (int)$_level !== $_defaultMap[$_name]) {
+                    $_diff[] = $_name . '=' . (int)$_level;
+                }
+            }
+            if ($_diff) {
+                error_log("gov2session: pageroles app '{$pageID}' menyimpang dari kanonik (" . implode(',', $_diff) . ") — angka XML deprecated sejak R1 role-framework, migrasikan ke nama privilege kanonik");
+            }
+        }
+
+        // Fail-closed (R0): privilege tanpa level setelah merge = tolak. Dengan
+        // peta kanonik dari enum, SEMUA nama role sah (public..developer,
+        // termasuk 'owner' yang dulu tak terdefinisi) kini privilege valid;
+        // yang ditolak tinggal nama asing ('sdi', typo). 'maintenance' sengaja
+        // di luar peta (cabang khusus di bawah).
+        // $_privilege bisa datang dari segmen URL (authenticate($vars['role']))
+        // — bersihkan newline (anti log injection) + potong sebelum masuk log.
+        $_privLog = substr(str_replace(["\r", "\n"], ' ', $_privilege), 0, 64);
+        // Fail-closed juga utk level NON-NUMERIK (typo config, mis.
+        // <webmaster>x</webmaster>): tanpa guard ini (int) cast menjadikannya
+        // 0 = terbuka utk semua — kebalikan arah R0 yang kebetulan menolak.
+        if ((!isset($_pageRole[$_privilege]) || !is_numeric((string)$_pageRole[$_privilege]))
+            && $_privilege != PagePrivilege::MAINTENANCE->value) {
+            error_log("gov2session: privilege '{$_privLog}' tak dikenal/level non-numerik utk app '{$pageID}' — ditolak fail-closed");
             throw new \Exception("UnknownPrivilege:Level akses '" . $_privilege . "' tidak terdefinisi, akses ditolak. Silakan hubungi Admin");
         }
 
-        $_userRole = $this->getRoleLevel('member', 'role');
+        // maintenance: selalu menolak, tanpa perbandingan level (tak ada di peta).
+        if ($_privilege == PagePrivilege::MAINTENANCE->value) {
+            throw new \Exception("Maintenance:System sedang dalam peningkatan kapasitas hingga jam " . $_maintenance);
+        }
 
         $_role = $this->checkSuperuser();
         if ($_role) {
             $this->val['userRole'] = $_role;
         }
 
-        if ($_userRole[$this->val['userRole']] < $_pageRole[$_privilege] && $_privilege != 'closed' && $_privilege != 'maintenance') {
-            throw new \Exception("Unauthorized:UserRole akun Anda tidak memiliki wewenang mengakses halaman dengan PageRole " . strtoupper($_privilege) . ". Silakan hubungi Admin");
-        } elseif ($_userRole[$this->val['userRole']] < $_pageRole[$_privilege] && $_privilege == 'closed') {
-            throw new \Exception("Closed:Menu ini ditutup");
-        } elseif ($_privilege == 'maintenance') {
-            throw new \Exception("Maintenance:System sedang dalam peningkatan kapasitas hingga jam " . $_maintenance);
+        // Role tak dikenal (data lama / superuser.xml menyimpang / role domain
+        // lain sebelum mapping R5) → fromName jatuh ke guest + log, bukan fatal.
+        $_userLevel = UserRole::fromName((string)($this->val['userRole'] ?? ''))->level();
+        $_requiredLevel = (int)$_pageRole[$_privilege];
+
+        if ($_userLevel < $_requiredLevel) {
+            throw new \Exception($_privilege == PagePrivilege::CLOSED->value
+                ? "Closed:Menu ini ditutup"
+                : "Unauthorized:UserRole akun Anda tidak memiliki wewenang mengakses halaman dengan PageRole " . strtoupper($_privilege) . ". Silakan hubungi Admin");
         }
     }
 
@@ -344,7 +363,7 @@ class gov2session extends dsnSource
     public function insertMember(): ?int
     {
         global $doc, $config, $pageID;
-        $_role = "guest";
+        $_role = UserRole::GUEST->value;
 
         try {
             $_customDataroles = $this->readXML($pageID, "dataroles");
@@ -407,10 +426,11 @@ class gov2session extends dsnSource
             return false;
         }
 
-        if ($config->domain->attr['level'] == 2) {
-            $_id = $this->parentRead(trim($config->domain->attr['table']), trim($config->domain->attr['id']));
+        $_domainAttr = $config->domain->attr ?? [];
+        if (($_domainAttr['level'] ?? null) == 2) {
+            $_id = $this->parentRead(trim($_domainAttr['table'] ?? ''), trim($_domainAttr['id'] ?? ''));
         } else {
-            $_id = trim($config->domain->attr['id'] ?? '');
+            $_id = trim($_domainAttr['id'] ?? '');
         }
 
         foreach ($_superuser->role as $_roles) {
@@ -466,7 +486,6 @@ class gov2session extends dsnSource
 
         try {
             if (STAGE != 'local') {
-                $_userRole = $this->getRoleLevel('member', 'role');
                 $_privilege = $this->privilegeRead($id, $structure, $level);
 
                 if (!($this->val['privilege'] ?? false)) {
@@ -482,7 +501,7 @@ class gov2session extends dsnSource
                     $doc->body[$structure . '_penugasan'] = $this->val['privilege'][$structure . '_nama'];
                 } elseif (
                     ($this->val['privilege']['authorisation'] ?? null) == 'unauthorized' &&
-                    $_userRole[$this->val['userRole']] <= $_userRole[$role]
+                    UserRole::fromName((string)($this->val['userRole'] ?? ''))->level() <= UserRole::fromName($role)->level()
                 ) {
                     throw new \Exception("Unauthorized:Akun Anda tidak memiliki wewenang di " . ucfirst($this->val['privilege']['level_label']) . " " . $this->val['privilege']['nama'] . ", silakan hubungi Admin");
                 }
