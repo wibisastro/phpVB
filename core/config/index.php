@@ -8,7 +8,14 @@
 *********************************************************************/
 try {
     error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
-    $publickey="c65ca73ce4c38dcec21151aa64f1590c";
+    // Kunci default framework-wide untuk cookie Gov2Session (JWT HS256, kunci
+    // SIMETRIS). Nilai ini ADA di source publik GitHub → siapa pun bisa
+    // menempa cookie (userRole=developer, dst) di server mana pun yang masih
+    // memakainya. Setiap server prod WAJIB override via <publickey> unik di
+    // config.prod.xml; guard di bawah (R2 role-framework) menolak boot prod
+    // yang masih memakai default ini.
+    $defaultPublickey = "c65ca73ce4c38dcec21151aa64f1590c";
+    $publickey = $defaultPublickey;
 
     // Stage detection priority:
     // 1. localhost → local
@@ -83,6 +90,19 @@ try {
     // (K8 #6161) supaya kebocoran salinan beo tak bisa menempa cookie portal lain.
     if (!empty($config->publickey)) {
         $publickey = trim((string)$config->publickey);
+    }
+
+    // Guard R2 role-framework: kunci sesi default TAK BOLEH dipakai di server
+    // publik. 'local' dikecualikan (single-machine, laptop dev). 'prod' →
+    // fatal (halaman error via catch di bawah — mekanisme sama dgn
+    // ConfigFileNotExist, BUKAN white screen); go-live tanpa kunci unik
+    // diblokir. 'dev'/stage lain → warning ber-log (server dev boleh berbagi
+    // sementara, tapi tetap tercatat sebagai utang keamanan).
+    if ($publickey === $defaultPublickey && STAGE !== 'local') {
+        if (STAGE === 'prod') {
+            throw new Exception('PublicKeyDefault:Portal ini masih memakai kunci sesi bawaan framework yang tersebar publik. Set <publickey> unik di config.prod.xml server sebelum go-live.');
+        }
+        error_log('config: STAGE ' . STAGE . ' memakai publickey default framework — cookie Gov2Session bisa ditempa; set <publickey> unik di config.' . STAGE . '.xml');
     }
 
     // Set error reporting based on stage
