@@ -102,8 +102,20 @@ class gov2session extends dsnSource
     public function sesRead(string $data): void
     {
         global $publickey;
-        $_result = JWT::decode($data, new Key($publickey, 'HS256'));
-        $this->val = json_decode(json_encode($_result), true);
+        try {
+            $_result = JWT::decode($data, new Key($publickey, 'HS256'));
+            $this->val = json_decode(json_encode($_result), true);
+        } catch (\Throwable $e) {
+            // Cookie basi (publickey dirotasi per-server #6161, exp lewat, atau
+            // garbage) = TIDAK LOGIN, bukan fatal. Tanpa ini $self->ses tak pernah
+            // di-assign di route.php -> controller "authenticate() on null" (500),
+            // dan /gov2login pun terkunci karena membaca cookie yang sama (#10636).
+            $this->val = [];
+            if (!headers_sent()) {
+                setcookie('Gov2Session', '', time() - 3600, '/');
+            }
+            error_log('gov2session: cookie Gov2Session ditolak (' . get_class($e) . ': ' . $e->getMessage() . ') - sesi direset');
+        }
     }
 
     /**
