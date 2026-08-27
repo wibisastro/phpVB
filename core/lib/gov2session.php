@@ -259,6 +259,12 @@ class gov2session extends dsnSource
     public function memberUpdateCounter(int $id): void
     {
         try {
+            // MeekroDB lazy sejak T4 (#6085): koneksi master baru terkonfigurasi oleh
+            // connectDB(). Cabang authenticate() saat cookie sudah memuat `id`
+            // (request ke-2 dst. setelah login) memanggil method ini SEBELUM
+            // memberRead() → \DB tanpa kredensial → "Access denied for user ''@'localhost'"
+            // → semua halaman/JSON berikutnya 401 (#10637).
+            $this->connectDB('master');
             $_query = "UPDATE LOW_PRIORITY member SET counter=counter+1,lastlogin_at=NOW() WHERE id=%i";
             \DB::query($_query, $id);
         } catch (\MeekroDBException $e) {
