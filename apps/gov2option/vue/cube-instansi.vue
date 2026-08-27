@@ -67,10 +67,9 @@
           <li v-if="treeItems.length === 0" class="list-group-item border-0 px-3 py-2 text-muted small">
             Tidak ada data
           </li>
-          <template v-for="item in treeItems">
+          <template v-for="item in treeItems" :key="item.id">
             <!-- Eselon 1 header: chevron = expand, area nama = pilih -->
-            <li :key="'h-' + item.id"
-                class="list-group-item border-0 p-0"
+            <li class="list-group-item border-0 p-0"
                 :class="{ 'bg-primary-subtle': config.unit_id == item.id }">
               <div class="d-flex align-items-stretch">
                 <button type="button"

@@ -20,8 +20,8 @@
         </div>
         <hr>
         <div class="row">
-            <template v-for="(chunk, index) in survey.pertanyaan">
-                <div class="col-md-6 col-sm-12 bb-1" v-bind:key="index + 1">
+            <template v-for="(chunk, index) in survey.pertanyaan" v-bind:key="index + 1">
+                <div class="col-md-6 col-sm-12 bb-1">
                     <div class="question ms-2 ps-2 pt-2" v-for="(pertanyaan, pindex) in chunk" v-bind:key="pindex + 1">
                         <div class="py-2 h5 fw-bold">{{pertanyaan.nomor}}. {{pertanyaan.nama}}</div>
 
