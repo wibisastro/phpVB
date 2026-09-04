@@ -72,6 +72,11 @@
       <!-- Main container ends -->
 
 <!-- Side Panel Offcanvas starts -->
+    <style>
+      /* Slot kancil butuh ruang lebih lebar dari offcanvas default (400px) */
+      #sidePanelOffcanvas.sidepanel-wide { width: min(50vw, 960px); min-width: 480px; }
+      @media (max-width: 767.98px) { #sidePanelOffcanvas.sidepanel-wide { width: 100vw; min-width: 0; } }
+    </style>
     <div class="offcanvas offcanvas-end" tabindex="-1" id="sidePanelOffcanvas" aria-labelledby="sidePanelLabel">
       <div class="offcanvas-header border-bottom py-2">
         <h6 class="offcanvas-title fw-semibold mb-0" id="sidePanelLabel"></h6>
@@ -100,6 +105,15 @@
             :context='{{ chatRagContext|default('{}')|raw }}'
           ></cube-chat-rag>
         </div>
+        {% if kancilUrl %}
+        {# Slot Kancil: iframe ke kancil.<slug>.gov3.id — src diisi lazy saat
+           openSidePanel('kancil') pertama kali (lihat rencana/sidepanel-kancil-iframe.md) #}
+        <div id="sidePanel-kancil" class="h-100" style="display:none">
+          <iframe id="sidePanelKancilFrame" data-src="{{ kancilUrl }}" title="Kancil"
+                  style="border:0; width:100%; height:100%; display:block"
+                  allow="clipboard-read; clipboard-write"></iframe>
+        </div>
+        {% endif %}
       </div>
     </div>
     <!-- Side Panel Offcanvas ends -->
@@ -152,10 +166,11 @@
       wilayah: '<i class="bi bi-geo-alt me-2"></i>Wilayah',
       instansi: '<i class="bi bi-building me-2"></i>Instansi',
       pengaturan: '<i class="bi bi-gear me-2"></i>Pengaturan',
-      chat: '<i class="bi bi-chat-dots me-2"></i>Chat Dokumen'
+      chat: '<i class="bi bi-chat-dots me-2"></i>Chat Dokumen',
+      kancil: '<span class="me-2 d-inline-flex align-items-center"><svg xmlns="http://www.w3.org/2000/svg" width="1.25em" height="1.25em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><ellipse cx="8.6" cy="6.2" rx="2.1" ry="5.4" transform="rotate(-14 8.6 6.2)"/><ellipse cx="15.4" cy="6.2" rx="2.1" ry="5.4" transform="rotate(14 15.4 6.2)"/><circle cx="12" cy="15.6" r="6.2"/><circle cx="9.7" cy="14.6" r="0.9" fill="var(--bs-body-bg,#fff)"/><circle cx="14.3" cy="14.6" r="0.9" fill="var(--bs-body-bg,#fff)"/></svg></span>Kancil'
     };
     // Toggle panels via DOM
-    var views = ['wilayah', 'instansi', 'pengaturan', 'chat'];
+    var views = ['wilayah', 'instansi', 'pengaturan', 'chat', 'kancil'];
     views.forEach(function(v) {
       var el = document.getElementById('sidePanel-' + v);
       if (el) { el.style.display = (v === view) ? '' : 'none'; }
@@ -163,9 +178,17 @@
     // Update title
     var label = document.getElementById('sidePanelLabel');
     if (label) { label.innerHTML = titles[view] || ''; }
+    // Lazy-load iframe kancil hanya saat panel dibuka pertama kali
+    if (view === 'kancil') {
+      var frame = document.getElementById('sidePanelKancilFrame');
+      if (frame && !frame.getAttribute('src') && frame.dataset.src) {
+        frame.setAttribute('src', frame.dataset.src);
+      }
+    }
     // Open offcanvas
     var panel = document.getElementById('sidePanelOffcanvas');
     if (panel) {
+      panel.classList.toggle('sidepanel-wide', view === 'kancil');
       var bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(panel);
       bsOffcanvas.show();
     }

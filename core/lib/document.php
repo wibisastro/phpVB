@@ -327,6 +327,32 @@ class document extends customException
     }
 
     /**
+     * URL app Kancil untuk slot sidepanel `kancil` (iframe di cubeLayout).
+     * Priority:
+     *   1. $config->platform->kancil   — override URL penuh di config instance
+     *   2. https://kancil.{SERVER_NAME} — auto: acehbaratkab.gov3.id → kancil.acehbaratkab.gov3.id
+     *   3. ""                          — SERVER_NAME tanpa titik (localhost) → menu & slot disembunyikan
+     *
+     * Controller boleh override lebih dulu via $doc->body('kancilUrl', ...).
+     */
+    public function formatKancilUrl(): string
+    {
+        global $config;
+
+        $url = trim((string) ($config->platform->kancil ?? ''));
+        if ($url !== '') {
+            return $url;
+        }
+
+        $host = strtolower(trim((string) ($_SERVER['SERVER_NAME'] ?? '')));
+        if ($host === '' || !str_contains($host, '.') || !preg_match('/^[a-z0-9.-]+$/', $host)) {
+            return '';
+        }
+
+        return "https://kancil.{$host}";
+    }
+
+    /**
      * Format the sidebar brand text. Priority:
      *   1. $config->domain->attr['brand']  — per-domain XML attribute
      *   2. $config->brand                  — global XML element
@@ -547,6 +573,9 @@ class document extends customException
         $this->body('sidebars', $this->sidebar);
         $this->body('sidebarsRight', $this->sidebarRight);
         $this->body('brandText', $this->formatBrand());
+        if (!isset($this->body['kancilUrl'])) {
+            $this->body('kancilUrl', $this->formatKancilUrl());
+        }
 
         // Load top-bar options from database
         if (isset($self) && isset($self->opt) && $pageID) {
