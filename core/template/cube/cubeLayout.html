@@ -108,9 +108,16 @@
         {% if kancilUrl %}
         {# Slot Kancil: iframe ke kancil.<slug>.gov3.id — src diisi lazy saat
            openSidePanel('kancil') pertama kali (lihat rencana/sidepanel-kancil-iframe.md) #}
-        <div id="sidePanel-kancil" class="h-100" style="display:none">
+        <div id="sidePanel-kancil" class="h-100 d-flex flex-column" style="display:none">
+          {# Strip konteks: diisi window.openKancilPanel({contextLabel, prompts}).
+             Jembatan sementara selama kancil belum punya kontrak deep-link —
+             pertanyaan disalin ke clipboard, ditempel manual di dalam iframe. #}
+          <div id="sidePanelKancilContext" class="border-bottom px-3 py-2 small" style="display:none; flex:0 0 auto">
+            <div id="sidePanelKancilContextLabel" class="text-body-secondary mb-1"></div>
+            <div id="sidePanelKancilPrompts" class="d-flex flex-wrap gap-1"></div>
+          </div>
           <iframe id="sidePanelKancilFrame" data-src="{{ kancilUrl }}" title="Kancil"
-                  style="border:0; width:100%; height:100%; display:block"
+                  style="border:0; width:100%; flex:1 1 auto; min-height:0; display:block"
                   allow="clipboard-read; clipboard-write"></iframe>
         </div>
         {% endif %}
@@ -161,13 +168,15 @@
 
 <!-- Side panel global function -->
 <script>
+  var KANCIL_ICON = '<span class="me-2 d-inline-flex align-items-center"><svg xmlns="http://www.w3.org/2000/svg" width="1.25em" height="1.25em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><ellipse cx="8.6" cy="6.2" rx="2.1" ry="5.4" transform="rotate(-14 8.6 6.2)"/><ellipse cx="15.4" cy="6.2" rx="2.1" ry="5.4" transform="rotate(14 15.4 6.2)"/><circle cx="12" cy="15.6" r="6.2"/><circle cx="9.7" cy="14.6" r="0.9" fill="var(--bs-body-bg,#fff)"/><circle cx="14.3" cy="14.6" r="0.9" fill="var(--bs-body-bg,#fff)"/></svg></span>';
+
   window.openSidePanel = function(view) {
     var titles = {
       wilayah: '<i class="bi bi-geo-alt me-2"></i>Wilayah',
       instansi: '<i class="bi bi-building me-2"></i>Instansi',
       pengaturan: '<i class="bi bi-gear me-2"></i>Pengaturan',
       chat: '<i class="bi bi-chat-dots me-2"></i>Chat Dokumen',
-      kancil: '<span class="me-2 d-inline-flex align-items-center"><svg xmlns="http://www.w3.org/2000/svg" width="1.25em" height="1.25em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><ellipse cx="8.6" cy="6.2" rx="2.1" ry="5.4" transform="rotate(-14 8.6 6.2)"/><ellipse cx="15.4" cy="6.2" rx="2.1" ry="5.4" transform="rotate(14 15.4 6.2)"/><circle cx="12" cy="15.6" r="6.2"/><circle cx="9.7" cy="14.6" r="0.9" fill="var(--bs-body-bg,#fff)"/><circle cx="14.3" cy="14.6" r="0.9" fill="var(--bs-body-bg,#fff)"/></svg></span>Kancil'
+      kancil: KANCIL_ICON + 'Kancil'
     };
     // Toggle panels via DOM
     var views = ['wilayah', 'instansi', 'pengaturan', 'chat', 'kancil'];
@@ -184,6 +193,10 @@
       if (frame && !frame.getAttribute('src') && frame.dataset.src) {
         frame.setAttribute('src', frame.dataset.src);
       }
+      // Konteks dari pemanggil sebelumnya tidak boleh menempel di pembukaan
+      // polos (mis. dari dropdown profil); openKancilPanel() mengisinya ulang.
+      var ctxBox = document.getElementById('sidePanelKancilContext');
+      if (ctxBox) { ctxBox.style.display = 'none'; }
     }
     // Open offcanvas
     var panel = document.getElementById('sidePanelOffcanvas');
@@ -193,6 +206,117 @@
       bsOffcanvas.show();
     }
   };
+
+  /**
+   * Buka sidepanel Kancil dengan konteks pemanggil.
+   *
+   *   openKancilPanel({
+   *     title:        'Kancil — Kriteria 1.a.1',   // judul offcanvas
+   *     contextLabel: 'palembangkota · kriteria 1.a.1',
+   *     prompts:      ['Tunjukkan bukti …', '…'],  // chip, klik = salin
+   *     url:          'https://kancil.x.gov3.id/…' // opsional, deep-link
+   *   });
+   *
+   * Mengembalikan false kalau portal ini tidak punya slot kancil (kancilUrl
+   * kosong) — pemanggil bisa memakai itu untuk jalur cadangan sendiri.
+   *
+   * Prompt disalin ke clipboard, bukan dikirim ke frame: kancil belum punya
+   * kontrak deep-link/postMessage. Begitu kontraknya ada, `url` (atau
+   * postMessage di sini) menggantikan strip salin-tempel ini.
+   */
+  window.openKancilPanel = function(opts) {
+    opts = opts || {};
+    var frame = document.getElementById('sidePanelKancilFrame');
+    if (!frame) { return false; }
+
+    if (opts.url) {
+      frame.dataset.src = opts.url;
+      if (frame.getAttribute('src') && frame.getAttribute('src') !== opts.url) {
+        frame.setAttribute('src', opts.url);
+      }
+    }
+
+    window.openSidePanel('kancil');
+
+    if (opts.title) {
+      var label = document.getElementById('sidePanelLabel');
+      if (label) { label.innerHTML = KANCIL_ICON + kancilEsc(opts.title); }
+    }
+
+    var ctx = document.getElementById('sidePanelKancilContext');
+    var ctxLabel = document.getElementById('sidePanelKancilContextLabel');
+    var promptBox = document.getElementById('sidePanelKancilPrompts');
+    if (!ctx || !ctxLabel || !promptBox) { return true; }
+
+    var prompts = Array.isArray(opts.prompts)
+      ? opts.prompts.filter(function(p) { return p && String(p).trim(); }).slice(0, 8)
+      : [];
+    if (!opts.contextLabel && !prompts.length) { return true; }
+
+    ctxLabel.innerHTML = '<i class="bi bi-info-circle me-1"></i>' +
+      kancilEsc(opts.contextLabel || '') +
+      (prompts.length ? ' <span class="opacity-75">— klik pertanyaan untuk menyalin, lalu tempel di Kancil</span>' : '');
+    promptBox.innerHTML = prompts.map(function(p, i) {
+      var t = String(p);
+      return '<button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" ' +
+             'style="font-size:.72rem" data-kancil-prompt="' + i + '" title="' + kancilEsc(t) + '">' +
+             '<i class="bi bi-clipboard me-1"></i>' +
+             kancilEsc(t.length > 56 ? t.slice(0, 55) + '…' : t) + '</button>';
+    }).join('');
+    promptBox.__kancilPrompts = prompts;
+    ctx.style.display = '';
+    return true;
+  };
+
+  function kancilEsc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+
+  function kancilCopy(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function(resolve, reject) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      if (ok) { resolve(); } else { reject(new Error('clipboard tidak tersedia')); }
+    });
+  }
+
+  document.addEventListener('click', function(ev) {
+    var btn = ev.target && ev.target.closest ? ev.target.closest('[data-kancil-prompt]') : null;
+    if (!btn) { return; }
+    var box = document.getElementById('sidePanelKancilPrompts');
+    var list = box && box.__kancilPrompts;
+    var text = list ? list[parseInt(btn.dataset.kancilPrompt, 10)] : null;
+    if (!text) { return; }
+    var html = btn.innerHTML;
+    kancilCopy(String(text)).then(function() {
+      btn.innerHTML = '<i class="bi bi-check2 me-1"></i>tersalin';
+      btn.classList.add('btn-success');
+      btn.classList.remove('btn-outline-secondary');
+    }).catch(function() {
+      btn.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i>gagal salin';
+      btn.classList.add('btn-warning');
+      btn.classList.remove('btn-outline-secondary');
+    }).then(function() {
+      setTimeout(function() {
+        btn.innerHTML = html;
+        btn.classList.remove('btn-success', 'btn-warning');
+        btn.classList.add('btn-outline-secondary');
+      }, 1400);
+    });
+  });
 </script>
 
 <!-- Cube sidebar custom JS -->
