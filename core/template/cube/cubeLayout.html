@@ -106,18 +106,33 @@
           ></cube-chat-rag>
         </div>
         {% if kancilUrl %}
-        {# Slot Kancil: iframe ke kancil.<slug>.gov3.id — src diisi lazy saat
-           openSidePanel('kancil') pertama kali (lihat rencana/sidepanel-kancil-iframe.md) #}
-        <div id="sidePanel-kancil" class="h-100 d-flex flex-column" style="display:none">
+        {# Slot Kancil: iframe ke kancil.<slug>.gov3.id (#10723). Login TIDAK PERNAH
+           dimuat di dalam iframe — sebelum src diisi, sesi diperiksa lewat fetch
+           (kancilProbe); tanpa sesi, panel menampilkan tombol "Masuk ke Kancil"
+           yang membuka tab baru. Lihat rencana/sidepanel-kancil-iframe.md #}
+        <div id="sidePanel-kancil" class="h-100 d-flex flex-column" style="display:none"
+             data-kancil-url="{{ kancilUrl }}" data-kancil-dir="{{ kancilDir }}" data-kancil-b64="{{ kancilB64 }}">
           {# Strip konteks: diisi window.openKancilPanel({contextLabel, prompts}).
-             Jembatan sementara selama kancil belum punya kontrak deep-link —
-             pertanyaan disalin ke clipboard, ditempel manual di dalam iframe. #}
+             Chip = kirim langsung ke sesi kancil lewat kancilAsk(); salin = aksi sekunder. #}
           <div id="sidePanelKancilContext" class="border-bottom px-3 py-2 small" style="display:none; flex:0 0 auto">
             <div id="sidePanelKancilContextLabel" class="text-body-secondary mb-1"></div>
             <div id="sidePanelKancilPrompts" class="d-flex flex-wrap gap-1"></div>
           </div>
-          <iframe id="sidePanelKancilFrame" data-src="{{ kancilUrl }}" title="Kancil"
-                  style="border:0; width:100%; flex:1 1 auto; min-height:0; display:block"
+          <div id="sidePanelKancilStatus" class="border-bottom px-3 py-1 small text-body-secondary" style="display:none; flex:0 0 auto"></div>
+          <div id="sidePanelKancilLogin" class="p-4 text-center" style="display:none; flex:1 1 auto">
+            <div class="mb-3 text-body-secondary" id="sidePanelKancilLoginMsg">
+              Belum ada sesi Kancil di peramban ini. Masuk sekali di tab baru, lalu muat ulang panel —
+              sesudahnya panel Kancil di portal mana pun langsung bersesi.
+            </div>
+            <a id="sidePanelKancilLoginBtn" class="btn btn-primary me-1" href="{{ kancilUrl }}" target="_blank" rel="noopener">
+              <i class="bi bi-box-arrow-up-right me-1"></i>Masuk ke Kancil
+            </a>
+            <button type="button" class="btn btn-outline-secondary" onclick="kancilReloadPanel()">
+              <i class="bi bi-arrow-clockwise me-1"></i>Muat ulang panel
+            </button>
+          </div>
+          <iframe id="sidePanelKancilFrame" data-src="{{ kancilUrl }}/{{ kancilB64 }}/session" title="Kancil"
+                  style="border:0; width:100%; flex:1 1 auto; min-height:0; display:none"
                   allow="clipboard-read; clipboard-write"></iframe>
         </div>
         {% endif %}
@@ -187,16 +202,14 @@
     // Update title
     var label = document.getElementById('sidePanelLabel');
     if (label) { label.innerHTML = titles[view] || ''; }
-    // Lazy-load iframe kancil hanya saat panel dibuka pertama kali
+    // Kancil: sesi diperiksa dulu (kancilProbe) — iframe hanya diisi bila ada
+    // cookie kancil; tanpa sesi tampil kotak login (tab baru), bukan frame 403.
     if (view === 'kancil') {
-      var frame = document.getElementById('sidePanelKancilFrame');
-      if (frame && !frame.getAttribute('src') && frame.dataset.src) {
-        frame.setAttribute('src', frame.dataset.src);
-      }
       // Konteks dari pemanggil sebelumnya tidak boleh menempel di pembukaan
       // polos (mis. dari dropdown profil); openKancilPanel() mengisinya ulang.
       var ctxBox = document.getElementById('sidePanelKancilContext');
       if (ctxBox) { ctxBox.style.display = 'none'; }
+      kancilEnsureSession();
     }
     // Open offcanvas
     var panel = document.getElementById('sidePanelOffcanvas');
@@ -212,29 +225,23 @@
    *
    *   openKancilPanel({
    *     title:        'Kancil — Kriteria 1.a.1',   // judul offcanvas
-   *     contextLabel: 'palembangkota · kriteria 1.a.1',
-   *     prompts:      ['Tunjukkan bukti …', '…'],  // chip, klik = salin
-   *     url:          'https://kancil.x.gov3.id/…' // opsional, deep-link
+   *     contextLabel: 'kemenpanrb · kriteria 1.a.1',
+   *     prompts:      ['Tunjukkan bukti …', '…'],  // chip: klik = kirim ke kancil
+   *     url:          'https://kancil.x.gov3.id/…' // opsional, deep-link (dimuat setelah sesi siap)
    *   });
    *
    * Mengembalikan false kalau portal ini tidak punya slot kancil (kancilUrl
-   * kosong) — pemanggil bisa memakai itu untuk jalur cadangan sendiri.
-   *
-   * Prompt disalin ke clipboard, bukan dikirim ke frame: kancil belum punya
-   * kontrak deep-link/postMessage. Begitu kontraknya ada, `url` (atau
-   * postMessage di sini) menggantikan strip salin-tempel ini.
+   * kosong — slug di luar document::KANCIL_SLUGS) — pemanggil memakai itu
+   * untuk jalur cadangan sendiri.
    */
   window.openKancilPanel = function(opts) {
     opts = opts || {};
     var frame = document.getElementById('sidePanelKancilFrame');
-    if (!frame) { return false; }
+    if (!frame || !KANCIL) { return false; }
 
-    if (opts.url) {
-      frame.dataset.src = opts.url;
-      if (frame.getAttribute('src') && frame.getAttribute('src') !== opts.url) {
-        frame.setAttribute('src', opts.url);
-      }
-    }
+    // Deep-link ditunda sampai sesi terverifikasi: halaman login tidak boleh
+    // pernah dimuat di dalam iframe (#10725: 403 Google pada Sec-Fetch-Dest: iframe).
+    KANCIL.pendingUrl = opts.url || null;
 
     window.openSidePanel('kancil');
 
@@ -255,17 +262,156 @@
 
     ctxLabel.innerHTML = '<i class="bi bi-info-circle me-1"></i>' +
       kancilEsc(opts.contextLabel || '') +
-      (prompts.length ? ' <span class="opacity-75">— klik pertanyaan untuk menyalin, lalu tempel di Kancil</span>' : '');
+      (prompts.length ? ' <span class="opacity-75">— klik pertanyaan untuk mengirimnya ke Kancil</span>' : '');
     promptBox.innerHTML = prompts.map(function(p, i) {
       var t = String(p);
-      return '<button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" ' +
-             'style="font-size:.72rem" data-kancil-prompt="' + i + '" title="' + kancilEsc(t) + '">' +
-             '<i class="bi bi-clipboard me-1"></i>' +
-             kancilEsc(t.length > 56 ? t.slice(0, 55) + '…' : t) + '</button>';
+      return '<div class="btn-group btn-group-sm" role="group">' +
+             '<button type="button" class="btn btn-outline-secondary py-0 px-2" ' +
+             'style="font-size:.72rem" data-kancil-prompt="' + i + '" title="Kirim ke Kancil: ' + kancilEsc(t) + '">' +
+             '<i class="bi bi-send me-1"></i>' +
+             kancilEsc(t.length > 56 ? t.slice(0, 55) + '…' : t) + '</button>' +
+             '<button type="button" class="btn btn-outline-secondary py-0 px-1" ' +
+             'style="font-size:.72rem" data-kancil-copy="' + i + '" title="Salin pertanyaan">' +
+             '<i class="bi bi-clipboard"></i></button>' +
+             '</div>';
     }).join('');
     promptBox.__kancilPrompts = prompts;
     ctx.style.display = '';
     return true;
+  };
+
+  // ----- Kancil: sesi & kontrak kancilAsk (#10723 brief 2026-09-05, #10722 journal 10:33) -----
+  // KANCIL.url  = https://kancil.<slug>.gov3.id
+  // KANCIL.dir  = /<slug>/<project>       → ?directory= pada POST /session
+  // KANCIL.b64  = b64url(slug/project)    → prefix URL iframe /<b64>/session/<id>
+  // Dirancang agar mudah diganti: bila gate #10713 kelak punya /_kancil/ask,
+  // tiga langkah kancilAsk() menyusut jadi satu navigasi iframe.
+  var KANCIL = (function() {
+    var el = document.getElementById('sidePanel-kancil');
+    if (!el || !el.dataset.kancilUrl) { return null; }
+    return {
+      url: el.dataset.kancilUrl.replace(/\/+$/, ''),
+      dir: el.dataset.kancilDir || '',
+      b64: el.dataset.kancilB64 || '',
+      ready: false,        // true setelah probe/ask sukses → iframe boleh diisi
+      probing: null,       // Promise probe yang sedang berjalan
+      pendingUrl: null     // deep-link dari openKancilPanel({url}) menunggu sesi
+    };
+  })();
+
+  function kancilShow(state, msg) {
+    var frame = document.getElementById('sidePanelKancilFrame');
+    var login = document.getElementById('sidePanelKancilLogin');
+    var loginMsg = document.getElementById('sidePanelKancilLoginMsg');
+    var status = document.getElementById('sidePanelKancilStatus');
+    if (!frame || !login || !status) { return; }
+    frame.style.display = (state === 'ok') ? 'block' : 'none';
+    login.style.display = (state === 'login') ? '' : 'none';
+    status.style.display = (state === 'checking' || state === 'error') ? '' : 'none';
+    if (state === 'checking') {
+      status.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Memeriksa sesi Kancil…';
+    } else if (state === 'error') {
+      status.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i>' + kancilEsc(msg || 'Kancil tidak dapat dihubungi.') +
+        ' <a href="#" onclick="event.preventDefault(); kancilReloadPanel()">Coba lagi</a>';
+    } else if (state === 'login' && loginMsg && msg) {
+      loginMsg.textContent = msg;
+    }
+  }
+
+  /**
+   * Probe sesi kancil tanpa memuat apa pun di iframe.
+   * → 'OK' | 'BELUM_LOGIN' | 'TIDAK_BERHAK' | 'GAGAL_SAMBUNG'
+   */
+  function kancilProbe() {
+    if (!KANCIL) { return Promise.resolve('GAGAL_SAMBUNG'); }
+    return fetch(KANCIL.url + '/session?directory=' + encodeURIComponent(KANCIL.dir), {
+      method: 'GET', credentials: 'include', redirect: 'manual', headers: { 'Accept': 'application/json' }
+    }).then(function(r) {
+      if (r.ok) { return 'OK'; }
+      if (r.status === 403) { return 'TIDAK_BERHAK'; }
+      return 'BELUM_LOGIN';   // 0/opaqueredirect (302 oauth2-proxy) atau 401
+    }).catch(function() { return 'GAGAL_SAMBUNG'; });
+  }
+
+  function kancilApplyState(res) {
+    if (!KANCIL) { return res; }
+    var frame = document.getElementById('sidePanelKancilFrame');
+    if (res === 'OK') {
+      KANCIL.ready = true;
+      if (frame) {
+        var target = KANCIL.pendingUrl || null;
+        KANCIL.pendingUrl = null;
+        if (target && frame.getAttribute('src') !== target) {
+          frame.setAttribute('src', target);
+        } else if (!frame.getAttribute('src') && frame.dataset.src) {
+          frame.setAttribute('src', frame.dataset.src);
+        }
+      }
+      kancilShow('ok');
+    } else if (res === 'TIDAK_BERHAK') {
+      KANCIL.ready = false;
+      kancilShow('login', 'Akun Anda sudah masuk, tetapi belum diizinkan memakai Kancil instansi ini. Hubungi admin SAKIP.');
+    } else if (res === 'BELUM_LOGIN') {
+      KANCIL.ready = false;
+      kancilShow('login');
+    } else {
+      KANCIL.ready = false;
+      kancilShow('error', 'Kancil (' + KANCIL.url.replace(/^https?:\/\//, '') + ') tidak dapat dihubungi.');
+    }
+    return res;
+  }
+
+  function kancilEnsureSession() {
+    if (!KANCIL) { return Promise.resolve('GAGAL_SAMBUNG'); }
+    if (KANCIL.ready) { return Promise.resolve(kancilApplyState('OK')); }
+    if (KANCIL.probing) { return KANCIL.probing; }
+    kancilShow('checking');
+    KANCIL.probing = kancilProbe().then(function(res) {
+      KANCIL.probing = null;
+      return kancilApplyState(res);
+    });
+    return KANCIL.probing;
+  }
+
+  // Tombol "Muat ulang panel" — dipakai setelah login di tab baru.
+  window.kancilReloadPanel = function() {
+    if (!KANCIL) { return; }
+    KANCIL.ready = false;
+    var frame = document.getElementById('sidePanelKancilFrame');
+    if (frame) { frame.removeAttribute('src'); }
+    kancilEnsureSession();
+  };
+
+  /**
+   * Kirim satu prompt ke sesi kancil BARU di proyek KANCIL.dir, lalu arahkan
+   * iframe ke sesi itu — hanya SETELAH pesan terkirim.
+   * → Promise<'OK' | 'BELUM_LOGIN' | 'TIDAK_BERHAK' | 'GAGAL_KIRIM' | 'GAGAL_SAMBUNG'>
+   */
+  window.kancilAsk = function(prompt) {
+    if (!KANCIL) { return Promise.resolve('GAGAL_SAMBUNG'); }
+    var text = String(prompt == null ? '' : prompt).trim();
+    if (!text) { return Promise.resolve('GAGAL_KIRIM'); }
+    var q = '?directory=' + encodeURIComponent(KANCIL.dir);
+    var frame = document.getElementById('sidePanelKancilFrame');
+    return fetch(KANCIL.url + '/session' + q, {
+      method: 'POST', credentials: 'include', redirect: 'manual',
+      headers: { 'Content-Type': 'application/json' }, body: '{}'
+    }).then(function(r1) {
+      if (!r1.ok) { return kancilApplyState(r1.status === 403 ? 'TIDAK_BERHAK' : 'BELUM_LOGIN'); }
+      return r1.json().then(function(s) {
+        if (!s || !s.id) { return 'GAGAL_KIRIM'; }
+        return fetch(KANCIL.url + '/session/' + encodeURIComponent(s.id) + '/message' + q, {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ parts: [{ type: 'text', text: text }] })
+        }).then(function(r2) {
+          if (!r2.ok) { return 'GAGAL_KIRIM'; }
+          KANCIL.pendingUrl = KANCIL.url + '/' + KANCIL.b64 + '/session/' + encodeURIComponent(s.id);
+          if (frame) { frame.removeAttribute('src'); }   // paksa navigasi ke sesi baru
+          return kancilApplyState('OK');
+        });
+      });
+    }).catch(function() { return kancilApplyState('GAGAL_SAMBUNG'); });
   };
 
   function kancilEsc(s) {
@@ -293,28 +439,51 @@
     });
   }
 
+  function kancilFlash(btn, html, cls, restoreHtml, ms) {
+    btn.innerHTML = html;
+    btn.classList.remove('btn-outline-secondary');
+    btn.classList.add(cls);
+    setTimeout(function() {
+      btn.innerHTML = restoreHtml;
+      btn.classList.remove('btn-success', 'btn-warning', 'btn-danger');
+      btn.classList.add('btn-outline-secondary');
+      btn.disabled = false;
+    }, ms || 1400);
+  }
+
   document.addEventListener('click', function(ev) {
-    var btn = ev.target && ev.target.closest ? ev.target.closest('[data-kancil-prompt]') : null;
-    if (!btn) { return; }
+    var t = ev.target && ev.target.closest ? ev.target : null;
+    var sendBtn = t ? t.closest('[data-kancil-prompt]') : null;
+    var copyBtn = t ? t.closest('[data-kancil-copy]') : null;
+    if (!sendBtn && !copyBtn) { return; }
     var box = document.getElementById('sidePanelKancilPrompts');
     var list = box && box.__kancilPrompts;
-    var text = list ? list[parseInt(btn.dataset.kancilPrompt, 10)] : null;
+    var idx = parseInt((sendBtn || copyBtn).dataset[sendBtn ? 'kancilPrompt' : 'kancilCopy'], 10);
+    var text = list ? list[idx] : null;
     if (!text) { return; }
-    var html = btn.innerHTML;
-    kancilCopy(String(text)).then(function() {
-      btn.innerHTML = '<i class="bi bi-check2 me-1"></i>tersalin';
-      btn.classList.add('btn-success');
-      btn.classList.remove('btn-outline-secondary');
-    }).catch(function() {
-      btn.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i>gagal salin';
-      btn.classList.add('btn-warning');
-      btn.classList.remove('btn-outline-secondary');
-    }).then(function() {
-      setTimeout(function() {
-        btn.innerHTML = html;
-        btn.classList.remove('btn-success', 'btn-warning');
-        btn.classList.add('btn-outline-secondary');
-      }, 1400);
+
+    if (copyBtn) {
+      var h0 = copyBtn.innerHTML;
+      kancilCopy(String(text)).then(function() {
+        kancilFlash(copyBtn, '<i class="bi bi-check2"></i>', 'btn-success', h0);
+      }).catch(function() {
+        kancilFlash(copyBtn, '<i class="bi bi-exclamation-triangle"></i>', 'btn-warning', h0);
+      });
+      return;
+    }
+
+    var html = sendBtn.innerHTML;
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>mengirim…';
+    window.kancilAsk(String(text)).then(function(res) {
+      if (res === 'OK') {
+        kancilFlash(sendBtn, '<i class="bi bi-check2 me-1"></i>terkirim', 'btn-success', html);
+      } else if (res === 'BELUM_LOGIN' || res === 'TIDAK_BERHAK') {
+        // kotak login sudah ditampilkan oleh kancilApplyState
+        kancilFlash(sendBtn, '<i class="bi bi-box-arrow-up-right me-1"></i>masuk dulu', 'btn-warning', html, 2200);
+      } else {
+        kancilFlash(sendBtn, '<i class="bi bi-exclamation-triangle me-1"></i>gagal kirim', 'btn-danger', html, 2200);
+      }
     });
   });
 </script>

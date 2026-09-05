@@ -327,11 +327,58 @@ class document extends customException
     }
 
     /**
+     * Daftar STATIS slug portal yang punya host Kancil (#10723 brief 2026-09-05).
+     * Memunculkan ikon Kancil di portal harus tindakan sadar saat rollout —
+     * tambah slug di sini (atau override per instance via
+     * <platform><kancilSlugs>a,b,c</kancilSlugs>). Di luar daftar: kancilUrl
+     * kosong → item dropdown, slot iframe, dan openKancilPanel() ikut mati.
+     */
+    public const KANCIL_SLUGS = ['kemenpanrb'];
+
+    /** Direktori proyek opencode di dalam workspace slug (kancil.<slug>/<slug>/<project>). */
+    public const KANCIL_PROJECT = 'sakipai-agen';
+
+    /**
+     * Slug portal yang boleh menampilkan Kancil: config platform/kancilSlugs
+     * (dipisah koma) bila ada, selain itu KANCIL_SLUGS.
+     *
+     * @return string[]
+     */
+    public function kancilSlugs(): array
+    {
+        global $config;
+
+        $raw = trim((string) ($config->platform->kancilSlugs ?? ''));
+        if ($raw === '') {
+            return self::KANCIL_SLUGS;
+        }
+
+        $out = [];
+        foreach (explode(',', strtolower($raw)) as $slug) {
+            $slug = trim($slug);
+            if ($slug !== '' && preg_match('/^[a-z0-9_-]+$/', $slug)) {
+                $out[] = $slug;
+            }
+        }
+        return $out;
+    }
+
+    /** Nama proyek kancil: config platform/kancilProject bila ada, selain itu KANCIL_PROJECT. */
+    public function kancilProject(): string
+    {
+        global $config;
+
+        $p = trim((string) ($config->platform->kancilProject ?? ''));
+        return preg_match('/^[a-z0-9_-]+$/i', $p) ? $p : self::KANCIL_PROJECT;
+    }
+
+    /**
      * URL app Kancil untuk slot sidepanel `kancil` (iframe di cubeLayout).
      * Priority:
-     *   1. $config->platform->kancil   — override URL penuh di config instance
-     *   2. https://kancil.{SERVER_NAME} — auto: acehbaratkab.gov3.id → kancil.acehbaratkab.gov3.id
-     *   3. ""                          — SERVER_NAME tanpa titik (localhost) → menu & slot disembunyikan
+     *   1. $config->platform->kancil   — override URL penuh di config instance (menang tanpa cek daftar)
+     *   2. https://kancil.{SERVER_NAME} — hanya bila slug tenant ada di kancilSlugs()
+     *   3. ""                          — slug di luar daftar, atau SERVER_NAME tanpa titik (localhost)
+     *                                    → menu & slot disembunyikan
      *
      * Controller boleh override lebih dulu via $doc->body('kancilUrl', ...).
      */
@@ -349,7 +396,33 @@ class document extends customException
             return '';
         }
 
+        if (!in_array(fileSource::tenant(), $this->kancilSlugs(), true)) {
+            return '';
+        }
+
         return "https://kancil.{$host}";
+    }
+
+    /**
+     * Path sesi kancil untuk kontrak kancilAsk (#10722 journal 2026-09-04 10:33):
+     *   dir = "/<slug>/<project>"            → query ?directory= pada POST /session
+     *   b64 = b64url("<slug>/<project>")     → prefix URL iframe /<b64>/session/<id>,
+     *                                          tanpa padding, sama dengan helper sn() opencode
+     *
+     * @return array{slug:string,project:string,dir:string,b64:string}
+     */
+    public function kancilSession(?string $slug = null, ?string $project = null): array
+    {
+        $slug = $slug ?? fileSource::tenant();
+        $project = $project ?? $this->kancilProject();
+        $rel = "{$slug}/{$project}";
+
+        return [
+            'slug' => $slug,
+            'project' => $project,
+            'dir' => '/' . $rel,
+            'b64' => rtrim(strtr(base64_encode($rel), '+/', '-_'), '='),
+        ];
     }
 
     /**
@@ -575,6 +648,13 @@ class document extends customException
         $this->body('brandText', $this->formatBrand());
         if (!isset($this->body['kancilUrl'])) {
             $this->body('kancilUrl', $this->formatKancilUrl());
+        }
+        if (!empty($this->body['kancilUrl']) && !isset($this->body['kancilDir'])) {
+            $ks = $this->kancilSession();
+            $this->body('kancilSlug', $ks['slug']);
+            $this->body('kancilProject', $ks['project']);
+            $this->body('kancilDir', $ks['dir']);
+            $this->body('kancilB64', $ks['b64']);
         }
 
         // Load top-bar options from database

@@ -43,6 +43,13 @@ class SidePanelKancilTemplateTest extends TestCase
                 'id="sidePanelKancilContextLabel"',
                 'id="sidePanelKancilPrompts"',
                 'data-kancil-prompt',
+                'data-kancil-copy',
+                'window.kancilAsk',
+                'window.kancilReloadPanel',
+                'id="sidePanelKancilLogin"',
+                'id="sidePanelKancilStatus"',
+                'data-kancil-dir="{{ kancilDir }}"',
+                'data-kancil-b64="{{ kancilB64 }}"',
             ] as $needle) {
                 $this->assertStringContainsString($needle, $html, "template {$name} kehilangan {$needle}");
             }
@@ -74,6 +81,48 @@ class SidePanelKancilTemplateTest extends TestCase
                 $html,
                 "template {$name}: openSidePanel(\x27kancil\x27) tidak lagi mereset strip konteks"
             );
+        }
+    }
+
+    public function testLoginTidakPernahDimuatDiDalamIframe(): void
+    {
+        // #10723 brief 2026-09-05 + #10725: tombol masuk membuka tab baru; iframe
+        // mulai tanpa src dan tersembunyi sampai kancilProbe() memastikan ada sesi.
+        foreach ($this->bodies() as $name => $html) {
+            $this->assertMatchesRegularExpression(
+                '/id="sidePanelKancilLoginBtn"[^>]*target="_blank"/',
+                $html,
+                "template {$name}: tombol Masuk ke Kancil harus target=_blank"
+            );
+            $this->assertMatchesRegularExpression(
+                '/<iframe id="sidePanelKancilFrame" data-src="[^"]*"(?:(?!<\/iframe>).)*display:none/s',
+                $html,
+                "template {$name}: iframe kancil harus mulai tersembunyi tanpa src"
+            );
+            $this->assertDoesNotMatchRegularExpression(
+                '/<iframe id="sidePanelKancilFrame"[^>]*\ssrc="/',
+                $html,
+                "template {$name}: iframe kancil tidak boleh punya src statis"
+            );
+            $this->assertMatchesRegularExpression(
+                '/if \(view === \x27kancil\x27\).*kancilEnsureSession\(\)/s',
+                $html,
+                "template {$name}: openSidePanel(\x27kancil\x27) harus lewat kancilEnsureSession()"
+            );
+        }
+    }
+
+    public function testKancilAskMengikutiKontrakTigaLangkah(): void
+    {
+        foreach ($this->bodies() as $name => $html) {
+            $pos1 = strpos($html, "'/session' + q");
+            $pos2 = strpos($html, "'/message' + q");
+            $pos3 = strpos($html, "'/session/' + encodeURIComponent(s.id)");
+            $this->assertNotFalse($pos1, "template {$name}: POST /session hilang");
+            $this->assertNotFalse($pos2, "template {$name}: POST /session/{id}/message hilang");
+            $this->assertNotFalse($pos3, "template {$name}: navigasi iframe ke /<b64>/session/<id> hilang");
+            $this->assertStringContainsString("credentials: 'include'", $html, "template {$name}: fetch tanpa cookie kancil");
+            $this->assertStringContainsString("redirect: 'manual'", $html, "template {$name}: 302 oauth2-proxy harus terdeteksi sebagai BELUM_LOGIN");
         }
     }
 }
