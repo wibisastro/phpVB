@@ -112,17 +112,25 @@ class SidePanelKancilTemplateTest extends TestCase
         }
     }
 
-    public function testKancilAskMengikutiKontrakTigaLangkah(): void
+    public function testKancilAskMengikutiKontrakBridgeDanDeepLink(): void
     {
+        // gov3code #10727: prompt masuk lewat postMessage ke sesi yang terbuka (jalur 1),
+        // jatuh ke deep link /<b64>/session?prompt=…&send=1 bila tidak dijawab (jalur 2).
+        // Alur 3-langkah API (POST /session + /message) sudah tidak dipakai.
         foreach ($this->bodies() as $name => $html) {
-            $pos1 = strpos($html, "'/session' + q");
-            $pos2 = strpos($html, "'/message' + q");
-            $pos3 = strpos($html, "'/session/' + encodeURIComponent(s.id)");
-            $this->assertNotFalse($pos1, "template {$name}: POST /session hilang");
-            $this->assertNotFalse($pos2, "template {$name}: POST /session/{id}/message hilang");
-            $this->assertNotFalse($pos3, "template {$name}: navigasi iframe ke /<b64>/session/<id> hilang");
-            $this->assertStringContainsString("credentials: 'include'", $html, "template {$name}: fetch tanpa cookie kancil");
+            $this->assertStringContainsString("type: 'gov3.prompt'", $html, "template {$name}: postMessage gov3.prompt hilang");
+            $this->assertStringContainsString("'gov3.prompt.ack'", $html, "template {$name}: tidak menunggu gov3.prompt.ack");
+            $this->assertStringContainsString(".postMessage(", $html, "template {$name}: tidak memakai postMessage");
+            $this->assertStringContainsString("'/session?prompt=' + encodeURIComponent(text) + '&send=1'", $html, "template {$name}: deep link auto-kirim hilang");
+            $this->assertStringContainsString("opts.prompt", $html, "template {$name}: openKancilPanel tidak menerima prompt pertama");
+            $this->assertStringNotContainsString("'/message' + q", $html, "template {$name}: alur 3-langkah API masih ada");
+            $this->assertStringContainsString("credentials: 'include'", $html, "template {$name}: probe tanpa cookie kancil");
             $this->assertStringContainsString("redirect: 'manual'", $html, "template {$name}: 302 oauth2-proxy harus terdeteksi sebagai BELUM_LOGIN");
+            $this->assertMatchesRegularExpression(
+                '/kancilPost\(text\)\.then\(function\(res\) \{\s*if \(res === \x27OK\x27\) \{ return \x27OK\x27; \}\s*KANCIL\.pendingUrl = kancilDeepLink\(text\);/s',
+                $html,
+                "template {$name}: kancilAsk harus mencoba postMessage dulu lalu jatuh ke deep link"
+            );
         }
     }
 }

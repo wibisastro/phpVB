@@ -227,7 +227,8 @@
    *     title:        'Kancil — Kriteria 1.a.1',   // judul offcanvas
    *     contextLabel: 'kemenpanrb · kriteria 1.a.1',
    *     prompts:      ['Tunjukkan bukti …', '…'],  // chip: klik = kirim ke kancil
-   *     url:          'https://kancil.x.gov3.id/…' // opsional, deep-link (dimuat setelah sesi siap)
+   *     prompt:       'Ringkas dokumen …',          // opsional, prompt PERTAMA: sesi baru, auto-kirim
+   *     url:          'https://kancil.x.gov3.id/…' // opsional, deep-link (menang atas prompt)
    *   });
    *
    * Mengembalikan false kalau portal ini tidak punya slot kancil (kancilUrl
@@ -241,7 +242,7 @@
 
     // Deep-link ditunda sampai sesi terverifikasi: halaman login tidak boleh
     // pernah dimuat di dalam iframe (#10725: 403 Google pada Sec-Fetch-Dest: iframe).
-    KANCIL.pendingUrl = opts.url || null;
+    KANCIL.pendingUrl = opts.url || (opts.prompt && String(opts.prompt).trim() ? kancilDeepLink(String(opts.prompt).trim()) : null);
 
     window.openSidePanel('kancil');
 
@@ -280,12 +281,16 @@
     return true;
   };
 
-  // ----- Kancil: sesi & kontrak kancilAsk (#10723 brief 2026-09-05, #10722 journal 10:33) -----
+  // ----- Kancil: sesi & pengiriman prompt (#10723 brief 2026-09-05, gov3code #10727) -----
   // KANCIL.url  = https://kancil.<slug>.gov3.id
-  // KANCIL.dir  = /<slug>/<project>       → ?directory= pada POST /session
-  // KANCIL.b64  = b64url(slug/project)    → prefix URL iframe /<b64>/session/<id>
-  // Dirancang agar mudah diganti: bila gate #10713 kelak punya /_kancil/ask,
-  // tiga langkah kancilAsk() menyusut jadi satu navigasi iframe.
+  // KANCIL.dir  = /<slug>/<project>       → ?directory= pada GET /session (probe sesi)
+  // KANCIL.b64  = b64url(slug/project)    → prefix URL iframe /<b64>/session
+  // Prompt masuk ke app lewat dua jalur (binary gov3code dibangun dengan
+  // VITE_GOV3_AUTO_SEND=1 + VITE_GOV3_PROMPT_ORIGINS=https://*.gov3.id):
+  //   1. postMessage {type:'gov3.prompt', id, text, send:true} → sesi yang sedang terbuka
+  //      (prompt kedua dst.); app membalas {type:'gov3.prompt.ack', id, state}.
+  //   2. deep link /<b64>/session?prompt=…&send=1 → sesi baru, prompt pertama auto-kirim
+  //      (panel baru dibuka, atau jalur 1 tidak dijawab).
   var KANCIL = (function() {
     var el = document.getElementById('sidePanel-kancil');
     if (!el || !el.dataset.kancilUrl) { return null; }
@@ -382,36 +387,68 @@
     kancilEnsureSession();
   };
 
+  /** Deep link sesi BARU dengan prompt pertama yang otomatis terkirim (gov3code #10727). */
+  function kancilDeepLink(text) {
+    return KANCIL.url + '/' + KANCIL.b64 + '/session?prompt=' + encodeURIComponent(text) + '&send=1';
+  }
+
   /**
-   * Kirim satu prompt ke sesi kancil BARU di proyek KANCIL.dir, lalu arahkan
-   * iframe ke sesi itu — hanya SETELAH pesan terkirim.
+   * Jalur 1: serahkan prompt ke sesi yang SEDANG terbuka di iframe lewat postMessage
+   * {type:'gov3.prompt'} — app membalas {type:'gov3.prompt.ack', state} (#10727).
+   * → Promise<'OK' | 'NO_ACK'>; 'NO_ACK' = iframe belum dimuat / binary lama / composer
+   *   tidak mengambilnya → pemanggil jatuh ke jalur 2 (deep link).
+   */
+  function kancilPost(text) {
+    var frame = document.getElementById('sidePanelKancilFrame');
+    if (!KANCIL || !KANCIL.ready || !frame || !frame.getAttribute('src') || !frame.contentWindow) {
+      return Promise.resolve('NO_ACK');
+    }
+    var id = 'kp' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    return new Promise(function(resolve) {
+      var done = false;
+      var timer = setTimeout(function() { finish('NO_ACK'); }, 1500);   // app tidak menjawab sama sekali
+      function finish(res) {
+        if (done) { return; }
+        done = true;
+        clearTimeout(timer);
+        window.removeEventListener('message', onMsg);
+        resolve(res);
+      }
+      function onMsg(ev) {
+        var d = ev.data;
+        if (ev.origin !== KANCIL.url || !d || d.type !== 'gov3.prompt.ack' || d.id !== id) { return; }
+        if (d.state === 'sent' || d.state === 'prefilled') { finish('OK'); return; }
+        if (d.state === 'ignored') { finish('NO_ACK'); return; }
+        // 'received': diantre sampai model siap — beri waktu lebih; kalau lewat, jalur 2
+        // memuat ulang iframe sehingga antrean itu ikut hangus (tidak terkirim dobel).
+        clearTimeout(timer);
+        timer = setTimeout(function() { finish('NO_ACK'); }, 8000);
+      }
+      window.addEventListener('message', onMsg);
+      try {
+        frame.contentWindow.postMessage({ type: 'gov3.prompt', id: id, text: text, send: true }, KANCIL.url);
+      } catch (e) { finish('NO_ACK'); }
+    });
+  }
+
+  /**
+   * Kirim satu prompt ke Kancil: ke sesi yang sedang terbuka (jalur 1), atau —
+   * bila iframe belum bersesi / tidak menjawab — sebagai prompt pertama sesi baru
+   * lewat deep link (jalur 2). Iframe hanya dimuat SETELAH probe sesi OK.
    * → Promise<'OK' | 'BELUM_LOGIN' | 'TIDAK_BERHAK' | 'GAGAL_KIRIM' | 'GAGAL_SAMBUNG'>
    */
   window.kancilAsk = function(prompt) {
     if (!KANCIL) { return Promise.resolve('GAGAL_SAMBUNG'); }
     var text = String(prompt == null ? '' : prompt).trim();
     if (!text) { return Promise.resolve('GAGAL_KIRIM'); }
-    var q = '?directory=' + encodeURIComponent(KANCIL.dir);
-    var frame = document.getElementById('sidePanelKancilFrame');
-    return fetch(KANCIL.url + '/session' + q, {
-      method: 'POST', credentials: 'include', redirect: 'manual',
-      headers: { 'Content-Type': 'application/json' }, body: '{}'
-    }).then(function(r1) {
-      if (!r1.ok) { return kancilApplyState(r1.status === 403 ? 'TIDAK_BERHAK' : 'BELUM_LOGIN'); }
-      return r1.json().then(function(s) {
-        if (!s || !s.id) { return 'GAGAL_KIRIM'; }
-        return fetch(KANCIL.url + '/session/' + encodeURIComponent(s.id) + '/message' + q, {
-          method: 'POST', credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ parts: [{ type: 'text', text: text }] })
-        }).then(function(r2) {
-          if (!r2.ok) { return 'GAGAL_KIRIM'; }
-          KANCIL.pendingUrl = KANCIL.url + '/' + KANCIL.b64 + '/session/' + encodeURIComponent(s.id);
-          if (frame) { frame.removeAttribute('src'); }   // paksa navigasi ke sesi baru
-          return kancilApplyState('OK');
-        });
-      });
-    }).catch(function() { return kancilApplyState('GAGAL_SAMBUNG'); });
+    return kancilPost(text).then(function(res) {
+      if (res === 'OK') { return 'OK'; }
+      KANCIL.pendingUrl = kancilDeepLink(text);
+      var frame = document.getElementById('sidePanelKancilFrame');
+      if (frame) { frame.removeAttribute('src'); }   // paksa navigasi ke sesi baru
+      KANCIL.ready = false;                           // probe ulang: cookie bisa kedaluwarsa
+      return kancilEnsureSession();
+    });
   };
 
   function kancilEsc(s) {
