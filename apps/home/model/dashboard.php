@@ -1,6 +1,7 @@
 <?php namespace App\home\model;
 
 use DB;
+use Gov2lib\context;
 
 /**
  * Dashboard portal landing (app home) — Lebah #5210.
@@ -15,6 +16,12 @@ use DB;
  *
  * extends crudHandler supaya konek DB sejak constructor (model document tidak
  * konek DB saat index()/render — lihat #5209).
+ *
+ * Konteks konten (rencana/filter-konteks-instansi-wilayah.md §3.6): saat filter
+ * Instansi/Wilayah menunjuk portal LAIN, pembacaan tabel portal (dashboard_ingest,
+ * member, instansi, wilayah) pindah ke koneksi reader lintas-DB lewat
+ * \Gov2lib\context::connector(). Tanpa konteks (632 portal lain) reader() jatuh ke
+ * DB:: global yang sama persis seperti sebelumnya — no-op.
  */
 class dashboard extends \Gov2lib\crudHandler {
     function __construct () {
@@ -29,12 +36,29 @@ class dashboard extends \Gov2lib\crudHandler {
     function dependencies () {
     }
 
+    /**
+     * Koneksi baca tabel PORTAL. Konteks menunjuk portal lain → MeekroDB dari
+     * DSN reader lintas-DB (SELECT-only, DB di-override ke {scope}_{slug});
+     * selain itu instance global DB:: — identik dengan DB::queryFirstRow(...) dsb,
+     * karena DB::__callStatic memang meneruskan ke DB::getMDB().
+     *
+     * Dipanggil hanya dari dalam blok try: DSN reader yang belum terdaftar
+     * membuat DBConnector::$db tidak terinisialisasi (\Error), dan itu ikut
+     * tertangkap catch (\Throwable) di pemanggil → nilai default tetap dipakai.
+     */
+    private function reader(): \MeekroDB {
+        if (context::isForeign()) {
+            return context::connector()->db;
+        }
+        return DB::getMDB();
+    }
+
     public function getKelengkapan(): ?array {
         try {
             // Cache lokal: scope metadata. self_* di tabel ini stale/abandoned —
             // di-override oleh live overlay. rollup_* DEPRECATED di sini —
             // sekarang dibaca dari gov3_central.dashboard_rollup.
-            $row = DB::queryFirstRow("SELECT * FROM `dashboard_ingest` LIMIT 1");
+            $row = $this->reader()->queryFirstRow("SELECT * FROM `dashboard_ingest` LIMIT 1");
             if (!$row) return null;
 
             // Live overlay self_* dari tabel lokal (member/instansi/wilayah).
@@ -61,6 +85,10 @@ class dashboard extends \Gov2lib\crudHandler {
      * Baca rollup_* dari tabel central gov3_central.dashboard_rollup.
      * Overlay ke $row. Degrades gracefully kalau central table belum ada
      * atau user tidak punya SELECT (rollup_* stays default NULL).
+     *
+     * Sengaja TETAP lewat DB:: global walau konteks aktif: gov3_central sudah
+     * lintas-DB dari kredensial portal sendiri, dan $row['scope_slug'] yang
+     * dipakai sebagai kunci sudah berasal dari dashboard_ingest portal konteks.
      */
     private function overlayRollupCentral(array $row): array {
         try {
@@ -81,13 +109,14 @@ class dashboard extends \Gov2lib\crudHandler {
     }
 
     /**
-     * Hitung self_* live dari tabel lokal portal. Override field self_* di $row.
-     * Degrades gracefully kalau tabel sumber tidak ada (counter tetap 0/null).
+     * Hitung self_* live dari tabel portal (portal sendiri, atau portal konteks
+     * bila filter Instansi/Wilayah aktif — lihat reader()). Override field self_*
+     * di $row. Degrades gracefully kalau tabel sumber tidak ada (counter tetap 0/null).
      */
     private function overlaySelfLive(array $row): array {
         // Member: COUNT total + per role (enum: webmaster/admin/member/guest).
         try {
-            $m = DB::queryFirstRow("
+            $m = $this->reader()->queryFirstRow("
                 SELECT COUNT(*)                    AS total,
                        SUM(role='webmaster')       AS webmaster,
                        SUM(role='admin')           AS admin,
@@ -106,8 +135,9 @@ class dashboard extends \Gov2lib\crudHandler {
 
         // Instansi: COUNT total + breakdown by level_label.
         try {
-            $row['self_instansi_total'] = (int) DB::queryFirstField("SELECT COUNT(*) FROM `instansi`");
-            $bd = DB::query("SELECT IFNULL(level_label, 'unknown') AS k, COUNT(*) AS v FROM `instansi` GROUP BY level_label");
+            $db = $this->reader();
+            $row['self_instansi_total'] = (int) $db->queryFirstField("SELECT COUNT(*) FROM `instansi`");
+            $bd = $db->query("SELECT IFNULL(level_label, 'unknown') AS k, COUNT(*) AS v FROM `instansi` GROUP BY level_label");
             $row['self_instansi_breakdown'] = $this->bdAssoc($bd);
         } catch (\Throwable $e) { /* instansi absent → keep cache defaults */ }
 
@@ -121,10 +151,11 @@ class dashboard extends \Gov2lib\crudHandler {
                 'prov'  => 'kabupaten',   // gov3 wilayah pakai 'kabupaten' untuk gabungan kab+kota
                 default => 'kecamatan',   // kab/kota
             };
-            $row['self_wilayah_total'] = (int) DB::queryFirstField(
+            $db = $this->reader();
+            $row['self_wilayah_total'] = (int) $db->queryFirstField(
                 "SELECT COUNT(*) FROM `wilayah` WHERE level_label = %s", $primaryLevel
             );
-            $bd = DB::query("SELECT IFNULL(level_label, 'unknown') AS k, COUNT(*) AS v FROM `wilayah` GROUP BY level_label");
+            $bd = $db->query("SELECT IFNULL(level_label, 'unknown') AS k, COUNT(*) AS v FROM `wilayah` GROUP BY level_label");
             $row['self_wilayah_breakdown'] = $this->bdAssoc($bd);
         } catch (\Throwable $e) { /* wilayah absent → keep cache defaults */ }
 

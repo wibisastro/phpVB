@@ -15,6 +15,13 @@
       </div>
     </div>
 
+    <!-- Badge konteks (mode supervisor saja) -->
+    <div v-if="config.supervisor && contextBadge" class="px-3 py-1 border-bottom bg-body-tertiary">
+      <span class="badge text-bg-light border fw-normal" style="font-size:0.7rem">
+        <i class="bi me-1" :class="contextIcon"></i>{{ contextBadge }}
+      </span>
+    </div>
+
     <!-- Lock notice -->
     <div v-if="config.locked" class="px-3 py-2 text-muted small border-bottom">
       <i class="bi bi-lock me-1"></i>Instansi dikunci sesuai role <strong>{{ config.userRole }}</strong>
@@ -24,7 +31,7 @@
     <div v-if="!config.locked" class="px-3 py-2 border-bottom">
       <div class="position-relative">
         <input type="text" class="form-control form-control-sm ps-4" v-model="search"
-               placeholder="Cari instansi..." @input="onSearch">
+               :placeholder="searchPlaceholder" @input="onSearch">
         <i class="bi bi-search position-absolute" style="left:10px;top:7px;font-size:0.8rem;color:#aaa"></i>
       </div>
     </div>
@@ -49,11 +56,11 @@
           <li v-if="searchResults.length === 0" class="list-group-item border-0 px-3 py-2 text-muted small">
             Tidak ditemukan
           </li>
-          <li v-for="item in searchResults" :key="item.id"
+          <li v-for="item in searchResults" :key="'s-' + itemKey(item)"
               class="list-group-item border-0 px-3 py-2 list-group-item-action"
-              :class="{ 'bg-primary-subtle': config.unit_id == item.id }"
+              :class="{ 'bg-primary-subtle': isSelected(item) }"
               style="cursor:pointer" @click="selectUnit(item)">
-            <span class="small" :class="{ 'fw-bold': config.unit_id == item.id }"><strong>{{ item.kode }}</strong> - {{ item.nama }}</span>
+            <span class="small" :class="{ 'fw-bold': isSelected(item) }"><strong>{{ item.kode }}</strong> - {{ item.nama }}</span>
           </li>
         </ul>
       </div>
@@ -67,22 +74,22 @@
           <li v-if="treeItems.length === 0" class="list-group-item border-0 px-3 py-2 text-muted small">
             Tidak ada data
           </li>
-          <template v-for="item in treeItems" :key="item.id">
+          <template v-for="item in treeItems" :key="itemKey(item)">
             <!-- Eselon 1 header: chevron = expand, area nama = pilih -->
             <li class="list-group-item border-0 p-0"
-                :class="{ 'bg-primary-subtle': config.unit_id == item.id }">
+                :class="{ 'bg-primary-subtle': isSelected(item) }">
               <div class="d-flex align-items-stretch">
                 <button type="button"
                         class="btn btn-sm border-0 rounded-0 px-2 py-2 expand-toggle"
-                        :title="item.expanded ? 'Tutup sub instansi' : 'Buka sub instansi'"
+                        :title="expandTitle(item)"
                         @click.stop="toggleExpand(item)">
                   <i class="bi" :class="item.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"
                      style="font-size:0.75rem"></i>
                 </button>
                 <a href="#"
                    class="flex-grow-1 px-2 py-2 small fw-semibold text-decoration-none select-area"
-                   :class="config.unit_id == item.id ? 'fw-bold text-primary' : 'text-body'"
-                   title="Pilih instansi ini"
+                   :class="isSelected(item) ? 'fw-bold text-primary' : 'text-body'"
+                   :title="selectTitle(item)"
                    @click.prevent="selectUnit(item)">
                   <span>{{ item.kode }}</span> - {{ item.nama }}
                   <i class="bi bi-check2 select-hint ms-1 text-primary"></i>
@@ -91,21 +98,21 @@
             </li>
             <!-- Eselon 2 children (shown when expanded) -->
             <template v-if="item.expanded">
-              <li v-if="item.childrenLoading" :key="'l-' + item.id"
+              <li v-if="item.childrenLoading" :key="'l-' + itemKey(item)"
                   class="list-group-item border-0 ps-5 py-1 text-muted small">
                 <div class="spinner-border spinner-border-sm me-1"></div> Memuat...
               </li>
-              <li v-for="child in item.childrenData" :key="'c-' + child.id"
+              <li v-for="child in item.childrenData" :key="'c-' + itemKey(child)"
                   class="list-group-item border-0 ps-5 py-1 list-group-item-action"
-                  :class="{ 'bg-primary-subtle': config.unit_id == child.id }"
+                  :class="{ 'bg-primary-subtle': isSelected(child) }"
                   style="cursor:pointer"
                   @click="selectUnit(child)">
-                <span class="small" :class="{ 'fw-bold': config.unit_id == child.id }">{{ child.kode }} - {{ child.nama }}</span>
+                <span class="small" :class="{ 'fw-bold': isSelected(child) }">{{ child.kode }} - {{ child.nama }}</span>
               </li>
               <li v-if="!item.childrenLoading && item.childrenData && item.childrenData.length === 0"
-                  :key="'e-' + item.id"
+                  :key="'e-' + itemKey(item)"
                   class="list-group-item border-0 ps-5 py-1 text-muted small">
-                Tidak ada sub instansi
+                {{ emptyChildLabel(item) }}
               </li>
             </template>
           </template>
@@ -120,7 +127,13 @@ module.exports = {
   name: 'cube-instansi',
   data() {
     return {
-      config: { userRole: '', locked: false, unit_nama: '', unit_id: null, parent_id: null, portal: '' },
+      // supervisor / ctx / sub_org_term / wilayah_nama = tambahan konteks lintas-portal.
+      // Default di bawah = perilaku portal biasa (non-supervisor) → UI identik.
+      config: {
+        userRole: '', locked: false, unit_nama: '', unit_id: null, parent_id: null, portal: '',
+        supervisor: false, sub_org_term: 'OPD', wilayah_nama: '',
+        ctx: { active: false, scope: '', slug: '', unit: '', unit_id: 0, foreign: false }
+      },
       treeItems: [],
       loading: false,
       search: '',
@@ -131,7 +144,58 @@ module.exports = {
       errorMsg: ''
     }
   },
+  computed: {
+    ctx() {
+      return this.config.ctx || { active: false, scope: '', slug: '', unit: '', unit_id: 0 };
+    },
+    // Sebutan sub-organisasi; portal biasa tetap memakai kata "instansi".
+    orgTerm() {
+      return this.config.supervisor ? (this.config.sub_org_term || 'Unit Kerja') : 'instansi';
+    },
+    searchPlaceholder() {
+      return this.config.supervisor ? ('Cari ' + this.orgTerm + '...') : 'Cari instansi...';
+    },
+    // Konteks daerah → daftar = OPD pemda; selain itu daftar = registry K/L.
+    isDaerah() {
+      var s = this.ctx.scope;
+      return !!this.ctx.slug && (s === 'prov' || s === 'kab' || s === 'kota');
+    },
+    contextBadge() {
+      if (!this.config.supervisor) return '';
+      if (this.isDaerah) {
+        return 'OPD — ' + (this.config.wilayah_nama || this.ctx.slug);
+      }
+      return 'Semua Kementerian/Lembaga';
+    },
+    contextIcon() {
+      return this.isDaerah ? 'bi-geo-alt-fill' : 'bi-bank';
+    }
+  },
   methods: {
+    // Node K/L virtual punya id 0 untuk semua baris → kunci pakai `node`.
+    itemKey(item) {
+      if (!item) return '';
+      return item.node ? item.node : ('id-' + item.id);
+    },
+    isSelected(item) {
+      if (!item) return false;
+      if (item.is_portal) {
+        return !!(this.ctx.slug && this.ctx.slug === item.slug && !this.ctx.unit);
+      }
+      return this.config.unit_id == item.id && !!item.id;
+    },
+    expandTitle(item) {
+      if (item && item.is_portal) {
+        return item.expanded ? 'Tutup daftar unit kerja' : 'Buka daftar unit kerja';
+      }
+      return (item && item.expanded) ? 'Tutup sub instansi' : 'Buka sub instansi';
+    },
+    selectTitle(item) {
+      return (item && item.is_portal) ? 'Pilih kementerian/lembaga ini' : 'Pilih instansi ini';
+    },
+    emptyChildLabel(item) {
+      return (item && item.is_portal) ? 'Tidak ada unit kerja' : 'Tidak ada sub instansi';
+    },
     loadConfig() {
       axios.get('/gov2option/index/getUnitKerjaConfig')
         .then(resp => {
@@ -170,9 +234,19 @@ module.exports = {
         this.loadChildren(item);
       }
     },
+    // Node K/L virtual dikirim lewat query string ?node=kl:{slug} (bukan segmen
+    // path) supaya route /gov2option/index/{cmd}[/{id}] tidak perlu berubah.
+    childrenUrl(item) {
+      if (item.is_portal && item.node) {
+        return '/gov2option/index/getUnitKerjaList?node=' + encodeURIComponent(item.node);
+      }
+      var url = '/gov2option/index/getUnitKerjaList/' + item.id;
+      if (item.slug) url += '?slug=' + encodeURIComponent(item.slug);
+      return url;
+    },
     loadChildren(item) {
       item.childrenLoading = true;
-      axios.get('/gov2option/index/getUnitKerjaList/' + item.id)
+      axios.get(this.childrenUrl(item))
         .then(resp => {
           item.childrenData = resp.data || [];
           item.childrenLoading = false;
@@ -184,29 +258,54 @@ module.exports = {
     },
     selectUnit(item) {
       var parentId = item.parent_id || 0;
-      var url = '/gov2option/index/changePortal/' + item.id
-              + '?portal=' + encodeURIComponent(item.portal || '')
-              + '&nama=' + encodeURIComponent(item.nama)
-              + '&parent_id=' + parentId;
+      var url;
+      if (item.is_portal && item.node) {
+        url = '/gov2option/index/changePortal'
+            + '?node=' + encodeURIComponent(item.node)
+            + '&nama=' + encodeURIComponent(item.nama);
+      } else {
+        url = '/gov2option/index/changePortal/' + item.id
+            + '?portal=' + encodeURIComponent(item.portal || '')
+            + '&nama=' + encodeURIComponent(item.nama)
+            + '&parent_id=' + parentId;
+        if (item.slug)  url += '&slug=' + encodeURIComponent(item.slug);
+        if (item.scope) url += '&scope=' + encodeURIComponent(item.scope);
+      }
       axios.get(url)
         .then(resp => {
+          var data = resp.data || {};
           this.config.unit_nama = item.nama;
-          this.config.unit_id = item.id;
-          this.config.parent_id = parentId;
+          this.config.unit_id = item.is_portal ? 0 : item.id;
+          this.config.parent_id = item.is_portal ? 0 : parentId;
           this.config.portal = item.portal || '';
+          if (data.ctx) this.config.ctx = data.ctx;
           this.search = '';
           this.searchMode = false;
           this.updateTopbar();
+          // Pilih K/L → server melepas filter wilayah; topbar ikut dikosongkan.
+          if (data.wilayah_cleared) {
+            this.config.wilayah_nama = '';
+            this.clearWilayahTopbar();
+          }
+          if (this.config.supervisor) this.loadConfig();
         })
         .catch(e => console.log('changePortal:', e.message));
     },
     resetUnit() {
       axios.get('/gov2option/index/resetPortal')
         .then(resp => {
+          var data = resp.data || {};
           this.config.unit_nama = '';
           this.config.unit_id = null;
+          this.config.parent_id = null;
           this.config.portal = '';
+          if (data.ctx) this.config.ctx = data.ctx;
           this.updateTopbar();
+          // Root list bisa berubah (registry K/L ⇄ OPD pemda) → muat ulang.
+          if (this.config.supervisor) {
+            this.loadConfig();
+            this.loadTree();
+          }
         })
         .catch(e => console.log('resetPortal:', e.message));
     },
@@ -231,6 +330,12 @@ module.exports = {
       var unitId = this.config.unit_id;
       var parentId = this.config.parent_id;
       var self = this;
+      // Root = registry K/L: id semua node 0, sehingga heuristik parent_id di
+      // bawah tidak berlaku (dan akan memicu ~99 request). Pakai jalur khusus.
+      if (this.treeItems.length > 0 && this.treeItems[0].is_portal) {
+        this.autoExpandPortal();
+        return;
+      }
       if (!unitId || this.treeItems.length === 0) return;
       // If parent_id available, use it directly
       if (parentId) {
@@ -270,7 +375,7 @@ module.exports = {
       this.treeItems.forEach(function(item) {
         if (!item.childrenData || item.childrenData.length === 0) {
           item.childrenLoading = true;
-          axios.get('/gov2option/index/getUnitKerjaList/' + item.id)
+          axios.get(self.childrenUrl(item))
             .then(function(resp) {
               var children = resp.data || [];
               item.childrenData = children;
@@ -289,6 +394,22 @@ module.exports = {
         }
       });
     },
+    // Buka K/L yang sedang jadi konteks (satu request, bukan seluruh registry).
+    autoExpandPortal() {
+      var slug = this.ctx.slug;
+      if (!slug) return;
+      for (var i = 0; i < this.treeItems.length; i++) {
+        if (this.treeItems[i].slug === slug) {
+          var portal = this.treeItems[i];
+          this.treeItems.forEach(function(x) { x.expanded = false; });
+          portal.expanded = true;
+          if (!portal.childrenData || portal.childrenData.length === 0) {
+            this.loadChildren(portal);
+          }
+          return;
+        }
+      }
+    },
     updateTopbar() {
       var el = document.getElementById('topbarUnitKerja');
       if (!el) return;
@@ -305,6 +426,21 @@ module.exports = {
       var tooltip = bootstrap.Tooltip.getInstance(el);
       if (tooltip) { tooltip.dispose(); }
       new bootstrap.Tooltip(el);
+    },
+    // Kembalikan indikator wilayah ke default (tiru gov2wilayah/vue/wilayah.vue).
+    clearWilayahTopbar() {
+      var el = document.getElementById('topbarWilayah');
+      if (el) {
+        el.innerHTML = '<i class="bi bi-geo-alt" style="font-size:1rem"></i>'
+          + '<span class="d-none d-lg-inline ms-1 text-muted" style="font-size:0.8rem">Wilayah</span>';
+      }
+      var menu = document.getElementById('topbarWilayahMenu');
+      if (menu) {
+        menu.innerHTML = '<div class="px-3 py-2 text-muted small">Belum dipilih</div>'
+          + '<div class="dropdown-divider my-1"></div>'
+          + '<a class="dropdown-item small" href="#" onclick="event.preventDefault(); openSidePanel(\'wilayah\')">'
+          + '<i class="bi bi-pencil-square me-2"></i>Pilih Wilayah</a>';
+      }
     },
     handleError(e) {
       var msg = 'Terjadi kesalahan';

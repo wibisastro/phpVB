@@ -5,10 +5,15 @@ namespace Gov2lib;
 /**
  * Unified reader for app-local text data files (tier statis — tanpa database).
  *
- * Resolves files under {appDir}/{format}/ with the same multi-tenant lookup
- * chain as document::body('readMD'):
- *   1. {appDir}/{format}/{tenant}/{name}.{format}
- *   2. {appDir}/{format}/{name}.{format}
+ * Resolves files under {appDir}/{format}/ with the same lookup chain as
+ * document::body('readMD') — see candidateDirs():
+ *   1. {appDir}/{format}/{context::path()}/{name}.{format}   — {slug}/{unit} (konteks aktif)
+ *   2. {appDir}/{format}/{context::tenant()}/{name}.{format} — {slug} konteks, atau tenant portal
+ *   3. {appDir}/{format}/{name}.{format}                     — generik
+ *
+ * Tanpa konteks konten aktif (key ctx_* di sesi kosong) rantai ini identik
+ * dengan sebelumnya: {tenant}/ lalu root — no-op untuk portal non-pilot.
+ * Rujukan desain: rencana/filter-konteks-instansi-wilayah.md (bagian 3.4).
  *
  * Path safety: format allowlist, filename pattern ^[a-zA-Z0-9_-]+$, realpath
  * base-dir containment check, per-format size cap from
@@ -67,14 +72,12 @@ class fileSource
         }
 
         $real = false;
-        $tenant = self::tenant();
 
-        if ($tenant !== '') {
-            $real = realpath("{$baseReal}/{$tenant}/{$name}.{$format}");
-        }
-
-        if (!$real) {
-            $real = realpath("{$baseReal}/{$name}.{$format}");
+        foreach (self::candidateDirs($baseReal) as $dir) {
+            $real = realpath("{$dir}/{$name}.{$format}");
+            if ($real) {
+                break;
+            }
         }
 
         if (!$real || !str_starts_with($real, $baseReal)) {
@@ -194,10 +197,47 @@ class fileSource
     }
 
     /**
-     * Resolve tenant slug for multi-tenant file lookup.
+     * Urutan direktori kandidat pencarian konten di bawah {base}, mengikuti
+     * konteks konten (Gov2lib\context) — first match wins:
+     *
+     *   1. {base}/{context::path()}   — '{slug}/{unit}' atau '{slug}', hanya bila konteks aktif
+     *   2. {base}/{context::tenant()} — '{slug}' bila konteks aktif (jadi duplikat dgn #1
+     *                                   saat tanpa unit), selain itu identitas portal
+     *   3. {base}                     — generik
+     *
+     * Tanpa konteks aktif hasilnya persis rantai lama: [{base}/{tenant}, {base}]
+     * (atau [{base}] saja bila tenant kosong). Duplikat dan segmen kosong dibuang.
+     * Segmen sudah tersanitasi oleh context/tenant(), tetapi dicek ulang di sini
+     * (^[a-z0-9_-]+(/[a-z0-9_-]+)?$) supaya tidak pernah menghasilkan traversal.
+     * {base} dikembalikan apa adanya (tanpa realpath) — caller yang memutuskan
+     * pengecekan containment (resolve() memakai realpath + str_starts_with).
+     *
+     * @return string[] Direktori absolut, urutan prioritas, tanpa trailing slash
+     */
+    public static function candidateDirs(string $base): array
+    {
+        $base = rtrim($base, '/');
+        $dirs = [];
+
+        foreach ([context::path(), context::tenant()] as $sub) {
+            if ($sub !== '' && preg_match('#^[a-z0-9_-]+(/[a-z0-9_-]+)?$#i', $sub)) {
+                $dirs[] = "{$base}/{$sub}";
+            }
+        }
+
+        $dirs[] = $base;
+
+        return array_values(array_unique($dirs));
+    }
+
+    /**
+     * Resolve tenant slug = identitas portal (bukan konteks konten).
      *
      * Priority: $config->domain->attr['tenant'] → first subdomain label
      * of SERVER_NAME → empty. Result is sanitized to ^[a-z0-9_-]+$.
+     *
+     * Untuk folder konten yang mengikuti filter Instansi/Wilayah pakai
+     * context::tenant() / context::path() (jatuh ke nilai ini bila tidak aktif).
      */
     public static function tenant(): string
     {

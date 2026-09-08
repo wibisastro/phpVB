@@ -245,22 +245,24 @@ class document extends customException
      *   renders to HTML. Without 'name', defaults to the caller's class
      *   short-name.
      *
-     *   Multi-tenant tenant slug resolution (in order):
-     *   1. $config->domain->attr['tenant']  — explicit XML override
-     *      <bkpm.gov2.web.id tenant="bkpm">home</bkpm.gov2.web.id>
-     *   2. First subdomain label of SERVER_NAME (auto)
-     *      bkpm.gov2.web.id → "bkpm"
-     *   3. Empty → no tenant lookup, use generic only
+     *   Folder lookup chain follows the content context (Gov2lib\context,
+     *   key sesi ctx_* dari filter Instansi/Wilayah) via
+     *   fileSource::candidateDirs() — first match wins:
+     *   1. md/{context::path()}/{name}.md   — md/{slug}/{unit}/ (konteks aktif, ada unit)
+     *   2. md/{context::tenant()}/{name}.md — md/{slug}/ konteks; tanpa konteks =
+     *                                          md/{tenant}/ identitas portal
+     *   3. md/{name}.md                     — generic fallback
      *
-     *   With a tenant slug, file lookup chain (first match wins):
-     *   1. md/{tenant}/{name}.md   — tenant subfolder
-     *   2. md/{name}.md            — generic fallback
-     *
-     *   Slug is sanitized to ^[a-z0-9_-]+$ (case-insensitive); other patterns
-     *   disable tenant lookup.
+     *   Tanpa konteks aktif rantai ini identik dengan sebelumnya
+     *   (md/{tenant}/ lalu md/) — no-op untuk portal non-pilot. Tenant portal:
+     *   $config->domain->attr['tenant'] (<bkpm.gov2.web.id tenant="bkpm">…)
+     *   → first subdomain label of SERVER_NAME → empty (generic only).
+     *   Semua segmen tersanitasi ^[a-z0-9_-]+$ (context: lowercase; tenant:
+     *   case-insensitive); pola lain menggugurkan langkah subfolder.
      *
      *   Missing files render the framework default at core/lib/md_missing.md
-     *   (with {path} substituted), with a hardcoded HTML notice as final fallback.
+     *   with {path} = semua jalur yang dicoba (dipisah " atau "), with a
+     *   hardcoded HTML notice as final fallback.
      *
      * - body('pageTitle'): without a value, defaults to ucfirst() of the
      *   caller's class short-name.
@@ -299,27 +301,30 @@ class document extends customException
             return $this->mdMissing($name !== '' ? "md/{$name}.md" : 'md/?.md');
         }
         $baseDir = dirname($controllerFile) . '/md';
-        $tenant = $this->resolveTenant();
+        $tried = [];
 
-        if ($tenant !== '' && file_exists("{$baseDir}/{$tenant}/{$name}.md")) {
-            return markdown::renderFile("{$baseDir}/{$tenant}/{$name}.md");
+        // Rantai konteks: md/{slug}/{unit}/ → md/{slug}/ → md/ (tanpa konteks:
+        // md/{tenant}/ → md/, identik dengan sebelumnya). Lihat fileSource::candidateDirs().
+        foreach (fileSource::candidateDirs($baseDir) as $dir) {
+            $file = "{$dir}/{$name}.md";
+            if (file_exists($file)) {
+                return markdown::renderFile($file);
+            }
+            $tried[] = 'md' . substr($file, strlen($baseDir));
         }
 
-        if (file_exists("{$baseDir}/{$name}.md")) {
-            return markdown::renderFile("{$baseDir}/{$name}.md");
-        }
-
-        $missingPath = $tenant !== ''
-            ? "md/{$tenant}/{$name}.md atau md/{$name}.md"
-            : "md/{$name}.md";
-        return $this->mdMissing($missingPath);
+        return $this->mdMissing(implode(' atau ', $tried));
     }
 
     /**
-     * Resolve tenant slug for multi-tenant md lookup.
+     * Resolve tenant slug = identitas portal (brand sidebar, gating Kancil).
      *
      * Priority: $config->domain->attr['tenant'] → first subdomain label
      * of SERVER_NAME → empty. Result is sanitized to ^[a-z0-9_-]+$.
+     *
+     * SENGAJA tidak mengikuti konteks konten (ctx_*): brand harus tetap
+     * menampilkan portal yang sedang dibuka, bukan portal yang sedang dilihat
+     * kontennya. Pencarian md/ memakai fileSource::candidateDirs() (lihat resolveMD()).
      */
     private function resolveTenant(): string
     {

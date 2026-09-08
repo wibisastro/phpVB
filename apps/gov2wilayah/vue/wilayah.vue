@@ -25,6 +25,11 @@
       <i class="bi bi-lock-fill me-1"></i>Wilayah dikunci sesuai role <strong>{{ config.userRole }}</strong>
     </div>
 
+    <!-- Catatan konteks (mode supervisor): wilayah terpilih tanpa portal konten -->
+    <div v-if="ctxNote" class="px-3 py-2 border-bottom bg-warning-subtle text-muted" style="font-size:0.72rem">
+      <i class="bi bi-info-circle me-1"></i>{{ ctxNote }}
+    </div>
+
     <!-- Error alert -->
     <div v-if="errorMsg" class="px-3 py-2">
       <div class="alert alert-danger alert-dismissible mb-0 small">
@@ -105,7 +110,13 @@ module.exports = {
   name: 'wilayah',
   data() {
     return {
-      config: { userRole: '', locked: false, wilayah_nama: '', wilayah_id: null, wilayah_level: '', wilayah_parent_id: null },
+      config: {
+        userRole: '', locked: false, wilayah_nama: '', wilayah_id: null, wilayah_level: '', wilayah_parent_id: null,
+        // Mode supervisor (atribut domain di config instance): wilayah menulis
+        // konteks konten lintas-portal. Portal biasa selalu false → perilaku lama.
+        supervisor: false,
+        ctx: { scope: '', slug: '', unit: '', unit_id: 0 }
+      },
       pathData: [],
       childList: [],
       selectedId: '',
@@ -114,7 +125,8 @@ module.exports = {
       hasMultipleRoots: false,
       loading: false,
       maxLevel: 4,
-      errorMsg: ''
+      errorMsg: '',
+      ctxNote: ''
     }
   },
   computed: {
@@ -228,6 +240,7 @@ module.exports = {
               + '?nama=' + encodeURIComponent(item.nama)
               + '&level=' + encodeURIComponent(item.level_label || '')
               + '&parent_id=' + parentId;
+      this.ctxNote = '';
       axios.get(url)
         .then(resp => {
           this.config.wilayah_nama = item.nama;
@@ -235,6 +248,7 @@ module.exports = {
           this.config.wilayah_level = item.level_label || '';
           this.config.wilayah_parent_id = parentId;
           this.updateTopbar();
+          this.applyContext(resp.data);
         })
         .catch(e => console.log('changeWilayah:', e.message));
     },
@@ -247,6 +261,7 @@ module.exports = {
       });
     },
     resetWilayah() {
+      this.ctxNote = '';
       axios.get('/gov2wilayah/sidepanel/resetWilayah')
         .then(resp => {
           this.config.wilayah_nama = '';
@@ -257,8 +272,36 @@ module.exports = {
           this.childList = [];
           this.loadBreadcrumb(-1);
           this.updateTopbar();
+          this.applyContext(resp.data);
         })
         .catch(e => console.log('resetWilayah:', e.message));
+    },
+    // Sinkron sesudah changeWilayah/resetWilayah. Server yang menentukan mode
+    // supervisor; portal biasa tidak pernah mengirim supervisor=true → no-op.
+    applyContext(data) {
+      if (!data || typeof data !== 'object') return;
+      this.config.supervisor = !!data.supervisor;
+      if (data.ctx) this.config.ctx = data.ctx;
+      if (!this.config.supervisor) return;
+      // Kosongkan topbar instansi HANYA bila server benar-benar mereset pilihan
+      // instansi (instansi_cleared). Pada jalur ctx_error (kecamatan/kelurahan
+      // atau lookup gagal) konteks lama sengaja dipertahankan server, jadi
+      // topbar tidak boleh mengaku "belum ada instansi terpilih".
+      if (data.instansi_cleared) this.clearInstansiTopbar();
+      this.ctxNote = data.ctx_error || '';
+    },
+    // Kebalikan updateTopbar() di cube-instansi.vue: kosongkan indikator instansi.
+    clearInstansiTopbar() {
+      var el = document.getElementById('topbarUnitKerja');
+      if (!el) return;
+      el.innerHTML = '<i class="bi bi-building" style="font-size:1rem"></i>' +
+        '<span class="d-none d-lg-inline ms-1 text-muted" style="font-size:0.8rem">Instansi</span>';
+      el.setAttribute('data-bs-title', 'Pilih Instansi');
+      try {
+        var tooltip = bootstrap.Tooltip.getInstance(el);
+        if (tooltip) { tooltip.dispose(); }
+        new bootstrap.Tooltip(el);
+      } catch (e) {}
     },
     updateTopbar() {
       // Update trigger: show selected name or default "Wilayah"

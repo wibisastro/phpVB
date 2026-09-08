@@ -16,11 +16,25 @@ class DBConnector
 
     public \MeekroDB $db;
 
-    public function __construct(string $dsn = 'master')
+    /**
+     * Nama DB pengganti <db> entri DSN ('' = pakai <db> dari XML).
+     * Dipakai Gov2lib\context untuk entri reader lintas-portal (gov3_reader)
+     * yang sengaja tanpa <db> tetap: satu entri untuk 633 DB portal.
+     */
+    private string $dbOverride = '';
+
+    /**
+     * @param string $dsn        Nama entri <dsn> di dsnSource.{STAGE}.xml
+     * @param string $dbOverride Nama DB pengganti; hanya dipakai bila cocok
+     *                           ^[a-z0-9_]+$ (kl_kemenkeu, gov3_central), selain
+     *                           itu diabaikan. Perilaku default tidak berubah.
+     */
+    public function __construct(string $dsn = 'master', string $dbOverride = '')
     {
         dsnSource::requireMeekroDB();
 
         $this->dsn = trim($dsn);
+        $this->dbOverride = preg_match('/^[a-z0-9_]+$/', $dbOverride) ? $dbOverride : '';
         $this->initializeDsn();
         $this->initializeDb();
     }
@@ -77,7 +91,7 @@ class DBConnector
                         'user' => trim((string) $dsn->user),
                         'pass' => trim((string) $dsn->pass),
                         'host' => trim((string) $dsn->host),
-                        'db' => trim((string) $dsn->db),
+                        'db' => $this->dbOverride !== '' ? $this->dbOverride : trim((string) $dsn->db),
                         'port' => !empty($dsn->port) ? (int) trim((string) $dsn->port) : 3306,
                         'connect_options' => [MYSQLI_CLIENT_COMPRESS => true],
                     ];

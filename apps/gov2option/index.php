@@ -189,18 +189,17 @@ class index extends \Gov2lib\api {
     }
 
     #---coded by claude
+    // $vars diteruskan utuh: model juga membaca ?node= / ?slug= (mode supervisor)
     function getUnitKerjaList($vars = []) {
         global $self, $doc;
-        $parentId = (int)($vars['id'] ?? 0);
-        $data = $self->getUnitKerjaList($parentId);
+        $data = $self->getUnitKerjaList(is_array($vars) ? $vars : []);
         return $doc->responseGet($data);
     }
 
     #---coded by claude
     function searchUnitKerja($vars = []) {
         global $self, $doc;
-        $keyword = $_GET['q'] ?? '';
-        $data = $self->searchUnitKerja($keyword);
+        $data = $self->searchUnitKerja(is_array($vars) ? $vars : []);
         return $doc->responseGet($data);
     }
 
@@ -218,10 +217,10 @@ class index extends \Gov2lib\api {
     }
 
     #---coded by claude
-    function resetPortal() {
-        global $self, $doc;
-        $self->resetPortal();
-        return $doc->responseGet(['status' => 'ok']);
+    // respons model diteruskan apa adanya (memuat ctx + kept_parent)
+    function resetPortal($vars = []) {
+        global $self;
+        return $self->resetPortal(is_array($vars) ? $vars : []);
     }
 
     function getRolePrivilege() {

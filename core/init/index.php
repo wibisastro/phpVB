@@ -22,6 +22,19 @@ if ($config->error) {
     $doc->exceptionHandler($config->error);
 }
 
+//--------konteks konten (filter instansi/wilayah lintas-portal)
+// Harus siap SEBELUM route.php: di sana model di-new (→ connectDB) lebih dulu
+// daripada gov2session, jadi cookie Gov2Session di-decode sendiri oleh context.
+// Tanpa key ctx_* di sesi = no-op. Gagal apa pun → tanpa konteks, request lanjut.
+// Rujukan: rencana/filter-konteks-instansi-wilayah.md
+try {
+    if (class_exists('Gov2lib\context')) {
+        Gov2lib\context::load();
+    }
+} catch (\Throwable $e) {
+    error_log('context: gagal memuat konteks konten (' . get_class($e) . ': ' . $e->getMessage() . ') - dilanjutkan tanpa konteks');
+}
+
 //--------routing
 
 require_once 'route.php';

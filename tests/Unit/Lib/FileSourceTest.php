@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Lib;
 
+use Gov2lib\context;
 use Gov2lib\fileSource;
 use PHPUnit\Framework\TestCase;
 
@@ -13,6 +14,9 @@ use PHPUnit\Framework\TestCase;
  * Tests:
  * - resolve(): allowlist, filename pattern, base-dir containment, size cap
  * - multi-tenant lookup chain (tenant subfolder wins over generic)
+ * - rantai konteks (Gov2lib\context): {slug}/{unit}/ → {slug}/ → root;
+ *   konteks kosong → perilaku lama (tenant/ → root) — prinsip no-op
+ * - candidateDirs(): urutan, dedup, tanpa segmen kosong, tolak traversal
  * - read(): parsed 'data' per format (csv/json/xml, raw formats null)
  * - parseCsv/parseJson/parseXml behavior on valid and invalid input
  * - tenant(): config override, subdomain autodetect, sanitization
@@ -24,7 +28,8 @@ class FileSourceTest extends TestCase
     protected function setUp(): void
     {
         $GLOBALS['config'] = new \SimpleXMLElement('<config/>');
-        unset($_SERVER['SERVER_NAME']);
+        unset($_SERVER['SERVER_NAME'], $_COOKIE['Gov2Session']);
+        context::reset();
 
         $this->appDir = sys_get_temp_dir() . '/filesource-test-' . uniqid();
         mkdir("{$this->appDir}/csv", 0777, true);
@@ -43,7 +48,20 @@ class FileSourceTest extends TestCase
     protected function tearDown(): void
     {
         exec('rm -rf ' . escapeshellarg($this->appDir));
-        unset($GLOBALS['config'], $_SERVER['SERVER_NAME']);
+        context::reset();
+        unset($GLOBALS['config'], $_SERVER['SERVER_NAME'], $_COOKIE['Gov2Session']);
+    }
+
+    /**
+     * Tulis file relatif terhadap appDir, membuat folder bila perlu.
+     */
+    private function put(string $rel, string $content): void
+    {
+        $path = "{$this->appDir}/{$rel}";
+        if (!is_dir(dirname($path))) {
+            mkdir(dirname($path), 0777, true);
+        }
+        file_put_contents($path, $content);
     }
 
     private function source(): fileSource
@@ -127,6 +145,150 @@ class FileSourceTest extends TestCase
 
         $this->assertNotNull($info);
         $this->assertEquals("# Halo\n", $info['content']);
+    }
+
+    // ---- rantai konteks (Gov2lib\context) ------------------------------------
+
+    public function testKonteksUnitMenangAtasSlugDanGenerik(): void
+    {
+        $_SERVER['SERVER_NAME'] = 'kemenpanrb.gov3.id';
+        $this->put('md/kemenpanrb/index.md', "# Halo PANRB\n");
+        $this->put('md/kemenkeu/index.md', "# Halo Kemenkeu\n");
+        $this->put('md/kemenkeu/itjen/index.md', "# Halo Itjen Kemenkeu\n");
+        context::load(['ctx_scope' => 'kl', 'ctx_slug' => 'kemenkeu', 'ctx_unit' => 'itjen', 'ctx_unit_id' => 5]);
+
+        $info = $this->source()->resolve('md', 'index');
+
+        $this->assertNotNull($info);
+        $this->assertEquals("# Halo Itjen Kemenkeu\n", $info['content']);
+        $this->assertStringEndsWith('/md/kemenkeu/itjen/index.md', $info['path']);
+    }
+
+    public function testKonteksUnitTanpaFileJatuhKeSlug(): void
+    {
+        $_SERVER['SERVER_NAME'] = 'kemenpanrb.gov3.id';
+        $this->put('md/kemenpanrb/index.md', "# Halo PANRB\n");
+        $this->put('md/kemenkeu/index.md', "# Halo Kemenkeu\n");
+        context::load(['ctx_scope' => 'kl', 'ctx_slug' => 'kemenkeu', 'ctx_unit' => 'itjen']);
+
+        $info = $this->source()->resolve('md', 'index');
+
+        $this->assertNotNull($info);
+        $this->assertEquals("# Halo Kemenkeu\n", $info['content']);
+    }
+
+    public function testKonteksPortalLainTidakMemakaiFolderTenantSendiri(): void
+    {
+        // Konteks menunjuk kemenkeu (tanpa folder): harus jatuh ke generik,
+        // BUKAN ke md/bkpm/ milik portal yang sedang dibuka.
+        $_SERVER['SERVER_NAME'] = 'bkpm.gov2.web.id';
+        context::load(['ctx_scope' => 'kl', 'ctx_slug' => 'kemenkeu', 'ctx_unit' => 'itjen']);
+
+        $info = $this->source()->resolve('md', 'index');
+
+        $this->assertNotNull($info);
+        $this->assertEquals("# Halo\n", $info['content']);
+    }
+
+    public function testKonteksSlugSajaMemakaiFolderSlug(): void
+    {
+        $_SERVER['SERVER_NAME'] = 'kemenpanrb.gov3.id';
+        $this->put('json/jabarprov/crud.json', '{"title": "CRUD Jabar"}');
+        context::load(['ctx_scope' => 'prov', 'ctx_slug' => 'jabarprov']);
+
+        $info = $this->source()->read('json', 'crud');
+
+        $this->assertNotNull($info);
+        $this->assertEquals('CRUD Jabar', $info['data']['title']);
+    }
+
+    public function testDrillUnitPortalSendiriMemakaiFolderBersarang(): void
+    {
+        $_SERVER['SERVER_NAME'] = 'bkpm.gov2.web.id';
+        $this->put('md/bkpm/itjen/index.md', "# Halo Itjen BKPM\n");
+        context::load(['ctx_scope' => '', 'ctx_slug' => 'bkpm', 'ctx_unit' => 'itjen', 'ctx_unit_id' => 3]);
+
+        $info = $this->source()->resolve('md', 'index');
+
+        $this->assertNotNull($info);
+        $this->assertEquals("# Halo Itjen BKPM\n", $info['content']);
+    }
+
+    public function testKonteksKosongTetapPerilakuLama(): void
+    {
+        // Folder unit ada, tetapi tanpa konteks tidak boleh dipakai (no-op).
+        $_SERVER['SERVER_NAME'] = 'bkpm.gov2.web.id';
+        $this->put('md/bkpm/itjen/index.md', "# Halo Itjen BKPM\n");
+        context::load([]);
+
+        $info = $this->source()->resolve('md', 'index');
+
+        $this->assertNotNull($info);
+        $this->assertEquals("# Halo BKPM\n", $info['content']);
+    }
+
+    public function testKonteksTakSahDiabaikanJatuhKeTenant(): void
+    {
+        $_SERVER['SERVER_NAME'] = 'bkpm.gov2.web.id';
+        context::load(['ctx_scope' => 'kl', 'ctx_slug' => '../etc', 'ctx_unit' => 'passwd']);
+
+        $info = $this->source()->resolve('md', 'index');
+
+        $this->assertNotNull($info);
+        $this->assertEquals("# Halo BKPM\n", $info['content']);
+        $this->assertEquals(["{$this->appDir}/md/bkpm", "{$this->appDir}/md"], fileSource::candidateDirs("{$this->appDir}/md"));
+    }
+
+    // ---- candidateDirs() -----------------------------------------------------
+
+    public function testCandidateDirsTanpaKonteksDanTanpaTenant(): void
+    {
+        $this->assertEquals(['/base'], fileSource::candidateDirs('/base'));
+    }
+
+    public function testCandidateDirsTanpaKonteksIdentikRantaiLama(): void
+    {
+        $_SERVER['SERVER_NAME'] = 'bkpm.gov2.web.id';
+
+        $this->assertEquals(['/base/bkpm', '/base'], fileSource::candidateDirs('/base/'));
+    }
+
+    public function testCandidateDirsKonteksSlugSajaTanpaDuplikat(): void
+    {
+        $_SERVER['SERVER_NAME'] = 'kemenpanrb.gov3.id';
+        context::load(['ctx_scope' => 'kl', 'ctx_slug' => 'kemenkeu']);
+
+        $this->assertEquals(['/base/kemenkeu', '/base'], fileSource::candidateDirs('/base'));
+    }
+
+    public function testCandidateDirsKonteksUnitBersarang(): void
+    {
+        $_SERVER['SERVER_NAME'] = 'kemenpanrb.gov3.id';
+        context::load(['ctx_scope' => 'kl', 'ctx_slug' => 'kemenkeu', 'ctx_unit' => 'itjen']);
+
+        $this->assertEquals(
+            ['/base/kemenkeu/itjen', '/base/kemenkeu', '/base'],
+            fileSource::candidateDirs('/base')
+        );
+    }
+
+    public function testCandidateDirsDrillUnitPortalSendiri(): void
+    {
+        $_SERVER['SERVER_NAME'] = 'kemenpanrb.gov3.id';
+        context::load(['ctx_scope' => '', 'ctx_slug' => 'kemenpanrb', 'ctx_unit' => 'itjen']);
+
+        $this->assertEquals(
+            ['/base/kemenpanrb/itjen', '/base/kemenpanrb', '/base'],
+            fileSource::candidateDirs('/base')
+        );
+    }
+
+    public function testCandidateDirsTenantDariConfigHurufBesarTetapDipakai(): void
+    {
+        // fileSource::tenant() case-insensitive: 'BKPM' dari attr tenant tetap jadi kandidat
+        $GLOBALS['config'] = new \SimpleXMLElement('<config><domain><attr tenant="BKPM"/></domain></config>');
+
+        $this->assertEquals(['/base/BKPM', '/base'], fileSource::candidateDirs('/base'));
     }
 
     public function testReadParsesCsv(): void
