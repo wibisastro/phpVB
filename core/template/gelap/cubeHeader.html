@@ -94,22 +94,6 @@
     </a>
     <!-- Instansi indicator ends -->
 
-    <!-- Indikator konteks konten start -->
-    {# Konteks konten (rencana/filter-konteks-instansi-wilayah.md §3.2): ctx_* ditulis
-       changeWilayah/changePortal. Tanpa ctx_slug chip tidak dirender sama sekali,
-       jadi 632 portal non-supervisor melihat topbar yang persis sama seperti dulu. #}
-    {% if _SESSION['ctx_slug'] %}
-    <span class="vr mx-1 d-none d-lg-inline" style="opacity:0.15"></span>
-    <a href="#" id="topbarKonteks"
-       class="badge rounded-pill fw-normal d-flex align-items-center text-decoration-none bg-warning-subtle text-warning-emphasis border border-warning-subtle"
-       style="font-size:0.7rem; padding:0.3rem 0.6rem; white-space:nowrap"
-       title="Konten yang ditampilkan berasal dari instansi ini — klik untuk mengganti"
-       onclick="event.preventDefault(); openSidePanel('instansi')">
-      <i class="bi bi-layers me-1" style="font-size:0.8rem"></i>
-      <span class="text-truncate" style="max-width:180px">Konteks: {{ _SESSION['ctx_slug'] }}{% if _SESSION['ctx_unit'] %} / {{ _SESSION['ctx_unit'] }}{% endif %}</span>
-    </a>
-    {% endif %}
-    <!-- Indikator konteks konten ends -->
 
   {% endif %}
 

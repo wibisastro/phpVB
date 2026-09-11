@@ -131,7 +131,7 @@ module.exports = {
       // Default di bawah = perilaku portal biasa (non-supervisor) → UI identik.
       config: {
         userRole: '', locked: false, unit_nama: '', unit_id: null, parent_id: null, portal: '',
-        supervisor: false, sub_org_term: 'OPD', wilayah_nama: '',
+        supervisor: false, sub_org_term: 'OPD', wilayah_nama: '', portal_nama: '',
         ctx: { active: false, scope: '', slug: '', unit: '', unit_id: 0, foreign: false }
       },
       treeItems: [],
@@ -141,7 +141,10 @@ module.exports = {
       searchLoading: false,
       searchMode: false,
       searchTimer: null,
-      errorMsg: ''
+      errorMsg: '',
+      // Konteks (scope|slug) saat daftar akar terakhir dimuat; berbeda → muat ulang.
+      treeLoaded: false,
+      treeCtxKey: ''
     }
   },
   computed: {
@@ -162,8 +165,12 @@ module.exports = {
     },
     contextBadge() {
       if (!this.config.supervisor) return '';
+      var nama = this.config.portal_nama || this.ctx.slug;
       if (this.isDaerah) {
-        return 'OPD — ' + (this.config.wilayah_nama || this.ctx.slug);
+        return 'OPD — ' + (this.config.wilayah_nama || nama);
+      }
+      if (this.ctx.scope === 'kl' && this.ctx.slug) {
+        return 'Unit Kerja — ' + nama;
       }
       return 'Semua Kementerian/Lembaga';
     },
@@ -196,17 +203,34 @@ module.exports = {
     emptyChildLabel(item) {
       return (item && item.is_portal) ? 'Tidak ada unit kerja' : 'Tidak ada sub instansi';
     },
+    // Kunci konteks yang menentukan isi daftar akar (unit tidak ikut: memilih
+    // unit hanya mengubah sorotan, bukan daftarnya).
+    ctxKey() {
+      return (this.ctx.scope || '') + '|' + (this.ctx.slug || '');
+    },
+    // Config dulu, baru daftar: daftar akar mode supervisor bergantung pada
+    // konteks (registry K/L ⇄ OPD pemda ⇄ unit kerja K/L), jadi dimuat ulang
+    // setiap konteks berubah — termasuk perubahan dari panel Wilayah atau
+    // tautan halaman audit, tanpa perlu memuat ulang browser.
     loadConfig() {
       axios.get('/gov2option/index/getUnitKerjaConfig')
         .then(resp => {
           this.config = resp.data || this.config;
           this.updateTopbar();
-          this.autoExpandSelected();
+          if (!this.treeLoaded || (this.config.supervisor && this.ctxKey() !== this.treeCtxKey)) {
+            this.loadTree();
+          } else {
+            this.autoExpandSelected();
+          }
         })
-        .catch(e => console.log('instansi config:', e.message));
+        .catch(e => {
+          console.log('instansi config:', e.message);
+          if (!this.treeLoaded) this.loadTree();
+        });
     },
     loadTree() {
       this.loading = true;
+      this.treeCtxKey = this.ctxKey();
       axios.get('/gov2option/index/getUnitKerjaList')
         .then(resp => {
           var items = resp.data || [];
@@ -216,6 +240,7 @@ module.exports = {
             item.childrenLoading = false;
           });
           this.treeItems = items;
+          this.treeLoaded = true;
           this.loading = false;
           this.autoExpandSelected();
         })
@@ -301,11 +326,9 @@ module.exports = {
           this.config.portal = '';
           if (data.ctx) this.config.ctx = data.ctx;
           this.updateTopbar();
-          // Root list bisa berubah (registry K/L ⇄ OPD pemda) → muat ulang.
-          if (this.config.supervisor) {
-            this.loadConfig();
-            this.loadTree();
-          }
+          // Reset = naik satu tingkat (unit → induk, induk K/L → registry);
+          // loadConfig memuat ulang daftar bila konteks daftarnya berubah.
+          if (this.config.supervisor) this.loadConfig();
         })
         .catch(e => console.log('resetPortal:', e.message));
     },
@@ -463,8 +486,8 @@ module.exports = {
     }
   },
   created() {
+    // loadConfig memuat daftar akar setelah config diketahui (lihat loadConfig).
     this.loadConfig();
-    this.loadTree();
   },
   mounted() {
     var el = document.getElementById('sidePanelOffcanvas');
@@ -473,6 +496,10 @@ module.exports = {
         this.loadConfig();
       });
     }
+    // Panel Wilayah (dan penyetel konteks lain) mengumumkan perubahan konteks.
+    window.addEventListener('gov2ctx', () => {
+      this.loadConfig();
+    });
   }
 }
 </script>

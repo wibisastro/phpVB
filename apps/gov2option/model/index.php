@@ -112,9 +112,6 @@ class index extends \Gov2lib\crudHandler {
     /** Pemisah pada node portal virtual ("kl:kemenkeu"). */
     private const NODE_SEP = ':';
 
-    /** Scope portal yang berarti pemerintah daerah (punya daftar OPD). */
-    private const SCOPES_DAERAH = ['prov', 'kab', 'kota'];
-
     /**
      * Normalkan slug portal/unit: lowercase, ter-trim, wajib ^[a-z0-9_-]+$.
      * Nilai tak sah (path traversal, spasi, array dari query string) → ''.
@@ -317,6 +314,8 @@ class index extends \Gov2lib\crudHandler {
         $result['ctx'] = $ctx;
         $result['sub_org_term'] = self::subOrgTerm($supervisor, $ctx['scope'], $ctx['active']);
         $result['wilayah_nama'] = $self->ses->val['wilayah_nama'] ?? '';
+        // Nama portal konteks dari registry (badge panel), hanya mode supervisor + konteks aktif.
+        $result['portal_nama'] = ($supervisor && $ctx['active']) ? $this->namaPortal($ctx['slug']) : '';
 
         return $doc->responseGet($result);
     }
@@ -371,31 +370,54 @@ class index extends \Gov2lib\crudHandler {
     }
 
     #---coded by claude
+    /**
+     * Lepas pilihan instansi SATU TINGKAT (mode supervisor), meniru perilaku
+     * filter Wilayah: unit/OPD → kembali ke induknya; induk K/L → lepas
+     * konteks (daftar kembali ke registry K/L); induk pemda yang masih
+     * dipegang filter Wilayah → konteks tetap. Portal biasa: hanya key legacy.
+     */
     function resetPortal($vars = [])
     {
         global $self, $doc;
-        $self->ses->val['opd_id'] = null;
-        $self->ses->val['opd'] = null;
-        $self->ses->val['portal_nama'] = null;
-        $self->ses->val['unit_nama'] = null;
-        $self->ses->val['unit_id'] = null;
-        $self->ses->val['unit_parent_id'] = null;
-        $self->ses->val['change_portal'] = null;
 
-        //--- supervisor + wilayah legacy masih aktif → konteks pemda dipertahankan,
-        //    hanya unit/OPD-nya yang dilepas (kembali ke induk pemda).
+        $supervisor = $this->supervisorMode();
+        $scope = $this->ctxNilai('scope');
+        $slug = $this->ctxNilai('slug');
+        $unit = $this->ctxNilai('unit');
+
+        $legacy = [
+            'opd_id' => null, 'opd' => null, 'portal_nama' => null, 'unit_nama' => null,
+            'unit_id' => null, 'unit_parent_id' => null, 'change_portal' => null,
+        ];
         $indukDipertahankan = false;
-        if ($this->supervisorMode() && !empty($self->ses->val['wilayah_id'])) {
-            $scope = $this->ctxNilai('scope');
-            $slug = $this->ctxNilai('slug');
-            if ($scope !== '' && $slug !== '') {
-                try {
+
+        if ($supervisor && $scope !== '' && $slug !== '') {
+            try {
+                if ($unit !== '') {
+                    //--- unit/OPD → induk
                     \Gov2lib\context::set($self->ses->val, $scope, $slug, '', 0);
                     $indukDipertahankan = true;
-                } catch (\Throwable $e) {
-                    error_log('gov2option: gagal mempertahankan konteks induk saat reset (' . $e->getMessage() . ')');
+                    if ($scope === 'kl') {
+                        // Induk K/L tidak diwakili filter lain, jadi tetap "terpilih" di topbar.
+                        $nama = $this->namaPortal($slug);
+                        $legacy = [
+                            'opd_id' => 0, 'opd' => $slug, 'portal_nama' => $nama, 'unit_nama' => $nama,
+                            'unit_id' => 0, 'unit_parent_id' => 0, 'change_portal' => 1,
+                        ];
+                    }
+                } elseif (!empty($self->ses->val['wilayah_id'])) {
+                    //--- induk pemda masih dipegang filter Wilayah → konteks tetap
+                    \Gov2lib\context::set($self->ses->val, $scope, $slug, '', 0);
+                    $indukDipertahankan = true;
                 }
+            } catch (\Throwable $e) {
+                error_log('gov2option: gagal mempertahankan konteks induk saat reset (' . $e->getMessage() . ')');
+                $indukDipertahankan = false;
             }
+        }
+
+        foreach ($legacy as $key => $nilai) {
+            $self->ses->val[$key] = $nilai;
         }
 
         if (!$indukDipertahankan) {
@@ -408,6 +430,7 @@ class index extends \Gov2lib\crudHandler {
         return $doc->responseGet([
             'status' => 'ok',
             'kept_parent' => $indukDipertahankan,
+            'unit_nama' => (string) ($legacy['unit_nama'] ?? ''),
             'ctx' => $this->contextInfo(),
         ]);
     }
@@ -508,8 +531,11 @@ class index extends \Gov2lib\crudHandler {
                 return $this->instansiRows($target, $parentId, $targetScope);
             }
 
-            //--- root: konteks daerah → OPD pemda; selain itu registry K/L
-            if ($active && in_array($scope, self::SCOPES_DAERAH, true)) {
+            //--- root: konteks aktif → sub-organisasi portal konteks (OPD pemda
+            //    atau unit kerja K/L), persis seperti Wilayah → daftar OPD; tanpa
+            //    konteks → registry K/L. Memilih K/L tidak lagi menyisakan daftar
+            //    99 K/L di bawahnya (keputusan Wibi 11 Sep 2026).
+            if ($active && $slug !== '') {
                 return $this->instansiRows($slug, 0, $scope);
             }
 
@@ -652,6 +678,32 @@ class index extends \Gov2lib\crudHandler {
         }
 
         return $out;
+    }
+
+    /**
+     * Nama portal dari registry pusat (monitor_snapshot.scope_name); jatuh ke
+     * slug bila kosong/tidak terdaftar/reader gagal.
+     */
+    private function namaPortal(string $slug): string
+    {
+        $slug = self::normSlug($slug);
+        if ($slug === '') {
+            return '';
+        }
+
+        try {
+            $db = \Gov2lib\context::reader()->db;
+            $nama = $db->queryFirstField(
+                "SELECT COALESCE(NULLIF(scope_name,''), scope_slug) FROM monitor_snapshot WHERE scope_slug=%s LIMIT 1",
+                $slug
+            );
+        } catch (\Throwable $e) {
+            error_log('gov2option: lookup nama portal gagal (' . $e->getMessage() . ')');
+
+            return $slug;
+        }
+
+        return (is_string($nama) && trim($nama) !== '') ? trim($nama) : $slug;
     }
 
     /**

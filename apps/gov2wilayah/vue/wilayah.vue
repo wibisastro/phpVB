@@ -289,6 +289,11 @@ module.exports = {
       // topbar tidak boleh mengaku "belum ada instansi terpilih".
       if (data.instansi_cleared) this.clearInstansiTopbar();
       this.ctxNote = data.ctx_error || '';
+      // Beri tahu panel Instansi supaya daftarnya (OPD pemda ⇄ registry K/L)
+      // dimuat ulang tanpa memuat ulang browser.
+      try {
+        window.dispatchEvent(new CustomEvent('gov2ctx', { detail: data.ctx || null }));
+      } catch (e) { /* browser tanpa CustomEvent: panel akan sinkron saat dibuka */ }
     },
     // Kebalikan updateTopbar() di cube-instansi.vue: kosongkan indikator instansi.
     clearInstansiTopbar() {
