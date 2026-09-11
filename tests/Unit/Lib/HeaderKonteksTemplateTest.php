@@ -42,11 +42,47 @@ class HeaderKonteksTemplateTest extends TestCase
                 'id="topbarKonteks"',
                 'Indikator konteks konten',
                 "Konteks: {{ _SESSION['ctx_slug'] }}",
-                "_SESSION['ctx_unit']",
             ] as $needle) {
                 $this->assertStringNotContainsString($needle, $html, "template {$name} masih memuat chip konteks: {$needle}");
             }
         }
+    }
+
+    /** @return array<string,string> blok indikator Instansi per skin */
+    private function blokInstansi(): array
+    {
+        $out = [];
+        foreach ($this->bodies() as $name => $html) {
+            $start = strpos($html, '<!-- Instansi indicator start -->');
+            $end = strpos($html, '<!-- Instansi indicator ends -->');
+            $this->assertIsInt($start, "penanda awal indikator instansi hilang di {$name}");
+            $this->assertIsInt($end, "penanda akhir indikator instansi hilang di {$name}");
+            $out[$name] = substr($html, $start, $end - $start);
+        }
+
+        return $out;
+    }
+
+    public function testLabelIndukMenempelPadaIndikatorInstansi(): void
+    {
+        // Pengganti chip (Wibi 11 Sep): unit terpilih → "Inspektorat · Kementerian PANRB".
+        // Hanya bila ctx_unit DAN ctx_nama terisi (mode supervisor); portal biasa tak berubah.
+        foreach ($this->blokInstansi() as $name => $blok) {
+            $this->assertStringContainsString("{% if _SESSION['ctx_unit'] and _SESSION['ctx_nama'] %}", $blok, "label induk hilang di {$name}");
+            $this->assertStringContainsString("{{ _SESSION['ctx_nama'] }}", $blok, "nama induk tidak dirender di {$name}");
+            $this->assertStringContainsString("{{ _SESSION['unit_nama'] }}", $blok, "nama unit hilang di {$name}");
+        }
+    }
+
+    public function testStrukturIndikatorInstansiIdentikAntaraCubeDanGelap(): void
+    {
+        $norm = static fn (string $s): string => (string) preg_replace(
+            ['/class="[^"]*"/', '/style="[^"]*"/'],
+            ['class="*"', 'style="*"'],
+            $s
+        );
+        $blok = $this->blokInstansi();
+        $this->assertSame($norm($blok['cube']), $norm($blok['gelap']), 'indikator instansi cube dan gelap menyimpang — samakan keduanya');
     }
 
     public function testIdYangDipakaiJsTidakBerubah(): void

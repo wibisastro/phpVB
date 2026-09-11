@@ -116,6 +116,7 @@ class sidepanel extends \Gov2lib\api
 
                 if ($scope !== '' && $slug !== '') {
                     context::set($self->ses->val, $scope, $slug);
+                    context::setNama($self->ses->val, is_scalar($nama) ? (string) $nama : '');
                     self::clearInstansi($self->ses->val);
                     $instansiCleared = true;
                 } elseif ($ctxError === '') {

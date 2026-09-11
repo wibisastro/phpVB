@@ -47,6 +47,14 @@ final class context
     /** Key kanonik di sesi (cookie Gov2Session). */
     public const KEYS = ['ctx_scope', 'ctx_slug', 'ctx_unit', 'ctx_unit_id'];
 
+    /**
+     * Nama portal konteks (tampilan saja, bukan bagian validitas konteks):
+     * dipakai topbar/panel untuk menunjukkan induk dari unit yang dipilih
+     * ("Inspektorat · Kementerian PANRB"). Ditulis oleh penyetel konteks
+     * (changeWilayah / changePortal), dihapus bersama KEYS oleh clear().
+     */
+    public const NAMA_KEY = 'ctx_nama';
+
     /** Tipe portal = prefiks nama DB ({scope}_{slug}). */
     public const SCOPES = ['kl', 'prov', 'kab', 'kota'];
 
@@ -298,6 +306,19 @@ final class context
         foreach (self::KEYS as $key) {
             $val[$key] = null;
         }
+        $val[self::NAMA_KEY] = null;
+    }
+
+    /**
+     * Simpan nama portal konteks untuk tampilan (teks polos, maks 200 karakter);
+     * kosong → null supaya sesSave() menimpa nilai lama.
+     */
+    public static function setNama(array &$val, string $nama): void
+    {
+        $nama = trim(strip_tags($nama));
+        $nama = function_exists('mb_substr') ? mb_substr($nama, 0, 200) : substr($nama, 0, 200);
+
+        $val[self::NAMA_KEY] = $nama !== '' ? $nama : null;
     }
 
     /**

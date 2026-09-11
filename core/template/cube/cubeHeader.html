@@ -83,11 +83,11 @@
        class="d-flex align-items-center text-decoration-none header-action-icon"
        style="white-space:nowrap; font-size:0.85rem"
        data-bs-toggle="tooltip" data-bs-placement="bottom"
-       data-bs-title="{{ _SESSION['unit_nama'] ?: 'Pilih Instansi' }}"
+       data-bs-title="{{ _SESSION['unit_nama'] ? (_SESSION['unit_nama'] ~ ((_SESSION['ctx_unit'] and _SESSION['ctx_nama']) ? ' — ' ~ _SESSION['ctx_nama'] : '')) : 'Pilih Instansi' }}"
        onclick="event.preventDefault(); openSidePanel('instansi')">
       <i class="bi bi-building{% if _SESSION['unit_nama'] %}-fill{% endif %}" style="font-size:1rem{% if _SESSION['unit_nama'] %}; color:#5b4fb9{% endif %}"></i>
       {% if _SESSION['unit_nama'] %}
-        <span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:160px; font-size:0.8rem">{{ _SESSION['unit_nama'] }}</span>
+        <span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:220px; font-size:0.8rem">{{ _SESSION['unit_nama'] }}{% if _SESSION['ctx_unit'] and _SESSION['ctx_nama'] %}<span class="text-muted ms-1" style="font-size:0.7rem">· {{ _SESSION['ctx_nama'] }}</span>{% endif %}</span>
       {% else %}
         <span class="d-none d-lg-inline ms-1 text-muted" style="font-size:0.8rem">Instansi</span>
       {% endif %}

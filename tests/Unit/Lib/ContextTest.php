@@ -238,6 +238,25 @@ class ContextTest extends TestCase
         }
     }
 
+    public function testSetNamaTeksPolosDanClearMenghapusnya(): void
+    {
+        $val = [];
+        context::setNama($val, "  <b>Kementerian</b> PANRB \n");
+        $this->assertSame('Kementerian PANRB', $val[context::NAMA_KEY]);
+
+        context::setNama($val, str_repeat('x', 250));
+        $this->assertSame(200, strlen((string) $val[context::NAMA_KEY]));
+
+        context::setNama($val, '   ');
+        $this->assertArrayHasKey(context::NAMA_KEY, $val);
+        $this->assertNull($val[context::NAMA_KEY]);
+
+        $val = ['ctx_slug' => 'kemenkeu', context::NAMA_KEY => 'Kementerian Keuangan'];
+        context::clear($val);
+        $this->assertArrayHasKey(context::NAMA_KEY, $val);
+        $this->assertNull($val[context::NAMA_KEY]);
+    }
+
     public function testClearMenulisNullBukanUnset(): void
     {
         $val = ['account_id' => 1, 'ctx_scope' => 'kl', 'ctx_slug' => 'kemenkeu', 'ctx_unit' => 'itjen', 'ctx_unit_id' => 5];

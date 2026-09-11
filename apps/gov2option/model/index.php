@@ -314,8 +314,13 @@ class index extends \Gov2lib\crudHandler {
         $result['ctx'] = $ctx;
         $result['sub_org_term'] = self::subOrgTerm($supervisor, $ctx['scope'], $ctx['active']);
         $result['wilayah_nama'] = $self->ses->val['wilayah_nama'] ?? '';
-        // Nama portal konteks dari registry (badge panel), hanya mode supervisor + konteks aktif.
-        $result['portal_nama'] = ($supervisor && $ctx['active']) ? $this->namaPortal($ctx['slug']) : '';
+        // Nama portal konteks (badge panel + label induk di topbar), hanya mode
+        // supervisor + konteks aktif: dari sesi (ditulis penyetel konteks), jatuh ke registry.
+        $result['portal_nama'] = '';
+        if ($supervisor && $ctx['active']) {
+            $namaSesi = trim((string) ($self->ses->val[\Gov2lib\context::NAMA_KEY] ?? ''));
+            $result['portal_nama'] = $namaSesi !== '' ? $namaSesi : $this->namaPortal($ctx['slug']);
+        }
 
         return $doc->responseGet($result);
     }
@@ -399,7 +404,11 @@ class index extends \Gov2lib\crudHandler {
                     $indukDipertahankan = true;
                     if ($scope === 'kl') {
                         // Induk K/L tidak diwakili filter lain, jadi tetap "terpilih" di topbar.
-                        $nama = $this->namaPortal($slug);
+                        $nama = trim((string) ($self->ses->val[\Gov2lib\context::NAMA_KEY] ?? ''));
+                        if ($nama === '') {
+                            $nama = $this->namaPortal($slug);
+                        }
+                        \Gov2lib\context::setNama($self->ses->val, $nama);
                         $legacy = [
                             'opd_id' => 0, 'opd' => $slug, 'portal_nama' => $nama, 'unit_nama' => $nama,
                             'unit_id' => 0, 'unit_parent_id' => 0, 'change_portal' => 1,
@@ -745,6 +754,7 @@ class index extends \Gov2lib\crudHandler {
         $nama = trim($nama) !== '' ? trim($nama) : $slug;
 
         \Gov2lib\context::set($self->ses->val, $scope, $slug, '', 0);
+        \Gov2lib\context::setNama($self->ses->val, $nama);
 
         $self->ses->val['opd_id'] = 0;
         $self->ses->val['opd'] = $slug;
@@ -828,8 +838,16 @@ class index extends \Gov2lib\crudHandler {
             $res['notice'] = 'Unit belum punya slug portal; konteks diset ke induk portal';
         }
 
+        // Nama induk untuk label "unit · induk": pertahankan yang sudah ada bila
+        // induknya sama (dipilih lewat panel), selain itu ambil dari registry.
+        $namaInduk = $slug === $ctxSlug ? trim((string) ($self->ses->val[\Gov2lib\context::NAMA_KEY] ?? '')) : '';
+        if ($namaInduk === '') {
+            $namaInduk = $this->namaPortal($slug);
+        }
+
         try {
             \Gov2lib\context::set($self->ses->val, $scope, $slug, $unit, $unit !== '' ? $unitId : 0);
+            \Gov2lib\context::setNama($self->ses->val, $namaInduk);
         } catch (\Throwable $e) {
             error_log('gov2option: gagal set konteks unit pusat (' . $e->getMessage() . ')');
         }

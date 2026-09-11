@@ -7,6 +7,8 @@
         <div class="small">
           <i class="bi bi-building text-primary me-1"></i>
           <strong>{{ config.unit_nama }}</strong>
+          <!-- Induk dari unit yang dipilih (mode supervisor), supaya jejak K/L / pemda tidak hilang -->
+          <div v-if="ctx.unit && config.portal_nama" class="text-muted" style="font-size:0.7rem">{{ config.portal_nama }}</div>
         </div>
         <button v-if="!config.locked" class="btn btn-sm btn-outline-secondary py-0 px-1"
                 @click="resetUnit" title="Reset">
@@ -437,15 +439,20 @@ module.exports = {
       var el = document.getElementById('topbarUnitKerja');
       if (!el) return;
       var nama = this.config.unit_nama;
+      // Unit terpilih → tampilkan induknya juga ("Inspektorat · Kementerian PANRB"),
+      // cermin dari markup Twig cubeHeader.html.
+      var induk = (this.ctx.unit && this.config.portal_nama) ? this.config.portal_nama : '';
       var icon = nama
         ? '<i class="bi bi-building-fill" style="font-size:1rem;color:#5b4fb9"></i>'
         : '<i class="bi bi-building" style="font-size:1rem"></i>';
       var label = nama
-        ? '<span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:160px;font-size:0.8rem">' + this.escapeHtml(nama) + '</span>'
+        ? '<span class="text-truncate d-none d-lg-inline ms-1 text-dark" style="max-width:220px;font-size:0.8rem">' + this.escapeHtml(nama)
+          + (induk ? '<span class="text-muted ms-1" style="font-size:0.7rem">\u00b7 ' + this.escapeHtml(induk) + '</span>' : '')
+          + '</span>'
         : '<span class="d-none d-lg-inline ms-1 text-muted" style="font-size:0.8rem">Instansi</span>';
       el.innerHTML = icon + label;
       // Update tooltip
-      el.setAttribute('data-bs-title', nama || 'Pilih Instansi');
+      el.setAttribute('data-bs-title', nama ? (nama + (induk ? ' \u2014 ' + induk : '')) : 'Pilih Instansi');
       var tooltip = bootstrap.Tooltip.getInstance(el);
       if (tooltip) { tooltip.dispose(); }
       new bootstrap.Tooltip(el);
