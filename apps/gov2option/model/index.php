@@ -416,9 +416,10 @@ class index extends \Gov2lib\crudHandler {
 
     /**
      * Mode supervisor EFEKTIF: atribut domain supervisor="1" DAN pengguna
-     * berwenang (role admin ke atas). Tanpa gerbang role, akun member yang
-     * UI-nya `locked` masih bisa memanggil endpoint GET ini langsung dan
-     * membuka konten 633 portal. Defensif terhadap config yang belum siap.
+     * berwenang (context::SWITCH_ROLES — guest/admin/webmaster/owner; member
+     * ditolak). Tanpa gerbang role, akun member yang UI-nya `locked` masih bisa
+     * memanggil endpoint GET ini langsung dan membuka konten 633 portal.
+     * Defensif terhadap config yang belum siap.
      */
     private function supervisorMode(): bool
     {

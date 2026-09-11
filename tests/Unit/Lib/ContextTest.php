@@ -358,7 +358,7 @@ class ContextTest extends TestCase
 
     // (h) gerbang otorisasi perpindahan konteks
 
-    public function testMaySwitchButuhLoginDanRoleAdminKeAtas(): void
+    public function testMaySwitchButuhLoginDanRoleSwitchRoles(): void
     {
         // anonim / belum login
         $this->assertFalse(context::maySwitch([]));
@@ -366,14 +366,15 @@ class ContextTest extends TestCase
         $this->assertFalse(context::maySwitch(['account_id' => '', 'userRole' => 'admin']));
         $this->assertFalse(context::maySwitch(['account_id' => null, 'userRole' => 'webmaster']));
 
-        // sudah login tapi role di bawah admin
+        // sudah login tapi role di luar SWITCH_ROLES (member terikat unitnya, selaras `locked`)
         $this->assertFalse(context::maySwitch(['account_id' => '7', 'userRole' => 'member']));
-        $this->assertFalse(context::maySwitch(['account_id' => '7', 'userRole' => 'guest']));
         $this->assertFalse(context::maySwitch(['account_id' => '7', 'userRole' => 'public']));
         $this->assertFalse(context::maySwitch(['account_id' => '7', 'userRole' => '']));
         $this->assertFalse(context::maySwitch(['account_id' => '7']));
 
-        // role berwenang (huruf besar & spasi dinormalkan)
+        // role berwenang (huruf besar & spasi dinormalkan); guest ikut (keputusan Wibi 2026-09-11)
+        $this->assertTrue(context::maySwitch(['account_id' => '7', 'userRole' => 'guest']));
+        $this->assertTrue(context::maySwitch(['account_id' => '7', 'userRole' => ' Guest ']));
         $this->assertTrue(context::maySwitch(['account_id' => '7', 'userRole' => 'admin']));
         $this->assertTrue(context::maySwitch(['account_id' => '7', 'userRole' => 'webmaster']));
         $this->assertTrue(context::maySwitch(['account_id' => '7', 'userRole' => 'owner']));

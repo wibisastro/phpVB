@@ -50,8 +50,15 @@ final class context
     /** Tipe portal = prefiks nama DB ({scope}_{slug}). */
     public const SCOPES = ['kl', 'prov', 'kab', 'kota'];
 
-    /** Role yang boleh memindahkan konteks konten ke portal lain. */
-    public const SWITCH_ROLES = ['admin', 'webmaster', 'owner'];
+    /**
+     * Role yang boleh memindahkan konteks konten ke portal lain.
+     *
+     * `guest` ikut serta (keputusan Wibi 2026-09-11): di framework ini guest
+     * adalah pengunjung ber-login yang bebas menjelajah, sedangkan `member`
+     * terikat pada unitnya — selaras dengan flag `locked` panel Instansi/Wilayah
+     * yang hanya mengunci role '' dan `member`.
+     */
+    public const SWITCH_ROLES = ['guest', 'admin', 'webmaster', 'owner'];
 
     private const RE_SLUG = '/^[a-z0-9_-]+$/';
 
@@ -204,8 +211,9 @@ final class context
      * endpoint GET yang tidak semuanya memanggil authenticate(), sehingga tanpa
      * cek ini pengunjung anonim pun bisa menyetel ctx_* di portal supervisor.
      *
-     * Sengaja lebih ketat daripada flag `locked` panel (yang hanya
-     * menyembunyikan tombol): wajib sudah login DAN ber-role minimal admin.
+     * Selaras dengan flag `locked` panel (yang hanya menyembunyikan tombol),
+     * tetapi ditegakkan di server: wajib sudah login DAN ber-role SWITCH_ROLES
+     * (guest/admin/webmaster/owner); `member` dan role kosong ditolak.
      *
      * @param array<string, mixed> $val isi sesi (gov2session::$val)
      */
