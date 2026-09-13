@@ -50,7 +50,9 @@ class UserRoleEnumTest extends TestCase
         $this->assertArrayHasKey('admin', $array);
         $this->assertArrayHasKey('member', $array);
         $this->assertArrayHasKey('guest', $array);
-        $this->assertEquals(4, $array['admin']);
-        $this->assertEquals(3, $array['member']);
+        // Hierarki pasca-hapus role pimpinan (d4a44c9): public 0, guest 1, member 2, admin 3, webmaster 4, owner 5 (#10804)
+        $this->assertEquals(3, $array['admin']);
+        $this->assertEquals(2, $array['member']);
+        $this->assertEquals(1, $array['guest']);
     }
 }

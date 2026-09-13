@@ -430,6 +430,9 @@ class dsnSource extends document
      */
     public function scroll(int $scroll = 0): string
     {
+        // Halaman dihitung dari 1. Pemanggil lewat getRecords($vars) bisa mengirim 0
+        // (segmen scroll kosong) → offset -interval → SQL "LIMIT -100,100" pecah (#10803).
+        $scroll = max(1, $scroll);
         $scroll--;
         $interval = $this->scrollInterval ?: 1000;
         $offset = $scroll * $interval;
