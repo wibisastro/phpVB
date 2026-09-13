@@ -238,19 +238,107 @@ class dsnSource extends document
                 ];
 
                 // Configure MeekroDB static connection
-                self::requireMeekroDB();
-                \DB::$user = $result['user'];
-                \DB::$password = $result['pass'];
-                \DB::$dbName = $result['db'];
-                \DB::$host = $result['host'];
-                \DB::$port = $result['port'];
-                \DB::$connect_options = [MYSQLI_CLIENT_COMPRESS => true];
+                self::applyMeekroCredential($result);
 
                 return $result;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Kredensial meekro yang terakhir dipasang ke facade statis \DB.
+     * Null bila belum ada connectDB() driver meekro pada request ini.
+     *
+     * @var array{user: string, pass: string, host: string, port: string, db: string}|null
+     */
+    private static ?array $activeCredential = null;
+
+    /**
+     * Pasang kredensial meekro ke facade statis \DB DAN pastikan koneksi yang
+     * sedang terbuka ikut berganti (#10801).
+     *
+     * MeekroDB::get() memakai ulang $internal_mysql selama request walau statik
+     * user/dbName berubah, sehingga "connectDB() terakhir menang" hanya berlaku
+     * SEBELUM query pertama. Kasus nyata: gov2option — model memasang DSN domain
+     * (lazy), lalu authenticate() → memberRead() memasang `master` (gov3_central)
+     * dan menjalankan query pertama; semua query model berikutnya ikut ke
+     * gov3_central (panel Instansi kosong/timeout). Di sini: bila sudah ada
+     * koneksi terbuka dengan identitas berbeda, putus dulu supaya query
+     * berikutnya reconnect memakai statik yang baru.
+     *
+     * @param array{user: string, pass: string, host: string, port: string, db: string} $cred
+     */
+    public static function applyMeekroCredential(array $cred): void
+    {
+        self::requireMeekroDB();
+
+        if (self::$activeCredential !== null
+            && self::credentialKey(self::$activeCredential) !== self::credentialKey($cred)) {
+            try {
+                $mdb = \DB::getMDB();
+                if (($mdb->internal_mysql ?? null) instanceof \mysqli) {
+                    \DB::disconnect();
+                }
+            } catch (\Throwable $e) {
+                // tanpa koneksi terbuka tidak ada yang perlu diputus
+            }
+        }
+
+        \DB::$user = $cred['user'];
+        \DB::$password = $cred['pass'];
+        \DB::$dbName = $cred['db'];
+        \DB::$host = $cred['host'];
+        \DB::$port = $cred['port'];
+        \DB::$connect_options = [MYSQLI_CLIENT_COMPRESS => true];
+
+        self::$activeCredential = $cred;
+    }
+
+    /**
+     * Kredensial meekro yang sedang aktif — untuk dipulihkan setelah detour
+     * sementara ke DSN lain (lihat gov2session::memberRead()).
+     *
+     * @return array{user: string, pass: string, host: string, port: string, db: string}|null
+     */
+    public static function activeCredential(): ?array
+    {
+        return self::$activeCredential;
+    }
+
+    /**
+     * Pulihkan kredensial hasil activeCredential(); null = tidak ada yang dipulihkan
+     * (mis. detour master adalah connectDB pertama pada request ini — #10637).
+     *
+     * @param array{user: string, pass: string, host: string, port: string, db: string}|null $cred
+     */
+    public static function restoreCredential(?array $cred): void
+    {
+        if ($cred === null) {
+            return;
+        }
+        if (self::$activeCredential !== null
+            && self::credentialKey(self::$activeCredential) === self::credentialKey($cred)) {
+            return;
+        }
+        self::applyMeekroCredential($cred);
+    }
+
+    /**
+     * Identitas koneksi (logika murni): dua kredensial dianggap sama bila host,
+     * port, user, dan db sama — password tidak ikut.
+     *
+     * @param array<string, mixed> $cred
+     */
+    public static function credentialKey(array $cred): string
+    {
+        return implode('|', [
+            strtolower(trim((string) ($cred['host'] ?? ''))),
+            trim((string) ($cred['port'] ?? '3306')) ?: '3306',
+            trim((string) ($cred['user'] ?? '')),
+            trim((string) ($cred['db'] ?? '')),
+        ]);
     }
 
     /**

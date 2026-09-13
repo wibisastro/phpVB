@@ -258,6 +258,9 @@ class gov2session extends dsnSource
      */
     public function memberUpdateCounter(int $id): void
     {
+        // Detour ke `master` lalu pulihkan DSN app yang sudah dipasang model
+        // (mis. DSN domain gov2option/gov2wilayah) — lihat dsnSource::applyMeekroCredential (#10801).
+        $prev = dsnSource::activeCredential();
         try {
             // MeekroDB lazy sejak T4 (#6085): koneksi master baru terkonfigurasi oleh
             // connectDB(). Cabang authenticate() saat cookie sudah memuat `id`
@@ -269,6 +272,8 @@ class gov2session extends dsnSource
             \DB::query($_query, $id);
         } catch (\MeekroDBException $e) {
             $this->exceptionHandler($e->getMessage());
+        } finally {
+            dsnSource::restoreCredential($prev);
         }
     }
 
@@ -279,6 +284,7 @@ class gov2session extends dsnSource
     {
         global $pageID;
         $WHERE = is_string($id) ? "account_id=%s" : "account_id=%i";
+        $prev = dsnSource::activeCredential(); // dipulihkan di finally (#10801)
 
         try {
             $this->connectDB('master');
@@ -306,6 +312,8 @@ class gov2session extends dsnSource
                 }
             }
             throw new \Exception('DatabaseError:' . $msg);
+        } finally {
+            dsnSource::restoreCredential($prev);
         }
 
         return $_result;
