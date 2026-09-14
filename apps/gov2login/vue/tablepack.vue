@@ -860,7 +860,9 @@
                 
                 if (this.parent) {url=this.getUrl+'/table/'+this.scroll+'/'+this.parent;}
                 else if (this.recursive) {url=this.getUrl+'/table/'+this.scroll+'/0';}
-                else {url=this.getUrl+'/table/'+this.scroll;}
+                // Selalu 3 segmen: /table/{scroll} saja cocok ke route {cmd}[/{id}]
+                // sehingga scroll mendarat di id dan scroll(null) TypeError 500.
+                else {url=this.getUrl+'/table/'+this.scroll+'/0';}
 
                 if (this.readLastUrlParam) {
                     let currUrl = window.location.href;

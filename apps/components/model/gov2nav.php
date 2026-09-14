@@ -7,8 +7,7 @@ class gov2nav extends \Gov2lib\document {
 		$this->templateDir=__DIR__."/../view";
         $path=explode("\\",__CLASS__);
         $this->className=$path[sizeof($path)-1];
-        $className=$self->className;
-        if (!$className) {$className=$this->className;}
+        $className=$this->activeClassName();
         // Hanya set default pathurl bila belum di-set. Mencegah multi-take()
         // (mis. SAKIPAI yang call setDefaultNav 3x dengan menu berbeda) meng-overwrite
         // pathurl yang benar dari setDefaultNav guard sebelumnya.
@@ -20,6 +19,21 @@ class gov2nav extends \Gov2lib\document {
 
 	function dependencies () {
 	}
+
+    /**
+     * Nama kelas halaman aktif untuk URL breadcrumb / pencocokan menu.
+     * Halaman core lintas-app (role/options/survey) berjalan di handler
+     * Gov2lib tanpa className → pakai segmen URL kedua ($scriptID, mis.
+     * "role" pada /sdi/role/admin). Tanpa fallback ini pathurl menjadi
+     * /components/gov2nav/breadcrumb/{pageID}?cmdID=… → 404 (F6 catatan bug SDI).
+     */
+    private function activeClassName () {
+        global $self, $scriptID;
+        $className = $self->className ?? '';
+        if (!$className) {$className = $scriptID ?? '';}
+        if (!$className) {$className = $this->className;}
+        return $className;
+    }
 
 	function setDefaultNav ($_menuFile="") {
         global $pageID,$config,$self,$doc,$cmdID;
@@ -38,8 +52,9 @@ class gov2nav extends \Gov2lib\document {
         // Mencegah last-call-wins masalah saat controller call setDefaultNav
         // berkali-kali dengan menu file berbeda (mis. SAKIPAI: ingest + aisakip).
         $lastMenu = end($this->menus);
-        if ($this->_menuContainsActiveUrl($lastMenu, $pageID, $self->className, $cmdID)) {
-            $base = rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
+        $className = $this->activeClassName();
+        if ($this->_menuContainsActiveUrl($lastMenu, $pageID, $className, $cmdID)) {
+            $base = rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$className."/".str_replace(".xml","",$_menuFile), '/');
             $GLOBALS['vueData']['pathurl'] = $cmdID ? $base.'?cmdID='.urlencode($cmdID) : $base;
         }
 	}
@@ -53,7 +68,15 @@ class gov2nav extends \Gov2lib\document {
      * sidebar KOSONG di portal tanpa getMenus.
      */
     function setAutoNav () {
-        global $pageID;
+        global $pageID, $doc;
+
+        // App sudah mendaftarkan sidebar sendiri (mis. di model index::dependencies()
+        // yang dipanggil konstruktor Gov2lib\role/options/login) → hormati, jangan
+        // tumpuk menu custom di atasnya. Contoh: SDI memakai setDefaultNav('menu_all.xml')
+        // di semua halamannya, sedangkan getMenus() di index-nya kode legacy tak terpakai.
+        if ($this->_alreadyRegistered($doc->sidebar ?? [], 'gov2navMenu')) {
+            return;
+        }
 
         if (class_exists("App\\{$pageID}\\index") && method_exists("App\\{$pageID}\\index", 'getMenus')) {
             $this->setCustomNav();
@@ -75,7 +98,7 @@ class gov2nav extends \Gov2lib\document {
         if (!$this->_alreadyRegistered($doc->sidebar ?? [], 'gov2navMenuCustom.html')) {
             $this->sidebar('gov2navMenuCustom.html');
         }
-        $base = rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$self->className."/".str_replace(".xml","",$_menuFile), '/');
+        $base = rtrim($config->webroot."/components/gov2nav/breadcrumb/$pageID/".$this->activeClassName()."/".str_replace(".xml","",$_menuFile), '/');
         $GLOBALS['vueData']['pathurl'] = $cmdID ? $base.'?cmdID='.urlencode($cmdID) : $base;
     }
 

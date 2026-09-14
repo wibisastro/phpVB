@@ -60,7 +60,7 @@ class member extends \Gov2lib\crudHandler {
     function memberBrowse ($role,$scroll) {
         global $uri;
 
-        $scrolled=$this->scroll($scroll);
+        $scrolled=$this->scroll((int)($scroll ?? 1));
         $query="SELECT * FROM {$this->tbl->table} WHERE role=%s LIMIT $scrolled";
 
         // if ($role === 'member') {

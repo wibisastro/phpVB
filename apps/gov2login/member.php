@@ -65,7 +65,7 @@ class member {
     function table ($vars) {
         global $doc, $self;
 
-        $data=$self->memberBrowse($vars['role'],$vars['scroll']);
+        $data=$self->memberBrowse($vars['role'],(int)($vars['scroll'] ?? 1));
         // $data = $self->browse($vars['scroll']);
         return $doc->responseGet($data);   
     }

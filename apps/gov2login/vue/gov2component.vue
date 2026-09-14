@@ -17,7 +17,9 @@
             }
         },
         components: {
-            'role-browse': httpVueLoader('./bs4roleBrowse.vue'),
+            // Path absolut: relatif ('./bs4roleBrowse.vue') diresolusi terhadap URL
+            // halaman (/gov2login/user/{role}/…) → HTML, bukan SFC. File-nya roleBrowse.vue.
+            'role-browse': httpVueLoader('/gov2login/vue/roleBrowse.vue'),
         },
         watch: {
             value: function() {

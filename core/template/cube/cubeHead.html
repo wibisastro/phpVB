@@ -90,7 +90,12 @@
 })();
 </script>
 <script src="{{ webroot }}/js/gov2form.js"></script>
+{# Lib INDUK iframeResizer. Jangan dimuat di halaman headless (isi iframe):
+   listener-nya ikut menerima balasan [iFrameSizer] dari induk, mencari iframe
+   by id di dokumen anak → null → "Cannot read properties of null (reading src)". #}
+{% if not headless|default(false) %}
 <script src="{{ webroot }}/js/iframeResizer.min.js"></script>
+{% endif %}
 
 <!-- Handsontable JS -->
 <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>

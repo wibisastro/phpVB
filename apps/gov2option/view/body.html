@@ -2,6 +2,7 @@
 
 {% block head %}
 	{{ parent() }}
+	{% set headless = true %}
 	{% include('cubeHead.html') %}
 {% endblock %}
 
