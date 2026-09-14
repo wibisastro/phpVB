@@ -1,0 +1,24 @@
+{# Body headless gov2login — dipakai member.php (/gov2login/user/{role}) yang
+   selalu tampil di iframe role.html. Blok sama dengan body.html tanpa navbar
+   dan judul halaman. #}
+{% extends "@gov2login/layoutHeadless.html" %}
+
+{% block head %}
+	{{ parent() }}
+	{% include('cubeHead.html') %}
+{% endblock %}
+
+{% block content %}
+    {% for item in contents %}
+       {% include[item,'cubeMissingFile.html'] %}
+	{% endfor %}
+{% endblock %}
+
+{% block js %}
+	{{ parent() }}
+	{% include('vueJS.html') %}
+{% endblock %}
+
+{% block externalJS %}
+	{% include('externalJS.html') %}
+{% endblock %}

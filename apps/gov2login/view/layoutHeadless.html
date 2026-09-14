@@ -1,0 +1,39 @@
+{# Layout headless gov2login: halaman manajemen user (/gov2login/user/{role})
+   selalu dirender di dalam iframe role.html (.saas-frame, panel Pengaturan >
+   Role) — hanya body konten, tanpa navbar (nama user/logout sudah ada di
+   topbar portal induk). Pola sama dengan apps/gov2option/view/layout.html;
+   iframeResizer.contentWindow melapor tinggi konten ke iframe induk. #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+{% endblock %}
+<link rel="stylesheet" href="{{ webroot }}/cube/fonts/bootstrap-icons.min.css" />
+<link rel="stylesheet" href="{{ webroot }}/cube/css/main.min.css" />
+</head>
+<body class="bg-white">
+<div id="app" class="p-3">
+    <gov2notification></gov2notification>
+    {% block content %} {% endblock %}
+</div>
+
+<script type="text/javascript">
+  window.__vueApp = phpvb.createPageApp({
+{% block js %}
+    el: '#app',
+    components: {
+    {% for component in components %}
+        {% for item in component %}
+       '{{ item.tag }}': httpVueLoader('{{ webroot }}/{{ item.pageID }}/vue/{{ item.component }}'),
+       {% endfor %}
+    {% endfor %}
+    },
+{% endblock %}
+  });
+</script>
+{% block externalJS %}{% endblock %}
+<script type="text/javascript" src="{{ webroot }}/js/iframeResizer.contentWindow.min.js"></script>
+</body>
+</html>

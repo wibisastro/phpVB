@@ -124,7 +124,7 @@
                 <form @submit.prevent="onSubmit">
                     <button type="submit" class="btn btn-danger" @click="softDelProceed" v-if="isSoftDel">Delete</button>
                     <button type="submit" class="btn btn-danger" @click="delProceed" v-if="isDel">Delete</button>
-                    <button class="btn btn-secondary" @click="isConfirm=false">Cancel</button>
+                    <button type="button" class="btn btn-secondary" @click="isConfirm=false">Cancel</button>
                 </form>
             </div>
         </div>
@@ -163,7 +163,7 @@ module.exports  = {
             fields: [],
             delData: '',
             isSoftDel: false,
-            isDel: true,
+            isDel: false,
             isHasChildren: false,
             isDisabled: [],
             form: new Form(this.fields),
@@ -413,7 +413,7 @@ module.exports  = {
 }
 </script>
 
-<style scoped>
+<style>
 
 form > .form-group > label,
 form > .form-group > input,
@@ -425,4 +425,78 @@ form > .form-group > textarea  {
         color: red;
     }
 
+/* BootstrapVue b-modal close button — posisi kanan (BS4 .close di dalam BS5 context) */
+.modal-header .close,
+.modal-header button[aria-label="Close"] {
+    order: 2;
+    margin-left: auto;
+    padding: 0.5rem;
+    background: transparent;
+    border: 0;
+    font-size: 1.25rem;
+    opacity: 0.5;
+    cursor: pointer;
+}
+.modal-header .close:hover,
+.modal-header button[aria-label="Close"]:hover {
+    opacity: 1;
+}
+.modal-header .modal-title {
+    order: 1;
+}
+
+/* Validation error text — sesuai Cube/BS5 .invalid-feedback style */
+.help-block {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.8em;
+    color: #dc3545;
+    font-style: italic;
+}
+
+/* md-modal (konfirmasi hapus): fallback saat nifty-component.css tidak dimuat
+   (tema Cube / layout headless). Tanpa ini .md-modal tampil inline. */
+.md-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 50%;
+    max-width: 500px;
+    min-width: 320px;
+    transform: translate(-50%, -50%);
+    visibility: hidden;
+    z-index: 2000;
+}
+.md-show {
+    visibility: visible;
+}
+.md-overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    visibility: hidden;
+    top: 0;
+    left: 0;
+    z-index: 1999;
+    opacity: 0;
+    background: rgba(0,0,0,0.5);
+    transition: all 0.3s;
+}
+.md-show ~ .md-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+.md-content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.md-content .modal-footer {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
 </style>

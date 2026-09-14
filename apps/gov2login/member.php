@@ -11,6 +11,10 @@ class member {
         $self->fields = $self->gov2formfield->getFields(__DIR__."/json/member.json");
         $self->ses->authenticate($vars['role']);
         $self->scrollInterval = 100;
+        // Halaman ini selalu tampil di iframe role.html (panel Pengaturan > Role)
+        // → body headless tanpa navbar gov2login; nama user/logout sudah ada di
+        // topbar portal induk. NotLogin tetap body.html (buildErrorBody).
+        $doc->baseBody = '@gov2login/bodyHeadless.html';
     }
     
     function index ($vars) {
