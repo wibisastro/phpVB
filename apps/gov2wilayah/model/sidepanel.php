@@ -49,6 +49,25 @@ class sidepanel extends \Gov2lib\crudHandler
         return \DB::queryFirstRow($query, (int) $parentId);
     }
 
+    /**
+     * Cari wilayah berdasarkan nama (LIKE), maks 50 baris — dipakai sidepanel::searchWilayah.
+     * Controller tidak boleh menyentuh $self->tbl (protected di dsnSource) → 500 "Cannot access protected property".
+     */
+    public function searchWilayah(string $keyword): array
+    {
+        $fields = "id, parent_id, `level`, level_label, nama";
+        try {
+            $rows = \DB::query(
+                "SELECT {$fields} FROM {$this->tbl->table} WHERE nama LIKE %ss ORDER BY level ASC, nama ASC LIMIT 50",
+                $keyword
+            );
+            return is_array($rows) ? $rows : [];
+        } catch (\MeekroDBException $e) {
+            $this->exceptionHandler($e->getMessage());
+            return [];
+        }
+    }
+
     public function dependencies(): void
     {
     }

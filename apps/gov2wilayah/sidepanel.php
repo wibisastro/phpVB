@@ -174,17 +174,9 @@ class sidepanel extends \Gov2lib\api
     public function searchWilayah(): mixed
     {
         global $self, $doc;
-        $keyword = $_GET['q'] ?? '';
-        $fields = "id, parent_id, `level`, level_label, nama";
-        $result = [];
-
-        try {
-            $q = "SELECT {$fields} FROM {$self->tbl->wilayah}
-                  WHERE nama LIKE %ss
-                  ORDER BY level ASC, nama ASC LIMIT 50";
-            $result = \DB::query($q, $keyword);
-        } catch (\MeekroDBException $e) {
-        }
+        $keyword = (string) ($_GET['q'] ?? '');
+        // $self->tbl protected (dsnSource) → query di model (sebelumnya 500 "Cannot access protected property")
+        $result = $keyword !== '' ? $self->searchWilayah($keyword) : [];
 
         return $doc->responseGet($result);
     }
