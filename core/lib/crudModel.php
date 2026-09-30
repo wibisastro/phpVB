@@ -484,15 +484,25 @@ class crudModel extends dsnSource
     public function doCountChildren(int|string $parentId = 0): ?array
     {
         if ($this->usesRepo()) {
+            if (method_exists($this, 'filterWhere') && $this->filterPanelHasActive($this->filterPanelInstance())) {
+                $this->exceptionHandler('FilterPanel: driver supabase belum didukung');
+                return null;
+            }
             $filter = $parentId ? ['parent_id' => (int) $parentId] : [];
 
             return ['totalRecord' => $this->repo()->count((string) $this->tbl->table, $filter)];
         }
 
-        $where = $parentId ? 'WHERE parent_id=%i' : '';
-        $query = "SELECT count(id) as totalRecord FROM " . $this->tbl->table . " {$where}";
+        $where = new \WhereClause('and');
+        if ($parentId) {
+            $where->add('parent_id=%i', (int) $parentId);
+        }
+        if (method_exists($this, 'filterWhere')) {
+            $where->add($this->filterWhere($this->filterPanelInstance()));
+        }
+        $query = "SELECT count(id) as totalRecord FROM " . $this->tbl->table . " WHERE %l";
 
-        return $this->db()->queryFirstRow($query, $parentId);
+        return $this->db()->queryFirstRow($query, $where);
     }
 
     /**
@@ -503,6 +513,10 @@ class crudModel extends dsnSource
     public function doBrowse(int|string $scroll = 0, int|string $parentId = 0, string $parentIdName = ''): ?array
     {
         if ($this->usesRepo()) {
+            if (method_exists($this, 'filterWhere') && $this->filterPanelHasActive($this->filterPanelInstance())) {
+                $this->exceptionHandler('FilterPanel: driver supabase belum didukung');
+                return null;
+            }
             try {
                 // Terjemahan scroll() "offset,interval" → limit/offset PostgREST;
                 // order eksplisit by id = padanan praktis urutan PK MySQL
@@ -521,11 +535,17 @@ class crudModel extends dsnSource
         try {
             $scrolled = $this->scroll((int) $scroll);
             $parentCol = $parentIdName ? "{$parentIdName}_id" : 'parent_id';
-            $where = $parentId ? "WHERE {$parentCol}=%i" : '';
+            $where = new \WhereClause('and');
+            if ($parentId) {
+                $where->add("{$parentCol}=%i", (int) $parentId);
+            }
+            if (method_exists($this, 'filterWhere')) {
+                $where->add($this->filterWhere($this->filterPanelInstance()));
+            }
 
-            $query = "SELECT * FROM " . $this->tbl->table . " {$where} LIMIT {$scrolled}";
+            $query = "SELECT * FROM " . $this->tbl->table . " WHERE %l LIMIT {$scrolled}";
 
-            return $this->db()->query($query, $parentId);
+            return $this->db()->query($query, $where);
         } catch (\Exception $e) {
             $this->exceptionHandler($e->getMessage());
             return null;

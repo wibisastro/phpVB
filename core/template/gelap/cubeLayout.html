@@ -94,6 +94,9 @@
              (Gurita/Kambing/Gajah, webmaster-only) di dalam cube-menu-settings #}
           <cube-menu-settings></cube-menu-settings>
         </div>
+        <div id="sidePanel-filter" style="display:none">
+          <gov2filter></gov2filter>
+        </div>
         <div id="sidePanel-chat" class="h-100" style="display:none">
           <cube-chat-rag
             endpoint="{{ chatRagEndpoint|default('') }}"
@@ -167,6 +170,7 @@
         'wilayah': httpVueLoader('{{ webroot }}/gov2wilayah/vue/wilayah.vue'),
         'cube-chat-rag': httpVueLoader('{{ webroot }}/components/vue/cube-chat-rag.vue'),
         'gov2navbreadcrumb': httpVueLoader('{{ webroot }}/components/vue/gov2navbreadcrumb.vue'),
+        'gov2filter': httpVueLoader('{{ webroot }}/components/vue/gov2filter.vue'),
         {% for component in components %}
             {% for item in component %}
            '{{ item.tag }}': httpVueLoader('{{ webroot }}/{{ item.pageID }}/vue/{{ item.component }}'),
@@ -190,11 +194,12 @@
       wilayah: '<i class="bi bi-geo-alt me-2"></i>Wilayah',
       instansi: '<i class="bi bi-building me-2"></i>Instansi',
       pengaturan: '<i class="bi bi-gear me-2"></i>Pengaturan',
+      filter: '<i class="bi bi-funnel me-2"></i>Filter',
       chat: '<i class="bi bi-chat-dots me-2"></i>Chat Dokumen',
       kancil: KANCIL_ICON + 'Kancil'
     };
     // Toggle panels via DOM
-    var views = ['wilayah', 'instansi', 'pengaturan', 'chat', 'kancil'];
+    var views = ['wilayah', 'instansi', 'pengaturan', 'filter', 'chat', 'kancil'];
     views.forEach(function(v) {
       var el = document.getElementById('sidePanel-' + v);
       if (el) { el.style.display = (v === view) ? '' : 'none'; }
@@ -217,6 +222,17 @@
       panel.classList.toggle('sidepanel-wide', view === 'kancil');
       var bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(panel);
       bsOffcanvas.show();
+    }
+  };
+
+  window.openFilterPanel = function (cfg) {
+    cfg = cfg || {};
+    window.__filterPanelCfg = cfg;
+    window.dispatchEvent(new CustomEvent('gov2filter:open', {detail: cfg}));
+    window.openSidePanel('filter');
+    if (cfg.title) {
+      var filterLabel = document.getElementById('sidePanelLabel');
+      if (filterLabel) { filterLabel.innerHTML = '<i class="bi bi-funnel me-2"></i>' + cfg.title; }
     }
   };
 
