@@ -100,6 +100,12 @@ trait FilterPanel
         return count($clean);
     }
 
+    /** Nilai filter aktif satu field (untuk field tanpa blok "where" yang ditangani model sendiri). */
+    public function filterValue(string $name, string $instance = ''): mixed
+    {
+        return $_SESSION['filter'][$this->filterPanelSessionKey($instance)][$name] ?? null;
+    }
+
     public function filterResetData(string $instance = ''): void
     {
         unset($_SESSION['filter'][$this->filterPanelSessionKey($instance)]);
@@ -133,8 +139,11 @@ trait FilterPanel
                 continue;
             }
 
-            $column = $this->filterPanelColumn($field['where']['kolom'] ?? '');
+            $kolom = $field['where']['kolom'] ?? '';
             $op = strtolower((string) ($field['where']['op'] ?? '='));
+            // like dengan daftar kolom = cocok di salah satu kolom (mis. nama/kode/deskripsi)
+            $columns = is_array($kolom) ? array_map([$this, 'filterPanelColumn'], $kolom) : [];
+            $column = is_array($kolom) ? '' : $this->filterPanelColumn((string) $kolom);
             $cast = $this->filterPanelCastOf($field);
             $value = $this->filterPanelCast($nilai[$name], $cast);
 
@@ -142,8 +151,21 @@ trait FilterPanel
                 throw new \InvalidArgumentException("FilterPanel: op tidak dikenal untuk {$name}: {$op}");
             }
 
+            if ($columns && $op !== 'like') {
+                throw new \InvalidArgumentException("FilterPanel: kolom berupa daftar hanya untuk op like ({$name})");
+            }
+
             if ($op === 'like') {
-                $where->add("{$column} LIKE %ss", (string) (is_array($value) ? reset($value) : $value));
+                $term = (string) (is_array($value) ? reset($value) : $value);
+                if ($columns) {
+                    $or = $this->filterPanelWhereClause('or');
+                    $where->add($or);
+                    foreach ($columns as $col) {
+                        $or->add("{$col} LIKE %ss", $term);
+                    }
+                    continue;
+                }
+                $where->add("{$column} LIKE %ss", $term);
                 continue;
             }
 

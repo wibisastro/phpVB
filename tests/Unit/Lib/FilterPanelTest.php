@@ -190,4 +190,37 @@ class FilterPanelTest extends TestCase
         $this->assertArrayNotHasKey('metadatakab', $_SESSION['filter']);
         $this->assertSame(['keyword' => 'b'], $_SESSION['filter']['metadatakec']);
     }
+
+    public function testLikeDenganDaftarKolomMenjadiOrPlaceholder(): void
+    {
+        $this->model->fields = [
+            ['name' => 'keyword', 'type' => 'text',
+                'where' => ['kolom' => ['t1.nama', 't1.kodeindikator'], 'op' => 'like']],
+        ];
+        $_SESSION['filter']['metadata'] = ['keyword' => "x' OR 1=1"];
+
+        [$sql, $args] = $this->model->filterWhere('')->textAndArgs();
+
+        $this->assertSame('((((t1.nama LIKE %ss) OR (t1.kodeindikator LIKE %ss))))', $sql);
+        $this->assertSame(["x' OR 1=1", "x' OR 1=1"], $args);
+    }
+
+    public function testDaftarKolomUntukOpLainDitolak(): void
+    {
+        $this->model->fields = [
+            ['name' => 'type', 'type' => 'select', 'where' => ['kolom' => ['a', 'b'], 'op' => '=']],
+        ];
+        $_SESSION['filter']['metadata'] = ['type' => 'x'];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->model->filterWhere('');
+    }
+
+    public function testFilterValueMembacaNilaiAktifPerInstance(): void
+    {
+        $this->model->filterApplyData('kab', ['keyword' => 'pajak']);
+
+        $this->assertSame('pajak', $this->model->filterValue('keyword', 'kab'));
+        $this->assertNull($this->model->filterValue('keyword', 'kec'));
+    }
 }
