@@ -5,11 +5,19 @@ namespace Gov2lib\Traits;
 /**
  * Pola M9 — panel filter sidepanel.
  *
- * Dipakai berpasangan: controller memakai endpoint cmd (filterFields/filterApply/filterReset),
+ * Dipakai berpasangan: controller memakai endpoint cmd (filterFields/filterApply/filterReset/filterResetAll),
  * model memakai filterWhere() untuk merakit WhereClause dari json/{mvc}_filter.json + sesi.
  * Blok "where" di JSON hanya dibaca server dan tidak pernah dikirim ke klien.
  * M9 sementara khusus driver MySQL/MeekroDB; cabang repo (Supabase) menolak filter aktif
  * lewat exceptionHandler alih-alih diam-diam mengabaikannya.
+ *
+ * FILTER GLOBAL LINTAS MVC (F3b): nilai disimpan PER ELEMEN, bukan per MVC — `$_SESSION['filter_global'][key]`.
+ * `key` default = `name` elemen, sehingga elemen bernama sama di MVC mana pun memakai nilai yang sama
+ * (sidepanel persisten lintas halaman seperti Wilayah/Instansi). Opt-out di JSON: `"scope":"mvc"` (kunci
+ * di-namespace className) atau `"key":"…"` eksplisit. Elemen ber-`options` statis hanya menerima nilai di dalam
+ * opsinya (nilai dari MVC lain yang tak cocok diabaikan, tak dihitung). Teks tampilan pilihan (untuk chip)
+ * disimpan di `$_SESSION['filter_global_teks'][key]` — dikirim klien saat Terapkan, hanya untuk tampilan.
+ * Argumen `$instance` pada metode publik dipertahankan demi kompatibilitas dan DIABAIKAN.
  *
  * @phpstan-ignore trait.unused
  */
@@ -18,25 +26,26 @@ trait FilterPanel
     /** @var array<int, array<string, mixed>>|null */
     protected ?array $filterPanelFieldsCache = null;
 
-    /** GET /{app}/{mvc}/filterFields?instance=... -> {fields, nilai, aktif} (tanpa blok where). */
+    /** GET /{app}/{mvc}/filterFields -> {fields, nilai, aktif, chips} (tanpa blok where). */
     public function filterFields(array $vars = []): mixed
     {
         global $self, $doc;
 
-        $instance = (string) ($_GET['instance'] ?? ($vars['instance'] ?? ''));
-        return $doc->responseGet($self->filterFieldsData($instance));
+        return $doc->responseGet($self->filterFieldsData((string) ($_GET['instance'] ?? ($vars['instance'] ?? ''))));
     }
 
-    /** POST {cmd:'filterApply', data:{instance, nilai:{name: value}}} -> {class:'success', aktif:n}. */
+    /** POST {cmd:'filterApply', data:{nilai:{name: value}, teks:{name:[teks]}}} -> {class:'success', aktif:n, chips:[…]}. */
     public function filterApply(): array
     {
         global $self;
 
         $data = $_POST['data'] ?? [];
         $nilai = $data['nilai'] ?? [];
+        $teks = $data['teks'] ?? [];
         $aktif = $self->filterApplyData(
             (string) ($data['instance'] ?? ''),
-            is_array($nilai) ? $nilai : []
+            is_array($nilai) ? $nilai : [],
+            is_array($teks) ? $teks : []
         );
 
         return [
@@ -44,29 +53,46 @@ trait FilterPanel
             'callback' => 'infoSnackbar',
             'notification' => 'Filter diterapkan',
             'aktif' => $aktif,
+            'chips' => $self->filterPanelChips(),
         ];
     }
 
-    /** POST {cmd:'filterReset', data:{instance}} -> {class:'success', aktif:0}. */
+    /** POST {cmd:'filterReset'} — mengosongkan elemen yang tampil di MVC ini (elemen MVC lain tetap). */
     public function filterReset(): array
     {
         global $self;
 
-        $data = $_POST['data'] ?? [];
-        $self->filterResetData((string) ($data['instance'] ?? ''));
+        $self->filterResetData('');
 
         return [
             'class' => 'success',
             'callback' => 'infoSnackbar',
             'notification' => 'Filter direset',
             'aktif' => 0,
+            'chips' => [],
         ];
     }
 
-    /** Data untuk endpoint filterFields: field tanpa "where" + nilai aktif dari sesi. */
+    /** POST {cmd:'filterResetAll'} — mengosongkan SEMUA filter (semua MVC) di sesi ini. */
+    public function filterResetAll(): array
+    {
+        global $self;
+
+        $self->filterResetAllData();
+
+        return [
+            'class' => 'success',
+            'callback' => 'infoSnackbar',
+            'notification' => 'Semua filter direset',
+            'aktif' => 0,
+            'chips' => [],
+        ];
+    }
+
+    /** Data untuk endpoint filterFields: field tanpa "where" + nilai aktif (hanya elemen MVC ini) + chip. */
     public function filterFieldsData(string $instance = ''): array
     {
-        $nilai = $_SESSION['filter'][$this->filterPanelSessionKey($instance)] ?? [];
+        $aktif = $this->filterPanelActive();
 
         $fields = array_map(function (array $field): array {
             unset($field['where']);
@@ -75,43 +101,71 @@ trait FilterPanel
 
         return [
             'fields' => array_values($fields),
-            'nilai' => $nilai,
-            'aktif' => count($nilai),
+            'nilai' => $aktif,
+            'aktif' => count($aktif),
+            'chips' => $this->filterPanelChips(),
         ];
     }
 
-    /** Simpan nilai filter tervalidasi ke sesi ber-namespace per MVC+instance. @return int jumlah filter aktif */
-    public function filterApplyData(string $instance, array $nilai): int
+    /**
+     * Simpan nilai filter ke sesi per ELEMEN. Elemen MVC ini yang tak ada/kosong di $nilai dikosongkan
+     * (panel mengirim kondisi lengkapnya); elemen MVC lain tak tersentuh.
+     *
+     * @param array<string, mixed> $nilai {name: value}
+     * @param array<string, mixed> $teks  {name: [teks tampilan]} — hanya untuk chip
+     * @return int jumlah filter aktif di MVC ini
+     */
+    public function filterApplyData(string $instance, array $nilai, array $teks = []): int
     {
-        $known = [];
         foreach ($this->filterPanelFields() as $field) {
-            $known[$field['name']] = $field;
-        }
+            $name = $field['name'];
+            $key = $this->filterPanelKey($field);
+            $value = array_key_exists($name, $nilai) ? $this->filterPanelValid($field, $nilai[$name]) : null;
 
-        $clean = [];
-        foreach ($nilai as $name => $value) {
-            if (!isset($known[$name]) || $this->filterPanelEmpty($value)) {
+            if ($value === null) {
+                unset($_SESSION['filter_global'][$key], $_SESSION['filter_global_teks'][$key]);
                 continue;
             }
-            $clean[$name] = $this->filterPanelCast($value, $this->filterPanelCastOf($known[$name]));
+
+            $_SESSION['filter_global'][$key] = $value;
+            $bersih = $this->filterPanelTeksBersih($teks[$name] ?? null);
+            if ($bersih) {
+                $_SESSION['filter_global_teks'][$key] = $bersih;
+            } else {
+                unset($_SESSION['filter_global_teks'][$key]);
+            }
         }
 
-        $_SESSION['filter'][$this->filterPanelSessionKey($instance)] = $clean;
-        return count($clean);
+        return count($this->filterPanelActive());
     }
 
-    /** Nilai filter aktif satu field (untuk field tanpa blok "where" yang ditangani model sendiri). */
+    /** Nilai filter aktif satu elemen MVC ini (untuk elemen tanpa blok "where" yang ditangani model sendiri). */
     public function filterValue(string $name, string $instance = ''): mixed
     {
-        return $_SESSION['filter'][$this->filterPanelSessionKey($instance)][$name] ?? null;
+        foreach ($this->filterPanelFields() as $field) {
+            if ($field['name'] === $name) {
+                return $this->filterPanelSesi($field);
+            }
+        }
+        return null;
     }
 
+    /** Kosongkan elemen yang tampil di MVC ini. */
     public function filterResetData(string $instance = ''): void
     {
-        unset($_SESSION['filter'][$this->filterPanelSessionKey($instance)]);
+        foreach ($this->filterPanelFields() as $field) {
+            $key = $this->filterPanelKey($field);
+            unset($_SESSION['filter_global'][$key], $_SESSION['filter_global_teks'][$key]);
+        }
     }
 
-    /** Instance tabel untuk namespace sesi; MVC multi-instance (M3) boleh override. */
+    /** Kosongkan seluruh filter (semua MVC). */
+    public function filterResetAllData(): void
+    {
+        unset($_SESSION['filter_global'], $_SESSION['filter_global_teks']);
+    }
+
+    /** Dipertahankan demi kompatibilitas: filter global tak lagi per instance. */
     protected function filterPanelInstance(): string
     {
         return '';
@@ -119,7 +173,121 @@ trait FilterPanel
 
     protected function filterPanelHasActive(string $instance = ''): bool
     {
-        return !empty($_SESSION['filter'][$this->filterPanelSessionKey($instance)]);
+        return count($this->filterPanelActive()) > 0;
+    }
+
+    /** Kunci sesi satu elemen: "key" eksplisit > scope=mvc (className.name) > name. */
+    protected function filterPanelKey(array $field): string
+    {
+        $key = (string) ($field['key'] ?? '');
+        if ($key === '') {
+            $key = (($field['scope'] ?? 'global') === 'mvc')
+                ? $this->filterPanelClassName() . '.' . $field['name']
+                : (string) $field['name'];
+        }
+        if (!preg_match('/^[A-Za-z0-9_.\-]{1,80}$/', $key)) {
+            throw new \InvalidArgumentException("FilterPanel: key tidak valid: {$key}");
+        }
+        return $key;
+    }
+
+    /**
+     * Nilai valid untuk elemen ini (cast sesuai JSON; elemen ber-options statis hanya menerima id di dalam opsinya),
+     * atau null bila kosong/tak cocok.
+     */
+    protected function filterPanelValid(array $field, mixed $value): mixed
+    {
+        if ($this->filterPanelEmpty($value)) {
+            return null;
+        }
+        $value = $this->filterPanelCast($value, $this->filterPanelCastOf($field));
+
+        if (isset($field['options']) && is_array($field['options']) && $field['options']) {
+            $ids = array_map(fn ($o) => (string) (is_array($o) ? ($o['id'] ?? '') : $o), $field['options']);
+            if (is_array($value)) {
+                $value = array_values(array_filter($value, fn ($v) => in_array((string) $v, $ids, true)));
+            } elseif (!in_array((string) $value, $ids, true)) {
+                return null;
+            }
+        }
+
+        return $this->filterPanelEmpty($value) ? null : $value;
+    }
+
+    /** Nilai sesi (valid) untuk satu elemen MVC ini. */
+    protected function filterPanelSesi(array $field): mixed
+    {
+        $key = $this->filterPanelKey($field);
+        if (!isset($_SESSION['filter_global']) || !is_array($_SESSION['filter_global']) || !array_key_exists($key, $_SESSION['filter_global'])) {
+            return null;
+        }
+        return $this->filterPanelValid($field, $_SESSION['filter_global'][$key]);
+    }
+
+    /** @return array<string, mixed> {name: value} elemen MVC ini yang sedang aktif */
+    protected function filterPanelActive(): array
+    {
+        $aktif = [];
+        foreach ($this->filterPanelFields() as $field) {
+            $v = $this->filterPanelSesi($field);
+            if ($v !== null) {
+                $aktif[$field['name']] = $v;
+            }
+        }
+        return $aktif;
+    }
+
+    /**
+     * Chip filter aktif: [{name, label, nilai, teks[]}]. Teks = teks tampilan tersimpan, atau teks opsi statis,
+     * atau nilai mentah.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function filterPanelChips(): array
+    {
+        $chips = [];
+        foreach ($this->filterPanelFields() as $field) {
+            $v = $this->filterPanelSesi($field);
+            if ($v === null) {
+                continue;
+            }
+            $key = $this->filterPanelKey($field);
+            $teks = $_SESSION['filter_global_teks'][$key] ?? null;
+            if (!is_array($teks) || !$teks) {
+                $peta = [];
+                foreach ((array) ($field['options'] ?? []) as $o) {
+                    if (is_array($o)) {
+                        $peta[(string) ($o['id'] ?? '')] = (string) ($o['text'] ?? ($o['id'] ?? ''));
+                    }
+                }
+                $teks = array_map(fn ($x) => $peta[(string) $x] ?? (string) $x, is_array($v) ? $v : [$v]);
+            }
+            $chips[] = [
+                'name' => $field['name'],
+                'label' => (string) ($field['label'] ?? $field['name']),
+                'nilai' => $v,
+                'teks' => array_values(array_map('strval', $teks)),
+            ];
+        }
+        return $chips;
+    }
+
+    /** Teks tampilan dari klien: daftar string pendek saja. @return array<int, string> */
+    protected function filterPanelTeksBersih(mixed $teks): array
+    {
+        if (!is_array($teks)) {
+            return [];
+        }
+        $out = [];
+        foreach (array_slice($teks, 0, 50) as $t) {
+            if (is_scalar($t)) {
+                $s = trim((string) $t);
+                if ($s !== '') {
+                    $out[] = mb_substr($s, 0, 200);
+                }
+            }
+        }
+        return $out;
     }
 
     /**
@@ -131,11 +299,11 @@ trait FilterPanel
     public function filterWhere(string $instance = '')
     {
         $where = $this->filterPanelWhereClause('and');
-        $nilai = $_SESSION['filter'][$this->filterPanelSessionKey($instance)] ?? [];
 
         foreach ($this->filterPanelFields() as $field) {
             $name = $field['name'];
-            if (empty($field['where']) || !array_key_exists($name, $nilai) || $this->filterPanelEmpty($nilai[$name])) {
+            $sesi = empty($field['where']) ? null : $this->filterPanelSesi($field);
+            if ($sesi === null) {
                 continue;
             }
 
@@ -145,7 +313,7 @@ trait FilterPanel
             $columns = is_array($kolom) ? array_map([$this, 'filterPanelColumn'], $kolom) : [];
             $column = is_array($kolom) ? '' : $this->filterPanelColumn((string) $kolom);
             $cast = $this->filterPanelCastOf($field);
-            $value = $this->filterPanelCast($nilai[$name], $cast);
+            $value = $sesi;
 
             if (!in_array($op, ['=', 'like', 'in', 'find_in_set', '>=', '<='], true)) {
                 throw new \InvalidArgumentException("FilterPanel: op tidak dikenal untuk {$name}: {$op}");
@@ -262,11 +430,6 @@ trait FilterPanel
             return (string) $this->className;
         }
         return basename((new \ReflectionClass($this))->getFileName(), '.php');
-    }
-
-    protected function filterPanelSessionKey(string $instance): string
-    {
-        return $this->filterPanelClassName() . $instance;
     }
 
     protected function filterPanelColumn(string $column): string

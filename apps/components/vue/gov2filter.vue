@@ -34,7 +34,8 @@
             Belum ada field filter untuk tabel ini.
         </div>
 
-        <div class="d-flex justify-content-end gap-2 border-top pt-3 mt-3">
+        <div class="d-flex justify-content-end align-items-center gap-2 border-top pt-3 mt-3">
+            <a href="#" class="small me-auto" @click.prevent="resetSemua" title="Kosongkan filter di semua halaman">Reset semua</a>
             <button type="button" class="btn btn-outline-secondary" @click="reset" :disabled="loading || saving">
                 Reset
             </button>
@@ -244,14 +245,15 @@ module.exports = {
                 cmd: 'filterApply',
                 data: {
                     instance: this.cfg.instance,
-                    nilai: this.nilai
+                    nilai: this.nilai,
+                    teks: this.teksPilihan()   // hanya untuk chip filter aktif di atas tabel
                 }
             })
                 .then(function (response) {
                     var data = response && response.data ? response.data : {};
                     if (data.class === 'success') {
                         vm.aktif = data.aktif !== undefined ? data.aktif : vm.hitungAktif();
-                        vm.dispatchApplied();
+                        vm.dispatchApplied(data.chips);
                         vm.notify(data);
                         vm.hidePanel();
                     } else {
@@ -281,7 +283,7 @@ module.exports = {
                         vm.nilai[field.name] = vm.defaultValue(field);
                     });
                     vm.aktif = 0;
-                    vm.dispatchApplied();
+                    vm.dispatchApplied([]);
                     vm.notify(data);
                     vm.hidePanel();
                 })
@@ -292,12 +294,55 @@ module.exports = {
                     vm.saving = false;
                 });
         },
-        dispatchApplied: function () {
+        // Kosongkan filter di SEMUA halaman (filter bersifat global per elemen)
+        resetSemua: function () {
+            var vm = this;
+            this.saving = true;
+            this.error = '';
+            axios.post(this.endpoint(''), {cmd: 'filterResetAll', data: {instance: this.cfg.instance}})
+                .then(function (response) {
+                    var data = response && response.data ? response.data : {};
+                    vm.fields.forEach(function (field) {
+                        vm.nilai[field.name] = vm.defaultValue(field);
+                    });
+                    vm.aktif = 0;
+                    vm.dispatchApplied([]);
+                    vm.notify(data);
+                    vm.hidePanel();
+                })
+                .catch(function (err) {
+                    vm.notify(err.response && err.response.data ? err.response.data : {notification: vm.errText(err)});
+                })
+                .finally(function () {
+                    vm.saving = false;
+                });
+        },
+        // {name: [teks tampilan]} untuk elemen berpilihan yang terisi — server menyimpannya hanya untuk chip
+        teksPilihan: function () {
+            var vm = this;
+            var out = {};
+            this.fields.forEach(function (field) {
+                if (field.type === 'text') {
+                    return;
+                }
+                var v = vm.nilai[field.name];
+                var ids = Array.isArray(v) ? v : (v === '' || v === null || v === undefined ? [] : [v]);
+                if (!ids.length) {
+                    return;
+                }
+                var peta = {};
+                vm.normalizedOptions(field).forEach(function (o) { peta[String(o.id)] = o.text; });
+                out[field.name] = ids.map(function (id) { return peta[String(id)] !== undefined ? String(peta[String(id)]) : String(id); });
+            });
+            return out;
+        },
+        dispatchApplied: function (chips) {
             window.dispatchEvent(new CustomEvent('gov2filter:applied', {
                 detail: {
                     url: this.cfg.url,
                     instance: this.cfg.instance,
-                    aktif: this.aktif
+                    aktif: this.aktif,
+                    chips: Array.isArray(chips) ? chips : []
                 }
             }));
         },

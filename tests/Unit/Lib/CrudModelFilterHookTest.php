@@ -144,7 +144,7 @@ class CrudModelFilterHookTest extends TestCase
     public function testBrowseDenganTraitMenambahkanKlausaFilter(): void
     {
         $model = $this->model(true);
-        $_SESSION['filter']['uji'] = ['type' => 'angka'];
+        $_SESSION['filter_global'] = ['type' => 'angka'];
         $model->doBrowse(1, 7);
 
         [, $text, $params] = $this->sql($model);
@@ -156,7 +156,7 @@ class CrudModelFilterHookTest extends TestCase
     public function testCountDenganTraitMenambahkanKlausaFilter(): void
     {
         $model = $this->model(true);
-        $_SESSION['filter']['uji'] = ['type' => 'angka'];
+        $_SESSION['filter_global'] = ['type' => 'angka'];
         $model->doCountChildren(0);
 
         [$sql, $text, $params] = $this->sql($model);
@@ -177,7 +177,7 @@ class CrudModelFilterHookTest extends TestCase
     public function testSupabaseDenganFilterAktifDitolakEksplisit(): void
     {
         $model = $this->model(true, true);
-        $_SESSION['filter']['uji'] = ['type' => 'angka'];
+        $_SESSION['filter_global'] = ['type' => 'angka'];
 
         $this->assertNull($model->doBrowse(1, 0));
         $this->assertNull($model->doCountChildren(0));

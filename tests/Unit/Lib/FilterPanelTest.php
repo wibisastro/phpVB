@@ -93,7 +93,7 @@ class FilterPanelTest extends TestCase
         $_SESSION = [];
     }
 
-    public function testApplyMenyimpanHanyaFieldKnownTidakKosongPerInstance(): void
+    public function testApplyMenyimpanPerElemenHanyaFieldKnownTidakKosong(): void
     {
         $aktif = $this->model->filterApplyData('kab', [
             'keyword' => '  pajak  ',
@@ -106,12 +106,8 @@ class FilterPanelTest extends TestCase
         $this->assertSame(3, $aktif);
         $this->assertSame(
             ['keyword' => 'pajak', 'type' => ['angka', 'formula'], 'urusan' => 5],
-            $_SESSION['filter']['metadatakab']
+            $_SESSION['filter_global']
         );
-
-        $this->model->filterApplyData('kec', ['keyword' => 'lain']);
-        $this->assertSame(['keyword' => 'lain'], $_SESSION['filter']['metadatakec']);
-        $this->assertSame('pajak', $_SESSION['filter']['metadatakab']['keyword']);
     }
 
     public function testFieldsDataMembuangWhereDanMengembalikanNilaiAktif(): void
@@ -129,7 +125,7 @@ class FilterPanelTest extends TestCase
 
     public function testFilterWhereSemuaOpMemakaiPlaceholder(): void
     {
-        $_SESSION['filter']['metadata'] = [
+        $_SESSION['filter_global'] = [
             'keyword' => 'pajak',
             'referensi' => ['1', '2'],
             'type' => ['angka', 'formula'],
@@ -154,7 +150,7 @@ class FilterPanelTest extends TestCase
 
     public function testMultipleInAdalahOrBukanAnd(): void
     {
-        $_SESSION['filter']['metadata'] = ['type' => ['angka', 'formula']];
+        $_SESSION['filter_global'] = ['type' => ['angka', 'formula']];
 
         [$sql] = $this->model->filterWhere('')->textAndArgs();
 
@@ -165,7 +161,7 @@ class FilterPanelTest extends TestCase
     public function testKolomTidakValidDitolak(): void
     {
         $this->model->fields[] = ['name' => 'jahat', 'where' => ['kolom' => 'parent.nama; DROP TABLE member', 'op' => '=']];
-        $_SESSION['filter']['metadata'] = ['jahat' => 'x'];
+        $_SESSION['filter_global'] = ['jahat' => 'x'];
 
         $this->expectException(\InvalidArgumentException::class);
         $this->model->filterWhere('');
@@ -174,22 +170,12 @@ class FilterPanelTest extends TestCase
     public function testOpDiLuarWhitelistDitolak(): void
     {
         $this->model->fields[] = ['name' => 'jahat', 'where' => ['kolom' => 'parent.nama', 'op' => 'regexp']];
-        $_SESSION['filter']['metadata'] = ['jahat' => 'x'];
+        $_SESSION['filter_global'] = ['jahat' => 'x'];
 
         $this->expectException(\InvalidArgumentException::class);
         $this->model->filterWhere('');
     }
 
-    public function testResetMenghapusHanyaInstanceItu(): void
-    {
-        $this->model->filterApplyData('kab', ['keyword' => 'a']);
-        $this->model->filterApplyData('kec', ['keyword' => 'b']);
-
-        $this->model->filterResetData('kab');
-
-        $this->assertArrayNotHasKey('metadatakab', $_SESSION['filter']);
-        $this->assertSame(['keyword' => 'b'], $_SESSION['filter']['metadatakec']);
-    }
 
     public function testLikeDenganDaftarKolomMenjadiOrPlaceholder(): void
     {
@@ -197,7 +183,7 @@ class FilterPanelTest extends TestCase
             ['name' => 'keyword', 'type' => 'text',
                 'where' => ['kolom' => ['t1.nama', 't1.kodeindikator'], 'op' => 'like']],
         ];
-        $_SESSION['filter']['metadata'] = ['keyword' => "x' OR 1=1"];
+        $_SESSION['filter_global'] = ['keyword' => "x' OR 1=1"];
 
         [$sql, $args] = $this->model->filterWhere('')->textAndArgs();
 
@@ -210,17 +196,147 @@ class FilterPanelTest extends TestCase
         $this->model->fields = [
             ['name' => 'type', 'type' => 'select', 'where' => ['kolom' => ['a', 'b'], 'op' => '=']],
         ];
-        $_SESSION['filter']['metadata'] = ['type' => 'x'];
+        $_SESSION['filter_global'] = ['type' => 'x'];
 
         $this->expectException(\InvalidArgumentException::class);
         $this->model->filterWhere('');
     }
 
-    public function testFilterValueMembacaNilaiAktifPerInstance(): void
+    public function testFilterValueTanpaDimensiInstance(): void
     {
         $this->model->filterApplyData('kab', ['keyword' => 'pajak']);
 
         $this->assertSame('pajak', $this->model->filterValue('keyword', 'kab'));
-        $this->assertNull($this->model->filterValue('keyword', 'kec'));
+        $this->assertSame('pajak', $this->model->filterValue('keyword', 'kec'));   // instance diabaikan (filter global)
+        $this->assertNull($this->model->filterValue('tidak_ada'));
+    }
+
+    // ---------------------------------------------------------------- F3b: filter global lintas MVC
+
+    private function modelLain(string $className, array $fields): FilterPanelDummy
+    {
+        $m = new FilterPanelDummy();
+        $m->className = $className;
+        $m->fields = $fields;
+        return $m;
+    }
+
+    public function testElemenBernamaSamaDiBagiAntarMvc(): void
+    {
+        $this->model->filterApplyData('', ['keyword' => 'pajak', 'type' => ['angka']]);
+
+        $lain = $this->modelLain('terbuka', [
+            ['name' => 'keyword', 'type' => 'text', 'where' => ['kolom' => 't1.nama', 'op' => 'like']],
+            ['name' => 'jenis', 'type' => 'select', 'options' => [['id' => 'Spasial', 'text' => 'Spasial']],
+                'where' => ['kolom' => 't1.jenis', 'op' => '=']],
+        ]);
+
+        $this->assertSame('pajak', $lain->filterValue('keyword'));
+        $this->assertSame(1, count($lain->filterFieldsData()['nilai']));      // type tak ada di MVC lain → tak dihitung
+        [$sql, $args] = $lain->filterWhere()->textAndArgs();
+        $this->assertSame('((t1.nama LIKE %ss))', $sql);
+        $this->assertSame(['pajak'], $args);
+    }
+
+    public function testApplyDiMvcIniTidakMenyentuhElemenMvcLain(): void
+    {
+        $this->model->filterApplyData('', ['urusan' => '5', 'keyword' => 'a']);
+        $lain = $this->modelLain('terbuka', [
+            ['name' => 'keyword', 'type' => 'text', 'where' => ['kolom' => 't1.nama', 'op' => 'like']],
+        ]);
+        $lain->filterApplyData('', ['keyword' => 'b']);
+
+        $this->assertSame('b', $_SESSION['filter_global']['keyword']);
+        $this->assertSame(5, $_SESSION['filter_global']['urusan']);   // milik MVC pertama, tak ada di terbuka
+    }
+
+    public function testApplyMengosongkanElemenMvcIniYangTidakDikirim(): void
+    {
+        $this->model->filterApplyData('', ['keyword' => 'a', 'type' => ['angka']]);
+        $this->model->filterApplyData('', ['keyword' => 'a']);
+
+        $this->assertArrayNotHasKey('type', $_SESSION['filter_global']);
+        $this->assertSame('a', $_SESSION['filter_global']['keyword']);
+    }
+
+    public function testScopeMvcMemisahkanKunciDanKeyEksplisit(): void
+    {
+        $a = $this->modelLain('metadata', [
+            ['name' => 'status', 'type' => 'text', 'scope' => 'mvc'],
+            ['name' => 'kode', 'type' => 'text', 'key' => 'kode_khusus'],
+        ]);
+        $b = $this->modelLain('daftardata', [
+            ['name' => 'status', 'type' => 'text', 'scope' => 'mvc'],
+            ['name' => 'kode', 'type' => 'text', 'key' => 'kode_khusus'],
+        ]);
+        $a->filterApplyData('', ['status' => 'x', 'kode' => 'k1']);
+
+        $this->assertNull($b->filterValue('status'));                 // scope mvc → tak dibagi
+        $this->assertSame('k1', $b->filterValue('kode'));              // key eksplisit sama → dibagi
+        $this->assertArrayHasKey('metadata.status', $_SESSION['filter_global']);
+        $this->assertArrayHasKey('kode_khusus', $_SESSION['filter_global']);
+    }
+
+    public function testNilaiDiLuarOpsiStatisDiabaikanDiMvcTujuan(): void
+    {
+        $_SESSION['filter_global'] = ['jenis' => 'Keuangan', 'type' => ['angka', 'bukan_opsi']];
+        $lain = $this->modelLain('terbuka', [
+            ['name' => 'jenis', 'type' => 'select', 'options' => [['id' => 'Spasial', 'text' => 'Spasial']],
+                'where' => ['kolom' => 'jenis', 'op' => '=']],
+            ['name' => 'type', 'type' => 'select2-tags', 'options' => [['id' => 'angka', 'text' => 'Angka']],
+                'where' => ['kolom' => 'type', 'op' => 'in']],
+        ]);
+
+        $this->assertNull($lain->filterValue('jenis'));
+        $this->assertSame(['angka'], $lain->filterValue('type'));
+        $this->assertSame(1, $lain->filterFieldsData()['aktif']);
+    }
+
+    public function testBadgeAktifHanyaMenghitungElemenYangAdaDiMvcIni(): void
+    {
+        $_SESSION['filter_global'] = ['keyword' => 'a', 'urusan' => 5, 'tidak_ada_di_json' => 'z'];
+        $data = $this->model->filterFieldsData();
+
+        $this->assertSame(2, $data['aktif']);
+        $this->assertSame(['keyword' => 'a', 'urusan' => 5], $data['nilai']);
+    }
+
+    public function testResetMvcIniTidakMenghapusElemenMvcLainSedangResetAllMenghapusSemua(): void
+    {
+        $_SESSION['filter_global'] = ['keyword' => 'a', 'sisa_mvc_lain' => 'x'];
+        $_SESSION['filter_global_teks'] = ['keyword' => ['a'], 'sisa_mvc_lain' => ['x']];
+
+        $this->model->filterResetData();
+        $this->assertSame(['sisa_mvc_lain' => 'x'], $_SESSION['filter_global']);
+        $this->assertSame(['sisa_mvc_lain' => ['x']], $_SESSION['filter_global_teks']);
+
+        $this->model->filterResetAllData();
+        $this->assertArrayNotHasKey('filter_global', $_SESSION);
+        $this->assertArrayNotHasKey('filter_global_teks', $_SESSION);
+    }
+
+    public function testChipMemakaiTeksTersimpanLaluTeksOpsiStatisLaluNilaiMentah(): void
+    {
+        $m = $this->modelLain('metadata', [
+            ['name' => 'urusan', 'label' => 'Urusan', 'type' => 'select2', 'options_url' => 'x'],
+            ['name' => 'jenis', 'label' => 'Jenis', 'type' => 'select',
+                'options' => [['id' => 'Spasial', 'text' => 'Data Spasial']]],
+            ['name' => 'keyword', 'label' => 'Kata Kunci', 'type' => 'text'],
+        ]);
+        $m->filterApplyData('', ['urusan' => '5', 'jenis' => 'Spasial', 'keyword' => 'pajak'],
+            ['urusan' => ['URUSAN WAJIB'], 'keyword' => ['  ', str_repeat('x', 500)]]);
+
+        $chips = array_column($m->filterPanelChips(), null, 'name');
+        $this->assertSame(['URUSAN WAJIB'], $chips['urusan']['teks']);          // teks tersimpan dari klien
+        $this->assertSame(['Data Spasial'], $chips['jenis']['teks']);           // teks opsi statis
+        $this->assertSame(200, mb_strlen($chips['keyword']['teks'][0]));        // teks klien dipotong; kosong dibuang
+        $this->assertSame('Urusan', $chips['urusan']['label']);
+    }
+
+    public function testKeyTidakValidDitolak(): void
+    {
+        $m = $this->modelLain('x', [['name' => 'a', 'type' => 'text', 'key' => "bad key'; DROP"]]);
+        $this->expectException(\InvalidArgumentException::class);
+        $m->filterApplyData('', ['a' => '1']);
     }
 }
