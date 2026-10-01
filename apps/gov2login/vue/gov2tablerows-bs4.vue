@@ -5,11 +5,11 @@
             <span v-if="totalRows > 0 && searchRows == false">{{ totalRows }}</span>
             <span v-if="totalRows > 0 && searchRows == true">{{ rows }}</span>
             <span v-if="totalRows == 0">
-                <img src="../../images/working.gif">
+                <img src="/images/working.gif">
             </span>row(s)
             <span v-if="scrolls > 0"> in {{ scrolls }} scroll(s)</span>
             <span v-if="scrolls == 0">
-                &nbsp;<img src="../../images/working.gif">
+                &nbsp;<img src="/images/working.gif">
             </span> &nbsp;
          </span>
         </div>
