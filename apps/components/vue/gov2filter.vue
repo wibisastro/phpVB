@@ -110,13 +110,20 @@ module.exports = {
                 .then(function (response) {
                     var data = response && response.data ? response.data : {};
                     var fields = Array.isArray(data) ? data : (data.fields || []);
-                    vm.fields = fields;
-                    vm.nilai = {};
+                    // Vue 2: properti yang ditambahkan SETELAH objek dipasang ke data tidak reaktif —
+                    // nilai dirakit utuh dulu, dan field disiapkan ber-`options` sebelum dipasang.
+                    var nilai = {};
                     fields.forEach(function (field) {
-                        var aktif = data.nilai && data.nilai[field.name] !== undefined
+                        nilai[field.name] = data.nilai && data.nilai[field.name] !== undefined
                             ? data.nilai[field.name]
                             : vm.defaultValue(field);
-                        vm.nilai[field.name] = aktif;
+                        if (field.options_url && !Array.isArray(field.options)) {
+                            field.options = [];
+                        }
+                    });
+                    vm.fields = fields;
+                    vm.nilai = nilai;
+                    fields.forEach(function (field) {
                         if (field.options_url) {
                             vm.loadOptions(field);
                         }
@@ -141,12 +148,17 @@ module.exports = {
                     if (!Array.isArray(rows) && rows.data && Array.isArray(rows.data)) {
                         rows = rows.data;
                     }
-                    field.options = rows.map(function (row) {
+                    var options = rows.map(function (row) {
                         return {
                             id: row.id !== undefined ? row.id : row.value,
                             text: row.text !== undefined ? row.text : (row.nama !== undefined ? row.nama : row.id)
                         };
                     });
+                    if (typeof vm.$set === 'function') {
+                        vm.$set(field, 'options', options);  // Vue 2: pastikan render ulang
+                    } else {
+                        field.options = options;
+                    }
                     vm.$nextTick(function () {
                         vm.initSelect2();
                     });
