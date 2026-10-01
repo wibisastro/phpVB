@@ -110,8 +110,9 @@ module.exports = {
                 .then(function (response) {
                     var data = response && response.data ? response.data : {};
                     var fields = Array.isArray(data) ? data : (data.fields || []);
-                    // Vue 2: properti yang ditambahkan SETELAH objek dipasang ke data tidak reaktif —
-                    // nilai dirakit utuh dulu, dan field disiapkan ber-`options` sebelum dipasang.
+                    // Vue 3: `vm.fields = fields` membungkus data dalam proxy reaktif, sedangkan `field` di bawah
+                    // tetap objek MENTAH — mengubahnya tidak memicu render. Karena itu field disiapkan ber-`options`
+                    // sebelum dipasang, dan pembaruan opsi (loadOptions) lewat vm.fields (proxy), bukan objek mentah.
                     var nilai = {};
                     fields.forEach(function (field) {
                         nilai[field.name] = data.nilai && data.nilai[field.name] !== undefined
@@ -154,11 +155,9 @@ module.exports = {
                             text: row.text !== undefined ? row.text : (row.nama !== undefined ? row.nama : row.id)
                         };
                     });
-                    if (typeof vm.$set === 'function') {
-                        vm.$set(field, 'options', options);  // Vue 2: pastikan render ulang
-                    } else {
-                        field.options = options;
-                    }
+                    // ubah lewat proxy reaktif (vm.fields), bukan `field` mentah dari closure
+                    var hidup = vm.fields.find(function (f) { return f.name === field.name; }) || field;
+                    hidup.options = options;
                     vm.$nextTick(function () {
                         vm.initSelect2();
                     });
