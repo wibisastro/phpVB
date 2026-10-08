@@ -213,6 +213,10 @@ try {
                                     // endpoint agen DB baca-saja (core/config/route.xml /{app}/agendb, v5.1.4)
                                     $controller = "Gov2lib\\agendb";
                                 break;
+                                case "manifestHandler":
+                                    // manifest tiga dokumen app (core/config/route.xml /{app}/manifest, v5.1.5)
+                                    $controller = "Gov2lib\\manifest";
+                                break;
                                 default:
                                     $controller = "Gov2lib\\index";
                             }

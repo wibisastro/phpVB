@@ -212,4 +212,18 @@
         <uri>/{app}/agendb</uri>
         <handler>Gov2lib\agendbHandler</handler>
     </route>
+
+    <!-- manifest: tiga dokumen bawaan app hasil vibe coding (view/manifest.md kontrak API untuk agen, view/release.md
+         kronologis versi, README.md konteks) — Gov2lib\manifest. HTML di browser, JSON bila Accept application/json,
+         /raw markdown mentah; authenticate('guest') kecuali <manifest>public</manifest> di xml/config.xml app. v5.1.5 -->
+    <route>
+        <method>GET</method>
+        <uri>/{app}/manifest</uri>
+        <handler>Gov2lib\manifestHandler</handler>
+    </route>
+    <route>
+        <method>GET</method>
+        <uri>/{app}/manifest/{cmd}[/{id}]</uri>
+        <handler>Gov2lib\manifestHandler</handler>
+    </route>
 </list>
