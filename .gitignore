@@ -9,6 +9,8 @@ composer.lock
 /public/.htaccess
 /core/scripts/sql/*.bak
 **/dsn*.xml
+# rahasia bersama endpoint agen DB baca-saja (Gov2lib\agendb) — ditulis per server, jangan di-commit
+/core/config/*.secret
 
 # IDE and Editor
 .vscode/

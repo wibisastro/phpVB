@@ -209,6 +209,10 @@ try {
                                 case "surveyHandler":
                                     $controller = "Gov2lib\\survey";
                                 break;
+                                case "agendbHandler":
+                                    // endpoint agen DB baca-saja (core/config/route.xml /{app}/agendb, v5.1.4)
+                                    $controller = "Gov2lib\\agendb";
+                                break;
                                 default:
                                     $controller = "Gov2lib\\index";
                             }

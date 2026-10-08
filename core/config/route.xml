@@ -194,4 +194,22 @@
         <uri>/{app}/role/eselon2</uri>
         <handler>Gov2lib\roleHandler</handler>
     </route-->
+
+    <!-- agendb: endpoint BACA-SAJA DB app untuk pengembang (MCP gov3phpvb, skill phpvb_cek_db) — Gov2lib\agendb.
+         Mati tanpa rahasia (PHPVB_AGENDB_SECRET / core/config/agendb.secret); identitas X-Gov3-User → webmaster/superuser.xml. v5.1.4 -->
+    <route>
+        <method>GET</method>
+        <uri>/{app}/agendb</uri>
+        <handler>Gov2lib\agendbHandler</handler>
+    </route>
+    <route>
+        <method>GET</method>
+        <uri>/{app}/agendb/{cmd}[/{id}]</uri>
+        <handler>Gov2lib\agendbHandler</handler>
+    </route>
+    <route>
+        <method>POST</method>
+        <uri>/{app}/agendb</uri>
+        <handler>Gov2lib\agendbHandler</handler>
+    </route>
 </list>
