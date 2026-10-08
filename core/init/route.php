@@ -218,8 +218,16 @@ try {
                                     $controller = "Gov2lib\\manifest";
                                 break;
                                 case "agenHandler":
-                                    // agen sesi: identitas kancil → sesi portal (core/config/route.xml /{app}/agen, v5.1.6)
-                                    $controller = "Gov2lib\\agen";
+                                    // agen sesi: identitas kancil → sesi portal (core/config/route.xml /{app}/agen, v5.1.6).
+                                    // App yang punya agen.php sendiri (sdi-staging untuk gov3sdi) MENANG: rute dinamis inti
+                                    // /{app}/agen/{cmd} terdaftar sebelum rute dinamis app sehingga FastRoute memilih inti —
+                                    // di sini dialihkan ke controller/model app itu (POST /{app}/agen statis sudah milik app).
+                                    if (file_exists(__DIR__ . "/../../apps/{$pageID}/agen.php") && class_exists("App\\{$pageID}\\model\\agen")) {
+                                        $handler = "App\\{$pageID}\\model\\agen";
+                                        $controller = "App\\{$pageID}\\agen";
+                                    } else {
+                                        $controller = "Gov2lib\\agen";
+                                    }
                                 break;
                                 default:
                                     $controller = "Gov2lib\\index";
