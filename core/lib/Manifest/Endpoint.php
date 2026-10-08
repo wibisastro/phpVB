@@ -7,29 +7,35 @@ namespace Gov2lib\Manifest;
 use Gov2lib\markdown;
 
 /**
- * Manifest per MVC — cmd bawaan `manifest` pada SETIAP controller app (lewat dispatcher core/init/index.php bila
- * controller tidak mendefinisikan method `manifest` sendiri). Endpoint = rute standar MVC itu, jadi konstruktor
- * controller (authenticate, konteks) sudah berjalan: siapa yang boleh membuka MVC, boleh membaca manifest-nya.
+ * Dokumen per MVC — cmd bawaan `readme` pada SETIAP controller app (lewat dispatcher core/init/index.php bila
+ * controller tidak mendefinisikan method `readme` sendiri). Endpoint = rute standar MVC itu, jadi konstruktor
+ * controller (authenticate, konteks) sudah berjalan: siapa yang boleh membuka MVC, boleh membaca dokumennya.
  *
- *   GET /{app}/{mvc}/manifest               → view/{mvc}/manifest.md   (kontrak API MVC ini, untuk agen/MCP)
- *   GET /{app}/{mvc}/manifest/readme        → view/{mvc}/readme.md     (konteks domain MVC)
- *   GET /{app}/{mvc}/manifest/release       → view/{mvc}/release.md    (kronologis versi MVC)
- *   …/raw (mis. /manifest/raw, /manifest/readme/raw) → text/markdown mentah
- *   POST /{app}/{mvc} {"cmd":"manifest","jenis":"readme","format":"raw"} — setara
+ *   GET /{app}/{mvc}/readme                 → view/{mvc}/readme.md     (konteks domain MVC — akar)
+ *   GET /{app}/{mvc}/readme/manifest        → view/{mvc}/manifest.md   (kontrak API MVC ini, untuk agen/MCP)
+ *   GET /{app}/{mvc}/readme/release         → view/{mvc}/release.md    (kronologis versi MVC)
+ *   GET /{app}/{mvc}/readme/spec            → view/{mvc}/spec.md       (prompt spesifikasi yang menghasilkan MVC ini)
+ *   …/raw (mis. /readme/raw, /readme/spec/raw) → text/markdown mentah (salin = salin berkas)
+ *   POST /{app}/{mvc} {"cmd":"readme","jenis":"spec","format":"raw"} — setara
  *
+ * Alias lama (v5.1.7, deprecated): cmd `manifest` — akarnya manifest.md (`/{app}/{mvc}/manifest[/readme|/release|/spec][/raw]`).
  * Balasan mengikuti Accept: HTML (halaman, tanpa tombol — navigasi lewat endpoint), JSON (markdown + blok data terurai).
- * Rujukan: phpVB/rencana/phpvb-manifest-mcp-run.md, release_notes/v5.1.7.md.
+ * Rujukan: phpVB/rencana/phpvb-readme-spec-mvc.md, release_notes/v5.1.8.md (v5.1.7: phpvb-manifest-mcp-run.md).
  *
- * @since 2026-10-08 (v5.1.7)
+ * @since 2026-10-08 (v5.1.7; v5.1.8 = akar readme + spec)
  */
 final class Endpoint
 {
-    public const CMD = 'manifest';
-    public const JENIS = ['manifest', 'readme', 'release'];
+    public const CMD = 'readme';
+    /** Alias v5.1.7 (deprecated): akarnya manifest.md. */
+    public const CMD_LAMA = 'manifest';
+    public const CMDS = [self::CMD, self::CMD_LAMA];
+    public const JENIS = ['readme', 'manifest', 'release', 'spec'];
     public const BERKAS = [
-        'manifest' => ['manifest.md'],
         'readme' => ['readme.md', 'README.md'],
+        'manifest' => ['manifest.md'],
         'release' => ['release.md', 'CHANGELOG.md'],
+        'spec' => ['spec.md'],
     ];
 
     /** Pengganti pengirim mentah (uji): fn(string $isi, string $nama): mixed. Null = header + echo + exit. */
@@ -70,7 +76,8 @@ final class Endpoint
         return $out;
     }
 
-    /** Jenis & format dari segmen rute (id, scroll) atau body POST (jenis, format). @return array{0: string, 1: bool} */
+    /** Jenis & format dari segmen rute (id, scroll) atau body POST (jenis, format); akar = readme (cmd `readme`) atau
+     * manifest (alias lama cmd `manifest`). @return array{0: string, 1: bool} */
     public static function argumen(array $vars): array
     {
         $token = [];
@@ -80,7 +87,7 @@ final class Endpoint
                 $token[] = strtolower($v);
             }
         }
-        $jenis = 'manifest';
+        $jenis = strtolower((string) ($vars['cmd'] ?? self::CMD)) === self::CMD_LAMA ? 'manifest' : 'readme';
         foreach ($token as $t) {
             if (in_array($t, self::JENIS, true)) {
                 $jenis = $t;
@@ -96,7 +103,8 @@ final class Endpoint
     {
         $b = "/{$app}/{$mvc}/" . self::CMD;
 
-        return ['manifest' => $b, 'readme' => "{$b}/readme", 'release' => "{$b}/release", 'raw' => "{$b}/raw", 'indeks_app' => "/{$app}/manifest"];
+        return ['readme' => $b, 'manifest' => "{$b}/manifest", 'release' => "{$b}/release", 'spec' => "{$b}/spec", 'raw' => "{$b}/raw",
+            'indeks_app' => "/{$app}/" . self::CMD];
     }
 
     public static function baca(string $path): string
@@ -116,9 +124,11 @@ final class Endpoint
         $p = self::path($dirApp, $mvc, $jenis);
         if ($p === null) {
             $rel = "apps/{$app}/view/{$mvc}/" . self::BERKAS[$jenis][0];
-            $pesan = "{$rel} belum ada — bangkitkan dengan phpvb_manifest (gov3phpvb) app={$app} mvc={$mvc}";
+            $pesan = $jenis === 'spec'
+                ? "{$rel} belum ada — tulis prompt spesifikasi MVC ini dengan phpvb_manifest (gov3phpvb) app={$app} mvc={$mvc} spec=…"
+                : "{$rel} belum ada — bangkitkan dengan phpvb_manifest (gov3phpvb) app={$app} mvc={$mvc}";
             if (($request ?? '') === 'page' && !$mentah) {
-                return self::halaman("Manifest API — {$app}/{$mvc}", '<div class="notification is-warning"><p>' . htmlspecialchars($pesan, ENT_QUOTES) . '</p></div>');
+                return self::halaman(self::judul($jenis, $app, $mvc, ''), '<div class="notification is-warning"><p>' . htmlspecialchars($pesan, ENT_QUOTES) . '</p></div>');
             }
 
             return self::tolak(404, 'ManifestNotFound', $pesan, ['app' => $app, 'mvc' => $mvc, 'jenis' => $jenis, 'url' => $url]);
@@ -131,11 +141,7 @@ final class Endpoint
         $release = $relPath ? self::baca($relPath) : '';
         $u = $jenis === 'manifest' ? Parser::urai($md) : null;
         $versi = $u ? ($u['versi'] !== '' ? $u['versi'] : Parser::versiRelease($release)) : Parser::versiRelease($release);
-        $judul = match ($jenis) {
-            'readme' => "README — {$app}/{$mvc}",
-            'release' => "Riwayat rilis — {$app}/{$mvc}" . ($versi !== '' ? " v{$versi}" : ''),
-            default => "Manifest API — {$app}/{$mvc}" . ($versi !== '' ? " v{$versi}" : ''),
-        };
+        $judul = self::judul($jenis, $app, $mvc, $versi);
         if (($request ?? '') === 'page') {
             // satu judul saja: H1 dokumen diangkat menjadi pageTitle tata letak, tidak dirender ulang di isi
             [$h1, $isi] = Parser::pisahJudul($jenis === 'manifest' ? Parser::tanpaBlokData($md) : $md);
@@ -157,6 +163,18 @@ final class Endpoint
         $out['markdown'] = $md;
 
         return $out;
+    }
+
+    private static function judul(string $jenis, string $app, string $mvc, string $versi): string
+    {
+        $v = $versi !== '' ? " v{$versi}" : '';
+
+        return match ($jenis) {
+            'readme' => "README — {$app}/{$mvc}",
+            'release' => "Riwayat rilis — {$app}/{$mvc}{$v}",
+            'spec' => "Spec — {$app}/{$mvc}",
+            default => "Manifest API — {$app}/{$mvc}{$v}",
+        };
     }
 
     /** Halaman tanpa tombol: judul + isi markdown; template inti core/template/general/manifest.html. */

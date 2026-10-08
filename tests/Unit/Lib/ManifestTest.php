@@ -58,8 +58,8 @@ class ManifestFakeSession extends gov2session
 }
 
 /**
- * Manifest per MVC (v5.1.7): cmd bawaan `manifest` (Gov2lib\Manifest\Endpoint) menyajikan view/{mvc}/{manifest|readme|release}.md;
- * /{app}/manifest = indeks endpoint MVC. Controller app ditiru dengan kelas di folder sementara (lokasi app = folder berkas kelas).
+ * Dokumen per MVC (v5.1.8): cmd bawaan `readme` (Gov2lib\Manifest\Endpoint) menyajikan view/{mvc}/{readme|manifest|release|spec}.md
+ * (akar = readme; alias v5.1.7 cmd `manifest` akarnya manifest); /{app}/readme (alias /{app}/manifest) = indeks endpoint MVC. Controller app ditiru dengan kelas di folder sementara (lokasi app = folder berkas kelas).
  */
 class ManifestTest extends TestCase
 {
@@ -123,8 +123,8 @@ class ManifestTest extends TestCase
     {
         foreach ($mvc as $m) {
             @mkdir(self::$dir . "/view/{$m}", 0777, true);
-            foreach (['manifest.md', 'release.md', 'readme.md'] as $f) {
-                copy(self::FIX . "/view/{$m}/{$f}", self::$dir . "/view/{$m}/{$f}");
+            foreach (glob(self::FIX . "/view/{$m}/*.md") as $f) {
+                copy($f, self::$dir . "/view/{$m}/" . basename($f));
             }
         }
     }
@@ -145,24 +145,34 @@ class ManifestTest extends TestCase
 
     public function testArgumenDariSegmenRuteDanPost(): void
     {
-        self::assertSame(['manifest', false], Endpoint::argumen(['cmd' => 'manifest']));
-        self::assertSame(['readme', false], Endpoint::argumen(['id' => 'readme']));
-        self::assertSame(['manifest', true], Endpoint::argumen(['id' => 'raw']));
+        // v5.1.8: akar = readme
+        self::assertSame(['readme', false], Endpoint::argumen(['cmd' => 'readme']));
+        self::assertSame(['readme', false], Endpoint::argumen([]));
+        self::assertSame(['readme', true], Endpoint::argumen(['cmd' => 'readme', 'id' => 'raw']));
+        self::assertSame(['manifest', false], Endpoint::argumen(['cmd' => 'readme', 'id' => 'manifest']));
+        self::assertSame(['spec', false], Endpoint::argumen(['cmd' => 'readme', 'id' => 'spec']));
+        self::assertSame(['spec', true], Endpoint::argumen(['cmd' => 'readme', 'scroll' => 'spec', 'id' => 'raw']));
         self::assertSame(['release', true], Endpoint::argumen(['scroll' => 'release', 'id' => 'raw']));
+        self::assertSame(['spec', true], Endpoint::argumen(['cmd' => 'readme', 'jenis' => 'spec', 'format' => 'raw']));
+        self::assertSame(['readme', false], Endpoint::argumen(['id' => '7']));
+        // alias v5.1.7: cmd manifest — akar manifest
+        self::assertSame(['manifest', false], Endpoint::argumen(['cmd' => 'manifest']));
+        self::assertSame(['manifest', true], Endpoint::argumen(['cmd' => 'manifest', 'id' => 'raw']));
         self::assertSame(['readme', true], Endpoint::argumen(['cmd' => 'manifest', 'jenis' => 'readme', 'format' => 'raw']));
-        self::assertSame(['manifest', false], Endpoint::argumen(['id' => '7']));
+        self::assertSame(['readme', 'manifest'], Endpoint::CMDS);
     }
 
     public function testManifestJsonPerMvc(): void
     {
         $this->salinFixture('kunjungan');
-        $r = Endpoint::sajikan($this->controller('kunjungan'), ['cmd' => 'manifest']);
+        $r = Endpoint::sajikan($this->controller('kunjungan'), ['cmd' => 'readme', 'id' => 'manifest']);
 
         self::assertTrue($r['ok'], json_encode($r));
         self::assertSame(['bukutamu', 'kunjungan', 'manifest', '1.2.0'], [$r['app'], $r['mvc'], $r['jenis'], $r['versi']]);
-        self::assertSame(['manifest' => true, 'readme' => true, 'release' => true], $r['berkas']);
-        self::assertSame('/bukutamu/kunjungan/manifest', $r['url']['manifest']);
-        self::assertSame('/bukutamu/kunjungan/manifest/readme', $r['url']['readme']);
+        self::assertSame(['readme' => true, 'manifest' => true, 'release' => true, 'spec' => true], $r['berkas']);
+        self::assertSame(['readme' => '/bukutamu/kunjungan/readme', 'manifest' => '/bukutamu/kunjungan/readme/manifest',
+            'release' => '/bukutamu/kunjungan/readme/release', 'spec' => '/bukutamu/kunjungan/readme/spec', 'raw' => '/bukutamu/kunjungan/readme/raw',
+            'indeks_app' => '/bukutamu/readme'], $r['url']);
         self::assertSame('edit', $r['data']['cmd']['del']['konfirmasi']);
         self::assertSame('kunjungan', $r['app_data']['mvc']);
         self::assertSame([], $r['galat']);
@@ -187,17 +197,47 @@ class ManifestTest extends TestCase
         Endpoint::sajikan($c, ['scroll' => 'readme', 'id' => 'raw']);
         self::assertSame('bukutamu-kunjungan-readme.md', $this->mentah['nama']);
         self::assertSame((string) file_get_contents(self::FIX . '/view/kunjungan/readme.md'), $this->mentah['isi']);
-        Endpoint::sajikan($c, ['id' => 'raw']);
-        self::assertSame('bukutamu-kunjungan-manifest.md', $this->mentah['nama']);
+        Endpoint::sajikan($c, ['cmd' => 'readme', 'id' => 'raw']);
+        self::assertSame('bukutamu-kunjungan-readme.md', $this->mentah['nama'], 'akar readme: /readme/raw = readme mentah');
+        Endpoint::sajikan($c, ['cmd' => 'manifest', 'id' => 'raw']);
+        self::assertSame('bukutamu-kunjungan-manifest.md', $this->mentah['nama'], 'alias lama: /manifest/raw = manifest mentah');
+    }
+
+    public function testSpecJsonHalamanDanMentahSalinBerkas(): void
+    {
+        $this->salinFixture('kunjungan');
+        $c = $this->controller('kunjungan');
+        $asli = (string) file_get_contents(self::FIX . '/view/kunjungan/spec.md');
+
+        $r = Endpoint::sajikan($c, ['cmd' => 'readme', 'id' => 'spec']);
+        self::assertTrue($r['ok']);
+        self::assertSame('spec', $r['jenis']);
+        self::assertSame($asli, $r['markdown']);
+        self::assertArrayNotHasKey('data', $r);
+
+        Endpoint::sajikan($c, ['cmd' => 'readme', 'scroll' => 'spec', 'id' => 'raw']);
+        self::assertSame('bukutamu-kunjungan-spec.md', $this->mentah['nama']);
+        self::assertSame($asli, $this->mentah['isi'], 'salin /readme/spec/raw = salin berkas spec.md');
+
+        $GLOBALS['request'] = 'page';
+        Endpoint::sajikan($c, ['cmd' => 'readme', 'id' => 'spec']);
+        $doc = $GLOBALS['doc'];
+        self::assertSame('Spec — bukutamu/kunjungan', $doc->body['pageTitle']);
+        self::assertStringContainsString('Di app bukutamu, buat halaman', $doc->body['manifestHtml']);
+        self::assertStringNotContainsString('spec phpVB:', $doc->body['manifestHtml'], 'komentar kepala tidak tampil');
+        self::assertStringNotContainsString('spec:rincian', $doc->body['manifestHtml']);
     }
 
     public function testBerkasHilang404BernamaDanHalamanPemberitahuan(): void
     {
-        $r = Endpoint::sajikan($this->controller('tanpadok'), ['cmd' => 'manifest']);
+        $r = Endpoint::sajikan($this->controller('tanpadok'), ['cmd' => 'readme', 'id' => 'manifest']);
         self::assertSame(404, http_response_code());
         self::assertSame('ManifestNotFound', $r['error']);
         self::assertStringContainsString('apps/bukutamu/view/tanpadok/manifest.md', $r['message']);
-        self::assertSame('/bukutamu/tanpadok/manifest', $r['url']['manifest']);
+        self::assertSame('/bukutamu/tanpadok/readme/manifest', $r['url']['manifest']);
+        $r = Endpoint::sajikan($this->controller('tanpadok'), ['cmd' => 'readme', 'id' => 'spec']);
+        self::assertStringContainsString('view/tanpadok/spec.md', $r['message']);
+        self::assertStringContainsString('spec=', $r['message']);
 
         $GLOBALS['request'] = 'page';
         $r = Endpoint::sajikan($this->controller('tanpadok'), ['id' => 'readme']);
@@ -209,7 +249,7 @@ class ManifestTest extends TestCase
     {
         $this->salinFixture('kunjungan');
         $GLOBALS['request'] = 'page';
-        $r = Endpoint::sajikan($this->controller('kunjungan'), []);
+        $r = Endpoint::sajikan($this->controller('kunjungan'), ['cmd' => 'readme', 'id' => 'manifest']);
         $doc = $GLOBALS['doc'];
 
         self::assertTrue($r['ok']);
@@ -225,8 +265,8 @@ class ManifestTest extends TestCase
         self::assertDoesNotMatchRegularExpression('/<h[1-6][\s>]/', $tpl, 'template tanpa judul sendiri');
 
         $GLOBALS['doc'] = new \Gov2lib\document();
-        Endpoint::sajikan($this->controller('kunjungan'), ['id' => 'readme']);
-        self::assertSame('Kunjungan Tamu — bukutamu/kunjungan', $GLOBALS['doc']->body['pageTitle'], 'judul readme = H1 readme');
+        Endpoint::sajikan($this->controller('kunjungan'), ['cmd' => 'readme']);
+        self::assertSame('Kunjungan Tamu — bukutamu/kunjungan', $GLOBALS['doc']->body['pageTitle'], 'akar /readme = readme, judul = H1 readme');
         self::assertStringNotContainsString('<h1>', $GLOBALS['doc']->body['manifestHtml']);
     }
 
@@ -237,6 +277,7 @@ class ManifestTest extends TestCase
         $j = strpos($src, 'Gov2lib\\Manifest\\Endpoint::sajikan');
         self::assertNotFalse($i);
         self::assertNotFalse($j);
+        self::assertStringContainsString('in_array($cmd, Gov2lib\\Manifest\\Endpoint::CMDS, true)', $src, 'readme + alias manifest');
         self::assertGreaterThan($i, $j, 'method milik controller diperiksa lebih dulu');
         self::assertStringContainsString("str_starts_with(\$controller, 'App\\\\')", $src);
     }
@@ -262,7 +303,9 @@ class ManifestTest extends TestCase
         self::assertTrue($r['ok'], json_encode($r));
         self::assertSame(2, $r['jumlah']);
         self::assertSame('1.2.0', $r['mvc']['kunjungan']['versi']);
-        self::assertSame('/bukutamu/kunjungan/manifest', $r['mvc']['kunjungan']['url']['manifest']);
+        self::assertSame('/bukutamu/kunjungan/readme/manifest', $r['mvc']['kunjungan']['url']['manifest']);
+        self::assertSame('/bukutamu/kunjungan/readme', $r['mvc']['kunjungan']['url']['readme']);
+        self::assertSame('/bukutamu/{mvc}/readme[/manifest|/release|/spec][/raw]', $r['url_pola']);
         self::assertContains('del', $r['mvc']['kunjungan']['cmd']);
         self::assertSame(['tanpadok'], $r['tanpa_manifest']);
     }
@@ -276,8 +319,18 @@ class ManifestTest extends TestCase
         self::assertTrue($r['ok']);
         self::assertSame([], $GLOBALS['self']->ses->dipanggil, 'public: tanpa authenticate');
         $html = $GLOBALS['doc']->body['manifestHtml'];
-        self::assertStringContainsString('/bukutamu/kunjungan/manifest', $html);
+        self::assertStringContainsString('/bukutamu/kunjungan/readme', $html);
+        self::assertStringContainsString('/bukutamu/kunjungan/readme/spec', $html);
         self::assertStringContainsString('tanpadok', $html);
+        self::assertSame('README — bukutamu', $GLOBALS['doc']->body['pageTitle']);
         self::assertSame(['takeAll:components', 'take:bukutamu/index/dependencies'], $GLOBALS['self']->diambil);
+    }
+
+    public function testRuteIndeksReadmeDanAliasManifest(): void
+    {
+        $xml = (string) file_get_contents(__DIR__ . '/../../../core/config/route.xml');
+        foreach (['/{app}/readme', '/{app}/readme/{cmd}[/{id}]', '/{app}/manifest', '/{app}/manifest/{cmd}[/{id}]'] as $uri) {
+            self::assertStringContainsString("<uri>{$uri}</uri>", $xml);
+        }
     }
 }

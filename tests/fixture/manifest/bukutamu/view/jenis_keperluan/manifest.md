@@ -29,7 +29,7 @@
 ```
 <!-- manifest:app end -->
 
-Dokumen MVC ini: `/bukutamu/jenis_keperluan/manifest` (kontrak API) · `/bukutamu/jenis_keperluan/manifest/readme` (konteks) · `/bukutamu/jenis_keperluan/manifest/release` (riwayat) · tambah `/raw` untuk markdown mentah. Indeks app: `/bukutamu/manifest`.
+Dokumen MVC ini: `/bukutamu/jenis_keperluan/readme` (konteks) · `/bukutamu/jenis_keperluan/readme/manifest` (kontrak API) · `/bukutamu/jenis_keperluan/readme/release` (riwayat) · `/bukutamu/jenis_keperluan/readme/spec` (prompt spesifikasi) · tambah `/raw` untuk markdown mentah. Indeks app: `/bukutamu/readme`.
 
 ## Konvensi transport
 
