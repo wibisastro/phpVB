@@ -226,4 +226,22 @@
         <uri>/{app}/manifest/{cmd}[/{id}]</uri>
         <handler>Gov2lib\manifestHandler</handler>
     </route>
+
+    <!-- agen: pertukaran identitas kancil → sesi portal (POST cmd=sesi) + klaim sesi (cmd=siapa) — Gov2lib\agen, untuk MCP generik phpvb-run.
+         Mati tanpa rahasia (PHPVB_AGEN_SECRET / core/config/agen.secret, terpisah dari agendb.secret). v5.1.6 -->
+    <route>
+        <method>GET</method>
+        <uri>/{app}/agen</uri>
+        <handler>Gov2lib\agenHandler</handler>
+    </route>
+    <route>
+        <method>GET</method>
+        <uri>/{app}/agen/{cmd}[/{id}]</uri>
+        <handler>Gov2lib\agenHandler</handler>
+    </route>
+    <route>
+        <method>POST</method>
+        <uri>/{app}/agen</uri>
+        <handler>Gov2lib\agenHandler</handler>
+    </route>
 </list>

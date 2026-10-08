@@ -217,6 +217,10 @@ try {
                                     // manifest tiga dokumen app (core/config/route.xml /{app}/manifest, v5.1.5)
                                     $controller = "Gov2lib\\manifest";
                                 break;
+                                case "agenHandler":
+                                    // agen sesi: identitas kancil → sesi portal (core/config/route.xml /{app}/agen, v5.1.6)
+                                    $controller = "Gov2lib\\agen";
+                                break;
                                 default:
                                     $controller = "Gov2lib\\index";
                             }
