@@ -218,8 +218,16 @@ class ManifestTest extends TestCase
         self::assertStringNotContainsString('"skema"', $doc->body['manifestHtml']);
         self::assertContains('manifest.html', $doc->content);
         self::assertArrayNotHasKey('manifestTautan', $doc->body, 'tanpa tombol navigasi');
+        self::assertStringNotContainsString('<h1>', $doc->body['manifestHtml'], 'judul hanya sekali: H1 dokumen diangkat ke pageTitle');
+        self::assertStringNotContainsString('Manifest API — bukutamu/kunjungan', $doc->body['manifestHtml']);
         $tpl = (string) file_get_contents(__DIR__ . '/../../../core/template/general/manifest.html');
         self::assertStringNotContainsString('btn', $tpl);
+        self::assertDoesNotMatchRegularExpression('/<h[1-6][\s>]/', $tpl, 'template tanpa judul sendiri');
+
+        $GLOBALS['doc'] = new \Gov2lib\document();
+        Endpoint::sajikan($this->controller('kunjungan'), ['id' => 'readme']);
+        self::assertSame('Kunjungan Tamu — bukutamu/kunjungan', $GLOBALS['doc']->body['pageTitle'], 'judul readme = H1 readme');
+        self::assertStringNotContainsString('<h1>', $GLOBALS['doc']->body['manifestHtml']);
     }
 
     public function testDispatcherMemanggilEndpointHanyaBilaControllerTakPunyaMethod(): void

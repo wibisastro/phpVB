@@ -137,7 +137,10 @@ final class Endpoint
             default => "Manifest API — {$app}/{$mvc}" . ($versi !== '' ? " v{$versi}" : ''),
         };
         if (($request ?? '') === 'page') {
-            return self::halaman($judul, markdown::render($jenis === 'manifest' ? Parser::tanpaBlokData($md) : $md));
+            // satu judul saja: H1 dokumen diangkat menjadi pageTitle tata letak, tidak dirender ulang di isi
+            [$h1, $isi] = Parser::pisahJudul($jenis === 'manifest' ? Parser::tanpaBlokData($md) : $md);
+
+            return self::halaman($h1 !== '' ? $h1 : $judul, markdown::render($isi));
         }
         $out = ['ok' => true, 'app' => $app, 'mvc' => $mvc, 'jenis' => $jenis, 'versi' => $versi, 'skema' => Parser::SKEMA,
             'berkas' => self::berkas($dirApp, $mvc), 'url' => $url, 'diubah' => ($t = @filemtime($p)) ? date('c', $t) : null];

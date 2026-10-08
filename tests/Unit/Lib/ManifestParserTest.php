@@ -89,6 +89,14 @@ class ManifestParserTest extends TestCase
         self::assertSame('9.9.9', Parser::versi($md, ['versi' => '9.9.9'], '', "## v1.0.0\n"), 'blok app menang');
     }
 
+    public function testPisahJudul(): void
+    {
+        self::assertSame(['Judul A', "isi\n"], Parser::pisahJudul("# Judul A\n\nisi\n"));
+        self::assertSame(['Judul B', ''], Parser::pisahJudul("\r\n#  Judul B  \r\n"));
+        self::assertSame(['', "## bukan H1\nisi"], Parser::pisahJudul("## bukan H1\nisi"));
+        self::assertSame(['', "teks\n# H1 di tengah\n"], Parser::pisahJudul("teks\n# H1 di tengah\n"));
+    }
+
     public function testCrlfDiterima(): void
     {
         $md = str_replace("\n", "\r\n", self::fixture());

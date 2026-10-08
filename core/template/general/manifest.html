@@ -1,7 +1,7 @@
 {# Manifest per MVC (/{app}/{mvc}/manifest[/readme|/release]) dan indeks app (/{app}/manifest) — v5.1.7.
-   Sengaja tanpa tombol: navigasi lewat endpoint. Tema cube jatuh ke general karena nama berkas ini tidak dioverride. #}
+   Sengaja tanpa tombol (navigasi lewat endpoint) dan tanpa judul sendiri: judul = pageTitle tata letak (H1 dokumen diangkat ke sana).
+   Tema cube jatuh ke general karena nama berkas ini tidak dioverride. #}
 <div class="p-4 manifest-page">
-  <h4 class="mb-3"><i class="fab fa-markdown me-2"></i>{{ pageTitle }}</h4>
   <div class="readme-content card card-body">
     {{ manifestHtml|raw }}
   </div>

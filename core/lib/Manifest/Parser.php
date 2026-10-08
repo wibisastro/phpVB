@@ -131,6 +131,21 @@ final class Parser
         return $md;
     }
 
+    /**
+     * Pisahkan judul `# …` pertama dari isi markdown — judul dipakai sebagai pageTitle tata letak supaya tidak tampil dua kali.
+     *
+     * @return array{0: string, 1: string} [judul ('' bila baris pertama bukan H1), isi tanpa baris judul]
+     */
+    public static function pisahJudul(string $md): array
+    {
+        $md = str_replace("\r\n", "\n", $md);
+        if (preg_match('/\A\s*#[ \t]+(.+?)[ \t]*(?:\n|\z)/', $md, $m)) {
+            return [trim($m[1]), ltrim(substr($md, strlen($m[0])), "\n")];
+        }
+
+        return ['', $md];
+    }
+
     /** Versi app: blok app → judul `vX.Y.Z` → entri teratas release.md → ''. */
     public static function versi(string $md, array $app = [], string $judul = '', string $release = ''): string
     {
