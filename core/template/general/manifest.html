@@ -1,19 +1,8 @@
-{# Halaman manifest/release/readme app — Gov2lib\manifest (v5.1.5). Dipakai lewat $self->content('manifest.html');
-   tema cube jatuh ke general karena nama berkas ini tidak dioverride. #}
+{# Manifest per MVC (/{app}/{mvc}/manifest[/readme|/release]) dan indeks app (/{app}/manifest) — v5.1.7.
+   Sengaja tanpa tombol: navigasi lewat endpoint. Tema cube jatuh ke general karena nama berkas ini tidak dioverride. #}
 <div class="p-4 manifest-page">
-  <div class="d-flex flex-wrap align-items-center mb-3">
-    <h4 class="mb-0 me-3"><i class="fab fa-markdown me-2"></i>{{ pageTitle }}</h4>
-    <div class="ms-auto">
-      {% for t in manifestTautan %}
-        <a class="btn btn-sm {{ t.aktif ? 'btn-primary' : 'btn-outline-secondary' }} me-1 mb-1" href="{{ t.url }}">{{ t.label }}</a>
-      {% endfor %}
-    </div>
-  </div>
+  <h4 class="mb-3"><i class="fab fa-markdown me-2"></i>{{ pageTitle }}</h4>
   <div class="readme-content card card-body">
     {{ manifestHtml|raw }}
   </div>
-  <p class="text-muted small mt-3">
-    Agen/MCP: <code>GET {{ manifestTautan[0].url }}</code> dengan header <code>Accept: application/json</code> mengembalikan markdown
-    + blok data terurai; <code>{{ manifestTautan[3].url }}</code> mengembalikan markdown mentah.
-  </p>
 </div>

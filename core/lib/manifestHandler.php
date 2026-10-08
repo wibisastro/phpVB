@@ -2,30 +2,17 @@
 
 namespace Gov2lib;
 
+use Gov2lib\Manifest\Endpoint;
+
 /**
- * Model endpoint manifest (`/{app}/manifest`, controller Gov2lib\manifest): hanya membaca tiga
- * dokumen bawaan app — tidak menyentuh DB app.
+ * Model indeks manifest app (`/{app}/manifest`, controller Gov2lib\manifest): memindai `apps/{app}/view/{mvc}/manifest.md`
+ * — manifest itu sendiri disajikan per MVC oleh cmd bawaan `manifest` (Gov2lib\Manifest\Endpoint, `/{app}/{mvc}/manifest`).
+ * Tidak menyentuh DB app; DSN domain dihubungkan seperti roleHandler agar authenticate('guest') bisa membaca member.
  *
- *   manifest → apps/{app}/view/manifest.md   (kontrak API, dibaca agen; wajib ada agar endpoint hidup)
- *   release  → apps/{app}/view/release.md    (kronologis versi)
- *   readme   → apps/{app}/README.md          (konteks domain; cadangan readme.md / view/readme.md)
- *
- * DSN domain dihubungkan seperti roleHandler agar authenticate('guest') bisa membaca member
- * bila cookie belum memuat `id`.
- *
- * @since 2026-10-08 (v5.1.5)
+ * @since 2026-10-08 (v5.1.5; v5.1.7 = indeks per MVC)
  */
 class manifestHandler extends checkExist
 {
-    public const JENIS = ['manifest', 'release', 'readme'];
-
-    /** Kandidat path relatif akar app per jenis — yang pertama ada dipakai. */
-    public const PATH = [
-        'manifest' => ['view/manifest.md'],
-        'release' => ['view/release.md', 'release.md', 'CHANGELOG.md'],
-        'readme' => ['README.md', 'readme.md', 'view/readme.md'],
-    ];
-
     public function __construct()
     {
         global $vars, $config, $pageID;
@@ -44,55 +31,44 @@ class manifestHandler extends checkExist
         return __DIR__ . "/../../apps/{$pageID}";
     }
 
-    /** Path berkas jenis tertentu yang ADA; null bila tidak ada. */
-    public function path(string $jenis): ?string
-    {
-        foreach (self::PATH[$jenis] ?? [] as $rel) {
-            $p = $this->dirApp() . '/' . $rel;
-            if (is_file($p) && is_readable($p)) {
-                return $p;
-            }
-        }
-
-        return null;
-    }
-
-    public function ada(string $jenis): bool
-    {
-        return $this->path($jenis) !== null;
-    }
-
-    /** Isi berkas (LF); '' bila tidak ada. */
-    public function baca(string $jenis): string
-    {
-        $p = $this->path($jenis);
-        if ($p === null) {
-            return '';
-        }
-
-        return str_replace("\r\n", "\n", (string) file_get_contents($p));
-    }
-
-    /** @return array<string, bool> */
-    public function berkas(): array
+    /** @return array<string, string> mvc → path manifest.md (urut nama) */
+    public function daftarManifest(): array
     {
         $out = [];
-        foreach (self::JENIS as $j) {
-            $out[$j] = $this->ada($j);
+        foreach (glob($this->dirApp() . '/view/*/manifest.md') ?: [] as $p) {
+            $mvc = basename(dirname($p));
+            if (preg_match('/^[A-Za-z][A-Za-z0-9_]{0,63}$/', $mvc)) {
+                $out[$mvc] = $p;
+            }
         }
+        ksort($out);
 
         return $out;
     }
 
-    /** Waktu ubah terakhir (ISO 8601) atau null. */
-    public function diubah(string $jenis): ?string
+    /** Controller app (berkas {mvc}.php di akar app, selain index) yang belum punya view/{mvc}/manifest.md. @return list<string> */
+    public function controllerTanpaManifest(): array
     {
-        $p = $this->path($jenis);
-        if ($p === null) {
-            return null;
+        $ada = $this->daftarManifest();
+        $out = [];
+        foreach (glob($this->dirApp() . '/*.php') ?: [] as $p) {
+            $mvc = basename($p, '.php');
+            if ($mvc !== 'index' && !isset($ada[$mvc]) && preg_match('/^[A-Za-z][A-Za-z0-9_]{0,63}$/', $mvc)) {
+                $out[] = $mvc;
+            }
         }
-        $t = @filemtime($p);
+        sort($out);
 
-        return $t ? date('c', $t) : null;
+        return $out;
+    }
+
+    public function versiMvc(string $mvc, array $urai): string
+    {
+        if ($urai['versi'] !== '') {
+            return $urai['versi'];
+        }
+        $rel = Endpoint::path($this->dirApp(), $mvc, 'release');
+
+        return $rel ? Manifest\Parser::versiRelease(Endpoint::baca($rel)) : '';
     }
 }

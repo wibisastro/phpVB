@@ -213,9 +213,9 @@
         <handler>Gov2lib\agendbHandler</handler>
     </route>
 
-    <!-- manifest: tiga dokumen bawaan app hasil vibe coding (view/manifest.md kontrak API untuk agen, view/release.md
-         kronologis versi, README.md konteks) — Gov2lib\manifest. HTML di browser, JSON bila Accept application/json,
-         /raw markdown mentah; authenticate('guest') kecuali <manifest>public</manifest> di xml/config.xml app. v5.1.5 -->
+    <!-- manifest: INDEKS manifest app (daftar MVC bermanifest + endpoint) — Gov2lib\manifest. Manifest itu sendiri milik tiap MVC:
+         /{app}/{mvc}/manifest[/readme|/release][/raw] = cmd bawaan semua controller app (dispatcher → Gov2lib\Manifest\Endpoint,
+         berkas view/{mvc}/{manifest,readme,release}.md). authenticate('guest') kecuali <manifest>public</manifest>. v5.1.5 → v5.1.7 -->
     <route>
         <method>GET</method>
         <uri>/{app}/manifest</uri>
