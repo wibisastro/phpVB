@@ -213,10 +213,21 @@
         <handler>Gov2lib\agendbHandler</handler>
     </route>
 
-    <!-- readme: INDEKS dokumen app (daftar MVC bermanifest + endpoint) — Gov2lib\manifest. Dokumen itu sendiri milik tiap MVC:
-         /{app}/{mvc}/readme[/manifest|/release|/spec][/raw] = cmd bawaan semua controller app (dispatcher → Gov2lib\Manifest\Endpoint,
-         berkas view/{mvc}/{readme,manifest,release,spec}.md). authenticate('guest') kecuali <manifest>public</manifest>. v5.1.8;
-         /{app}/manifest[/{cmd}] = alias v5.1.5–v5.1.7 (deprecated). `readme` & `manifest` = nama MVC terlarang. -->
+    <!-- artefak: INDEKS artefak app (daftar MVC bermanifest + endpoint) — Gov2lib\manifest. Artefak itu sendiri milik tiap MVC:
+         /{app}/{mvc}/artefak[/manifes|/rilis|/spek][/berkas] = cmd bawaan semua controller app (dispatcher → Gov2lib\Manifest\Endpoint,
+         berkas view/{mvc}/{readme,manifest,release,spec}.md). authenticate('guest') kecuali <manifest>public</manifest>. v5.1.9;
+         /{app}/readme[/{cmd}] = alias v5.1.8, /{app}/manifest[/{cmd}] = alias v5.1.5–v5.1.7 (deprecated).
+         `artefak`, `readme` & `manifest` = nama MVC terlarang. -->
+    <route>
+        <method>GET</method>
+        <uri>/{app}/artefak</uri>
+        <handler>Gov2lib\manifestHandler</handler>
+    </route>
+    <route>
+        <method>GET</method>
+        <uri>/{app}/artefak/{cmd}[/{id}]</uri>
+        <handler>Gov2lib\manifestHandler</handler>
+    </route>
     <route>
         <method>GET</method>
         <uri>/{app}/readme</uri>

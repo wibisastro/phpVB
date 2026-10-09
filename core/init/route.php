@@ -214,7 +214,7 @@ try {
                                     $controller = "Gov2lib\\agendb";
                                 break;
                                 case "manifestHandler":
-                                    // indeks dokumen app (core/config/route.xml /{app}/readme v5.1.8; alias /{app}/manifest v5.1.5)
+                                    // indeks artefak app (core/config/route.xml /{app}/artefak v5.1.9; alias /{app}/readme v5.1.8, /{app}/manifest v5.1.5)
                                     $controller = "Gov2lib\\manifest";
                                 break;
                                 case "agenHandler":

@@ -1,6 +1,6 @@
 # Riwayat rilis — bukutamu/kunjungan
 
-Kronologis versi MVC ini, terbaru di atas. Kontrak API: `/bukutamu/kunjungan/readme/manifest`.
+Kronologis versi MVC ini, terbaru di atas. Kontrak API: `/bukutamu/kunjungan/artefak/manifes`.
 
 ## v1.2.0 — 2026-10-08
 - cari ke seluruh data (M5)

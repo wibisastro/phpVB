@@ -5,9 +5,9 @@ namespace Gov2lib;
 use Gov2lib\Manifest\Endpoint;
 
 /**
- * Model indeks dokumen app (`/{app}/readme`, alias `/{app}/manifest`; controller Gov2lib\manifest): memindai
- * `apps/{app}/view/{mvc}/manifest.md` — dokumen itu sendiri disajikan per MVC oleh cmd bawaan `readme`
- * (Gov2lib\Manifest\Endpoint, `/{app}/{mvc}/readme[/manifest|/release|/spec]`).
+ * Model indeks artefak app (`/{app}/artefak`, alias `/{app}/readme`, `/{app}/manifest`; controller Gov2lib\manifest): memindai
+ * `apps/{app}/view/{mvc}/manifest.md` — artefak itu sendiri disajikan per MVC oleh cmd bawaan `artefak`
+ * (Gov2lib\Manifest\Endpoint, `/{app}/{mvc}/artefak[/manifes|/rilis|/spek]`).
  * Tidak menyentuh DB app; DSN domain dihubungkan seperti roleHandler agar authenticate('guest') bisa membaca member.
  *
  * @since 2026-10-08 (v5.1.5; v5.1.7 = indeks per MVC)

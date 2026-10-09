@@ -77,8 +77,8 @@ try {
             if (method_exists(${$pageID},$cmd)) {
                 $response=${$pageID}->$cmd($payload);
             } elseif (in_array($cmd, Gov2lib\Manifest\Endpoint::CMDS, true) && str_starts_with($controller, 'App\\')) {
-                // v5.1.8: dokumen per MVC (view/{mvc}/readme|manifest|release|spec.md) — cmd bawaan `readme` semua controller app
-                // (+ alias v5.1.7 `manifest`), dijalankan SETELAH konstruktor (authenticate MVC berlaku); method milik controller tetap menang.
+                // v5.1.9: artefak per MVC (view/{mvc}/readme|manifest|release|spec.md) — cmd bawaan `artefak` semua controller app
+                // (+ alias deprecated `readme` v5.1.8, `manifest` v5.1.7), dijalankan SETELAH konstruktor (authenticate MVC berlaku); method milik controller tetap menang.
                 $response=Gov2lib\Manifest\Endpoint::sajikan(${$pageID}, is_array($payload) ? $payload : []);
             } elseif ($cmd!="index") {
                 throw new Exception('MethodNotExist: '.$cmd.'()');

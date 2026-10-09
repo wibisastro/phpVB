@@ -6,16 +6,16 @@ use Gov2lib\Manifest\Endpoint;
 use Gov2lib\Manifest\Parser;
 
 /**
- * Indeks dokumen app — daftar MVC yang punya manifest beserta endpoint-nya. Dokumen itu sendiri milik tiap MVC:
- * `GET /{app}/{mvc}/readme` (+ `/manifest`, `/release`, `/spec`, `/raw`), disajikan cmd bawaan `readme` (Gov2lib\Manifest\Endpoint)
+ * Indeks artefak app — daftar MVC yang punya manifest beserta endpoint-nya. Artefak itu sendiri milik tiap MVC:
+ * `GET /{app}/{mvc}/artefak` (+ `/manifes`, `/rilis`, `/spek`, `/berkas`), disajikan cmd bawaan `artefak` (Gov2lib\Manifest\Endpoint)
  * sehingga ikut authenticate() MVC itu. Indeks ini dipakai agen (MCP phpvb-run) untuk menemukan MVC.
  *
- *   GET /{app}/readme          → HTML: daftar endpoint (tanpa tombol) | JSON: {mvc: {judul, versi, pola, auth, cmd, url}, tanpa_manifest}
- *   GET /{app}/readme/ping     → jumlah MVC bermanifest + yang belum (tanpa login)
- *   /{app}/manifest[/ping]     → alias v5.1.5–v5.1.7 (deprecated), isi sama
+ *   GET /{app}/artefak         → HTML: daftar endpoint (tanpa tombol) | JSON: {mvc: {judul, versi, pola, auth, cmd, url}, tanpa_manifest}
+ *   GET /{app}/artefak/ping    → jumlah MVC bermanifest + yang belum (tanpa login)
+ *   /{app}/readme[/ping], /{app}/manifest[/ping] → alias v5.1.8 / v5.1.5–v5.1.7 (deprecated), isi sama
  *
  * Akses: authenticate('guest') kecuali <manifest>public</manifest> di apps/{app}/xml/config.xml. Tanpa DB, tanpa rahasia.
- * Rujukan: phpVB/rencana/phpvb-readme-spec-mvc.md, release_notes/v5.1.5.md + v5.1.7.md + v5.1.8.md.
+ * Rujukan: phpVB/rencana/sdd-berbasis-tiket.md, release_notes/v5.1.5.md + v5.1.7.md + v5.1.8.md + v5.1.9.md.
  */
 class manifest
 {
@@ -60,7 +60,7 @@ class manifest
         }
         $tanpa = $m->controllerTanpaManifest();
         if (($request ?? '') === 'page') {
-            $doc->body('pageTitle', "README — {$pageID}");
+            $doc->body('pageTitle', "Artefak — {$pageID}");
             $doc->body('manifestHtml', markdown::render($this->mdIndeks((string) $pageID, $daftar, $tanpa)));
             $doc->counter();
             if (!isset($doc->content) || !is_array($doc->content)) {
@@ -72,7 +72,7 @@ class manifest
         }
 
         return ['ok' => true, 'app' => $pageID, 'skema' => Parser::SKEMA, 'jumlah' => count($daftar), 'mvc' => $daftar, 'tanpa_manifest' => $tanpa,
-            'url_pola' => "/{$pageID}/{mvc}/readme[/manifest|/release|/spec][/raw]"];
+            'url_pola' => "/{$pageID}/{mvc}/artefak[/manifes|/rilis|/spek][/berkas]"];
     }
 
     /** Hidup? Berapa MVC bermanifest? — tanpa login, tanpa isi. */
@@ -86,23 +86,23 @@ class manifest
         }
 
         return ['ok' => true, 'app' => $pageID, 'agen' => 'manifest', 'skema' => Parser::SKEMA, 'mvc_bermanifest' => array_keys($m->daftarManifest()),
-            'tanpa_manifest' => $m->controllerTanpaManifest(), 'url_pola' => "/{$pageID}/{mvc}/readme", 'cmd' => ['index', 'ping']];
+            'tanpa_manifest' => $m->controllerTanpaManifest(), 'url_pola' => "/{$pageID}/{mvc}/artefak", 'cmd' => ['index', 'ping']];
     }
 
     // ---------------------------------------------------------------- bantu
 
     private function mdIndeks(string $app, array $daftar, array $tanpa): string
     {
-        $b = ["Dokumen dimiliki tiap MVC. Endpoint: `/{$app}/{mvc}/readme` (konteks), `…/readme/manifest` (kontrak API), `…/readme/release` (riwayat versi), "
-            . "`…/readme/spec` (prompt spesifikasi); tambah `/raw` untuk markdown mentah; `Accept: application/json` untuk data terurai.", ''];
+        $b = ["Artefak dimiliki tiap MVC. Endpoint: `/{$app}/{mvc}/artefak` (readme — konteks), `…/artefak/manifes` (kontrak API), `…/artefak/rilis` (riwayat versi), "
+            . "`…/artefak/spek` (prompt spesifikasi); tambah `/berkas` untuk markdown mentah; `Accept: application/json` untuk data terurai.", ''];
         if ($daftar) {
-            $b[] = '| MVC | Judul | Versi | Pola | Readme | Manifest | Spec |';
+            $b[] = '| MVC | Judul | Versi | Pola | Artefak | Manifes | Spek |';
             $b[] = '|---|---|---|---|---|---|---|';
             foreach ($daftar as $mvc => $d) {
                 $u = $d['url'];
-                $spec = !empty($d['berkas']['spec']) ? "[spec]({$u['spec']})" : '—';
+                $spec = !empty($d['berkas']['spec']) ? "[spek]({$u['spec']})" : '—';
                 $b[] = "| {$mvc} | {$d['judul']} | " . ($d['versi'] ?: '—') . ' | ' . (implode('+', $d['pola']) ?: '—')
-                    . " | [{$u['readme']}]({$u['readme']}) | [manifest]({$u['manifest']}) | {$spec} |";
+                    . " | [{$u['readme']}]({$u['readme']}) | [manifes]({$u['manifest']}) | {$spec} |";
             }
         } else {
             $b[] = '_Belum ada MVC bermanifest._';
