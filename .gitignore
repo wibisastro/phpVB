@@ -36,7 +36,7 @@ Thumbs.db
 tests/golden/fixtures/
 
 # Galeri Komponen Cube — ARTEFAK GENERATE (9MB: aset = salinan verbatim demo Cube,
-# HTML = generate). Bangun ulang: php .claude/skills/halaman-cube/scripts/build-galeri.php
+# HTML = generate). Bangun ulang: php ~/Documents/projects/bootstrap/perangkat/build-galeri.php
 # <dir-design> public/galeri. Landing /home/galeri degrade anggun bila absen.
 /public/galeri/
 
