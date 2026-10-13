@@ -203,7 +203,8 @@ class landing extends \Gov2lib\document {
                 ],
                 'kontakJudul' => 'Hubungi kami',
                 'bawah'   => [],
-                'catatan' => 'Dibangun di atas platform gov3 (phpVB).',
+                'catatan' => 'Dibangun di atas platform gov3 (phpVB)',
+                'kredit'  => ['nama' => 'Alif Zidane', 'url' => 'mailto:alif@cybergl.co.id'],
             ],
         ];
     }
