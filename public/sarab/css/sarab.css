@@ -36,3 +36,5 @@
    tidak memaksa lebar minimum isinya (min-width:0), supaya layar sempit tidak melebar. */
 .panel-gelap .d-flex > div, .ctitem .ctinfo { min-width: 0; }
 .panel-gelap .info-nilai, .panel-gelap .info-label, .ctinfo span, .fciinfo { overflow-wrap: anywhere; }
+/* Logo gambar di navbar (landing.brandLogo) menggantikan lingkaran ikon .bico: tinggi tetap, lebar mengikuti. */
+.blogo-img { height: 46px; width: auto; max-width: 200px; display: block; }

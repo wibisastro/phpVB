@@ -1,11 +1,11 @@
 {# sarab#2 — nav#nav (index.html:51). Tombol pencarian + overlay #searchOv (sarab#3, index.html:85) DIBUANG:
-   pencarian demo tanpa backend. fa-bars → bi-list; ikon brand fa-utensils → landing.brandIkon. #}
+   pencarian demo tanpa backend. fa-bars → bi-list; ikon brand fa-utensils → landing.brandIkon, atau gambar logo bila landing.brandLogo (URL) diisi. #}
 {% import '@sarab/url.html' as url %}
 <nav class="navbar navbar-expand-lg" id="nav">
     <div class="container">
         <a class="navbar-brand" href="#hero">
             <div class="blogo">
-                <div class="bico"><i class="{{ landing.brandIkon|default('bi-shop') }}"></i></div>
+                {% if landing.brandLogo|default('') %}<img class="blogo-img" src="{{ landing.brandLogo }}" alt="{{ landing.brandLogoAlt|default('') }}" />{% else %}<div class="bico"><i class="{{ landing.brandIkon|default('bi-shop') }}"></i></div>{% endif %}
                 <div>
                     <div class="bname">{{ landing.brand }}<span>{{ landing.brandAksen|default('') }}</span></div>
                     <div class="bsub">{{ landing.tagline }}</div>

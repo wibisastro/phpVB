@@ -22,7 +22,9 @@ class landing extends \Gov2lib\document {
         return [
             'brand'      => 'SAKIP',
             'brandAksen' => 'AI',
-            'brandIkon'  => 'bi-robot',
+            'brandIkon'  => 'bi-robot',   // dipakai hanya bila brandLogo kosong
+            'brandLogo'  => $img.'/logo-kemenpanrb.png',   // logo resmi Kementerian PANRB 2021 (Wikimedia Commons, domain publik)
+            'brandLogoAlt' => 'Kementerian PANRB',
             'tagline'    => 'Evaluasi SAKIP berbasis AI',
             'deskripsi'  => 'Tools analisis dokumen dan evaluasi SAKIP dengan pendekatan AI-in-the-Loop: AI sebagai co-pilot asesor, bukan pengganti. Klien KemenPANRB, mitra riset UI-CSGAR.',
             'topbarTag'  => 'AI-in-the-Loop · piloting 2026',
