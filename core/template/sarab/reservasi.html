@@ -1,0 +1,38 @@
+{# sarab#17 — section#reservation (index.html:924). Form vendor PALSU (JS setTimeout, tanpa backend) → panel ajakan
+   + tombol (telepon / e-mail / rute app). Panel info kiri dari landing.reservasi.info[]. null = tidak dirender. #}
+{% import '@sarab/url.html' as url %}
+{% if landing.reservasi|default(null) %}
+<section id="reservation">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="slbl">{{ landing.reservasi.kicker }}</span>
+            <h2 class="stitle">{{ landing.reservasi.judul }} <span>{{ landing.reservasi.judulAksen|default('') }}</span></h2>
+            <div class="sline"></div>
+            {% if landing.reservasi.teks|default('') %}<p class="sdesc mx-auto" style="max-width:480px;">{{ landing.reservasi.teks }}</p>{% endif %}
+        </div>
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-4" data-aos="fade-right">
+                <div class="panel-gelap h-100">
+                    <h4>{{ landing.reservasi.infoJudul|default('Informasi') }}</h4>
+                    <p class="panel-gelap-sub">{{ landing.reservasi.infoTeks|default('') }}</p>
+                    <div class="d-flex flex-column gap-3">
+                        {% for i in landing.reservasi.info|default([]) %}
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="cticon"><i class="{{ i.ikon }}"></i></div>
+                            <div><strong class="info-label">{{ i.judul }}</strong><span class="info-nilai">{{ i.teks }}</span></div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8" data-aos="fade-left">
+                <div class="panel-ajak text-center h-100 d-flex flex-column justify-content-center">
+                    <h4>{{ landing.reservasi.panel.judul }}</h4>
+                    <p class="sdesc">{{ landing.reservasi.panel.teks }}</p>
+                    <div><a href="{{ url.ke(landing.reservasi.panel.tombol.url, _context) }}" class="btn-red"><i class="{{ landing.reservasi.panel.tombol.ikon|default('bi-calendar-check') }}"></i>{{ landing.reservasi.panel.tombol.label }}</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}

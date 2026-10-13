@@ -1,0 +1,38 @@
+{# Tema sarab (Sarab v1.0.0, Bestwpware via ThemeWagon, MIT) — tema HALAMAN PUBLIK, bukan overlay cube: tidak ada
+   file cube*, tidak diaktifkan lewat <template>. App memakainya dari apps/{app}/view/body.html:
+   {% extends "@sarab/layout.html" %} (namespace tema didaftarkan core/init/template.php). Teks dari model app (landing.*).
+   SENGAJA tidak include cubeHead.html: Bootstrap 5.3.8 vendor dimuat sendiri (css/bootstrap.min.css; JS bundle
+   dari /cube, versi sama 5.3.8). Tidak ada #app / createPageApp — tanpa Vue, tanpa jQuery.
+   Dibuang: jQuery + magnific-popup (video → tautan), Font Awesome lokal 7 MB (→ bootstrap-icons /cube/fonts),
+   overlay pencarian, keranjang, form palsu. Dibawa: AOS + Swiper (public/sarab/vendor/, Swiper hanya bila
+   landing.testimoni ada). Google Fonts Playfair Display + Poppins + Dancing Script tetap CDN (keputusan 13 Okt 2026).
+   Id section = id vendor (#hero #about #menu …) karena CSS vendor mengunci id itu. #}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+{% block head %}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="{{ landing.deskripsi }}" />
+    <title>{{ pageTitle }}</title>
+    <link rel="icon" type="image/png" href="{{ webroot }}/images/logo-krisna.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&amp;family=Poppins:wght@300;400;500;600;700&amp;family=Dancing+Script:wght@700&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ webroot }}/sarab/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="{{ webroot }}/cube/fonts/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="{{ webroot }}/sarab/vendor/aos/aos.css" />
+    {% if landing.testimoni|default(null) %}<link rel="stylesheet" href="{{ webroot }}/sarab/vendor/swiper/swiper-bundle.min.css" />{% endif %}
+    <link rel="stylesheet" href="{{ webroot }}/sarab/css/style.css" />
+    <link rel="stylesheet" href="{{ webroot }}/sarab/css/sarab.css" />
+{% endblock %}
+</head>
+<body>
+{% block content %}{% endblock %}
+{# sarab#22 — tombol kembali ke atas (index.html:1215); onclick inline vendor → handler di sarab.js #}
+<button id="btt" type="button" aria-label="Ke atas"><i class="bi-chevron-up"></i></button>
+<script src="{{ webroot }}/cube/js/bootstrap.bundle.min.js"></script>
+<script src="{{ webroot }}/sarab/vendor/aos/aos.js"></script>
+{% if landing.testimoni|default(null) %}<script src="{{ webroot }}/sarab/vendor/swiper/swiper-bundle.min.js"></script>{% endif %}
+<script src="{{ webroot }}/sarab/js/sarab.js"></script>
+{% block externalJS %}{% endblock %}
+</body>
+</html>

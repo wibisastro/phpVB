@@ -1,0 +1,36 @@
+{# sarab#11 — section#gallery (index.html:566) + sarab#12 popup #galPop (index.html:618) sebelum/berikutnya.
+   Foto portofolio vendor tidak dibawa; gambar dari app; tanpa gambar → panel ikon. Item pertama memakan 2 baris
+   (CSS vendor .gitem:first-child). null = tidak dirender. #}
+{% if landing.galeri|default(null) %}
+<section id="gallery">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="slbl">{{ landing.galeri.kicker }}</span>
+            <h2 class="stitle">{{ landing.galeri.judul }} <span>{{ landing.galeri.judulAksen|default('') }}</span></h2>
+            <div class="sline"></div>
+        </div>
+        <div class="ggrid" data-aos="fade-up">
+            {% for g in landing.galeri.daftar %}
+            <div class="gitem" data-gi="{{ loop.index0 }}" data-gimg="{{ g.gambar|default('') }}" data-gtitle="{{ g.judul }}" data-gdesc="{{ g.teks|default('') }}">
+                {% if g.gambar|default('') %}<img src="{{ g.gambar }}" alt="{{ g.judul }}" />{% else %}<div class="panel-gambar"><i class="{{ g.ikon|default('bi-image') }}"></i></div>{% endif %}
+                <div class="gover"><span><i class="bi-arrows-fullscreen"></i> {{ g.judul }}</span></div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<div id="galPop">
+    <div class="gpbox">
+        <button class="gpclose" id="gpClose" type="button" aria-label="Tutup"><i class="bi-x-lg"></i></button>
+        <img id="gpImg" src="" alt="" />
+        <div class="gpcap">
+            <h5 id="gpTitle"></h5>
+            <p id="gpDesc"></p>
+        </div>
+        <div class="gpnav">
+            <button id="gpPrev" type="button"><i class="bi-chevron-left me-1"></i>Sebelumnya</button>
+            <button id="gpNext" type="button">Berikutnya <i class="bi-chevron-right ms-1"></i></button>
+        </div>
+    </div>
+</div>
+{% endif %}

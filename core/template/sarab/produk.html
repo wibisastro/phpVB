@@ -1,0 +1,62 @@
+{# sarab#8 — section#menu (index.html:306) + sarab#9 popup #menuPop (index.html:512). Popup tanpa keranjang/qty/
+   rating (demo tanpa backend; jangan mengarang ulasan). Tombol filter dibuat dari landing.kategori.daftar.
+   Ikon hati FA far/fas → bi-heart/bi-heart-fill. Gambar dari app; tanpa gambar → panel ikon. null = tidak dirender. #}
+{% import '@sarab/url.html' as url %}
+{% if landing.produk|default(null) %}
+<section id="menu">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="slbl">{{ landing.produk.kicker }}</span>
+            <h2 class="stitle">{{ landing.produk.judul }} <span>{{ landing.produk.judulAksen|default('') }}</span></h2>
+            <div class="sline"></div>
+        </div>
+        {% if landing.kategori.daftar|default([]) is not empty %}
+        <div class="text-center mb-4" data-aos="fade-up">
+            <button class="filtbtn active" type="button" data-f="all">{{ landing.kategori.semua|default('Semua') }}</button>
+            {% for k in landing.kategori.daftar %}<button class="filtbtn" type="button" data-f="{{ k.kode }}">{{ k.nama }}</button>{% endfor %}
+        </div>
+        {% endif %}
+        <div class="row g-4" id="mgrid">
+            {% for p in landing.produk.daftar %}
+            <div class="col-sm-6 col-lg-4 mwrap" data-c="{{ p.kode|default('') }}" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 3) * 80 }}">
+                <div class="mcard" data-img="{{ p.gambar|default('') }}" data-ikon="{{ p.ikon|default('bi-box-seam') }}" data-title="{{ p.judul }}" data-cat="{{ p.kategori|default('') }}" data-price="{{ p.harga|default('') }}" data-old="{{ p.hargaLama|default('') }}" data-desc="{{ p.deskripsi|default(p.teks) }}" data-tags="{{ p.tag|default([])|join(',') }}">
+                    <div class="mimg">
+                        {% if p.gambar|default('') %}<img src="{{ p.gambar }}" alt="{{ p.judul }}" />{% else %}<div class="panel-gambar"><i class="{{ p.ikon|default('bi-box-seam') }}"></i></div>{% endif %}
+                        {% if p.badge|default(null) %}<div class="mbdg {{ p.badge.gaya|default('') }}"><i class="bi-star-fill"></i> {{ p.badge.teks }}</div>{% endif %}
+                        <div class="mhrt" title="Favorit"><i class="bi-heart"></i></div>
+                    </div>
+                    <div class="mbody">
+                        <div class="mcat">{{ p.kategori|default('') }}</div>
+                        <div class="mtit">{{ p.judul }}</div>
+                        <div class="mdesc">{{ p.teks }}</div>
+                        <div class="mfoot">
+                            <div>
+                                <div class="mprice">{{ p.harga|default('') }}{% if p.hargaLama|default('') %} <small>{{ p.hargaLama }}</small>{% endif %}</div>
+                                {% if p.keterangan|default('') %}<div class="mstars"><span style="color:#bbb;font-size:.7rem;">{{ p.keterangan }}</span></div>{% endif %}
+                            </div>
+                            <button class="madd" type="button" title="Lihat detail"><i class="bi-plus-lg"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if landing.produk.tombol|default(null) %}
+        <div class="text-center mt-5"><a href="{{ url.ke(landing.produk.tombol.url, _context) }}" class="btn-red"><i class="{{ landing.produk.tombol.ikon|default('bi-grid-fill') }}"></i>{{ landing.produk.tombol.label }}</a></div>
+        {% endif %}
+    </div>
+</section>
+<div id="menuPop">
+    <div class="mpbox">
+        <button class="mpclose" id="mpClose" type="button" aria-label="Tutup"><i class="bi-x-lg"></i></button>
+        <div class="mpimg"><img id="mpImg" src="" alt="" /><div class="panel-gambar" id="mpPanel"><i class="bi-box-seam"></i></div></div>
+        <div class="mpbody">
+            <div id="mpCat"></div>
+            <div id="mpTitle"></div>
+            <div id="mpDesc"></div>
+            <div id="mpPrice"></div>
+            <div class="mptags" id="mpTags"></div>
+        </div>
+    </div>
+</div>
+{% endif %}

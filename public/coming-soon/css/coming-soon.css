@@ -1,0 +1,19 @@
+/* Override kecil di atas styles.css vendor (Coming Soon v6.0.7).
+   Video latar vendor (assets/mp4/bg.mp4, 13 MB) TIDAK dibawa: diganti foto latar tetap
+   (div.bg-foto di layout.html) di semua lebar, meniru posisi video.bg-video vendor;
+   lapisan warna body:before vendor tetap bekerja di atasnya. Tombol pengganti form
+   SB Forms meniru gaya tombol newsletter vendor (uppercase, letter-spacing). */
+.bg-foto {
+  position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 0;
+  background: #2a5555 url("../img/bg.jpg") no-repeat center center;
+  background-size: cover;
+}
+.masthead .masthead-content .brand {
+  font-size: .9rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; opacity: .85;
+}
+.masthead .masthead-content .brand img { max-height: 1.75rem; }
+.masthead .masthead-tombol .btn {
+  font-size: .85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+  padding: calc(1rem + 2px) 1.75rem;
+}
+.social-icons .btn { font-size: 1.25rem; }

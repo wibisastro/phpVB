@@ -1,0 +1,34 @@
+{# stylish-portfolio#7 — section#portfolio (index.html:104); id diganti "portofolio".
+   Foto stok vendor (portfolio-1..4.jpg) TIDAK dibawa: gambar dari app (landing.portofolio.daftar[].gambar,
+   URL — aset app lewat rute /{app}/img/{file}); tanpa gambar → panel gradien + ikon (ukuran 3:2
+   seperti foto vendor 700×467). landing.portofolio null = tidak dirender. #}
+{% import '@stylish-portfolio/url.html' as url %}
+{% if landing.portofolio|default(null) %}
+<section class="content-section" id="portofolio">
+    <div class="container px-4 px-lg-5">
+        <div class="content-section-heading text-center">
+            <h3 class="text-secondary mb-0">{{ landing.portofolio.kicker }}</h3>
+            <h2 class="mb-5">{{ landing.portofolio.judul }}</h2>
+        </div>
+        <div class="row gx-0">
+            {% for p in landing.portofolio.daftar %}
+            <div class="col-lg-6">
+                <a class="portfolio-item" href="{{ url.ke(p.url|default('#portofolio'), _context) }}">
+                    <div class="caption">
+                        <div class="caption-content">
+                            <div class="h2">{{ p.judul }}</div>
+                            <p class="mb-0">{{ p.teks }}</p>
+                        </div>
+                    </div>
+                    {% if p.gambar|default('') %}
+                    <img class="img-fluid" src="{{ p.gambar }}" alt="{{ p.judul }}" />
+                    {% else %}
+                    <div class="portfolio-panel"><i class="{{ p.ikon|default('bi-folder2-open') }}"></i></div>
+                    {% endif %}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}

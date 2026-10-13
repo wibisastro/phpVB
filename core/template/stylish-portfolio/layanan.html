@@ -1,0 +1,19 @@
+{# stylish-portfolio#5 — section#services (index.html:58); id diganti "layanan".
+   Ikon Simple Line Icons (icon-*) → bootstrap-icons (landing.layanan.daftar[].ikon). #}
+<section class="content-section bg-primary text-white text-center" id="layanan">
+    <div class="container px-4 px-lg-5">
+        <div class="content-section-heading">
+            <h3 class="text-secondary mb-0">{{ landing.layanan.kicker }}</h3>
+            <h2 class="mb-5">{{ landing.layanan.judul }}</h2>
+        </div>
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            {% for l in landing.layanan.daftar %}
+            <div class="col-lg-3 col-md-6 mb-5 mb-lg-0">
+                <span class="service-icon rounded-circle mx-auto mb-3"><i class="{{ l.ikon }}"></i></span>
+                <h4><strong>{{ l.judul }}</strong></h4>
+                <p class="text-faded mb-0">{{ l.teks }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

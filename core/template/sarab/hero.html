@@ -1,0 +1,55 @@
+{# sarab#4 — section#hero (index.html:132). Tombol video vendor (magnific popup + jQuery) → tautan biasa ke tab baru
+   (landing.hero.video {label,url}, null = tanpa). Gambar lingkaran: landing.hero.gambar (URL) atau foto bawaan tema
+   img/banner-img.jpg. Kartu melayang maksimal 3 (CSS vendor fc1..fc3). Angka statistik dianimasikan sarab.js. #}
+{% import '@sarab/url.html' as url %}
+<section id="hero">
+    <div class="hs hs1"></div>
+    <div class="hs hs2"></div>
+    {% if landing.hero.latarTeks|default('') %}<div class="hbgtxt">{{ landing.hero.latarTeks }}</div>{% endif %}
+    <div class="container">
+        <div class="row align-items-center g-5" style="min-height:88vh;">
+            <div class="col-lg-6">
+                {% if landing.hero.badge|default('') %}
+                <div class="hbadge">
+                    <div class="hbi"><i class="bi-star-fill"></i></div>
+                    <span>{{ landing.hero.badge }}</span>
+                </div>
+                {% endif %}
+                <h1 class="htitle">{{ landing.hero.judul }}{% if landing.hero.judulAksen|default('') %} <span class="hl">{{ landing.hero.judulAksen }}</span>{% endif %}{% if landing.hero.judulLanjut|default('') %}<br/>{{ landing.hero.judulLanjut }}{% endif %}</h1>
+                <p class="hdesc">{{ landing.hero.teks }}</p>
+                <div class="d-flex flex-wrap gap-3 mb-2">
+                    {% if landing.hero.utama|default(null) %}
+                    <a href="{{ url.ke(landing.hero.utama.url, _context) }}" class="btn-red"><i class="{{ landing.hero.utama.ikon|default('bi-grid-fill') }}"></i>{{ landing.hero.utama.label }}</a>
+                    {% endif %}
+                    {% if landing.hero.video|default(null) %}
+                    <a href="{{ landing.hero.video.url }}" class="btn-play" target="_blank" rel="noopener">
+                        <div class="pico"><i class="bi-play-fill"></i></div>
+                        <span>{{ landing.hero.video.label }}</span>
+                    </a>
+                    {% endif %}
+                </div>
+                {% if landing.hero.statistik|default([]) is not empty %}
+                <div class="hstats d-flex gap-3 flex-wrap mt-4">
+                    {% for s in landing.hero.statistik %}
+                    {% if not loop.first %}<div class="sdiv"></div>{% endif %}
+                    <div class="hstat"><span class="snum">{{ s.angka }}<em>{{ s.sufiks|default('') }}</em></span><small>{{ s.label }}</small></div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-lg-6">
+                <div style="position:relative;text-align:center;">
+                    <div class="hcircle">
+                        <img src="{{ landing.hero.gambar|default(webroot ~ '/sarab/img/banner-img.jpg') }}" alt="" />
+                    </div>
+                    {% for k in landing.hero.kartu|default([])|slice(0, 3) %}
+                    <div class="fcard fc{{ loop.index }}">
+                        <div class="fcoi {{ k.warna|default(cycle(['r', 'y', 'g'], loop.index0)) }}"><i class="{{ k.ikon }}"></i></div>
+                        <div><span class="fcnum">{{ k.judul }}</span><span class="fcsm">{{ k.teks }}</span></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

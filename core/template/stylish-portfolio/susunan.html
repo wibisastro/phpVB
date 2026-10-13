@@ -1,0 +1,14 @@
+{# Susunan section bawaan tema stylish-portfolio (ID katalog stylish-portfolio#1..#10, v6.0.6;
+   #11 tombol gulir ke atas ada di layout.html). App memakai: view/index.html berisi
+   {% include "@stylish-portfolio/susunan.html" %}. Mau urutan lain / membuang section:
+   salin daftar include ini ke view/index.html app. Section yang datanya kosong/null
+   (callout, portofolio, kontak) tidak dirender. #}
+{% include '@stylish-portfolio/menu.html' %}
+{% include '@stylish-portfolio/masthead.html' %}
+{% include '@stylish-portfolio/tentang.html' %}
+{% include '@stylish-portfolio/layanan.html' %}
+{% include '@stylish-portfolio/callout.html' %}
+{% include '@stylish-portfolio/portofolio.html' %}
+{% include '@stylish-portfolio/ajakan.html' %}
+{% include '@stylish-portfolio/kontak.html' %}
+{% include '@stylish-portfolio/footer.html' %}

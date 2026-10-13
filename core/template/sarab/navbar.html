@@ -1,0 +1,31 @@
+{# sarab#2 — nav#nav (index.html:51). Tombol pencarian + overlay #searchOv (sarab#3, index.html:85) DIBUANG:
+   pencarian demo tanpa backend. fa-bars → bi-list; ikon brand fa-utensils → landing.brandIkon. #}
+{% import '@sarab/url.html' as url %}
+<nav class="navbar navbar-expand-lg" id="nav">
+    <div class="container">
+        <a class="navbar-brand" href="#hero">
+            <div class="blogo">
+                <div class="bico"><i class="{{ landing.brandIkon|default('bi-shop') }}"></i></div>
+                <div>
+                    <div class="bname">{{ landing.brand }}<span>{{ landing.brandAksen|default('') }}</span></div>
+                    <div class="bsub">{{ landing.tagline }}</div>
+                </div>
+            </div>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu" aria-label="Menu">
+            <i class="bi-list" style="color:var(--primary);font-size:1.35rem;"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navmenu">
+            <ul class="navbar-nav mx-auto">
+                {% for m in landing.menu|default([]) %}
+                <li class="nav-item"><a class="nav-link{{ loop.first ? ' active' : '' }}" href="{{ url.ke(m.url, _context) }}">{{ m.label }}</a></li>
+                {% endfor %}
+            </ul>
+            {% if landing.navCta|default(null) %}
+            <div class="d-flex align-items-center gap-1">
+                <a href="{{ url.ke(landing.navCta.url, _context) }}" class="nav-link nav-cta"><i class="{{ landing.navCta.ikon|default('bi-bag-fill') }} me-1"></i>{{ landing.navCta.label }}</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>

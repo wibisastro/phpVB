@@ -1,0 +1,34 @@
+{# sarab#6 — section#category (index.html:205). Kartu "Semua" dibuat otomatis; klik kartu menyaring section #menu
+   (sarab.js). Gambar bulat dari app (landing.kategori.daftar[].gambar); tanpa gambar → ikon. Jumlah item dihitung
+   dari landing.produk.daftar bila tidak diisi. null = tidak dirender. #}
+{% if landing.kategori|default(null) %}
+<section id="category">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="slbl">{{ landing.kategori.kicker }}</span>
+            <h2 class="stitle">{{ landing.kategori.judul }} <span>{{ landing.kategori.judulAksen|default('') }}</span></h2>
+            <div class="sline"></div>
+            {% if landing.kategori.teks|default('') %}<p class="sdesc mx-auto" style="max-width:480px;">{{ landing.kategori.teks }}</p>{% endif %}
+        </div>
+        <div class="row g-3 justify-content-center">
+            {% set semuaProduk = landing.produk.daftar|default([]) %}
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2" data-aos="zoom-in">
+                <div class="catcard active" data-filter="all">
+                    <span class="catimg panel-ikon"><i class="bi-grid-3x3-gap-fill"></i></span>
+                    <div class="catnm">{{ landing.kategori.semua|default('Semua') }}</div>
+                    <div class="catct">{{ semuaProduk|length }} {{ landing.kategori.satuan|default('item') }}</div>
+                </div>
+            </div>
+            {% for k in landing.kategori.daftar %}
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2" data-aos="zoom-in" data-aos-delay="{{ loop.index * 70 }}">
+                <div class="catcard" data-filter="{{ k.kode }}">
+                    {% if k.gambar|default('') %}<img class="catimg" src="{{ k.gambar }}" alt="" />{% else %}<span class="catimg panel-ikon"><i class="{{ k.ikon|default('bi-tag-fill') }}"></i></span>{% endif %}
+                    <div class="catnm">{{ k.nama }}</div>
+                    <div class="catct">{{ k.jumlah|default(semuaProduk|filter(p => p.kode == k.kode)|length) }} {{ landing.kategori.satuan|default('item') }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}

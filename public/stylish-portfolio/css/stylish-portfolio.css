@@ -1,0 +1,14 @@
+/* Override kecil di atas styles.css vendor (Stylish Portfolio v6.0.6).
+   Ikon font vendor (Font Awesome + Simple Line Icons, dua CDN) diganti bootstrap-icons milik
+   framework; panel portofolio tanpa foto (foto stok vendor tidak dibawa); warna lewat token --bs-*. */
+.menu-toggle i, .scroll-to-top i { font-size: 1.5rem; line-height: 50px; }
+.portfolio-item .portfolio-panel {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; aspect-ratio: 700 / 467;
+  background: linear-gradient(135deg, var(--bs-primary) 0%, #155d74 100%);
+  color: rgba(255, 255, 255, .85); font-size: 5rem;
+}
+@media (min-width: 992px) {
+  .portfolio-item .portfolio-panel { transition: clip-path .25s ease-out; clip-path: inset(-1px); }
+  .portfolio-item:hover .portfolio-panel { clip-path: inset(2rem); }
+}

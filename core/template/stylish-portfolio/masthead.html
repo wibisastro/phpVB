@@ -1,0 +1,11 @@
+{# stylish-portfolio#3 — header.masthead (index.html:34); latar img/bg-masthead.jpg via CSS. #}
+{% import '@stylish-portfolio/url.html' as url %}
+<header class="masthead d-flex align-items-center">
+    <div class="container px-4 px-lg-5 text-center">
+        <h1 class="mb-1">{{ landing.masthead.judul|default(landing.brand) }}</h1>
+        <h3 class="mb-5"><em>{{ landing.masthead.teks }}</em></h3>
+        {% if landing.masthead.utama|default(null) %}
+        <a class="btn btn-primary btn-xl" href="{{ url.ke(landing.masthead.utama.url, _context) }}">{{ landing.masthead.utama.label }}</a>
+        {% endif %}
+    </div>
+</header>

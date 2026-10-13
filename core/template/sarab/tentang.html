@@ -1,0 +1,40 @@
+{# sarab#7 — section#about (index.html:260). Foto vendor about1.jpg (interior kafe BERISI ORANG) tidak dibawa:
+   gambar utama dari app (landing.tentang.gambar) atau panel ikon; foto kecil bawaan img/about2.jpg. #}
+{% import '@sarab/url.html' as url %}
+<section id="about">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5" data-aos="fade-right">
+                <div class="astack">
+                    {% if landing.tentang.angka|default(null) %}
+                    <div class="aexp"><span class="anum">{{ landing.tentang.angka.nilai }}</span><small>{{ landing.tentang.angka.label }}</small></div>
+                    {% endif %}
+                    <div class="amain">
+                        {% if landing.tentang.gambar|default('') %}<img src="{{ landing.tentang.gambar }}" alt="" />{% else %}<div class="panel-gambar" style="height:440px;"><i class="{{ landing.tentang.ikon|default('bi-building') }}"></i></div>{% endif %}
+                    </div>
+                    <div class="asm"><img src="{{ landing.tentang.gambarKecil|default(webroot ~ '/sarab/img/about2.jpg') }}" alt="" /></div>
+                </div>
+            </div>
+            <div class="col-lg-7" data-aos="fade-left">
+                <span class="slbl">{{ landing.tentang.kicker }}</span>
+                <h2 class="stitle text-start">{{ landing.tentang.judul }}{% if landing.tentang.judulAksen|default('') %}<br/><span>{{ landing.tentang.judulAksen }}</span>{% endif %}</h2>
+                <div class="sline lft"></div>
+                <p class="sdesc mb-4">{{ landing.tentang.teks }}</p>
+                <div class="mb-4">
+                    {% for f in landing.tentang.fitur|default([]) %}
+                    <div class="fti">
+                        <div class="ftico {{ f.warna|default(cycle(['r', 'y', 'g'], loop.index0)) }}"><i class="{{ f.ikon }}"></i></div>
+                        <div>
+                            <h6>{{ f.judul }}</h6>
+                            <p>{{ f.teks }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if landing.tentang.tombol|default(null) %}
+                <a href="{{ url.ke(landing.tentang.tombol.url, _context) }}" class="btn-red"><i class="{{ landing.tentang.tombol.ikon|default('bi-book') }}"></i>{{ landing.tentang.tombol.label }}</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>

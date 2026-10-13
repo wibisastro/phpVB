@@ -1,0 +1,36 @@
+{# Tema coming-soon (StartBootstrap Coming Soon v6.0.7) — tema HALAMAN PUBLIK, bukan
+   overlay cube: tidak ada file cube*, tidak diaktifkan lewat <template>. App memakainya
+   dari apps/{app}/view/body.html: {% extends "@coming-soon/layout.html" %} (namespace
+   tema didaftarkan core/init/template.php). Teks datang dari model app (landing.*).
+   SENGAJA tidak include cubeHead.html: styles.css sudah membawa Bootstrap 5.2.3 sendiri.
+   Tidak ada #app / createPageApp — tanpa Vue.
+   Video latar vendor (bg.mp4 13 MB) diganti div.bg-foto (foto fallback vendor, dikompres);
+   Font Awesome vendor dibuang (hanya dipakai ikon sosmed) → bootstrap-icons dari /cube/fonts.
+   Google Fonts Tinos + DM Sans tetap CDN (keputusan 13 Okt 2026). #}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+{% block head %}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="{{ landing.deskripsi }}" />
+    <title>{{ pageTitle }}</title>
+    <link rel="icon" type="image/png" href="{{ webroot }}/images/logo-krisna.png" />
+    <link rel="stylesheet" href="{{ webroot }}/cube/fonts/bootstrap-icons.min.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ webroot }}/coming-soon/css/styles.css" />
+    <link rel="stylesheet" href="{{ webroot }}/coming-soon/css/coming-soon.css" />
+{% endblock %}
+</head>
+<body>
+{% block latar %}
+    {# coming-soon#1 — pengganti video.bg-video (index.html:21). landing.latar (URL gambar) menimpa foto bawaan tema. #}
+    <div class="bg-foto"{% if landing.latar|default('') %} style="background-image: url('{{ landing.latar }}');"{% endif %}></div>
+{% endblock %}
+{% block content %}{% endblock %}
+<script src="{{ webroot }}/cube/js/bootstrap.bundle.min.js"></script>
+{% block externalJS %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,13 @@
+{# coming-soon#3 — social-icons (index.html:67). Ikon Font Awesome vendor (fab fa-twitter dkk,
+   dimuat dari use.fontawesome.com) → bootstrap-icons milik framework (/cube/fonts).
+   Daftar dari landing.tautan[] {ikon, label, url}; url 'mailto' = kontakEmail;
+   daftar kosong = kolom tidak dirender (tanpa akun sosmed tidak ada ikon kosong). #}
+{% if landing.tautan|default([]) is not empty %}
+<div class="social-icons">
+    <div class="d-flex flex-row flex-lg-column justify-content-center align-items-center h-100 mt-3 mt-lg-0">
+        {% for t in landing.tautan %}
+        <a class="btn btn-dark m-3" href="{{ t.url == 'mailto' ? 'mailto:' ~ kontakEmail : t.url }}" title="{{ t.label }}" aria-label="{{ t.label }}"><i class="{{ t.ikon }}"></i></a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

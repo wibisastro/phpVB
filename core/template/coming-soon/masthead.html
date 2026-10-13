@@ -1,0 +1,27 @@
+{# coming-soon#2 — masthead (index.html:23). Form SB Forms vendor DIHAPUS (layanan pihak
+   ketiga, mengirim e-mail pengunjung ke luar) → tombol utama (rute app) + tombol kedua
+   (opsional; url 'mailto' = kontakEmail) + catatan kecil (opsional). #}
+<div class="masthead">
+    <div class="masthead-content text-white">
+        <div class="container-fluid px-4 px-lg-0">
+            {% if landing.brand|default('') %}
+            <p class="brand mb-4 d-flex align-items-center gap-2">
+                <img src="{{ webroot }}/cube/images/logo-krisna2.png" alt="" />
+                <span>{{ landing.brand }}</span>
+            </p>
+            {% endif %}
+            <h1 class="fst-italic lh-1 mb-4">{{ landing.masthead.judul }}</h1>
+            <p class="mb-5">{{ landing.masthead.teks }}</p>
+            <div class="masthead-tombol d-flex flex-column flex-sm-row gap-3">
+                <a class="btn btn-primary" href="{{ webroot }}/{{ pageID }}/{{ landing.masthead.utama.url }}">{{ landing.masthead.utama.label }}</a>
+                {% if landing.masthead.kedua|default(null) %}
+                {% set u = landing.masthead.kedua.url %}
+                <a class="btn btn-outline-light" href="{{ u == 'mailto' ? 'mailto:' ~ kontakEmail : u }}">{{ landing.masthead.kedua.label }}</a>
+                {% endif %}
+            </div>
+            {% if landing.masthead.catatan|default('') %}
+            <p class="small mt-4 mb-0 opacity-75">{{ landing.masthead.catatan }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>

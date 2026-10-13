@@ -1,0 +1,11 @@
+{# stylish-portfolio#8 — section call-to-action (index.html:159): judul + tombol[] (gaya bawaan
+   vendor: btn-light lalu btn-dark). #}
+{% import '@stylish-portfolio/url.html' as url %}
+<section class="content-section bg-primary text-white">
+    <div class="container px-4 px-lg-5 text-center">
+        <h2 class="mb-4">{{ landing.ajakan.judul }}</h2>
+        {% for t in landing.ajakan.tombol %}
+        <a class="btn btn-xl {{ t.gaya|default(loop.first ? 'btn-light' : 'btn-dark') }} {{ loop.last ? '' : 'me-4' }}" href="{{ url.ke(t.url, _context) }}">{{ t.label }}</a>
+        {% endfor %}
+    </div>
+</section>

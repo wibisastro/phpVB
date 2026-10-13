@@ -1,0 +1,22 @@
+{# sarab#1 — div#topbar (index.html:26): kontak ringkas (landing.kontak + kontakEmail), tag promo, sosmed.
+   Ikon Font Awesome → bootstrap-icons. #}
+{% import '@sarab/url.html' as url %}
+<div id="topbar">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="top-contact d-flex flex-wrap">
+                {% if landing.kontak.telepon|default('') %}<span><i class="bi-telephone-fill"></i>{{ landing.kontak.telepon }}</span>{% endif %}
+                {% if kontakEmail %}<span><i class="bi-envelope-fill"></i>{{ kontakEmail }}</span>{% endif %}
+                {% if landing.kontak.alamat|default('') %}<span><i class="bi-geo-alt-fill"></i>{{ landing.kontak.alamat }}</span>{% endif %}
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                {% if landing.topbarTag|default('') %}<span class="ttag"><i class="bi-fire me-1"></i>{{ landing.topbarTag }}</span>{% endif %}
+                {% if landing.sosmed|default([]) is not empty %}
+                <div class="tsoc">
+                    {% for s in landing.sosmed %}<a href="{{ url.ke(s.url, _context) }}" title="{{ s.label }}" aria-label="{{ s.label }}"><i class="{{ s.ikon }}"></i></a>{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,13 @@
+{# stylish-portfolio#6 — section.callout (index.html:94); latar img/bg-callout.jpg via CSS.
+   landing.callout null = tidak dirender. #}
+{% import '@stylish-portfolio/url.html' as url %}
+{% if landing.callout|default(null) %}
+<section class="callout">
+    <div class="container px-4 px-lg-5 text-center">
+        <h2 class="mx-auto mb-5">{{ landing.callout.judul }}</h2>
+        {% if landing.callout.tombol|default(null) %}
+        <a class="btn btn-primary btn-xl" href="{{ url.ke(landing.callout.tombol.url, _context) }}">{{ landing.callout.tombol.label }}</a>
+        {% endif %}
+    </div>
+</section>
+{% endif %}

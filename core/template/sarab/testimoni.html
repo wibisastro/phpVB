@@ -1,0 +1,35 @@
+{# sarab#16 — section#testimonials (index.html:852): Swiper (css+js dimuat layout.html hanya bila section ini ada).
+   HANYA untuk kutipan NYATA dari app — jangan mengarang; kerangka app mengirim null = tidak dirender.
+   Foto vendor (wajah) tidak dibawa; avatar dari app atau inisial nama. #}
+{% if landing.testimoni|default(null) %}
+<section id="testimonials">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="slbl">{{ landing.testimoni.kicker }}</span>
+            <h2 class="stitle">{{ landing.testimoni.judul }} <span>{{ landing.testimoni.judulAksen|default('') }}</span></h2>
+            <div class="sline"></div>
+        </div>
+        <div class="swiper tesSwiper" data-aos="fade-up">
+            <div class="swiper-wrapper">
+                {% for t in landing.testimoni.daftar %}
+                <div class="swiper-slide">
+                    <div class="tescard">
+                        <div class="tesq">"</div>
+                        {% if t.bintang|default(0) > 0 %}<div class="tess">{% for i in 1..t.bintang %}<i class="bi-star-fill"></i>{% endfor %}</div>{% endif %}
+                        <p class="testxt">{{ t.teks }}</p>
+                        <div class="tesauth">
+                            {% if t.gambar|default('') %}<img src="{{ t.gambar }}" alt="" />{% else %}<span class="panel-avatar">{{ t.nama|slice(0, 1)|upper }}</span>{% endif %}
+                            <div>
+                                <div class="tesnm">{{ t.nama }}</div>
+                                <div class="tesrl">{{ t.peran|default('') }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="swiper-pagination mt-4" style="position:static;"></div>
+        </div>
+    </div>
+</section>
+{% endif %}

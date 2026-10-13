@@ -1,0 +1,9 @@
+{# sarab#5 — div.mqsec (index.html:186): teks berjalan; daftar diulang dua kali agar animasi mulus (vendor idem).
+   landing.marquee kosong = tidak dirender. #}
+{% if landing.marquee|default([]) is not empty %}
+<div class="mqsec">
+    <div class="mqtrack">
+        {% for ulang in 0..1 %}{% for t in landing.marquee %}<div class="mqitem"><i class="bi-circle-fill"></i>{{ t }}</div>{% endfor %}{% endfor %}
+    </div>
+</div>
+{% endif %}

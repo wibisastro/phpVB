@@ -1,0 +1,32 @@
+{# sarab#13 — section#history (index.html:637): garis waktu. Teks diulang kiri + kanan persis seperti vendor karena
+   CSS vendor menyembunyikan satu sisi per baris ganjil/genap (desktop) dan hanya menampilkan kanan (ponsel).
+   null = tidak dirender. #}
+{% if landing.sejarah|default(null) %}
+<section id="history">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="slbl">{{ landing.sejarah.kicker }}</span>
+            <h2 class="stitle">{{ landing.sejarah.judul }} <span>{{ landing.sejarah.judulAksen|default('') }}</span></h2>
+            <div class="sline"></div>
+            {% if landing.sejarah.teks|default('') %}<p class="sdesc mx-auto" style="max-width:480px;">{{ landing.sejarah.teks }}</p>{% endif %}
+        </div>
+        <div class="timeline" data-aos="fade-up">
+            {% for t in landing.sejarah.daftar %}
+            <div class="tli">
+                <div class="tl-left">
+                    <div class="tlyear">{{ t.tahun }}</div>
+                    <h5>{{ t.judul }}</h5>
+                    <p>{{ t.teks }}</p>
+                </div>
+                <div class="tl-center"><div class="tldot"></div></div>
+                <div class="tl-right">
+                    <div class="tlyear">{{ t.tahun }}</div>
+                    <h5>{{ t.judul }}</h5>
+                    <p>{{ t.teks }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}

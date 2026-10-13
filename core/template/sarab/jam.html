@@ -1,0 +1,48 @@
+{# sarab#15 — section#hours (index.html:782): jadwal layanan + kartu ajakan + lokasi (dari landing.kontak).
+   null = tidak dirender. #}
+{% import '@sarab/url.html' as url %}
+{% if landing.jam|default(null) %}
+<section id="hours">
+    <div class="hrsbg"></div>
+    <div class="container" style="position:relative;z-index:2;">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="slbl" style="color:#a5d6bc;">{{ landing.jam.kicker }}</span>
+            <h2 class="stitle" style="color:#fff;">{{ landing.jam.judul }} <span style="color:var(--secondary);">{{ landing.jam.judulAksen|default('') }}</span></h2>
+            <div class="sline"></div>
+        </div>
+        <div class="row g-4 align-items-start">
+            <div class="col-lg-5" data-aos="fade-right">
+                <div class="hrscard">
+                    {% for j in landing.jam.daftar %}
+                    <div class="hrsrow">
+                        <span class="hrsday"><i class="bi-calendar-day me-2" style="color:var(--secondary);"></i>{{ j.hari }}</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="hdot {{ j.buka|default(true) ? 'on' : 'off' }}"></div>
+                            <span class="hrstime"{% if not j.buka|default(true) %} style="color:#ff6b6b;"{% endif %}>{{ j.jam }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-lg-3" data-aos="zoom-in">
+                {% if landing.jam.cta|default(null) %}
+                <div class="hrscta">
+                    <i class="{{ landing.jam.cta.ikon|default('bi-truck') }} fs-2 mb-3 d-block" style="color:rgba(255,255,255,.8);"></i>
+                    <h4>{{ landing.jam.cta.judul }}</h4>
+                    <p>{{ landing.jam.cta.teks }}</p>
+                    <a href="{{ url.ke(landing.jam.cta.tombol.url, _context) }}" class="btnw">{{ landing.jam.cta.tombol.label }} &rarr;</a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-lg-4" data-aos="fade-left">
+                <div class="hrscard">
+                    <h5 style="color:#fff;margin-bottom:18px;font-family:'Poppins',sans-serif;font-size:.95rem;font-weight:700;"><i class="bi-geo-alt-fill me-2" style="color:var(--secondary);"></i>{{ landing.jam.lokasiJudul|default('Temukan kami') }}</h5>
+                    {% if landing.kontak.alamat|default('') %}<div class="hrsrow"><span class="hrsday"><i class="bi-geo-alt me-2" style="color:var(--secondary);"></i>Alamat</span><span class="hrstime" style="font-size:.8rem;">{{ landing.kontak.alamat }}</span></div>{% endif %}
+                    {% if landing.kontak.telepon|default('') %}<div class="hrsrow"><span class="hrsday"><i class="bi-telephone me-2" style="color:var(--secondary);"></i>Telepon</span><span class="hrstime" style="font-size:.8rem;">{{ landing.kontak.telepon }}</span></div>{% endif %}
+                    {% if kontakEmail %}<div class="hrsrow"><span class="hrsday"><i class="bi-envelope me-2" style="color:var(--secondary);"></i>E-mail</span><span class="hrstime" style="font-size:.8rem;">{{ kontakEmail }}</span></div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}

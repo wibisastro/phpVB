@@ -1,0 +1,32 @@
+{# sarab#18 — section#blog (index.html:1005). Jumlah komentar vendor dibuang; gambar dari app atau panel ikon.
+   null = tidak dirender. #}
+{% import '@sarab/url.html' as url %}
+{% if landing.berita|default(null) %}
+<section id="blog">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="slbl">{{ landing.berita.kicker }}</span>
+            <h2 class="stitle">{{ landing.berita.judul }} <span>{{ landing.berita.judulAksen|default('') }}</span></h2>
+            <div class="sline"></div>
+        </div>
+        <div class="row g-4">
+            {% for b in landing.berita.daftar %}
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
+                <div class="blcard">
+                    <div class="blimg">
+                        {% if b.gambar|default('') %}<img src="{{ b.gambar }}" alt="" />{% else %}<div class="panel-gambar"><i class="bi-newspaper"></i></div>{% endif %}
+                        {% if b.tanggal|default(null) %}<div class="bldatebdg"><span class="bd">{{ b.tanggal.hari }}</span><span class="bm">{{ b.tanggal.bulan }}</span></div>{% endif %}
+                    </div>
+                    <div class="blbody">
+                        {% if b.tag|default('') %}<div class="bltag">{{ b.tag }}</div>{% endif %}
+                        <div class="bltit"><a href="{{ url.ke(b.url|default('#blog'), _context) }}">{{ b.judul }}</a></div>
+                        {% if b.penulis|default('') %}<div class="blmeta"><span><i class="bi-person-fill"></i>{{ b.penulis }}</span></div>{% endif %}
+                        <a href="{{ url.ke(b.url|default('#blog'), _context) }}" class="blmore">{{ landing.berita.selengkapnya|default('Selengkapnya') }} <i class="bi-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}

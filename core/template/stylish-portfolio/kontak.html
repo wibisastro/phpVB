@@ -1,0 +1,22 @@
+{# stylish-portfolio#9 — div.map#contact (index.html:167); id diganti "kontak". Vendor hanya
+   iframe Google Maps lokasi contoh (Twitter Inc.) — di sini iframe OPSIONAL (landing.kontak.peta =
+   URL embed; tanpa itu tidak ada rujukan ke Google), ditambah blok alamat/e-mail/telepon.
+   landing.kontak null = tidak dirender. #}
+{% if landing.kontak|default(null) %}
+<section class="content-section bg-light" id="kontak">
+    <div class="container px-4 px-lg-5 text-center">
+        <div class="content-section-heading">
+            <h3 class="text-secondary mb-0">{{ landing.kontak.kicker }}</h3>
+            <h2 class="mb-4">{{ landing.kontak.judul }}</h2>
+        </div>
+        {% if landing.kontak.alamat|default('') %}<p class="lead mb-2">{{ landing.kontak.alamat }}</p>{% endif %}
+        <p class="mb-0">
+            {% if kontakEmail %}<a href="mailto:{{ kontakEmail }}"><i class="bi-envelope-at me-1"></i>{{ kontakEmail }}</a>{% endif %}
+            {% if landing.kontak.telepon|default('') %}<span class="mx-3 text-muted">&sdot;</span><a href="tel:{{ landing.kontak.telepon|replace({' ': ''}) }}"><i class="bi-telephone me-1"></i>{{ landing.kontak.telepon }}</a>{% endif %}
+        </p>
+    </div>
+</section>
+{% if landing.kontak.peta|default('') %}
+<div class="map"><iframe src="{{ landing.kontak.peta }}" title="Peta lokasi" loading="lazy"></iframe></div>
+{% endif %}
+{% endif %}

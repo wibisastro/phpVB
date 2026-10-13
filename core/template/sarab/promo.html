@@ -1,0 +1,36 @@
+{# sarab#10 — section#special (index.html:536). Hitung mundur vendor PALSU (berulang 08:45:30) → hitung mundur nyata
+   ke landing.promo.sampai (ISO 8601, mis. "2026-12-31T23:59:59+07:00"); kosong = tanpa hitung mundur.
+   Gambar: landing.promo.gambar atau foto bawaan img/off-img.jpg. null = tidak dirender. #}
+{% import '@sarab/url.html' as url %}
+{% if landing.promo|default(null) %}
+<section id="special">
+    <div class="spbg"></div>
+    <div class="container" style="position:relative;z-index:2;">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6" data-aos="fade-right">
+                {% if landing.promo.tag|default('') %}<div class="sptag"><i class="bi-lightning-fill me-1"></i>{{ landing.promo.tag }}</div>{% endif %}
+                <h2 class="sptitle">{{ landing.promo.judul }}{% if landing.promo.judulAksen|default('') %}<br/><span>{{ landing.promo.judulAksen }}</span>{% endif %}</h2>
+                <p class="spdesc">{{ landing.promo.teks }}</p>
+                {% if landing.promo.sampai|default('') %}
+                <div class="cdwrap" id="cdwrap" data-sampai="{{ landing.promo.sampai }}">
+                    <div class="cditem"><span class="cdnum" id="cdD">00</span><span class="cdlbl">Hari</span></div>
+                    <div class="cditem"><span class="cdnum" id="cdH">00</span><span class="cdlbl">Jam</span></div>
+                    <div class="cditem"><span class="cdnum" id="cdM">00</span><span class="cdlbl">Menit</span></div>
+                    <div class="cditem"><span class="cdnum" id="cdS">00</span><span class="cdlbl">Detik</span></div>
+                </div>
+                {% endif %}
+                {% if landing.promo.tombol|default(null) %}
+                <a href="{{ url.ke(landing.promo.tombol.url, _context) }}" class="btn-red"><i class="{{ landing.promo.tombol.ikon|default('bi-bag-fill') }}"></i>{{ landing.promo.tombol.label }}</a>
+                {% endif %}
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="spimgw">
+                    <div class="spglow"></div>
+                    {% if landing.promo.harga|default('') %}<div class="sppbdg">{% if landing.promo.hargaLama|default('') %}<span class="old">{{ landing.promo.hargaLama }}</span>{% endif %}<span class="np">{{ landing.promo.harga }}</span></div>{% endif %}
+                    <img src="{{ landing.promo.gambar|default(webroot ~ '/sarab/img/off-img.jpg') }}" alt="" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}

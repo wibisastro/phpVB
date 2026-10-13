@@ -1,0 +1,17 @@
+{# stylish-portfolio#10 — footer (index.html:172): ikon sosmed Simple Line Icons → bootstrap-icons
+   dari landing.footer.tautan[] {ikon, label, url} (kosong = tanpa ikon); mr-3 (BS4) → me-3. #}
+{% import '@stylish-portfolio/url.html' as url %}
+<footer class="footer text-center">
+    <div class="container px-4 px-lg-5">
+        {% if landing.footer.tautan|default([]) is not empty %}
+        <ul class="list-inline mb-5">
+            {% for t in landing.footer.tautan %}
+            <li class="list-inline-item">
+                <a class="social-link rounded-circle text-white me-3" href="{{ url.ke(t.url, _context) }}" title="{{ t.label }}" aria-label="{{ t.label }}"><i class="{{ t.ikon }}"></i></a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <p class="text-muted small mb-0">&copy; {{ tahun }} {{ landing.brand }}. {{ landing.footer.catatan|default('') }}</p>
+    </div>
+</footer>

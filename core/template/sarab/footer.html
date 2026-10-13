@@ -1,0 +1,41 @@
+{# sarab#21 — footer (index.html:1146): brand, teks, sosmed, kolom tautan (landing.footer.kolom[]), kontak
+   (landing.kontak), baris bawah. Kredit vendor (Bestwpware/ThemeWagon) tidak ditampilkan — lisensi MIT hanya
+   mewajibkan notis di berkas sumber (header css/js vendor tetap utuh). #}
+{% import '@sarab/url.html' as url %}
+<footer>
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-4">
+                <div class="fnm">{{ landing.brand }}<span>{{ landing.brandAksen|default('') }}</span></div>
+                <p class="fdesc">{{ landing.footer.teks|default(landing.deskripsi) }}</p>
+                {% if landing.sosmed|default([]) is not empty %}
+                <div class="fsoc">{% for s in landing.sosmed %}<a href="{{ url.ke(s.url, _context) }}" title="{{ s.label }}" aria-label="{{ s.label }}"><i class="{{ s.ikon }}"></i></a>{% endfor %}</div>
+                {% endif %}
+            </div>
+            {% for k in landing.footer.kolom|default([]) %}
+            <div class="col-sm-6 col-lg-2">
+                <div class="ftit">{{ k.judul }}</div>
+                <ul class="flinks ps-0">
+                    {% for t in k.tautan %}<li><a href="{{ url.ke(t.url, _context) }}"><i class="bi-chevron-right"></i>{{ t.label }}</a></li>{% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+            <div class="col-lg-4">
+                <div class="ftit">{{ landing.footer.kontakJudul|default('Hubungi kami') }}</div>
+                {% set alamat = landing.kontak.alamatPanjang|default(landing.kontak.alamat|default('')) %}
+                {% if alamat %}<div class="fci"><div class="fciico"><i class="bi-geo-alt-fill"></i></div><div class="fciinfo"><strong>Alamat</strong>{{ alamat }}</div></div>{% endif %}
+                {% if landing.kontak.telepon|default('') %}<div class="fci"><div class="fciico"><i class="bi-telephone-fill"></i></div><div class="fciinfo"><strong>Telepon</strong>{{ landing.kontak.telepon }}</div></div>{% endif %}
+                {% if kontakEmail %}<div class="fci"><div class="fciico"><i class="bi-envelope-fill"></i></div><div class="fciinfo"><strong>E-mail</strong>{{ kontakEmail }}</div></div>{% endif %}
+                {% if landing.kontak.jam|default('') %}<div class="fci"><div class="fciico"><i class="bi-clock-fill"></i></div><div class="fciinfo"><strong>Jam</strong>{{ landing.kontak.jam }}</div></div>{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="fbot">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <p>&copy; {{ tahun }} <span>{{ landing.brand }}{{ landing.brandAksen|default('') }}</span>. {{ landing.footer.catatan|default('') }}</p>
+                {% if landing.footer.bawah|default([]) is not empty %}<div>{% for t in landing.footer.bawah %}<a href="{{ url.ke(t.url, _context) }}">{{ t.label }}</a>{% endfor %}</div>{% endif %}
+            </div>
+        </div>
+    </div>
+</footer>

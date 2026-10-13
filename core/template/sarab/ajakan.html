@@ -1,0 +1,17 @@
+{# sarab#19 — section#newsletter (index.html:1060). Form langganan e-mail vendor (PALSU, tanpa backend; mengumpulkan
+   alamat e-mail) → pita ajakan + tombol. null = tidak dirender. #}
+{% import '@sarab/url.html' as url %}
+{% if landing.ajakan|default(null) %}
+<section id="newsletter">
+    <div class="nlbg"></div>
+    <div class="container">
+        <div class="nlw text-center" data-aos="zoom-in">
+            <span class="slbl" style="color:rgba(255,255,255,.7);">{{ landing.ajakan.kicker }}</span>
+            <h2 class="mb-3" style="color:#fff;">{{ landing.ajakan.judul }} <span style="color:var(--secondary);">{{ landing.ajakan.judulAksen|default('') }}</span></h2>
+            <p class="mb-4" style="color:rgba(255,255,255,.78);">{{ landing.ajakan.teks }}</p>
+            <a href="{{ url.ke(landing.ajakan.tombol.url, _context) }}" class="btn-red"><i class="{{ landing.ajakan.tombol.ikon|default('bi-send-fill') }}"></i>{{ landing.ajakan.tombol.label }}</a>
+            {% if landing.ajakan.catatan|default('') %}<p style="color:rgba(255,255,255,.45);font-size:.76rem;margin-top:11px;"><i class="bi-lock-fill me-1"></i>{{ landing.ajakan.catatan }}</p>{% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}

@@ -1,0 +1,34 @@
+/* Override di atas style.css vendor (Sarab v1.0.0). Panel pengganti gambar (foto vendor berwajah/konten demo tidak
+   dibawa), avatar inisial, panel info/ajakan pengganti form palsu, penyesuaian bootstrap-icons. Warna lewat token
+   vendor --primary/--cream2 (style.css :root). */
+.panel-gambar { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--cream2), #f6d8b5); color: var(--primary); font-size: 3.2rem; }
+.catimg.panel-ikon { display: flex; align-items: center; justify-content: center; background: var(--cream2);
+  color: var(--primary); font-size: 2rem; }
+.hcircle .panel-gambar { width: 90%; height: 90%; border-radius: 50%; font-size: 6rem; }
+.gitem .panel-gambar { min-height: 215px; }
+.mpimg .panel-gambar { min-height: 400px; font-size: 5rem; }
+.mpimg img[style*="display: none"] + .panel-gambar { display: flex; }
+.panel-avatar { width: 46px; height: 46px; border-radius: 50%; display: inline-flex; align-items: center;
+  justify-content: center; background: var(--primary); color: #fff; font-weight: 700; flex-shrink: 0; }
+.panel-gelap { background: var(--dark); border-radius: 18px; padding: 36px; }
+.panel-gelap h4 { color: #fff; font-size: 1.3rem; margin-bottom: 8px; }
+.panel-gelap .panel-gelap-sub { color: rgba(255, 255, 255, .55); font-size: .85rem; margin-bottom: 26px; }
+.panel-gelap .cticon { width: 46px; height: 46px; border-radius: 11px; font-size: 1.1rem; }
+.panel-gelap .info-label { display: block; color: #ccc; font-size: .78rem; text-transform: uppercase; letter-spacing: .8px; }
+.panel-gelap .info-nilai { color: #fff; font-size: .87rem; }
+.panel-ajak { background: #fff; border-radius: 18px; padding: 48px 32px; box-shadow: 0 6px 30px rgba(0, 0, 0, .08); }
+.panel-ajak h4 { font-family: "Playfair Display", serif; font-weight: 700; margin-bottom: 12px; }
+.panel-peta { border-radius: 18px; overflow: hidden; box-shadow: 0 6px 30px rgba(0, 0, 0, .08); min-height: 360px; }
+.panel-peta iframe { width: 100%; height: 100%; min-height: 360px; border: 0; display: block; }
+.top-contact span i { margin-right: 6px; }
+.mhrt i { font-size: .95rem; }
+#btt { cursor: pointer; }
+/* AOS fade-left/right menggeser elemen ±100 px sebelum digulir masuk → di layar sempit document.scrollWidth
+   melebar (414 → 526 px) walau body vendor overflow-x:hidden. Di ponsel geser vertikal saja. */
+@media (max-width: 767px) {
+  [data-aos="fade-left"], [data-aos="fade-right"] { transform: translate3d(0, 40px, 0); }
+}
+/* .row.g-5 vendor (gutter 3 rem) di dalam .container (padding 12 px) menjulur 12 px tiap sisi; di layar sempit
+   kolomnya bertumpuk, jadi gutter horizontal disamakan dengan padding container. */
+@media (max-width: 767px) { .row.g-5 { --bs-gutter-x: 1.5rem; } }

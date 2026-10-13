@@ -1,0 +1,33 @@
+{# sarab#14 — section#chefs (index.html:716). Foto chef vendor (WAJAH orang) tidak dibawa: foto dari app
+   (landing.tim.daftar[].gambar) atau panel ikon. Sosmed per anggota opsional. null = tidak dirender. #}
+{% import '@sarab/url.html' as url %}
+{% if landing.tim|default(null) %}
+<section id="chefs">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="slbl">{{ landing.tim.kicker }}</span>
+            <h2 class="stitle">{{ landing.tim.judul }} <span>{{ landing.tim.judulAksen|default('') }}</span></h2>
+            <div class="sline"></div>
+        </div>
+        <div class="row g-4">
+            {% for a in landing.tim.daftar %}
+            <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
+                <div class="chcard">
+                    <div class="chimg">
+                        {% if a.gambar|default('') %}<img src="{{ a.gambar }}" alt="{{ a.nama }}" />{% else %}<div class="panel-gambar"><i class="bi-person-fill"></i></div>{% endif %}
+                        {% if a.sosmed|default([]) is not empty %}
+                        <div class="chsoc">{% for s in a.sosmed %}<a href="{{ url.ke(s.url, _context) }}" title="{{ s.label }}" aria-label="{{ s.label }}"><i class="{{ s.ikon }}"></i></a>{% endfor %}</div>
+                        {% endif %}
+                    </div>
+                    <div class="chbody">
+                        <div class="chnm">{{ a.nama }}</div>
+                        <div class="chrole">{{ a.peran }}</div>
+                        {% if a.keterangan|default('') %}<div class="chexp">{{ a.keterangan }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}

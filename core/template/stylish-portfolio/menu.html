@@ -1,0 +1,13 @@
+{# stylish-portfolio#1 tombol menu (index.html:22) + #2 nav#sidebar-wrapper (index.html:23):
+   menu offcanvas kanan, bukan app shell. fa-bars → bi-list (JS tema menukar ke bi-x-lg).
+   Kelas js-scroll-trigger ditambah di sini: JS vendor merujuknya tapi HTML vendor tidak. #}
+{% import '@stylish-portfolio/url.html' as url %}
+<a class="menu-toggle rounded" href="#" aria-label="Menu"><i class="bi-list"></i></a>
+<nav id="sidebar-wrapper">
+    <ul class="sidebar-nav">
+        <li class="sidebar-brand"><a href="#page-top">{{ landing.brand }}</a></li>
+        {% for m in landing.menu|default([]) %}
+        <li class="sidebar-nav-item"><a class="js-scroll-trigger" href="{{ url.ke(m.url, _context) }}">{{ m.label }}</a></li>
+        {% endfor %}
+    </ul>
+</nav>

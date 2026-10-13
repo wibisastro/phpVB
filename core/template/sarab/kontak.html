@@ -1,0 +1,41 @@
+{# sarab#20 — section#contact-section (index.html:1079). Form vendor PALSU → kolom kanan: peta embed opsional
+   (landing.hubungi.peta; tanpa itu 0 rujukan ke Google) atau panel ajakan + tombol. Data kontak dari landing.kontak
+   + kontakEmail + landing.sosmed. null = tidak dirender. #}
+{% import '@sarab/url.html' as url %}
+{% if landing.hubungi|default(null) %}
+<section id="contact-section">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="slbl">{{ landing.hubungi.kicker }}</span>
+            <h2 class="stitle">{{ landing.hubungi.judul }} <span>{{ landing.hubungi.judulAksen|default('') }}</span></h2>
+            <div class="sline"></div>
+            {% if landing.hubungi.teks|default('') %}<p class="sdesc mx-auto" style="max-width:480px;">{{ landing.hubungi.teks }}</p>{% endif %}
+        </div>
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-4" data-aos="fade-right">
+                <div class="ctdark h-100">
+                    <h4>{{ landing.hubungi.panelJudul|default('Hubungi kami') }}</h4>
+                    <p class="ctsub">{{ landing.hubungi.panelTeks|default('') }}</p>
+                    {% set alamat = landing.kontak.alamatPanjang|default(landing.kontak.alamat|default('')) %}
+                    {% if alamat %}<div class="ctitem"><div class="cticon"><i class="bi-geo-alt-fill"></i></div><div class="ctinfo"><strong>Alamat</strong><span>{{ alamat }}</span></div></div>{% endif %}
+                    {% if landing.kontak.telepon|default('') %}<div class="ctitem"><div class="cticon"><i class="bi-telephone-fill"></i></div><div class="ctinfo"><strong>Telepon</strong><span>{{ landing.kontak.telepon }}</span></div></div>{% endif %}
+                    {% if kontakEmail %}<div class="ctitem"><div class="cticon"><i class="bi-envelope-fill"></i></div><div class="ctinfo"><strong>E-mail</strong><span>{{ kontakEmail }}</span></div></div>{% endif %}
+                    {% if landing.kontak.jam|default('') %}<div class="ctitem"><div class="cticon"><i class="bi-clock-fill"></i></div><div class="ctinfo"><strong>Jam layanan</strong><span>{{ landing.kontak.jam }}</span></div></div>{% endif %}
+                    {% if landing.sosmed|default([]) is not empty %}<div class="ctsocrow">{% for s in landing.sosmed %}<a href="{{ url.ke(s.url, _context) }}" title="{{ s.label }}" aria-label="{{ s.label }}"><i class="{{ s.ikon }}"></i></a>{% endfor %}</div>{% endif %}
+                </div>
+            </div>
+            <div class="col-lg-8" data-aos="fade-left">
+                {% if landing.hubungi.peta|default('') %}
+                <div class="panel-peta"><iframe src="{{ landing.hubungi.peta }}" title="Peta lokasi" loading="lazy"></iframe></div>
+                {% else %}
+                <div class="panel-ajak text-center h-100 d-flex flex-column justify-content-center">
+                    <h4>{{ landing.hubungi.ajakJudul|default(landing.hubungi.judul) }}</h4>
+                    <p class="sdesc">{{ landing.hubungi.ajakTeks|default('') }}</p>
+                    <div>{% if landing.hubungi.tombol|default(null) %}<a href="{{ url.ke(landing.hubungi.tombol.url, _context) }}" class="btn-red"><i class="{{ landing.hubungi.tombol.ikon|default('bi-send-fill') }}"></i>{{ landing.hubungi.tombol.label }}</a>{% endif %}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}

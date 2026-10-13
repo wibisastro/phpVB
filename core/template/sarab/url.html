@@ -1,0 +1,10 @@
+{# Makro URL tema sarab (sama dengan stylish-portfolio). Pakai: {% import '@sarab/url.html' as url %}
+   lalu href="{{ url.ke(x, _context) }}" (makro Twig tidak melihat konteks pemanggil → _context dioper).
+   Aturan: 'mailto' → mailto:kontakEmail; diawali # / http(s): mailto: tel: → apa adanya;
+   selain itu dianggap rute app: {{ webroot }}/{{ pageID }}/{x} (mis. 'login'). #}
+{% macro ke(u, c) -%}
+    {%- if u == 'mailto' -%}mailto:{{ c.kontakEmail }}
+    {%- elseif u matches '{^(#|/|https?:|mailto:|tel:)}' -%}{{ u }}
+    {%- else -%}{{ c.webroot }}/{{ c.pageID }}/{{ u }}
+    {%- endif -%}
+{%- endmacro %}
