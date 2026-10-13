@@ -50,7 +50,6 @@ class landing extends \Gov2lib\document {
                 'utama'       => ['label' => 'Lihat cara kerja', 'url' => '#menu', 'ikon' => 'bi-diagram-3'],
                 'video'       => null,
                 'statistik'   => [
-                    ['angka' => '640', 'sufiks' => '',  'label' => 'portal instansi'],
                     ['angka' => '119', 'sufiks' => '',  'label' => 'kriteria LKE 2026 (65 Pusat + 54 Unit)'],
                     ['angka' => '45',  'sufiks' => '',  'label' => 'kriteria Min Req'],
                     ['angka' => '7',   'sufiks' => '',  'label' => 'langkah pipeline'],
