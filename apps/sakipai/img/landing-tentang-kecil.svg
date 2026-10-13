@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Kesiapan E0 sampai E5">
+  <rect width="200" height="200" fill="#5b4fb9"/>
+  <g font-family="Poppins, Arial, sans-serif" fill="#fff">
+    <text x="22" y="40" font-size="11" font-weight="700" letter-spacing="2" opacity=".8">KESIAPAN SCOPE</text>
+    <line x1="30" y1="100" x2="170" y2="100" stroke="#fff" stroke-opacity=".35" stroke-width="4" stroke-linecap="round"/>
+    <g>
+      <circle cx="30" cy="100" r="9" fill="#fff"/><circle cx="58" cy="100" r="9" fill="#fff"/><circle cx="86" cy="100" r="9" fill="#fff"/>
+      <circle cx="114" cy="100" r="9" fill="#fff" fill-opacity=".55"/><circle cx="142" cy="100" r="9" fill="#fff" fill-opacity=".55"/><circle cx="170" cy="100" r="9" fill="#f6a623"/>
+    </g>
+    <text x="24" y="128" font-size="10" font-weight="600">E0</text><text x="162" y="128" font-size="10" font-weight="600">E5</text>
+    <text x="22" y="162" font-size="11" opacity=".85">audit · kriteria · predikat</text>
+    <text x="22" y="178" font-size="11" opacity=".85">tinjauan asesor · LHE final</text>
+  </g>
+</svg>

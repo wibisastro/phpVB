@@ -1,7 +1,12 @@
-{# Base body app sakipai — adanya file ini membuat core/init/template.php memakainya
-   sebagai baseBody (lepas dari tema admin cube). Memakai TEMA halaman publik
-   landing-page lewat namespace Twig; teks halaman dari model (landingData). #}
-{% extends "@landing-page/layout.html" %}
+{# Base body app sakipai — adanya file ini membuat core/init/template.php memakainya sebagai baseBody
+   (lepas dari tema admin cube). Tema HALAMAN PUBLIK dipilih per MVC lewat variabel `tema` yang diisi
+   controller (bawaan `landing-page` untuk MVC index; MVC landing memakai `sarab`). Teks halaman dari
+   model (landingData). `landingCss` (opsional) = berkas di apps/sakipai/css/ yang dimuat setelah css tema
+   lewat rute inti /sakipai/css/{berkas} — dipakai landing untuk mengulit tema ke palet gov3. #}
+{% extends "@" ~ (tema|default('landing-page')) ~ "/layout.html" %}
+
+{% block head %}{{ parent() }}{% if landingCss|default('') %}    <link rel="stylesheet" href="{{ webroot }}/{{ pageID }}/css/{{ landingCss }}" />
+{% endif %}{% endblock %}
 
 {% block content %}
     {% for item in contents %}

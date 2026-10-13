@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480" role="img" aria-label="Dokumen kinerja dinilai AI, diputuskan asesor">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ebe7f8"/><stop offset="1" stop-color="#cfc6f2"/></linearGradient>
+    <linearGradient id="ungu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5b4fb9"/><stop offset="1" stop-color="#3f3590"/></linearGradient>
+  </defs>
+  <circle cx="240" cy="240" r="240" fill="url(#bg)"/>
+  <g transform="translate(118 96)">
+    <rect x="34" y="26" width="200" height="268" rx="14" fill="#fff" opacity=".55"/>
+    <rect x="17" y="13" width="200" height="268" rx="14" fill="#fff" opacity=".8"/>
+    <rect x="0" y="0" width="200" height="268" rx="14" fill="#fff"/>
+    <rect x="24" y="30" width="86" height="12" rx="6" fill="#5b4fb9"/>
+    <rect x="24" y="60" width="152" height="8" rx="4" fill="#d9d4ee"/>
+    <rect x="24" y="80" width="140" height="8" rx="4" fill="#d9d4ee"/>
+    <rect x="24" y="100" width="152" height="8" rx="4" fill="#d9d4ee"/>
+    <rect x="24" y="132" width="152" height="40" rx="8" fill="#f6f4fc" stroke="#5b4fb9" stroke-width="2"/>
+    <rect x="34" y="146" width="110" height="6" rx="3" fill="#5b4fb9" opacity=".6"/>
+    <rect x="34" y="158" width="80" height="6" rx="3" fill="#5b4fb9" opacity=".35"/>
+    <rect x="24" y="192" width="120" height="8" rx="4" fill="#d9d4ee"/>
+    <rect x="24" y="212" width="152" height="8" rx="4" fill="#d9d4ee"/>
+    <rect x="24" y="232" width="96" height="8" rx="4" fill="#d9d4ee"/>
+  </g>
+  <circle cx="352" cy="352" r="54" fill="url(#ungu)"/>
+  <path d="M326 352l18 18 34-38" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#f6a623">
+    <path d="M118 78l6 16 16 6-16 6-6 16-6-16-16-6 16-6z"/>
+    <path d="M392 128l4 11 11 4-11 4-4 11-4-11-11-4 11-4z"/>
+  </g>
+</svg>

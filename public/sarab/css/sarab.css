@@ -32,3 +32,7 @@
 /* .row.g-5 vendor (gutter 3 rem) di dalam .container (padding 12 px) menjulur 12 px tiap sisi; di layar sempit
    kolomnya bertumpuk, jadi gutter horizontal disamakan dengan padding container. */
 @media (max-width: 767px) { .row.g-5 { --bs-gutter-x: 1.5rem; } }
+/* Nilai info/kontak bisa berupa token panjang tanpa spasi (pola nama berkas, URL) → boleh dipenggal; item flex
+   tidak memaksa lebar minimum isinya (min-width:0), supaya layar sempit tidak melebar. */
+.panel-gelap .d-flex > div, .ctitem .ctinfo { min-width: 0; }
+.panel-gelap .info-nilai, .panel-gelap .info-label, .ctinfo span, .fciinfo { overflow-wrap: anywhere; }

@@ -5,4 +5,9 @@
 		<uri>/sakipai</uri>
 		<handler>sakipai\model\index</handler>
 	</route>
+	<route>
+		<method>GET</method>
+		<uri>/sakipai/landing</uri>
+		<handler>sakipai\model\landing</handler>
+	</route>
 </list>
