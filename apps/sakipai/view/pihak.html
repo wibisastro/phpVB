@@ -1,0 +1,18 @@
+{# landing-page#5 — slot testimonials (index.html:129) dipakai untuk pihak
+   di balik SAKIPAI; potret stok vendor diganti ikon. Tidak ada kutipan rekaan. #}
+<section class="testimonials text-center bg-light" id="pihak">
+    <div class="container">
+        <h2 class="mb-5">{{ landing.pihak.judul }}</h2>
+        <div class="row">
+            {% for p in landing.pihak.daftar %}
+            <div class="col-lg-4">
+                <div class="testimonial-item mx-auto mb-5 mb-lg-0">
+                    <div class="pihak-avatar"><i class="{{ p.ikon }}"></i></div>
+                    <h5>{{ p.nama }}</h5>
+                    <p class="font-weight-light mb-0">{{ p.peran }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,25 @@
+{# landing-page#7 — footer (index.html:203). Ikon media sosial vendor dibuang. #}
+<footer class="footer bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 h-100 text-center text-lg-start my-auto">
+                <ul class="list-inline mb-2">
+                    {% for t in landing.footer.tautan %}
+                    {% if not loop.first %}<li class="list-inline-item">&sdot;</li>{% endif %}
+                    <li class="list-inline-item">
+                        {% if t.url == 'mailto' %}
+                        <a href="mailto:{{ kontakEmail }}">{{ t.label }}</a>
+                        {% else %}
+                        <a href="{{ t.url }}">{{ t.label }}</a>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                <p class="text-muted small mb-4 mb-lg-0">&copy; {{ tahun }} {{ landing.brand }}. {{ landing.footer.catatan }}</p>
+            </div>
+            <div class="col-lg-6 h-100 text-center text-lg-end my-auto">
+                <p class="text-muted small mb-0">{{ landing.tagline }}</p>
+            </div>
+        </div>
+    </div>
+</footer>

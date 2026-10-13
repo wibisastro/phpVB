@@ -1,0 +1,17 @@
+{# landing-page#4 — showcase (index.html:103). Foto vendor (produk bermerek)
+   TIDAK dibawa: panel gambar diganti gradien + ikon (sakipai.css). #}
+<section class="showcase" id="cara-kerja">
+    <div class="container-fluid p-0">
+        {% for s in landing.showcase %}
+        <div class="row g-0">
+            <div class="col-lg-6 {{ loop.index is odd ? 'order-lg-2' : '' }} text-white showcase-img showcase-panel">
+                <i class="{{ s.ikon }}"></i>
+            </div>
+            <div class="col-lg-6 {{ loop.index is odd ? 'order-lg-1' : '' }} my-auto showcase-text">
+                <h2>{{ s.judul }}</h2>
+                <p class="lead mb-0">{{ s.teks }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>

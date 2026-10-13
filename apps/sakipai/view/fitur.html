@@ -1,0 +1,16 @@
+{# landing-page#3 — features-icons (index.html:75) #}
+<section class="features-icons bg-light text-center" id="fitur">
+    <div class="container">
+        <div class="row">
+            {% for f in landing.fitur %}
+            <div class="col-lg-4">
+                <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+                    <div class="features-icons-icon d-flex"><i class="{{ f.ikon }} m-auto text-primary"></i></div>
+                    <h3>{{ f.judul }}</h3>
+                    <p class="lead mb-0">{{ f.teks }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

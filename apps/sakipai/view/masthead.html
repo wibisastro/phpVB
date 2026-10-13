@@ -1,0 +1,18 @@
+{# landing-page#2 — masthead (index.html:27). Form SB Forms vendor DIHAPUS
+   (layanan pihak ketiga, mengirim data pengunjung ke luar) → dua tombol. #}
+<header class="masthead">
+    <div class="container position-relative">
+        <div class="row justify-content-center">
+            <div class="col-xl-7">
+                <div class="text-center text-white">
+                    <h1 class="mb-4">{{ landing.masthead.judul }}</h1>
+                    <p class="lead mb-5">{{ landing.masthead.teks }}</p>
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                        <a class="btn btn-primary btn-lg px-4" href="{{ webroot }}/{{ pageID }}/{{ landing.masthead.utama.url }}">{{ landing.masthead.utama.label }}</a>
+                        <a class="btn btn-outline-light btn-lg px-4" href="{{ landing.masthead.kedua.url }}">{{ landing.masthead.kedua.label }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,12 @@
+{# landing-page#1 — navbar static-top (index.html:20) #}
+<nav class="navbar navbar-light bg-light static-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ webroot }}/{{ pageID }}">
+            <img src="{{ webroot }}/cube/images/logo-krisna2.png" alt="" style="max-height: 28px;" />
+            <span class="fw-bold">{{ landing.brand }}</span>
+        </a>
+        <a class="btn btn-primary" href="{{ webroot }}/{{ pageID }}/{{ landing.masthead.utama.url }}">
+            <i class="bi-box-arrow-in-right me-1"></i>{{ landing.masthead.utama.label }}
+        </a>
+    </div>
+</nav>

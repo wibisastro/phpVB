@@ -1,0 +1,12 @@
+/* Override kecil di atas styles.css vendor (Landing Page v6.0.6).
+   Panel showcase & avatar pihak tanpa foto vendor; warna lewat token --bs-* . */
+.showcase .showcase-panel {
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--bs-primary) 0%, #0b3d91 100%);
+}
+.showcase .showcase-panel i { font-size: 7rem; color: rgba(255, 255, 255, .85); }
+.pihak-avatar {
+  width: 8rem; height: 8rem; margin: 0 auto 1rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bs-primary); color: #fff; font-size: 3.5rem;
+}

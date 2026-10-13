@@ -1,0 +1,29 @@
+{# Shell landing SAKIPAI — jalur B (halaman publik, view standalone per-app).
+   SENGAJA tidak include cubeHead.html: styles.css vendor sudah membawa Bootstrap
+   5.2.3 sendiri; main.min.css cube akan bertumpuk dan saling menimpa.
+   Tidak ada #app / createPageApp — halaman statis tanpa Vue.
+   Aset lokal: ikon + bootstrap bundle dari /cube (sudah ada di framework); styles.css +
+   gambar dari apps/sakipai/{css,img} lewat rute inti /{app}/css|img (Gov2lib\css, Gov2lib\img).
+   BUKAN public/{app}/: folder itu membayangi rute /{app} (rewrite Apache !-d, php -S juga).
+   Google Fonts Lato tetap CDN (keputusan 13 Okt). #}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+{% block head %}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="{{ landing.deskripsi }}" />
+    <title>{{ pageTitle }}</title>
+    <link rel="icon" type="image/png" href="{{ webroot }}/images/logo-krisna.png" />
+    <link rel="stylesheet" href="{{ webroot }}/cube/fonts/bootstrap-icons.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{{ webroot }}/{{ pageID }}/css/styles.css" />
+    <link rel="stylesheet" href="{{ webroot }}/{{ pageID }}/css/sakipai.css" />
+{% endblock %}
+</head>
+<body>
+{% block content %}{% endblock %}
+<script src="{{ webroot }}/cube/js/bootstrap.bundle.min.js"></script>
+{% block externalJS %}{% endblock %}
+</body>
+</html>

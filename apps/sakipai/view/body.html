@@ -1,0 +1,9 @@
+{# Base body app sakipai — dipilih core/init/template.php karena file ini ada
+   (jalan resmi keluar dari tema admin tanpa menyentuh core/template). #}
+{% extends "@sakipai/layout.html" %}
+
+{% block content %}
+    {% for item in contents %}
+       {% include [item, 'cubeMissingFile.html'] %}
+    {% endfor %}
+{% endblock %}
