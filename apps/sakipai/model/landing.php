@@ -151,8 +151,6 @@ class landing extends \Gov2lib\document {
                 'daftar' => [
                     ['nama' => 'KemenPANRB',      'peran' => 'Klien & pemilik kebijakan',  'keterangan' => 'Evaluasi SAKIP, PermenPANRB 88/2021, LKE AKIP 2026', 'ikon' => 'bi-building',    'gambar' => '', 'sosmed' => []],
                     ['nama' => 'UI-CSGAR',        'peran' => 'Mitra riset',                'keterangan' => 'Center for Study of Governance and Administrative Reform, Universitas Indonesia', 'ikon' => 'bi-mortarboard', 'gambar' => '', 'sosmed' => []],
-                    ['nama' => 'Platform gov3',   'peran' => 'Portal instansi',            'keterangan' => '640 portal {slug}.gov3.id berbasis phpVB, SSO & kontrol akses', 'ikon' => 'bi-hdd-network', 'gambar' => '', 'sosmed' => []],
-                    ['nama' => 'DocEngine & gajah','peran' => 'Mesin dokumen & RAG',       'keterangan' => 'Docling, BGE-M3, pgvector; penyimpanan 4 lapis kambing.gov3.id', 'ikon' => 'bi-cpu',         'gambar' => '', 'sosmed' => []],
                 ],
             ],
             'jam'       => null,
