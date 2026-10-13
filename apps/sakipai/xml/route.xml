@@ -6,6 +6,13 @@
 		<handler>sakipai\model\index</handler>
 	</route>
 	<route>
+		<!-- root domain (sakip.ai.id): hanya aktif bila <domain> config memetakan host ke app sakipai;
+		     rute app dimuat per pageID, jadi tidak menyentuh portal lain -->
+		<method>GET</method>
+		<uri>/</uri>
+		<handler>sakipai\model\landing</handler>
+	</route>
+	<route>
 		<method>GET</method>
 		<uri>/sakipai/landing</uri>
 		<handler>sakipai\model\landing</handler>
