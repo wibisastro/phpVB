@@ -106,18 +106,17 @@ try {
 
     }
 
-    // Tema overlay (rencana/multi-template-bootstrap.md): <template>nama</template>
-    // di config menaruh core/template/{nama} DI DEPAN cube — tema cukup override
-    // file yang perlu (nama file cube* = nama kontrak), sisanya fallback
-    // cube → general. Tanpa config / nama tak valid / folder tak ada = cube.
-    $templates=array(__DIR__.'/../template/cube',
-                     __DIR__.'/../template/general');
-    $tema = trim((string)($config->template ?? ''));
-    if ($tema !== '' && $tema !== 'cube' && $tema !== 'general'
-        && preg_match('/^[a-z0-9_-]+$/', $tema)
-        && is_dir(__DIR__.'/../template/'.$tema)) {
-        array_unshift($templates, __DIR__.'/../template/'.$tema);
-    }
+    // Tema overlay (rencana/multi-template-bootstrap.md): core/template/{tema} ditaruh
+    // DI DEPAN cube — tema cukup override file yang perlu (nama file cube* = nama
+    // kontrak), sisanya fallback cube → general. v5.1.10 (Gov2lib\Tema): tema dipilih
+    // PER APP lewat apps/{app}/xml/tema.xml <tema>nama</tema>; <template> config
+    // portal = bawaan app yang tidak menetapkan sendiri; tanpa keduanya / nama tak
+    // valid / folder tak ada = cube.
+    $dirApp = (isset($self->templateDir) && is_string($self->templateDir) && $self->templateDir !== '')
+        ? dirname($self->templateDir) : null;
+    $pilihanTema = Gov2lib\Tema::pilih(__DIR__.'/../template', (string)($config->template ?? ''), $dirApp);
+    $templates = $pilihanTema['templates'];
+    $doc->body('tema', $pilihanTema['tema']);
 
     $vueData['isNavToggle'] = false;
 
