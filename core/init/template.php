@@ -123,6 +123,15 @@ try {
 
     $loader = new FilesystemLoader($templates);
 
+    // Tema sebagai namespace Twig (bootstrap:rencana/pabrik-tema.md, 13 Okt 2026):
+    // setiap folder core/template/{nama} juga bisa dirujuk "@{nama}/file.html" dari
+    // app mana pun — body.html app: {% extends "@landing-page/layout.html" %} —
+    // tanpa mengubah overlay aktif <template>. Resolusi TANPA namespace tetap
+    // [tema, cube, general] seperti sebelumnya (halaman yang ada byte-identik).
+    foreach (glob(__DIR__.'/../template/*', GLOB_ONLYDIR) as $dirTema) {
+        $loader->addPath($dirTema, basename($dirTema));
+    }
+
     $twig = new Environment($loader,
         array(
             'auto_reload'=> true,

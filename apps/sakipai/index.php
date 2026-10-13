@@ -1,10 +1,10 @@
 <?php namespace App\sakipai;
 
 /**
- * Landing page SAKIPAI — jalur B pabrik tema (halaman publik, view standalone
- * per-app; rencana: bootstrap:rencana/pabrik-tema.md §6b).
- * Sengaja TANPA authenticate(): halaman terbuka tanpa login. Tanpa Vue.
- * Teks halaman hidup di model (landingData), bukan di view.
+ * Landing page SAKIPAI — memakai TEMA halaman publik `landing-page`
+ * (core/template/landing-page + public/landing-page; rencana bootstrap:rencana/pabrik-tema.md).
+ * App hanya: rute + controller ini + model (teks, landingData) + view/body.html yang
+ * extends "@landing-page/layout.html". Sengaja TANPA authenticate(): terbuka tanpa login. Tanpa Vue.
  */
 class index {
     function __construct () {
