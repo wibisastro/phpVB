@@ -33,7 +33,7 @@
     <div class="fbot">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <p>&copy; {{ tahun }} <span>{{ landing.brand }}{{ landing.brandAksen|default('') }}</span>. {{ landing.footer.catatan|default('') }}{% if landing.footer.kredit|default(null) %} oleh <a class="fw-bold" href="{{ url.ke(landing.footer.kredit.url, _context) }}">{{ landing.footer.kredit.nama }}</a>.{% endif %}</p>
+                <p>&copy; {{ tahun }} <span>{{ landing.brand }}{{ landing.brandAksen|default('') }}</span>. {{ landing.footer.catatan|default('') }}{% if landing.footer.kredit|default(null) %} oleh <a class="mx-0 fw-bold" href="{{ url.ke(landing.footer.kredit.url, _context) }}">{{ landing.footer.kredit.nama }}</a>.{% endif %}</p>
                 {% if landing.footer.bawah|default([]) is not empty %}<div>{% for t in landing.footer.bawah %}<a href="{{ url.ke(t.url, _context) }}">{{ t.label }}</a>{% endfor %}</div>{% endif %}
             </div>
         </div>
