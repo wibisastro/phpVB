@@ -150,7 +150,9 @@ class landing extends \Gov2lib\document {
                 'kicker' => 'Pihak', 'judul' => 'Siapa di balik', 'judulAksen' => 'SAKIPAI',
                 'daftar' => [
                     ['nama' => 'KemenPANRB',      'peran' => 'Klien & pemilik kebijakan',  'keterangan' => 'Evaluasi SAKIP, PermenPANRB 88/2021, LKE AKIP 2026', 'ikon' => 'bi-building',    'gambar' => '', 'sosmed' => []],
-                    ['nama' => 'UI-CSGAR',        'peran' => 'Mitra riset',                'keterangan' => 'Center for Study of Governance and Administrative Reform, Universitas Indonesia', 'ikon' => 'bi-mortarboard', 'gambar' => '', 'sosmed' => []],
+                    ['nama' => 'UI-CSGAR',        'peran' => 'Mitra riset tata kelola pemerintahan', 'keterangan' => 'Center for Study of Governance and Administrative Reform, Universitas Indonesia', 'ikon' => 'bi-mortarboard', 'gambar' => '', 'sosmed' => []],
+                    ['nama' => 'Lab E-Government & E-Business', 'peran' => 'Sumber riset AI', 'keterangan' => 'Universitas Indonesia — bukan mitra langsung; penyedia referensi hasil riset penerapan AI dalam e-Government', 'ikon' => 'bi-lightbulb', 'gambar' => '',
+                     'sosmed' => [['ikon' => 'bi-globe2', 'label' => 'egb.cs.ui.ac.id', 'url' => 'https://egb.cs.ui.ac.id/']]],
                 ],
             ],
             'jam'       => null,
