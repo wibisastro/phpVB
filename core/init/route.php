@@ -174,10 +174,14 @@ try {
                         throw new Exception('MethodNotAllowed:'.$httpMethod);
                     break;
                     case Gov2lib\Contracts\RouteStatus::FOUND:
+                        // Placeholder URL ({role}, {id}, ...) diisi untuk SEMUA method (#11043, v5.1.11).
+                        // Sebelumnya hanya GET → konstruktor controller yang membaca $vars pada POST
+                        // (mis. gov2login/member.php authenticate($vars['role'])) menerima null → TypeError.
+                        // Dispatch cmd/payload POST tetap dari $_POST (core/init/index.php), tidak berubah.
+                        $vars = $routeResult->vars;
                         if ($httpMethod == "POST" && !$_POST) {
                             $_POST = json_decode(trim(file_get_contents('php://input')), true);
                         } elseif ($httpMethod == "GET") {
-                            $vars = $routeResult->vars;
                             if (!isset($vars["cmd"])) {
                                 if (($_GET['cmd'] ?? '')=='logout') {$vars["cmd"]="logout";}
                                 else {$vars["cmd"]="";}
