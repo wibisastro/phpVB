@@ -121,7 +121,38 @@
     if ($('gpPrev')) { $('gpPrev').addEventListener('click', function () { openGal((galIdx - 1 + galData.length) % galData.length); }); }
     if ($('gpNext')) { $('gpNext').addEventListener('click', function () { openGal((galIdx + 1) % galData.length); }); }
 
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeMenuPop(); closeGal(); } });
+    /* POPUP TEKNOLOGI (section#teknologi) — isi dari atribut data-* chip; rincian dipisah '|' */
+    var techPop = $('techPop');
+    function openTechPop(chip) {
+        if (!techPop || !chip) { return; }
+        var gambar = chip.getAttribute('data-tkgambar') || '', tkImg = $('tkIkon'), tkFb = $('tkIkonFb');
+        if (tkImg) { tkImg.setAttribute('src', gambar); tkImg.style.display = gambar ? '' : 'none'; }
+        if (tkFb) {
+            tkFb.className = gambar ? '' : (chip.getAttribute('data-tkikon') || 'bi-hdd-network');
+            tkFb.style.display = gambar ? 'none' : '';
+        }
+        if ($('tkTitle')) { $('tkTitle').textContent = chip.getAttribute('data-tknama') || ''; }
+        if ($('tkHost')) { $('tkHost').textContent = chip.getAttribute('data-tkhost') || ''; }
+        if ($('tkDesc')) { $('tkDesc').textContent = chip.getAttribute('data-tkdesc') || ''; }
+        if ($('tkRinci')) {
+            $('tkRinci').innerHTML = '';
+            (chip.getAttribute('data-tkrinci') || '').split('|').filter(Boolean).forEach(function (r) {
+                var sp = document.createElement('span'); sp.className = 'mptag'; sp.textContent = r.trim(); $('tkRinci').appendChild(sp);
+            });
+        }
+        var tkLink = $('tkLink'), href = chip.getAttribute('data-tkurl') || '';
+        if (tkLink) {
+            tkLink.style.display = href ? '' : 'none';
+            if (href) { tkLink.setAttribute('href', href); tkLink.textContent = chip.getAttribute('data-tklabel') || ''; }
+        }
+        techPop.classList.add('open'); document.body.style.overflow = 'hidden';
+    }
+    function closeTechPop() { if (techPop) { techPop.classList.remove('open'); document.body.style.overflow = ''; } }
+    all('.techchip').forEach(function (chip) { chip.addEventListener('click', function () { openTechPop(this); }); });
+    if ($('tkClose')) { $('tkClose').addEventListener('click', closeTechPop); }
+    if (techPop) { techPop.addEventListener('click', function (e) { if (e.target === this) { closeTechPop(); } }); }
+
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeMenuPop(); closeGal(); closeTechPop(); } });
 
     /* TESTIMONI — Swiper hanya bila dimuat layout */
     if (window.Swiper && document.querySelector('.tesSwiper')) {

@@ -1,0 +1,66 @@
+{# sarab#15 — section#teknologi + popup #techPop (Lebah #10986, konsep revisi 2 #10953). Chip ikon+label+host;
+   klik chip → popup berisi keterangan, rincian, dan (opsional) satu tombol tautan keluar. Semua teks dari app;
+   tema hanya markup. null = tidak dirender, jadi app yang tidak mengisi `teknologi` tidak terpengaruh.
+
+   Chip memakai kelas sendiri (.techchip), BUKAN .catcard: sarab.js mengikat .catcard ke filter section #menu,
+   chip teknologi akan ikut memfilter daftar produk kalau kelas itu dipakai (konsep §5.1).
+
+   Bentuk data yang diharapkan di landing.teknologi (diisi landingData() sisi app):
+     kicker      string  — label kecil di atas judul, mis. 'Teknologi'
+     judul       string  — judul section
+     judulAksen  string  — penggal judul yang diberi warna aksen (opsional)
+     teks        string  — satu paragraf pengantar (opsional)
+     petunjuk    string  — kalimat ajakan klik di bawah chip (opsional)
+     daftar      list    — tiap item:
+       nama         string  — label chip
+       host         string  — nama host di bawah label
+       gambar       string  — URL ikon SVG, mis. '{{ webroot }}/landingpage/img/satwa-pesut.svg'
+       ikon         string  — kelas bootstrap-icons sebagai fallback bila `gambar` kosong, mis. 'bi-cpu'
+       teks         string  — paragraf keterangan di popup
+       rincian      list    — butir teknis singkat (konsep: 3 per chip), tampil sebagai chip kecil
+       tautan       string  — URL tombol di dalam popup; kosong = tanpa tombol (hanya KMS & Portal yang punya)
+       tautanLabel  string  — teks tombol tautan, mis. 'Buka KMS'
+   Ikon mengikuti pola tema yang sudah ada (kategori.html/tim.html): `gambar` dulu, `ikon` sebagai fallback. #}
+{% import '@sarab/url.html' as url %}
+{% if landing.teknologi|default(null) %}
+<section id="teknologi">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="slbl">{{ landing.teknologi.kicker }}</span>
+            <h2 class="stitle">{{ landing.teknologi.judul }} <span>{{ landing.teknologi.judulAksen|default('') }}</span></h2>
+            <div class="sline"></div>
+            {% if landing.teknologi.teks|default('') %}<p class="sdesc mx-auto" style="max-width:560px;">{{ landing.teknologi.teks }}</p>{% endif %}
+        </div>
+        <div class="row g-3 justify-content-center">
+            {% for t in landing.teknologi.daftar %}
+            {% set tautan = t.tautan|default('') %}
+            <div class="col-6 col-sm-4 col-lg-2" data-aos="zoom-in" data-aos-delay="{{ loop.index * 70 }}">
+                <button type="button" class="techchip" aria-haspopup="dialog"
+                        data-tkikon="{{ t.ikon|default('bi-hdd-network') }}" data-tkgambar="{{ t.gambar|default('') }}"
+                        data-tknama="{{ t.nama }}" data-tkhost="{{ t.host|default('') }}" data-tkdesc="{{ t.teks|default('') }}"
+                        data-tkrinci="{{ t.rincian|default([])|join('|') }}"
+                        data-tkurl="{{ tautan ? url.ke(tautan, _context) : '' }}" data-tklabel="{{ t.tautanLabel|default('') }}">
+                    {% if t.gambar|default('') %}<span class="catimg panel-ikon tkico"><img src="{{ t.gambar }}" alt="" /></span>{% else %}<span class="catimg panel-ikon tkico"><i class="{{ t.ikon|default('bi-hdd-network') }}"></i></span>{% endif %}
+                    <div class="catnm">{{ t.nama }}</div>
+                    {% if t.host|default('') %}<div class="tkhost">{{ t.host }}</div>{% endif %}
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% if landing.teknologi.petunjuk|default('') %}<p class="sdesc text-center mt-4 mb-0"><i class="bi-hand-index-thumb me-1"></i>{{ landing.teknologi.petunjuk }}</p>{% endif %}
+    </div>
+</section>
+<div id="techPop" role="dialog" aria-modal="true" aria-labelledby="tkTitle">
+    <div class="mpbox tkbox">
+        <button class="mpclose" id="tkClose" type="button" aria-label="Tutup"><i class="bi-x-lg"></i></button>
+        <div class="mpbody tkbody">
+            <span class="catimg panel-ikon tkico tkicobig"><img id="tkIkon" src="" alt="" /><i id="tkIkonFb"></i></span>
+            <h4 id="tkTitle"></h4>
+            <div id="tkHost" class="tkhost"></div>
+            <p id="tkDesc"></p>
+            <div class="mptags" id="tkRinci"></div>
+            <a id="tkLink" class="btn-red" href="#" target="_blank" rel="noopener" style="display:none;"></a>
+        </div>
+    </div>
+</div>
+{% endif %}

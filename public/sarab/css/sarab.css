@@ -38,3 +38,31 @@
 .panel-gelap .info-nilai, .panel-gelap .info-label, .ctinfo span, .fciinfo { overflow-wrap: anywhere; }
 /* Logo gambar di navbar (landing.brandLogo) menggantikan lingkaran ikon .bico: tinggi tetap, lebar mengikuti. */
 .blogo-img { height: 46px; width: auto; max-width: 200px; display: block; }
+/* ============ section#teknologi + popup #techPop (teknologi.html, Lebah #10986) ============
+   .techchip menyalin tampilan .catcard vendor TANPA kelasnya: sarab.js mengikat .catcard ke filter #menu.
+   Bayangan hover diturunkan dari --primary lewat color-mix (bukan rgba tetap seperti .catcard vendor) supaya
+   ikut berubah kalau palet tema diganti. */
+.techchip { display: block; width: 100%; background: #fff; border: 2px solid transparent; border-radius: 15px;
+  padding: 18px 12px; text-align: center; cursor: pointer; transition: .4s; box-shadow: 0 4px 18px rgba(0, 0, 0, .06); }
+.techchip:hover, .techchip:focus-visible { transform: translateY(-7px);
+  box-shadow: 0 14px 38px color-mix(in srgb, var(--primary) 14%, transparent);
+  border-color: var(--primary); outline: none; }
+/* Ikon satwa masuk sebagai <img>, jadi ukurannya tidak ikut font-size seperti ikon bi-* → dibatasi sendiri. */
+.techchip .tkico { width: 64px; height: 64px; margin-bottom: 10px; }
+.techchip .tkico img { width: 34px; height: 34px; display: block; }
+.catimg.panel-ikon.tkico { color: var(--primary); }
+.techchip:hover .tkico { transform: scale(1.1) rotate(-4deg); }
+.tkhost { font-size: .72rem; color: #8a8a8a; overflow-wrap: anywhere; }
+/* Overlay vendor hanya didefinisikan per id (#menuPop/#galPop), jadi #techPop mengulang aturannya. */
+#techPop { display: none; position: fixed; inset: 0; z-index: 99999; background: rgba(0, 0, 0, .84);
+  backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 18px; }
+#techPop.open { display: flex; animation: fadeov .28s ease; }
+.tkbox { max-width: 560px; }
+/* .mpbox .mpbody vendor = 56% (sisanya kolom gambar); popup teknologi tanpa gambar → satu kolom penuh. */
+.tkbody { width: 100%; padding: 38px 32px; text-align: center; }
+.tkbody .tkicobig { width: 78px; height: 78px; margin-bottom: 16px; }
+.tkbody .tkicobig img { width: 42px; height: 42px; display: block; }
+.tkbody h4 { font-family: "Playfair Display", serif; font-weight: 700; margin-bottom: 4px; }
+.tkbody .tkhost { font-size: .82rem; margin-bottom: 16px; }
+.tkbody p { color: #6c6c6c; font-size: .92rem; margin-bottom: 18px; }
+.tkbody .mptags { justify-content: center; }
