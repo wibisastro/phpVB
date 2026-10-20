@@ -31,10 +31,10 @@
             <div class="sline"></div>
             {% if landing.teknologi.teks|default('') %}<p class="sdesc mx-auto" style="max-width:560px;">{{ landing.teknologi.teks }}</p>{% endif %}
         </div>
-        <div class="row g-3 justify-content-center">
+        <div class="row g-3 justify-content-center techgrid">
             {% for t in landing.teknologi.daftar %}
             {% set tautan = t.tautan|default('') %}
-            <div class="col-6 col-sm-4 col-lg-2" data-aos="zoom-in" data-aos-delay="{{ loop.index * 70 }}">
+            <div class="col-6 col-sm-4 techcol" data-aos="zoom-in" data-aos-delay="{{ loop.index * 70 }}">
                 <button type="button" class="techchip" aria-haspopup="dialog"
                         data-tkikon="{{ t.ikon|default('bi-hdd-network') }}" data-tkgambar="{{ t.gambar|default('') }}"
                         data-tknama="{{ t.nama }}" data-tkhost="{{ t.host|default('') }}" data-tkdesc="{{ t.teks|default('') }}"

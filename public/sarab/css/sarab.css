@@ -53,13 +53,20 @@
 .catimg.panel-ikon.tkico { color: var(--primary); }
 .techchip:hover .tkico { transform: scale(1.1) rotate(-4deg); }
 .tkhost { font-size: .72rem; color: #8a8a8a; overflow-wrap: anywhere; }
+/* Semua chip dipaksa SATU baris di layar lebar: kelas kolom Bootstrap tidak punya pecahan 1/7, jadi
+   .techcol memakai flex-basis 0 supaya berapa pun jumlah chip membagi lebar baris rata. Di bawah lg tetap
+   kelas kolom biasa (col-6 col-sm-4), karena satu baris jadi terlalu sempit di layar kecil. */
+@media (min-width: 992px) { .techgrid > .techcol { flex: 1 1 0; width: auto; max-width: none; } }
 /* Overlay vendor hanya didefinisikan per id (#menuPop/#galPop), jadi #techPop mengulang aturannya. */
 #techPop { display: none; position: fixed; inset: 0; z-index: 99999; background: rgba(0, 0, 0, .84);
   backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 18px; }
 #techPop.open { display: flex; animation: fadeov .28s ease; }
 .tkbox { max-width: 560px; }
-/* .mpbox .mpbody vendor = 56% (sisanya kolom gambar); popup teknologi tanpa gambar → satu kolom penuh. */
-.tkbody { width: 100%; padding: 38px 32px; text-align: center; }
+/* .mpbox .mpbody vendor = 56% (sisanya kolom gambar); popup teknologi tanpa gambar → satu kolom penuh.
+   WAJIB lewat #techPop: selektor vendor `.mpbox .mpbody` (0,2,0) mengalahkan `.tkbody` (0,1,0), sehingga isi
+   popup hanya mengisi 56% kiri kotak dan menyisakan ruang kosong di kanan. Vendor baru menyetelnya 100% di
+   media query ponsel, jadi gejalanya cuma muncul di layar lebar. */
+#techPop .tkbody { width: 100%; padding: 38px 32px; text-align: center; }
 .tkbody .tkicobig { width: 78px; height: 78px; margin-bottom: 16px; }
 .tkbody .tkicobig img { width: 42px; height: 42px; display: block; }
 .tkbody h4 { font-family: "Playfair Display", serif; font-weight: 700; margin-bottom: 4px; }
