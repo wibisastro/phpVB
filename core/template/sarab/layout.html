@@ -29,7 +29,7 @@
 {% block content %}{% endblock %}
 {# sarab#22 — tombol kembali ke atas (index.html:1215); onclick inline vendor → handler di sarab.js #}
 <button id="btt" type="button" aria-label="Ke atas"><i class="bi-chevron-up"></i></button>
-{% include '@sarab/kancilPanel.html' %}
+{% include '@sarab/agenPanel.html' %}
 <script src="{{ webroot }}/cube/js/bootstrap.bundle.min.js"></script>
 <script src="{{ webroot }}/sarab/vendor/aos/aos.js"></script>
 {% if landing.testimoni|default(null) %}<script src="{{ webroot }}/sarab/vendor/swiper/swiper-bundle.min.js"></script>{% endif %}

@@ -1,0 +1,68 @@
+{# Panel agen untuk tema sarab — offcanvas berisi iframe ke chat agen mana pun (Agen Pesut, dst.).
+   Generik: yang menentukan agennya adalah data `agenPanel` dari app, bukan template ini.
+
+     agenPanel = {
+       nama:       'Agen Pesut',                                  judul panel + label tombol bawaan
+       url:        'https://pesut.sakip.ai.id/',                  isi iframe (wajib — kosong = panel mati)
+       loginUrl:   'https://pesut.sakip.ai.id/oauth/oidc/login',  opsional: tombol masuk lewat popup
+       loginLabel: 'Masuk dengan beo',                            opsional (bawaan "Masuk")
+       tombol:     'Tanya Agen Pesut',                            opsional: label tombol pemicu di footer
+       ikon:       'bi-robot',                                    opsional: kelas bootstrap-icons
+       wajibLogin: false                                          true = pemicu nonaktif tanpa sesi phpVB
+     }
+
+   Login ke agen lewat popup, bukan di dalam iframe: halaman login IdP (Google) menolak di-frame
+   (X-Frame-Options: DENY). Setelah popup ditutup iframe dimuat ulang; sesi ikut terbawa bila host
+   agen satu situs dengan halaman ini (cookie SameSite=Lax). Status login di iframe tidak bisa dibaca
+   dari sini (beda origin), jadi tombol masuk selalu tampil.
+   Varian cube (slot kancil di cubeLayout.html, dengan probe sesi + postMessage) terpisah dan tidak
+   memakai berkas ini. #}
+{% if agenPanel.url|default('') %}
+<style>
+  #agenPanelOffcanvas { width: min(50vw, 960px); min-width: 480px; }
+  @media (max-width: 767.98px) { #agenPanelOffcanvas { width: 100vw; min-width: 0; } }
+</style>
+<div class="offcanvas offcanvas-end" tabindex="-1" id="agenPanelOffcanvas" aria-labelledby="agenPanelLabel">
+  <div class="offcanvas-header border-bottom py-2 gap-2">
+    <h6 class="offcanvas-title fw-semibold mb-0 me-auto" id="agenPanelLabel"><i class="{{ agenPanel.ikon|default('bi-robot') }} me-2"></i>{{ agenPanel.nama|default('Agen') }}</h6>
+    {% if agenPanel.loginUrl|default('') %}
+    <a id="agenPanelMasuk" class="btn btn-sm btn-outline-primary" href="{{ agenPanel.loginUrl }}" target="_blank" rel="noopener"><i class="bi bi-box-arrow-in-right me-1"></i>{{ agenPanel.loginLabel|default('Masuk') }}</a>
+    {% endif %}
+    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="agenPanelMuatUlang()" title="Muat ulang panel" aria-label="Muat ulang panel"><i class="bi bi-arrow-clockwise"></i></button>
+    <button type="button" class="btn-close ms-1" data-bs-dismiss="offcanvas" aria-label="Tutup"></button>
+  </div>
+  <div class="offcanvas-body p-0 d-flex">
+    <iframe id="agenPanelFrame" data-src="{{ agenPanel.url }}" title="{{ agenPanel.nama|default('Agen') }}"
+            style="border:0; width:100%; flex:1 1 auto; min-height:0"
+            allow="clipboard-read; clipboard-write"></iframe>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var frame = document.getElementById('agenPanelFrame');
+    var masuk = document.getElementById('agenPanelMasuk');
+
+    function muat() { frame.setAttribute('src', frame.dataset.src); }
+
+    // iframe baru diisi saat panel pertama kali dibuka — pengunjung yang tidak membukanya tidak memuat agen.
+    window.openAgenPanel = function () {
+      if (!frame.getAttribute('src')) { muat(); }
+      bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('agenPanelOffcanvas')).show();
+    };
+
+    window.agenPanelMuatUlang = muat;
+
+    if (masuk) {
+      masuk.addEventListener('click', function (ev) {
+        var w = window.open(masuk.href, 'agen-login', 'width=520,height=720');
+        if (!w) { return; }   // popup diblok → biarkan tautan membuka tab baru; muat ulang manual sesudahnya
+        ev.preventDefault();
+        var t = setInterval(function () {
+          if (w.closed) { clearInterval(t); muat(); }
+        }, 800);
+      });
+    }
+  })();
+</script>
+{% endif %}
