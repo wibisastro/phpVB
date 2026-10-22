@@ -24,6 +24,9 @@
 .top-contact span i { margin-right: 6px; }
 .mhrt i { font-size: .95rem; }
 #btt { cursor: pointer; }
+/* Vendor memberi #btt z-index 9990 → melayang di atas offcanvas Bootstrap (1045) dan menutupi tombol kirim
+   panel agen di pojok kanan bawah. 1030: tetap di atas navbar (990), di bawah backdrop (1040) + offcanvas. */
+#btt { z-index: 1030; }
 /* AOS fade-left/right menggeser elemen ±100 px sebelum digulir masuk → di layar sempit document.scrollWidth
    melebar (414 → 526 px) walau body vendor overflow-x:hidden. Di ponsel geser vertikal saja. */
 @media (max-width: 767px) {
