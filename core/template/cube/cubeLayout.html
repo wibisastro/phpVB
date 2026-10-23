@@ -139,6 +139,27 @@
                   allow="clipboard-read; clipboard-write"></iframe>
         </div>
         {% endif %}
+        {% if agenPanel.url|default('') and (not agenPanel.wajibLogin|default(false) or _SESSION['account_id']|default(false)) %}
+        {# Slot agen generik (rencana sidepanel-pesut-cube, #11096): iframe ke chat agen mana pun
+           (Agen Pesut/OWUI, dst.). Kontrak data `agenPanel` SAMA dengan sarab/agenPanel.html:
+           {nama, url, loginUrl, loginLabel, tombol, ikon, wajibLogin}. Default dari config
+           instance <platform><agen …/> (document::agenPanelConfig); app boleh override lewat
+           $doc->body('agenPanel', …). Login lewat popup, TIDAK PERNAH di dalam iframe (IdP
+           menolak di-frame, pola gov2:Pola_Login_Popup_Iframe). Iframe baru diisi saat panel
+           dibuka (openSidePanel('agen') / openAgenPanel()). #}
+        <div id="sidePanel-agen" class="h-100 d-flex flex-column" style="display:none"
+             data-agen-url="{{ agenPanel.url }}" data-agen-login="{{ agenPanel.loginUrl|default('') }}">
+          <div id="sidePanelAgenBar" class="border-bottom px-3 py-1 d-flex justify-content-end gap-1" style="flex:0 0 auto">
+            {% if agenPanel.loginUrl|default('') %}
+            <a id="sidePanelAgenMasuk" class="btn btn-sm btn-outline-primary" href="{{ agenPanel.loginUrl }}" target="_blank" rel="noopener"><i class="bi bi-box-arrow-in-right me-1"></i>{{ agenPanel.loginLabel|default('Masuk') }}</a>
+            {% endif %}
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="agenPanelMuatUlang()" title="Muat ulang panel" aria-label="Muat ulang panel"><i class="bi bi-arrow-clockwise"></i></button>
+          </div>
+          <iframe id="sidePanelAgenFrame" data-src="{{ agenPanel.url }}" title="{{ agenPanel.nama|default('Agen') }}"
+                  style="border:0; width:100%; flex:1 1 auto; min-height:0"
+                  allow="clipboard-read; clipboard-write"></iframe>
+        </div>
+        {% endif %}
       </div>
     </div>
     <!-- Side Panel Offcanvas ends -->
@@ -196,10 +217,11 @@
       pengaturan: '<i class="bi bi-gear me-2"></i>Pengaturan',
       filter: '<i class="bi bi-funnel me-2"></i>Filter',
       chat: '<i class="bi bi-chat-dots me-2"></i>Chat Dokumen',
-      kancil: KANCIL_ICON + 'Kancil'
+      kancil: KANCIL_ICON + 'Kancil',
+      agen: '<i class="{{ agenPanel.ikon|default('bi-robot') }} me-2"></i>{{ agenPanel.nama|default('Agen')|e('js') }}'
     };
     // Toggle panels via DOM
-    var views = ['wilayah', 'instansi', 'pengaturan', 'filter', 'chat', 'kancil'];
+    var views = ['wilayah', 'instansi', 'pengaturan', 'filter', 'chat', 'kancil', 'agen'];
     views.forEach(function(v) {
       var el = document.getElementById('sidePanel-' + v);
       if (el) { el.style.display = (v === view) ? '' : 'none'; }
@@ -216,14 +238,46 @@
       if (ctxBox) { ctxBox.style.display = 'none'; }
       kancilEnsureSession();
     }
+    // Agen: iframe baru diisi saat pertama dibuka (lazy), lalu dibiarkan hidup
+    // supaya chat tidak hilang tiap panel ditutup-buka.
+    if (view === 'agen') { agenEnsureLoaded(); }
     // Open offcanvas
     var panel = document.getElementById('sidePanelOffcanvas');
     if (panel) {
-      panel.classList.toggle('sidepanel-wide', view === 'kancil');
+      panel.classList.toggle('sidepanel-wide', view === 'kancil' || view === 'agen');
       var bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(panel);
       bsOffcanvas.show();
     }
   };
+
+  // Slot agen generik (Agen Pesut dst.) — nama fungsi SAMA dengan sarab/agenPanel.html
+  // supaya app memanggil satu fungsi yang sama di kedua template.
+  function agenFrame() { return document.getElementById('sidePanelAgenFrame'); }
+  function agenEnsureLoaded() {
+    var f = agenFrame();
+    if (f && !f.getAttribute('src')) { f.setAttribute('src', f.dataset.src); }
+  }
+  window.agenPanelMuatUlang = function() {
+    var f = agenFrame();
+    if (f) { f.setAttribute('src', f.dataset.src); }
+  };
+  /** Buka slot agen. false = portal ini tidak punya slot agen (agenPanel kosong, atau wajib login
+   *  dan belum login) — pemanggil memakai itu untuk menyembunyikan tombolnya sendiri. */
+  window.openAgenPanel = function() {
+    if (!document.getElementById('sidePanel-agen')) { return false; }
+    window.openSidePanel('agen');
+    return true;
+  };
+  (function() {
+    var masuk = document.getElementById('sidePanelAgenMasuk');
+    if (!masuk) { return; }
+    masuk.addEventListener('click', function(ev) {
+      var w = window.open(masuk.href, 'agen-login', 'width=520,height=720');
+      if (!w) { return; }   // popup diblokir → biarkan tautan membuka tab baru (target=_blank)
+      ev.preventDefault();
+      var t = setInterval(function() { if (w.closed) { clearInterval(t); window.agenPanelMuatUlang(); } }, 800);
+    });
+  })();
 
   window.openFilterPanel = function (cfg) {
     cfg = cfg || {};

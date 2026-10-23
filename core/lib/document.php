@@ -409,6 +409,49 @@ class document extends customException
     }
 
     /**
+     * Data panel agen generik untuk slot sidepanel `agen` (cube/gelap) — kontrak SAMA
+     * dengan `sarab/agenPanel.html`: {nama, url, loginUrl, loginLabel, tombol, ikon, wajibLogin}.
+     * Sumber: config instance
+     *   <platform><agen nama="Agen Pesut" url="https://pesut.sakip.ai.id/"
+     *                   login="https://pesut.sakip.ai.id/oauth/oidc/login" loginLabel="Masuk dengan beo"
+     *                   ikon="bi-robot" wajibLogin="1"/></platform>
+     * Tanpa elemen <agen> atau tanpa url http(s) yang valid → [] : slot dan item dropdown mati.
+     * Itu default untuk 633 portal — memunculkan agen harus tindakan sadar per instance.
+     * wajibLogin bawaan TRUE (tombol agen hanya untuk yang sudah login portal).
+     * Controller boleh override lebih dulu via $doc->body('agenPanel', [...]).
+     */
+    public function agenPanelConfig(): array
+    {
+        global $config;
+
+        if (!isset($config->platform) || !isset($config->platform->agen)) {
+            return [];
+        }
+        $agen = $config->platform->agen;
+        $attr = static fn (string $k): string => trim((string) ($agen[$k] ?? ''));
+        $isUrl = static fn (string $u): bool => (bool) preg_match('#^https?://[^\s"\'<>]+$#i', $u);
+
+        $url = $attr('url') !== '' ? $attr('url') : trim((string) $agen);
+        if (!$isUrl($url)) {
+            return [];
+        }
+        $login = $isUrl($attr('login')) ? $attr('login') : '';
+        $nama = $attr('nama') !== '' ? $attr('nama') : 'Agen';
+        $ikon = preg_match('/^[a-z0-9 _-]+$/i', $attr('ikon')) ? $attr('ikon') : 'bi-robot';
+        $wajib = strtolower($attr('wajibLogin'));
+
+        return [
+            'nama' => $nama,
+            'url' => $url,
+            'loginUrl' => $login,
+            'loginLabel' => $attr('loginLabel') !== '' ? $attr('loginLabel') : 'Masuk',
+            'tombol' => $attr('tombol') !== '' ? $attr('tombol') : "Tanya {$nama}",
+            'ikon' => $ikon,
+            'wajibLogin' => $wajib === '' ? true : !in_array($wajib, ['0', 'false', 'tidak', 'no'], true),
+        ];
+    }
+
+    /**
      * Path sesi kancil untuk kontrak kancilAsk (#10722 journal 2026-09-04 10:33):
      *   dir = "/<slug>/<project>"            → query ?directory= pada POST /session
      *   b64 = b64url("<slug>/<project>")     → prefix URL iframe /<b64>/session/<id>,
@@ -660,6 +703,9 @@ class document extends customException
             $this->body('kancilProject', $ks['project']);
             $this->body('kancilDir', $ks['dir']);
             $this->body('kancilB64', $ks['b64']);
+        }
+        if (!isset($this->body['agenPanel'])) {
+            $this->body('agenPanel', $this->agenPanelConfig());
         }
 
         // Load top-bar options from database
