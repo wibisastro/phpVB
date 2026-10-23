@@ -130,6 +130,37 @@ class SidePanelAgenTemplateTest extends TestCase
         }
     }
 
+    public function testPromptDariHalamanLewatDeepLinkDiCubeGelapDanSarab(): void
+    {
+        // Skenario Wibi 23 Okt 2026: ikon chat di halaman (mis. aisakip/evaluasi kriteria) mengirim
+        // prompt ke Pesut di panel yang masih tertutup → panel terbuka, prompt sudah terkirim.
+        // Jalur = deep link OWUI ?models=…&q=…[&submit=false] lewat src iframe.
+        $files = self::LAYOUTS + ['sarab' => __DIR__ . '/../../../core/template/sarab/agenPanel.html'];
+        foreach ($this->bodies($files) as $name => $html) {
+            foreach ([
+                "function agenPromptUrl(base, opts)",
+                "u.searchParams.set('models', model)",
+                "u.searchParams.set('q', String(opts.prompt).slice(0, 4000))",
+                "if (opts.kirim === false) { u.searchParams.set('submit', 'false'); }",
+                "closest('[data-agen-prompt]')",
+                "el.getAttribute('data-agen-model')",
+                "el.getAttribute('data-agen-kirim') !== 'false'",
+                'data-model="{{ agenPanel.model|default(\'\') }}"',
+                'window.agenPanelTersedia',
+            ] as $needle) {
+                $this->assertStringContainsString($needle, $html, "{$name} kehilangan {$needle}");
+            }
+            $this->assertMatchesRegularExpression(
+                '/window\.openAgenPanel = function ?\(opts\)/',
+                $html,
+                "{$name}: openAgenPanel harus menerima opts {prompt, model, kirim}"
+            );
+            $this->assertStringContainsString('model: opts.model || ', $html, "{$name}: model bawaan dari agenPanel.model tidak dipakai");
+        }
+        $sarab = (string) file_get_contents($files['sarab']);
+        $this->assertStringContainsString("if (oc.dataset.terkunci === '1') { return false; }", $sarab, 'sarab: prompt tidak boleh membuka panel yang terkunci wajibLogin');
+    }
+
     public function testItemDropdownProfilDiKeduaHeader(): void
     {
         // Pemicu = item di dropdown profil, di sebelah item Kancil (keputusan Wibi 23 Okt 2026);

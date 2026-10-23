@@ -154,7 +154,7 @@
            ulang sendiri. Tombol ↻ di kepala offcanvas hanya cadangan. Iframe baru diisi saat panel
            dibuka (openSidePanel('agen') / openAgenPanel()); lebar = tema sarab. #}
         <div id="sidePanel-agen" class="h-100 d-flex flex-column d-none" style="display:none" data-agen-url="{{ agenPanel.url }}">
-          <iframe id="sidePanelAgenFrame" data-src="{{ agenPanel.url }}" title="{{ agenPanel.nama|default('Agen') }}"
+          <iframe id="sidePanelAgenFrame" data-src="{{ agenPanel.url }}" data-model="{{ agenPanel.model|default('') }}" title="{{ agenPanel.nama|default('Agen') }}"
                   style="border:0; width:100%; flex:1 1 auto; min-height:0"
                   allow="clipboard-read; clipboard-write"></iframe>
         </div>
@@ -279,13 +279,52 @@
     var f = agenFrame();
     if (f) { f.setAttribute('src', f.dataset.src); }
   };
-  /** Buka slot agen. false = portal ini tidak punya slot agen (agenPanel kosong, atau wajib login
-   *  dan belum login) — pemanggil memakai itu untuk menyembunyikan tombolnya sendiri. */
-  window.openAgenPanel = function() {
-    if (!document.getElementById('sidePanel-agen')) { return false; }
+  // Prompt dari halaman induk → deep link Open WebUI: ?models=<id>&q=<prompt>[&submit=false]
+  // (OWUI 0.9.6 Chat.svelte initNewChat: q mengisi kotak input lalu LANGSUNG mengirim, kecuali
+  // submit=false). Setiap prompt = chat baru di agen, karena iframe dinavigasi ulang.
+  function agenPromptUrl(base, opts) {
+    var u = new URL(base, window.location.href);
+    var model = String(opts.model || '').trim();
+    if (model) { u.searchParams.set('models', model); }
+    u.searchParams.set('q', String(opts.prompt).slice(0, 4000));
+    if (opts.kirim === false) { u.searchParams.set('submit', 'false'); }
+    return u.toString();
+  }
+  /**
+   * Buka slot agen, opsional dengan prompt:
+   *   openAgenPanel()                                              // buka saja
+   *   openAgenPanel({prompt: 'Jelaskan kriteria 1.a.1',           // chat baru, langsung terkirim
+   *                  model: 'asesor-sakip-ai',                     // opsional; bawaan = agenPanel.model
+   *                  kirim: false})                                // opsional: hanya isi kotak input
+   * false = portal ini tidak punya slot agen (agenPanel kosong, atau wajib login dan belum
+   * login) — pemanggil memakai itu untuk menyembunyikan tombolnya sendiri.
+   */
+  window.openAgenPanel = function(opts) {
+    var f = agenFrame();
+    if (!document.getElementById('sidePanel-agen') || !f) { return false; }
+    opts = opts || {};
+    var prompt = String(opts.prompt || '').trim();
+    if (prompt) {
+      f.setAttribute('src', agenPromptUrl(f.dataset.src, {
+        prompt: prompt, model: opts.model || f.dataset.model, kirim: opts.kirim
+      }));
+    }
     window.openSidePanel('agen');
     return true;
   };
+  window.agenPanelTersedia = function() { return !!document.getElementById('sidePanel-agen'); };
+  // Deklaratif: elemen apa pun dengan data-agen-prompt="…" (opsional data-agen-model,
+  // data-agen-kirim="false") membuka panel agen dengan prompt itu — halaman tidak perlu JS.
+  document.addEventListener('click', function(ev) {
+    var el = ev.target && ev.target.closest ? ev.target.closest('[data-agen-prompt]') : null;
+    if (!el) { return; }
+    ev.preventDefault();
+    window.openAgenPanel({
+      prompt: el.getAttribute('data-agen-prompt'),
+      model: el.getAttribute('data-agen-model') || '',
+      kirim: el.getAttribute('data-agen-kirim') !== 'false'
+    });
+  });
 
   window.openFilterPanel = function (cfg) {
     cfg = cfg || {};

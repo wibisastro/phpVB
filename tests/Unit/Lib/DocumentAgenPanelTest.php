@@ -55,6 +55,7 @@ class DocumentAgenPanelTest extends TestCase
             'tombol' => 'Tanya Pesut',
             'ikon' => 'bi-robot',
             'wajibLogin' => true,
+            'model' => '',
         ], $this->doc()->agenPanelConfig());
     }
 
@@ -73,7 +74,20 @@ class DocumentAgenPanelTest extends TestCase
             'tombol' => 'Tanya Agen',
             'ikon' => 'bi-robot',
             'wajibLogin' => true,
+            'model' => '',
         ], $this->doc()->agenPanelConfig());
+    }
+
+    public function testModelBawaanUntukPromptDanDisaring(): void
+    {
+        $GLOBALS['config'] = new \SimpleXMLElement(
+            '<config><platform><agen url="https://pesut.sakip.ai.id/" model="asesor-sakip-ai"/></platform></config>'
+        );
+        $this->assertSame('asesor-sakip-ai', $this->doc()->agenPanelConfig()['model']);
+        $GLOBALS['config'] = new \SimpleXMLElement(
+            '<config><platform><agen url="https://pesut.sakip.ai.id/" model="x&quot; onload=&quot;y"/></platform></config>'
+        );
+        $this->assertSame('', $this->doc()->agenPanelConfig()['model'], 'model dengan karakter aneh dibuang');
     }
 
     public function testWajibLoginBisaDimatikanDanNilaiAnehDisaring(): void

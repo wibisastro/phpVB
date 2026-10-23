@@ -19,11 +19,12 @@
    openAgenPanel(), agenPanelMuatUlang(); default dari config <platform><agen …/> lewat
    document::agenPanelConfig). Berkas ini khusus tema sarab. #}
 {% if agenPanel.url|default('') %}
+{% set agenTerkunci = agenPanel.wajibLogin|default(false) and not _SESSION['account_id']|default(false) %}
 <style>
   #agenPanelOffcanvas { width: min(50vw, 960px); min-width: 480px; }
   @media (max-width: 767.98px) { #agenPanelOffcanvas { width: 100vw; min-width: 0; } }
 </style>
-<div class="offcanvas offcanvas-end" tabindex="-1" id="agenPanelOffcanvas" aria-labelledby="agenPanelLabel">
+<div class="offcanvas offcanvas-end" tabindex="-1" id="agenPanelOffcanvas" aria-labelledby="agenPanelLabel" data-terkunci="{{ agenTerkunci ? '1' : '' }}">
   <div class="offcanvas-header border-bottom py-2 gap-2">
     <h6 class="offcanvas-title fw-semibold mb-0 me-auto" id="agenPanelLabel"><i class="{{ agenPanel.ikon|default('bi-robot') }} me-2"></i>{{ agenPanel.nama|default('Agen') }}</h6>
     {% if agenPanel.loginUrl|default('') %}
@@ -33,7 +34,7 @@
     <button type="button" class="btn-close ms-1" data-bs-dismiss="offcanvas" aria-label="Tutup"></button>
   </div>
   <div class="offcanvas-body p-0 d-flex">
-    <iframe id="agenPanelFrame" data-src="{{ agenPanel.url }}" title="{{ agenPanel.nama|default('Agen') }}"
+    <iframe id="agenPanelFrame" data-src="{{ agenPanel.url }}" data-model="{{ agenPanel.model|default('') }}" title="{{ agenPanel.nama|default('Agen') }}"
             style="border:0; width:100%; flex:1 1 auto; min-height:0"
             allow="clipboard-read; clipboard-write"></iframe>
   </div>
@@ -46,11 +47,49 @@
 
     function muat() { frame.setAttribute('src', frame.dataset.src); }
 
+    // Prompt dari halaman induk → deep link Open WebUI: ?models=<id>&q=<prompt>[&submit=false]
+    // (OWUI 0.9.6 Chat.svelte initNewChat: q mengisi kotak input lalu LANGSUNG mengirim, kecuali
+    // submit=false). Setiap prompt = chat baru di agen, karena iframe dinavigasi ulang.
+    function agenPromptUrl(base, opts) {
+      var u = new URL(base, window.location.href);
+      var model = String(opts.model || '').trim();
+      if (model) { u.searchParams.set('models', model); }
+      u.searchParams.set('q', String(opts.prompt).slice(0, 4000));
+      if (opts.kirim === false) { u.searchParams.set('submit', 'false'); }
+      return u.toString();
+    }
+
     // iframe baru diisi saat panel pertama kali dibuka — pengunjung yang tidak membukanya tidak memuat agen.
-    window.openAgenPanel = function () {
-      if (!frame.getAttribute('src')) { muat(); }
-      bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('agenPanelOffcanvas')).show();
+    // Kontrak sama dengan slot agen cube: openAgenPanel({prompt, model, kirim}); false = terkunci
+    // (wajibLogin dan belum login portal).
+    window.openAgenPanel = function (opts) {
+      var oc = document.getElementById('agenPanelOffcanvas');
+      if (oc.dataset.terkunci === '1') { return false; }
+      opts = opts || {};
+      var prompt = String(opts.prompt || '').trim();
+      if (prompt) {
+        frame.setAttribute('src', agenPromptUrl(frame.dataset.src, {
+          prompt: prompt, model: opts.model || frame.dataset.model, kirim: opts.kirim
+        }));
+      } else if (!frame.getAttribute('src')) { muat(); }
+      bootstrap.Offcanvas.getOrCreateInstance(oc).show();
+      return true;
     };
+    window.agenPanelTersedia = function () {
+      return document.getElementById('agenPanelOffcanvas').dataset.terkunci !== '1';
+    };
+    // Deklaratif: elemen apa pun dengan data-agen-prompt="…" (opsional data-agen-model,
+    // data-agen-kirim="false") membuka panel agen dengan prompt itu — halaman tidak perlu JS.
+    document.addEventListener('click', function(ev) {
+      var el = ev.target && ev.target.closest ? ev.target.closest('[data-agen-prompt]') : null;
+      if (!el) { return; }
+      ev.preventDefault();
+      window.openAgenPanel({
+        prompt: el.getAttribute('data-agen-prompt'),
+        model: el.getAttribute('data-agen-model') || '',
+        kirim: el.getAttribute('data-agen-kirim') !== 'false'
+      });
+    });
 
     window.agenPanelMuatUlang = muat;
 

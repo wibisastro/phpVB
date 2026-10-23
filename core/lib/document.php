@@ -414,7 +414,9 @@ class document extends customException
      * Sumber: config instance
      *   <platform><agen nama="Agen Pesut" url="https://pesut.sakip.ai.id/"
      *                   login="https://pesut.sakip.ai.id/oauth/oidc/login" loginLabel="Masuk dengan beo"
-     *                   ikon="bi-robot" wajibLogin="1"/></platform>
+     *                   ikon="bi-robot" wajibLogin="1" model="asesor-sakip-ai"/></platform>
+     * `model` (opsional) = id model bawaan untuk prompt dari halaman (openAgenPanel({prompt}),
+     * data-agen-prompt) bila pemanggil tidak menyebut model sendiri.
      * Tanpa elemen <agen> atau tanpa url http(s) yang valid → [] : slot dan item dropdown mati.
      * Itu default untuk 633 portal — memunculkan agen harus tindakan sadar per instance.
      * wajibLogin bawaan TRUE (tombol agen hanya untuk yang sudah login portal).
@@ -439,6 +441,7 @@ class document extends customException
         $nama = $attr('nama') !== '' ? $attr('nama') : 'Agen';
         $ikon = preg_match('/^[a-z0-9 _-]+$/i', $attr('ikon')) ? $attr('ikon') : 'bi-robot';
         $wajib = strtolower($attr('wajibLogin'));
+        $model = preg_match('/^[A-Za-z0-9._:-]{1,128}$/', $attr('model')) ? $attr('model') : '';
 
         return [
             'nama' => $nama,
@@ -448,6 +451,7 @@ class document extends customException
             'tombol' => $attr('tombol') !== '' ? $attr('tombol') : "Tanya {$nama}",
             'ikon' => $ikon,
             'wajibLogin' => $wajib === '' ? true : !in_array($wajib, ['0', 'false', 'tidak', 'no'], true),
+            'model' => $model,
         ];
     }
 
