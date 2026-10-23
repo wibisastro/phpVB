@@ -76,10 +76,17 @@
       /* Slot kancil butuh ruang lebih lebar dari offcanvas default (400px) */
       #sidePanelOffcanvas.sidepanel-wide { width: min(50vw, 960px); min-width: 480px; }
       @media (max-width: 767.98px) { #sidePanelOffcanvas.sidepanel-wide { width: 100vw; min-width: 0; } }
+      /* Slot agen (Pesut dst.): lebar SAMA dengan panel agen tema sarab (#agenPanelOffcanvas).
+         !important supaya tidak kalah dari aturan lebar offcanvas di CSS tema/overlay venue. */
+      #sidePanelOffcanvas.sidepanel-agen { width: min(50vw, 960px) !important; min-width: 480px !important; }
+      @media (max-width: 767.98px) { #sidePanelOffcanvas.sidepanel-agen { width: 100vw !important; min-width: 0 !important; } }
     </style>
     <div class="offcanvas offcanvas-end" tabindex="-1" id="sidePanelOffcanvas" aria-labelledby="sidePanelLabel">
       <div class="offcanvas-header border-bottom py-2">
         <h6 class="offcanvas-title fw-semibold mb-0" id="sidePanelLabel"></h6>
+        {# Muat ulang iframe slot agen — hanya tampil saat view agen (diatur openSidePanel) #}
+        <button type="button" id="sidePanelAgenReload" class="btn btn-sm btn-outline-secondary ms-auto me-2" style="display:none"
+                onclick="agenPanelMuatUlang()" title="Muat ulang panel agen" aria-label="Muat ulang panel agen"><i class="bi bi-arrow-clockwise"></i></button>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="offcanvas-body p-0">
@@ -144,17 +151,12 @@
            (Agen Pesut/OWUI, dst.). Kontrak data `agenPanel` SAMA dengan sarab/agenPanel.html:
            {nama, url, loginUrl, loginLabel, tombol, ikon, wajibLogin}. Default dari config
            instance <platform><agen …/> (document::agenPanelConfig); app boleh override lewat
-           $doc->body('agenPanel', …). Login lewat popup, TIDAK PERNAH di dalam iframe (IdP
-           menolak di-frame, pola gov2:Pola_Login_Popup_Iframe). Iframe baru diisi saat panel
-           dibuka (openSidePanel('agen') / openAgenPanel()). #}
-        <div id="sidePanel-agen" class="h-100 d-flex flex-column" style="display:none"
-             data-agen-url="{{ agenPanel.url }}" data-agen-login="{{ agenPanel.loginUrl|default('') }}">
-          <div id="sidePanelAgenBar" class="border-bottom px-3 py-1 d-flex justify-content-end gap-1" style="flex:0 0 auto">
-            {% if agenPanel.loginUrl|default('') %}
-            <a id="sidePanelAgenMasuk" class="btn btn-sm btn-outline-primary" href="{{ agenPanel.loginUrl }}" target="_blank" rel="noopener"><i class="bi bi-box-arrow-in-right me-1"></i>{{ agenPanel.loginLabel|default('Masuk') }}</a>
-            {% endif %}
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="agenPanelMuatUlang()" title="Muat ulang panel" aria-label="Muat ulang panel"><i class="bi bi-arrow-clockwise"></i></button>
-          </div>
+           $doc->body('agenPanel', …). Tanpa tombol masuk di sini (keputusan Wibi 23 Okt 2026):
+           pengguna portal sudah ber-SSO beo, dan login agen (bila perlu) dilakukan di host agen
+           sendiri atau lewat panel agen landing; iframe dimuat ulang dengan tombol ↻ di kepala
+           offcanvas. Login TIDAK PERNAH di dalam iframe (IdP menolak di-frame). Iframe baru
+           diisi saat panel dibuka (openSidePanel('agen') / openAgenPanel()); lebar = tema sarab. #}
+        <div id="sidePanel-agen" class="h-100 d-flex flex-column" style="display:none" data-agen-url="{{ agenPanel.url }}">
           <iframe id="sidePanelAgenFrame" data-src="{{ agenPanel.url }}" title="{{ agenPanel.nama|default('Agen') }}"
                   style="border:0; width:100%; flex:1 1 auto; min-height:0"
                   allow="clipboard-read; clipboard-write"></iframe>
@@ -241,10 +243,13 @@
     // Agen: iframe baru diisi saat pertama dibuka (lazy), lalu dibiarkan hidup
     // supaya chat tidak hilang tiap panel ditutup-buka.
     if (view === 'agen') { agenEnsureLoaded(); }
+    var reload = document.getElementById('sidePanelAgenReload');
+    if (reload) { reload.style.display = (view === 'agen') ? '' : 'none'; }
     // Open offcanvas
     var panel = document.getElementById('sidePanelOffcanvas');
     if (panel) {
-      panel.classList.toggle('sidepanel-wide', view === 'kancil' || view === 'agen');
+      panel.classList.toggle('sidepanel-wide', view === 'kancil');
+      panel.classList.toggle('sidepanel-agen', view === 'agen');   // lebar = panel agen sarab
       var bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(panel);
       bsOffcanvas.show();
     }
@@ -268,16 +273,6 @@
     window.openSidePanel('agen');
     return true;
   };
-  (function() {
-    var masuk = document.getElementById('sidePanelAgenMasuk');
-    if (!masuk) { return; }
-    masuk.addEventListener('click', function(ev) {
-      var w = window.open(masuk.href, 'agen-login', 'width=520,height=720');
-      if (!w) { return; }   // popup diblokir → biarkan tautan membuka tab baru (target=_blank)
-      ev.preventDefault();
-      var t = setInterval(function() { if (w.closed) { clearInterval(t); window.agenPanelMuatUlang(); } }, 800);
-    });
-  })();
 
   window.openFilterPanel = function (cfg) {
     cfg = cfg || {};

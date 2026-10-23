@@ -42,7 +42,8 @@ class SidePanelAgenTemplateTest extends TestCase
             foreach ([
                 'id="sidePanel-agen"',
                 'id="sidePanelAgenFrame"',
-                'id="sidePanelAgenBar"',
+                'id="sidePanelAgenReload"',
+                '#sidePanelOffcanvas.sidepanel-agen { width: min(50vw, 960px) !important;',
                 'window.openAgenPanel',
                 'window.agenPanelMuatUlang',
                 'data-src="{{ agenPanel.url }}"',
@@ -65,26 +66,38 @@ class SidePanelAgenTemplateTest extends TestCase
         }
     }
 
-    public function testLoginLewatPopupBukanDiDalamIframe(): void
+    public function testIframeLazyTanpaTombolMasukDanSelebarSarab(): void
     {
+        // Keputusan Wibi 23 Okt 2026: tidak ada tombol "Masuk" di panel agen cube (pengguna portal
+        // sudah ber-SSO beo); muat ulang lewat tombol di kepala offcanvas; lebar = panel agen sarab.
+        $sarab = (string) file_get_contents(__DIR__ . '/../../../core/template/sarab/agenPanel.html');
+        $this->assertMatchesRegularExpression('/#agenPanelOffcanvas \{ width: min\(50vw, 960px\); min-width: 480px; \}/', $sarab);
         foreach ($this->bodies(self::LAYOUTS) as $name => $html) {
             $this->assertDoesNotMatchRegularExpression(
                 '/<iframe id="sidePanelAgenFrame"[^>]*\ssrc="/',
                 $html,
                 "layout {$name}: iframe agen tidak boleh punya src statis (lazy saat panel dibuka)"
             );
-            $this->assertMatchesRegularExpression(
-                '/id="sidePanelAgenMasuk"[^>]*target="_blank"/',
-                $html,
-                "layout {$name}: tombol masuk agen harus target=_blank"
-            );
-            $this->assertStringContainsString("window.open(masuk.href, 'agen-login'", $html, "layout {$name}: login agen harus lewat popup");
+            $this->assertStringNotContainsString('sidePanelAgenMasuk', $html, "layout {$name}: panel agen cube tidak boleh punya tombol masuk");
+            $this->assertStringNotContainsString('agenPanel.loginUrl', $html, "layout {$name}: loginUrl tidak dipakai di cube");
             $this->assertMatchesRegularExpression(
                 '/if \(view === \x27agen\x27\) \{ agenEnsureLoaded\(\); \}/',
                 $html,
                 "layout {$name}: openSidePanel(\x27agen\x27) harus mengisi iframe"
             );
-            $this->assertStringContainsString("view === 'kancil' || view === 'agen'", $html, "layout {$name}: slot agen harus memakai lebar sidepanel-wide");
+            $this->assertStringContainsString("panel.classList.toggle('sidepanel-agen', view === 'agen')", $html, "layout {$name}: lebar khusus agen tidak di-toggle");
+            $this->assertStringContainsString("panel.classList.toggle('sidepanel-wide', view === 'kancil')", $html, "layout {$name}: lebar kancil berubah");
+            $this->assertMatchesRegularExpression(
+                '/#sidePanelOffcanvas\.sidepanel-agen \{ width: min\(50vw, 960px\) !important; min-width: 480px !important; \}/',
+                $html,
+                "layout {$name}: lebar slot agen harus sama dengan sarab (min(50vw, 960px), min 480px)"
+            );
+            $this->assertMatchesRegularExpression(
+                '/id="sidePanelAgenReload"[^>]*onclick="agenPanelMuatUlang\(\)"/',
+                $html,
+                "layout {$name}: tombol muat ulang agen di kepala offcanvas hilang"
+            );
+            $this->assertStringContainsString("reload.style.display = (view === 'agen') ? '' : 'none'", $html, "layout {$name}: tombol muat ulang harus hanya tampil di view agen");
         }
     }
 
