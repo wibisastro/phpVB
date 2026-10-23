@@ -72,22 +72,18 @@
       <!-- Main container ends -->
 
 <!-- Side Panel Offcanvas starts -->
-    <style>
-      /* Slot kancil butuh ruang lebih lebar dari offcanvas default (400px) */
-      #sidePanelOffcanvas.sidepanel-wide { width: min(50vw, 960px); min-width: 480px; }
-      @media (max-width: 767.98px) { #sidePanelOffcanvas.sidepanel-wide { width: 100vw; min-width: 0; } }
-      /* Slot agen (Pesut dst.): lebar SAMA dengan panel agen tema sarab (#agenPanelOffcanvas).
-         !important supaya tidak kalah dari aturan lebar offcanvas di CSS tema/overlay venue. */
-      #sidePanelOffcanvas.sidepanel-agen { width: min(50vw, 960px) !important; min-width: 480px !important; }
-      @media (max-width: 767.98px) { #sidePanelOffcanvas.sidepanel-agen { width: 100vw !important; min-width: 0 !important; } }
-    </style>
+    {# CSS sidepanel ada di LUAR #app (lihat setelah "Page wrapper ends"): Vue 3 membuang tag
+       <style> di dalam template yang di-mount, sehingga aturan lebar di sini tidak pernah berlaku. #}
     <div class="offcanvas offcanvas-end" tabindex="-1" id="sidePanelOffcanvas" aria-labelledby="sidePanelLabel">
       <div class="offcanvas-header border-bottom py-2">
         <h6 class="offcanvas-title fw-semibold mb-0" id="sidePanelLabel"></h6>
-        {# Muat ulang iframe slot agen — hanya tampil saat view agen (diatur openSidePanel) #}
-        <button type="button" id="sidePanelAgenReload" class="btn btn-sm btn-outline-secondary ms-auto me-2" style="display:none"
-                onclick="agenPanelMuatUlang()" title="Muat ulang panel agen" aria-label="Muat ulang panel agen"><i class="bi bi-arrow-clockwise"></i></button>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        {# Tombol kanan dibungkus satu wadah ms-auto: kalau ↻ dan btn-close sama-sama margin-left:auto,
+           sisa ruang terbagi dua dan ↻ jatuh di tengah. ↻ hanya tampil saat view agen. #}
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <button type="button" id="sidePanelAgenReload" class="btn btn-sm btn-outline-secondary" style="display:none"
+                  onclick="agenPanelMuatUlang()" title="Muat ulang panel agen" aria-label="Muat ulang panel agen"><i class="bi bi-arrow-clockwise"></i></button>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
       </div>
       <div class="offcanvas-body p-0">
         <div id="sidePanel-wilayah" style="display:none">
@@ -120,7 +116,7 @@
            dimuat di dalam iframe — sebelum src diisi, sesi diperiksa lewat fetch
            (kancilProbe); tanpa sesi, panel menampilkan tombol "Masuk ke Kancil"
            yang membuka tab baru. Lihat rencana/sidepanel-kancil-iframe.md #}
-        <div id="sidePanel-kancil" class="h-100 d-flex flex-column" style="display:none"
+        <div id="sidePanel-kancil" class="h-100 d-flex flex-column d-none" style="display:none"
              data-kancil-url="{{ kancilUrl }}" data-kancil-dir="{{ kancilDir }}" data-kancil-b64="{{ kancilB64 }}">
           {# Strip konteks: diisi window.openKancilPanel({contextLabel, prompts}).
              Chip = kirim langsung ke sesi kancil lewat kancilAsk(); salin = aksi sekunder. #}
@@ -157,7 +153,7 @@
            OWUI) mencegat klik di iframe, membuka popup, lalu memberi sinyal dan iframe memuat
            ulang sendiri. Tombol ↻ di kepala offcanvas hanya cadangan. Iframe baru diisi saat panel
            dibuka (openSidePanel('agen') / openAgenPanel()); lebar = tema sarab. #}
-        <div id="sidePanel-agen" class="h-100 d-flex flex-column" style="display:none" data-agen-url="{{ agenPanel.url }}">
+        <div id="sidePanel-agen" class="h-100 d-flex flex-column d-none" style="display:none" data-agen-url="{{ agenPanel.url }}">
           <iframe id="sidePanelAgenFrame" data-src="{{ agenPanel.url }}" title="{{ agenPanel.nama|default('Agen') }}"
                   style="border:0; width:100%; flex:1 1 auto; min-height:0"
                   allow="clipboard-read; clipboard-write"></iframe>
@@ -169,6 +165,17 @@
 
     </div>
     <!-- Page wrapper ends -->
+
+    {# Sengaja di luar <div id="app">: Vue 3 membuang <style> di dalam template yang di-mount. #}
+    <style>
+      /* Slot kancil butuh ruang lebih lebar dari offcanvas default (400px) */
+      #sidePanelOffcanvas.sidepanel-wide { width: min(50vw, 960px); min-width: 480px; }
+      @media (max-width: 767.98px) { #sidePanelOffcanvas.sidepanel-wide { width: 100vw; min-width: 0; } }
+      /* Slot agen (Pesut dst.): lebar SAMA dengan panel agen tema sarab (#agenPanelOffcanvas).
+         !important supaya tidak kalah dari aturan lebar offcanvas di CSS tema/overlay venue. */
+      #sidePanelOffcanvas.sidepanel-agen { width: min(50vw, 960px) !important; min-width: 480px !important; }
+      @media (max-width: 767.98px) { #sidePanelOffcanvas.sidepanel-agen { width: 100vw !important; min-width: 0 !important; } }
+    </style>
 
 <script>
   if (window.localStorage && localStorage.getItem('sidebarToggled') === 'true') {
@@ -225,9 +232,14 @@
     };
     // Toggle panels via DOM
     var views = ['wilayah', 'instansi', 'pengaturan', 'filter', 'chat', 'kancil', 'agen'];
+    // d-none ikut di-toggle: slot ber-kelas d-flex (kancil, agen) bernilai display:flex !important
+    // sehingga style.display='none' saja kalah dan slot itu ikut tampil di view lain.
     views.forEach(function(v) {
       var el = document.getElementById('sidePanel-' + v);
-      if (el) { el.style.display = (v === view) ? '' : 'none'; }
+      if (el) {
+        el.style.display = (v === view) ? '' : 'none';
+        el.classList.toggle('d-none', v !== view);
+      }
     });
     // Update title
     var label = document.getElementById('sidePanelLabel');

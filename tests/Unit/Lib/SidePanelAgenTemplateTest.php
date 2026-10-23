@@ -101,6 +101,35 @@ class SidePanelAgenTemplateTest extends TestCase
         }
     }
 
+    public function testCssSidepanelDiLuarAkarVueDanSlotTersembunyiBenar(): void
+    {
+        // Regresi 23 Okt 2026 (#11099): (1) <style> di dalam <div id="app"> dibuang Vue 3 saat mount,
+        // lebar slot tidak pernah berlaku; (2) d-flex (display:flex !important) mengalahkan
+        // style display:none, slot agen ikut tampil di view Pengaturan; (3) ↻ jatuh di tengah header.
+        foreach ($this->bodies(self::LAYOUTS) as $name => $html) {
+            $posAppEnd = strpos($html, '<!-- Page wrapper ends -->');
+            $posCss = strpos($html, '#sidePanelOffcanvas.sidepanel-agen {');
+            $this->assertIsInt($posAppEnd);
+            $this->assertIsInt($posCss);
+            $this->assertGreaterThan($posAppEnd, $posCss, "layout {$name}: CSS sidepanel harus di luar <div id=\"app\">");
+            $this->assertGreaterThan($posAppEnd, (int) strpos($html, '#sidePanelOffcanvas.sidepanel-wide {'), "layout {$name}: CSS kancil harus di luar #app");
+            foreach (['sidePanel-agen', 'sidePanel-kancil'] as $id) {
+                $this->assertMatchesRegularExpression(
+                    '/<div id="' . $id . '" class="[^"]*\bd-none\b[^"]*"/',
+                    $html,
+                    "layout {$name}: {$id} ber-d-flex harus mulai dengan d-none"
+                );
+            }
+            $this->assertStringContainsString("el.classList.toggle('d-none', v !== view);", $html, "layout {$name}: openSidePanel harus men-toggle d-none");
+            $this->assertMatchesRegularExpression(
+                '/<div class="ms-auto d-flex align-items-center gap-2">\s*<button type="button" id="sidePanelAgenReload"[^>]*>.*?<\/button>\s*<button type="button" class="btn-close"/s',
+                $html,
+                "layout {$name}: ↻ dan tombol tutup harus satu wadah ms-auto (mepet kanan)"
+            );
+            $this->assertDoesNotMatchRegularExpression('/id="sidePanelAgenReload" class="[^"]*ms-auto/', $html, "layout {$name}: ↻ tidak boleh ms-auto sendiri");
+        }
+    }
+
     public function testItemDropdownProfilDiKeduaHeader(): void
     {
         // Pemicu = item di dropdown profil, di sebelah item Kancil (keputusan Wibi 23 Okt 2026);
