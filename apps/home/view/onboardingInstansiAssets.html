@@ -1,0 +1,72 @@
+<!-- Onboarding instansi — style + script untuk fragmen onboardingInstansi.html (app home phpVB).
+     Di-include via $self->externalJS('onboardingInstansiAssets.html'): dirender di luar #app
+     (Vue 3 membuang <style>/<script> dalam template yang di-mount). Warna lewat token --bs-*
+     supaya ikut tema gelap. Port dari aisakip b889d9f (Lebah #11107). -->
+<style>
+  /* ---------------------------------------------------------------
+     Komponen "tahap" = port vanilla dari form-wizard#3 (Dotted Round)
+     vendor SmartWizard (jQuery) TIDAK dipakai; hanya nav-nya yang
+     diambil, warna lewat token --bs-* supaya tahan tema gelap.
+     --------------------------------------------------------------- */
+  .onboarding-instansi .tahap > .nav {
+    display: flex; flex-wrap: nowrap; list-style: none; position: relative;
+    justify-content: space-between; padding: .5rem 0; margin: 0 0 1.25rem;
+  }
+  .onboarding-instansi .tahap > .nav::before {
+    content: ""; position: absolute; top: calc(.5rem + 1.875rem); left: 6%; width: 88%;
+    height: 3px; background: var(--bs-border-color); border-radius: 2px;
+  }
+  .onboarding-instansi .tahap > .nav .nav-item { flex: 1 1 0; min-width: 0; }
+  .onboarding-instansi .tahap > .nav .nav-link {
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: .35rem;
+    position: relative; width: 100%; padding: .5rem .25rem; border: 0; background: transparent;
+    color: var(--bs-secondary-color); font-weight: 500; font-size: .9rem; border-radius: .5rem;
+    transition: color .3s ease, background .3s ease;
+  }
+  .onboarding-instansi .tahap > .nav .nav-link:hover { background: var(--bs-tertiary-bg); color: var(--bs-body-color); }
+  .onboarding-instansi .tahap > .nav .nav-link > .num {
+    display: flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem;
+    border-radius: 50%; font-weight: 600; font-size: 1rem; z-index: 1;
+    background: var(--bs-border-color); color: var(--bs-body-color);
+    box-shadow: 0 0 0 .35rem var(--bs-body-bg); transition: all .3s ease;
+  }
+  .onboarding-instansi .tahap > .nav .nav-link > .num > i { font-size: 1.15rem; }
+  .onboarding-instansi .tahap > .nav .nav-link.active { color: var(--bs-primary); }
+  .onboarding-instansi .tahap > .nav .nav-link.active > .num {
+    background: var(--bs-primary); color: #fff; transform: scale(1.12);
+    box-shadow: 0 0 0 .35rem var(--bs-body-bg), 0 2px 8px rgba(0,0,0,.2);
+  }
+  .onboarding-instansi .tahap > .nav .nav-link.done { color: var(--bs-success); }
+  .onboarding-instansi .tahap > .nav .nav-link.done > .num { background: var(--bs-success); color: #fff; }
+  .onboarding-instansi .tahap > .nav .nav-link.blocked { color: var(--bs-danger); }
+  .onboarding-instansi .tahap > .nav .nav-link.blocked > .num { background: var(--bs-danger); color: #fff; }
+  .onboarding-instansi .tahap > .nav .nav-link > small { font-weight: 400; font-size: .75rem; color: var(--bs-secondary-color); }
+  @media (max-width: 767.98px) {
+    .onboarding-instansi .tahap > .nav { flex-direction: column; gap: .25rem; }
+    .onboarding-instansi .tahap > .nav::before { top: 0; left: calc(1.375rem - 1.5px); width: 3px; height: 100%; }
+    .onboarding-instansi .tahap > .nav .nav-link { flex-direction: row; text-align: left; gap: .75rem; }
+  }
+  /* kartu rincian yang sedang disorot stepper */
+  .onboarding-instansi .kartu-tahap { transition: box-shadow .3s ease, border-color .3s ease; scroll-margin-top: 1rem; }
+  .onboarding-instansi .kartu-tahap.sorot { border-color: var(--bs-primary); box-shadow: 0 0 0 .2rem rgba(var(--bs-primary-rgb), .2); }
+  /* diagram cabang keputusan */
+  .onboarding-instansi .cabang-panah { font-size: 1.75rem; color: var(--bs-secondary-color); line-height: 1; }
+</style>
+
+<script>
+// Stepper onboarding → sorot kartu rincian. Delegasi di document supaya tetap
+// hidup walau Vue 3 me-render ulang isi #app setelah mount.
+(function () {
+  if (!document.querySelector('.onboarding-instansi')) return;
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest('.onboarding-instansi #stepper .nav-link');
+    if (!b) return;
+    var root = b.closest('.onboarding-instansi');
+    root.querySelectorAll('#stepper .nav-link').forEach(function (x) { x.classList.remove('active'); });
+    b.classList.add('active');
+    root.querySelectorAll('.kartu-tahap').forEach(function (k) { k.classList.remove('sorot'); });
+    var k = root.querySelector('#tahap-' + b.getAttribute('data-tahap'));
+    if (k) { k.classList.add('sorot'); k.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+  });
+})();
+</script>

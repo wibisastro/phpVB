@@ -3,3 +3,9 @@
     {{ readMD|raw }}
   </div>
 </div>
+
+{# Onboarding instansi (Lebah #11107) — bagian "Cara Instansi Pemerintah
+   Bergabung" sudah pindah ke fragmen ini; md/index.md hanya punya penunjuk
+   #bergabung. Style+script via externalJS di luar #app (Vue 3 strip tag
+   dalam template yang di-mount). #}
+{% include('@home/onboardingInstansi.html') %}

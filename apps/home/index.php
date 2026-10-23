@@ -10,6 +10,8 @@ class index {
         $self->take("components","gov2nav", "setDefaultNav", "dashboard.xml");
         $doc->body("pageTitle",'Home Page');
         $doc->body("readMD");
+        // Onboarding instansi (stepper 5 tahap, Lebah #11107) — style+script di luar #app.
+        $self->externalJS('onboardingInstansiAssets.html');
         $self->content();
     }
 

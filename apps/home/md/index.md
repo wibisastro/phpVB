@@ -91,16 +91,9 @@ Yang di-graduate adalah **hasilnya**, bukan sandbox-nya. Ruang eksperimen tetap 
 
 ## Cara Instansi Pemerintah Bergabung
 
-Onboarding dirancang serupa pendaftaran layanan cloud — tanpa proses seleksi, tanpa MoU formal di awal:
+Onboarding dirancang serupa pendaftaran layanan cloud — tanpa proses seleksi, tanpa MoU formal di awal. **Daftar mandiri lima tahap: masuk akun SSO Beo, pilih instansi, verifikasi nama otomatis di situs resmi, portal aktif, lalu mulai eksperimen layanan pertama.** Tidak ada biaya selama fase sandbox dan tidak ada kewajiban graduasi pada timeline tertentu — instansi bergerak sesuai kesiapannya sendiri.
 
-1. **Ajukan permohonan onboarding** — kirim email ke kontak di bawah dengan: nama instansi, kode wilayah/K/L, dan satu liaison teknis (boleh ASN, boleh tenaga ahli)
-2. **Verifikasi instansi** — Tim Gov3 memvalidasi bahwa permohonan berasal dari unit kerja resmi (cek SOTK / surat penunjukan liaison)
-3. **Subdomain aktif** — dalam 1×24 jam, instansi mendapat `[instansi].gov3.id` lengkap dengan endpoint `mcp.`, `dav.`, `auth.`, `sql.`, `kms.`, `pnbp.` (lihat [`/sandbox`](/sandbox) untuk detail prefix)
-4. **Onboarding kit** — akses ke dokumentasi, criteria catalog, workflow template, dan jalur dukungan teknis (chat Merpati)
-5. **Eksperimen layanan pertama** — biasanya SAKIP AI sebagai entry point, atau layanan lain yang relevan dengan tugas pokok instansi
-6. **Maturity tracking dimulai** — posisi instansi di **Gov 3 Maturity Index** (Gov 3.1 — eksperimen awal hingga Gov 3.9 — institusionalisasi normatif) dipantau berbasis evidence, bukan klaim
-
-Tidak ada biaya selama fase sandbox. Tidak ada kewajiban graduasi pada timeline tertentu. Instansi bergerak sesuai kesiapannya sendiri.
+Rincian lengkap tiap tahap, dua syarat verifikasi otomatis, dan jalur alternatif email resmi ada di bagian **[Cara Instansi Pemerintah Bergabung](#bergabung)** di bawah manifesto ini.
 
 ---
 
