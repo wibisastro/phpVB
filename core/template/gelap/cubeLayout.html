@@ -151,11 +151,12 @@
            (Agen Pesut/OWUI, dst.). Kontrak data `agenPanel` SAMA dengan sarab/agenPanel.html:
            {nama, url, loginUrl, loginLabel, tombol, ikon, wajibLogin}. Default dari config
            instance <platform><agen …/> (document::agenPanelConfig); app boleh override lewat
-           $doc->body('agenPanel', …). Tanpa tombol masuk di sini (keputusan Wibi 23 Okt 2026):
-           pengguna portal sudah ber-SSO beo, dan login agen (bila perlu) dilakukan di host agen
-           sendiri atau lewat panel agen landing; iframe dimuat ulang dengan tombol ↻ di kepala
-           offcanvas. Login TIDAK PERNAH di dalam iframe (IdP menolak di-frame). Iframe baru
-           diisi saat panel dibuka (openSidePanel('agen') / openAgenPanel()); lebar = tema sarab. #}
+           $doc->body('agenPanel', …). Tanpa tombol masuk di sini (keputusan Wibi 22–23 Okt 2026):
+           aplikasi di dalam iframe menangani login-nya sendiri lewat pola popup
+           (gov2:Pola_Login_Popup_Iframe) — mis. kartu beo di halaman login Agen Pesut (loader.js
+           OWUI) mencegat klik di iframe, membuka popup, lalu memberi sinyal dan iframe memuat
+           ulang sendiri. Tombol ↻ di kepala offcanvas hanya cadangan. Iframe baru diisi saat panel
+           dibuka (openSidePanel('agen') / openAgenPanel()); lebar = tema sarab. #}
         <div id="sidePanel-agen" class="h-100 d-flex flex-column" style="display:none" data-agen-url="{{ agenPanel.url }}">
           <iframe id="sidePanelAgenFrame" data-src="{{ agenPanel.url }}" title="{{ agenPanel.nama|default('Agen') }}"
                   style="border:0; width:100%; flex:1 1 auto; min-height:0"
